@@ -1,0 +1,470 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  
+  font-family: Poppins;
+  line-height: 1;
+  border-color:#e5e7eb;
+
+  
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+ 
+  --admin-color: transparent;
+  --map-color:#F0E483;
+  --map-color:white;
+  --primary-color: #F6FFF8; /* Soft, light green for background */
+  --secondary-color: #6B9080; /* Muted green for main elements */
+  --main-color: green;
+  --tertiary-color: #CAD2C5; /* Light, fresh green for accents */
+  --quaternary-color: #CCE3DE; /* Very light green for highlights */
+  --accent-color: #EAF4F4; /* Soft, light cyan for emphasis */
+  --second-accent-color: #84A98C;
+  --background-gradient-start:rgba(107, 144, 128, 0.7); ; /* Light background gradient start */
+  --background-gradient-end: rgba(0, 0, 0, 0.6); /* Light background gradient end */
+  --card-background: rgba(107, 144, 128, 0.7); /* Frosted muted green */
+  --card-background: transparent /* Frosted muted green */
+  --location-line-color: var(--card-background);
+  --text-color: whitesmoke; /* Muted green for text */
+  --hover-color: #A4C3B2; /* Light fresh green for hover */
+  --icon-color: #6B9080; /* Matches muted green for icons */
+  --icon-hover-color: #CCE3DE; /* Very light green for icon hover */
+  --dark: rgb(4, 72, 41);
+  --khaki: khaki;
+  --toggle-container-dark-gradient: linear-gradient(to left, var(--primary-color), var(--tertiary-color));
+  --background: linear-gradient(to bottom, rgba(47, 62, 70, 0.9), rgba(84, 169, 140, 0.7)), 
+  
+  url('https://gitgregoryjones.github.io/WaterWatchPro/Crew.jpeg') no-repeat center center/cover;
+  --favorite-color:red;
+
+}
+
+.highlight {
+  background-color: var(--hover-color);
+}
+
+.cardBackground {
+      
+  background-color: var(--card-background);
+  /* padding: 20px; */
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--text-color);
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+--display: flex;
+  --place-items: center;
+ --min-width: 320px;
+  --min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.card-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  grid-template-areas: 
+      "header header header header" 
+      "full-line full-line full-line full-line"
+      "content content content content"
+      "footer footer footer footer"
+     ;
+     
+   
+   
+  
+      
+  
+  
+  .header {
+      
+      grid-area: header;
+  }
+  
+  .content {
+  
+      grid-area: content;
+      
+  }
+  
+  .footer {
+      grid-area:footer;
+      --border: 1px solid black;
+      
+  }
+  
+
+              
+}
+
+
+.big-card {
+  grid-column: 1/3;
+  --border:1px solid black;
+  display:flex;
+  justify-content:space-around;
+  --background-color:var(--map-color);
+  gap:1rem;
+  Card {
+      display:flex;
+      flex:1;
+      flex-direction:column;
+  }
+
+.g {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  border:1px solid black;
+  gap:1rem;
+  padding:1.5rem;
+  grid-template-areas: 
+  "header header" 
+  "footer footer footer";
+
+  
+  .card {
+      border:1px solid black;
+      --height:20rem;
+      border-radius:1rem;
+      padding:1rem;
+      text-align:center;
+      
+      
+      h1 {
+          text-align:left;
+          padding-left:1.5rem;
+          font-size:large;
+          
+          
+      }
+      
+      CardContent {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          grid-template-rows: auto;
+          grid-template-areas: 
+              "header header header header" 
+              "full-line full-line full-line full-line"
+              "content content content content"
+              "footer footer footer footer"
+             ;
+             
+           
+           
+          
+              
+          --border:1px solid black;
+          
+          .header {
+              
+              grid-area: header;
+          }
+          
+          .content {
+          
+              grid-area: content;
+              
+          }
+          
+          .footer {
+              grid-area:footer;
+              --border: 1px solid black;
+              
+          }
+          
+        
+                      
+      }
+      
+      
+  }
+
+  
+  
+   .line {
+              grid-area: full-line;
+          }
+  
+  .cardBackground {
+      
+      background-color: var(--card-background);
+      /* padding: 20px; */
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--text-color);
+  }
+}
+
+container {
+  display:flex;
+  flex-direction:column;
+  margin:auto;
+  font-size:.9rem;
+
+}
+
+/* */
+.rainfall-controls {
+  display:flex;
+  justify-content:space-around;
+  margin:1rem;
+}
+
+
+
+PillSwap {
+  
+  --border:1px solid var(--highlight-color);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  margin-top:1rem;
+  --padding:1rem;
+  border-radius:1rem;
+  margin:auto;
+  max-width:80%;
+  display:flex;
+  justify-content:space-between;
+  overflow:hidden;
+  
+  
+  
+  
+  pill {
+     background-color:var(--main-color);
+      width:100%;
+      color:var(--text-color);
+      padding-top:.25rem;
+      padding-bottom:.25rem;
+      transition: all .3s ease-in-out;
+      border: none;
+      opacity: .15;
+      cursor:pointer;
+  }
+}
+
+Location {
+  
+ display:flex;
+ justify-content:space-around;
+ align-items:center;
+ 
+ 
+  
+}
+
+  
+  .location-list {
+      gap:.5rem;
+  }
+  
+  .location-list > Location {
+      
+      background:#706E5F;
+      border:unset;
+      border-radius:.25rem;
+      --clip-path: polygon(0 50%, 100% 100%, 100% 0);
+      div:not(:first-child) {
+          display:none;
+      }
+  }
+}
+
+.location-list {
+  grid-column: 1/5;
+  overflow:scroll;
+  height:15rem;
+  max-height:15rem;
+  margin-top:1rem;
+ -border:1px solid var(--text-color);
+ --border-radius:1rem;
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+  
+ 
+ Location {
+     background:linear-gradient(to right, #5fa052, var(--card-background));
+     border: 1px solid var(--location-line-color);
+     padding-top:1rem;
+     padding-bottom:1rem;
+     opacity:1;
+     color: var(--text-color);
+     div {
+         flex:1;
+     }
+     .name {
+         flex:2;
+         align-self:start;
+         
+     }
+     
+     &:hover {
+         opacity:1;
+         color:white;
+         background:var(--main-color);
+     }
+     
+     &:active {
+         opacity:1;
+         color:white;
+         background: var(--main-color);
+     }
+ } 
+ 
+
+}
+
+.location-controls {
+  flex-direction:row;
+  display:flex;
+  .fa-trash {
+      color:red;
+  }
+}
+
+.inactiveTab {
+  --border-bottom: 4px solid var(--text-color);
+}
+
+.active, .activeTab, a:visited {
+  background-color:var(--main-color) !important;
+  opacity:1;
+  --font-weight:bold;
+  --border-bottom: 0px solid transparent;
+ --border-top: 4px solid var(--text-color);
+ --border-left: 4px solid var(--text-color);
+ --border-right: 4px solid var(--text-color);
+}
+
+.tabContent {
+    --min-height: 60vh;
+}
+
+.activeTabContent {
+  display:block;
+
+}
+
+.inactiveTabContent {
+  display:none;
+}
+
+
+
+.pill:last-child:after {
+  content: "★";
+  color:gold;
+  padding-left:.25rem;
+}
+
+/* Default Style to Show and Hide Pills */
+.pill-show {
+  display: block;
+}
+
+.pill-hide {
+  display: none;
+}
+
+
+header {
+  display:flex;
+  justify-content:center;
+  
+  min-height:100;
+  margin-bottom:1rem;
+  padding-top:1rem;
+  
+}
+
+
+.forecastCards {
+  margin:auto;
+  padding:.25rem;
+  color: var(--text-color);
+  font-weight:700;
+  min-width:5rem;
+  min-height:6rem;
+  text-transform:uppercase;
+  font-size:1rem;
+}
+
+
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+
+  /** Move to styled components **/
+  
+}
+
+@media(max-width:600px){
+  
+  * {
+      --font-size:1rem;
+  }
+  
+  .g {
+      grid-template-columns:1fr
+  }
+  container {
+      padding:unset;
+  }
+  
+  .big-card {
+      grid-column: 1/2;
+  }
+  
+  
+}

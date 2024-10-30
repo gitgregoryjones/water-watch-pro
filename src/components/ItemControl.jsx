@@ -116,6 +116,7 @@ const FavoriteButton = styled.button`
 const ItemControl = ({
   collectionList = [],
   enableMultiSelect = false,
+  showFavoriteControls = true,
   onItemClicked,
   onAddClicked,
   showAddButton = true,
@@ -125,6 +126,8 @@ const ItemControl = ({
   showSelectButton = false,
   className,
   onFavoriteClicked,
+  header,
+  showSearchBar = true
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
@@ -200,17 +203,20 @@ const ItemControl = ({
 
   return (
     <Container className={`flex flex-1 h-full w-full shadow-2xl ${className}`}>
-      <SearchBarContainer>
+      {header}
+      {showSearchBar && <SearchBarContainer>
         <SearchBar
           type="text"
           placeholder={searchPlaceholder}
           value={searchTerm}
           onChange={handleSearch}
         />
+        { showFavoriteControls &&
         <FilterIcon onClick={toggleShowFavorites} active={showFavorites}>
-          {showFavorites ? `Showing (${favorites.length}) Favorites` : "Show Favorites?"}
+          {showFavorites ? `Showing (${favorites.length}) Favorites` : "Show Favorites Only?"}
         </FilterIcon>
-      </SearchBarContainer>
+        }
+      </SearchBarContainer>}
       <div className='overflow-scroll w-full mb-4  max-h-[13rem]'>
         {Object.keys(groupedItems).map(category => (
           <Category key={category}>
@@ -226,7 +232,7 @@ const ItemControl = ({
                 onClick={() => handleItemClick(item)}
               >
                 <div className='px-4'>{item.name}</div>
-                <FavoriteButton onClick={(e) => toggleFavorite(e, item.name)}>
+                <FavoriteButton style={{visibility: !showFavoriteControls && "hidden"}} onClick={(e) => toggleFavorite(e, item.name)}>
                   {favorites.includes(item.name) ? <i className="fas fa-heart text-[--favorite-color]"></i> : <i className="far fa-heart"></i>}
                 </FavoriteButton>
               </Item>

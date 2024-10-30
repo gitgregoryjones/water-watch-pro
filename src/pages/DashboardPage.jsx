@@ -219,7 +219,7 @@ const handleChange = (event) => {
   console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
   return (
     
-    <Dashboard className='md:p-24'>
+    <Dashboard className='md:py-28'>
      
         <Card className='big-card flex flex-col md:flex-row justify-center items-center bg-[--admin-color]' >
           <CardContent>
@@ -227,7 +227,7 @@ const handleChange = (event) => {
           <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
             <div className='md:text-3xl font-bold'>Water Watch Pro Insights</div>
             <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
-            <div className='stat1 bg-[--notification] shadow border rounded p-4'>A Significant event or alert goes here...</div>
+            
             <div className='stat1 bg-[--alert] shadow border rounded p-4 '>NOA Error detected. Stay tuned...</div>
             </div>
           </div>
@@ -245,7 +245,7 @@ const handleChange = (event) => {
                 mapId={'mainMap'}
                
                 gestureHandling={'greedy'}
-                disableDefaultUI={true}
+                disableDefaultUI={false}
                 zoom={mapZoom}
                 center={mapCoords}
                 onCameraChanged={handleCameraChange}
@@ -290,7 +290,7 @@ const handleChange = (event) => {
         </div>
           </PillTabs>
             </div>
-          <div className='footer my-2 p-8 justify-around flex flex-1 text-2xl'>Currently Viewing {location.name}</div>
+         {location.location && <div className='footer my-2 p-8 justify-around flex flex-1 text-2xl'>{location.name} has a reported latitude of {location.location.lat} and a longitude of {location.location.lng}</div>}
           </CardContent>
         </Card>
   
@@ -298,7 +298,7 @@ const handleChange = (event) => {
           <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
              <div className='md:text-3xl font-bold'>Contact Management</div>
              <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
-             <div className='stat1 bg-[--notification] shadow border rounded p-4 '>{favoriteList.length} Contacts are favorited</div>
+             <div className='stat1 bg-[--notification] shadow border rounded p-4 '>{favoriteList.length} Contacts are Favorites</div>
              <div className='stat1 bg-[--alert] shadow border rounded p-4 '>3 Contacts are unassigned...</div>
              </div>
            </div>  
@@ -308,9 +308,16 @@ const handleChange = (event) => {
                 <ContactManagment contact={contact} contactList={contactList} setFavoriteList={setFavoriteList} setContact={setContact}/>
               </div>
               <div className='tab'>
-                Assign Contacts
+                Assign Locations
                 
                 <ContactAssignment unassignedList={unassignedList} deleteLocationsFromUser={deleteLocationsFromUser} addLocationsToUser={addLocationsToUser} contact={contact} assignedContact={assignedContact} setUnassignedList={setUnassignedList} setAssignedContact={setAssignedContact} contactList={contactList} />
+              </div>
+              <div className='tab'>Bulk Upload
+              <div class="cta-container border h-full  py-[10rem] border-4 rounded-2xl border-[gold] flex flex-col justify-center items-center">
+    <img src="https://img1.wsimg.com/isteam/ip/88056157-8118-4fa6-a40b-afa381a48cd5/Eye%20Words.png/:/rs=h:30" alt="Logo" class="cta-logo"/>
+    <p className="cta-text">Upgrade to the Gold Level for this feature!</p>
+</div>
+
               </div>
             </PillTabs>
             </CardContent>

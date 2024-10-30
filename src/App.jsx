@@ -20,7 +20,7 @@ function App() {
   return (
     <>
 
-      <Container>
+      <Container className="big-container">
         <Header/>
        <BrowserRouter>
       <Routes>

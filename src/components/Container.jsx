@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const Container = styled.div`
 
-    background-color: var(--secondary-color);
+    --background-color: var(--secondary-color);
     width:100vw;
     min-height:100vh;
     display:flex;
@@ -10,6 +10,7 @@ const Container = styled.div`
     justify-content:center;
     align-items:center;
     background: var(--background);
+    position:relative;
 
     
              

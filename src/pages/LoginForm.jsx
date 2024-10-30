@@ -48,7 +48,7 @@ export default function LoginForm(){
 
     return(
 
-        <FormContainer onSubmit={handleLogin}>
+        <div className='bg-[#CAD2C5] rounded-2xl '><FormContainer onSubmit={handleLogin} className='bg-[##CAD2C5]'>
             
             <img className="logo" src="https://img1.wsimg.com/isteam/ip/88056157-8118-4fa6-a40b-afa381a48cd5/Eye%20Words.png/:/rs=w:400,cg:true"/>
             <ButtonContainer>
@@ -73,6 +73,7 @@ export default function LoginForm(){
             
             
         </FormContainer>
+        </div>
     )
 }
 

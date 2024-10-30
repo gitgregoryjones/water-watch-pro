@@ -37,7 +37,7 @@
   --khaki: khaki;
   --contrast:white;
   --toggle-container-dark-gradient: linear-gradient(to left, var(--primary-color), var(--tertiary-color));
-  --background: linear-gradient(to bottom, rgba(47, 62, 70, 0.9), rgba(84, 169, 140, 0.7)), 
+  --background: linear-gradient(to left,var(--highlight-color), rgba(84, 169, 140, .5),  var(--highlight-color) ), 
   url('https://gitgregoryjones.github.io/WaterWatchPro/Crew.jpeg') no-repeat center center/cover;
   --favorite-color:red;
   --shadow: box-shadow: 0 0 50px #ccc;
@@ -46,10 +46,48 @@
 
 }
 
+input::placeholder{
+    color:black;
+}
+
 .highlight {
   background-color: var(--hover-color);
 }
 
+.big-container {
+
+   background-color: var(--highlight-color);
+
+}
+
+.big-card {
+    background-color: white !important;
+}
+
+.header, .footer {
+    color:#4CB5F5;
+    color:#6AB187;
+    text-shadow: 1px 1px black;
+    background-color: white;
+}
+
+.footer {
+    color: #4CB5F5;
+    font-weight: 700;
+    text-shadow:none;
+
+}
+
+.footer {
+    justify-content:start;
+}
+
+.card {
+    background-color: #B3C100;
+    background-color: #6AB187;
+    background-color:  whitesmoke;
+    
+}
 .cardBackground {
       
   background-color: var(--card-background);
@@ -249,12 +287,15 @@ container {
 
 }
 
+
 /* */
 .rainfall-controls {
   display:flex;
   justify-content:space-around;
   margin:1rem;
 }
+
+
 
 
 
@@ -396,7 +437,7 @@ Location {
 
 
 
-.pill:last-child:after {
+.tab:last-child:after {
   content: "★";
   color:gold;
   padding-left:.25rem;

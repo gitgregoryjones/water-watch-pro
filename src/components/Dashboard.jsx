@@ -17,7 +17,7 @@ const Dashboard = styled.div`
    --border-radius:1rem;
    position:static;
    background-color: var(--dark);
-   background-color: whitesmoke;
+   background-color: transparent;
    
    @media(max-width:600px){
   

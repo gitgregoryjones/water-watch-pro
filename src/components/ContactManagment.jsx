@@ -22,13 +22,14 @@ export default function ContactManagment({contactList, setContact, setFavoriteLi
     <Card>
     <CardContent>
     
-           <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
-             <div className='md:text-2xl font-bold'>Instructions or Notes</div>
+           <div className='footer flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
+             <div style={{textShadow:"none"}} className=' md:text-md drop-shadow-none text-[black]   flex gap-4 justify-center items-center w-full'><div className='border-2 p-8 rounded-2xl  text-[black]  flex gap-2'><i class="fa-solid fa-circle-info"></i> Tip:</div><div className='border-2 p-8 rounded-2xl text-lg border-[#B3C100] text-[black]  flex gap-2 text-start  flex-1 w-full'>If you need to add many users at once, contact support to learn about our options.</div></div>
              <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
             
             
              </div>
            </div>  
+           
         <div className='content flex gap-4 md:flex-row flex-col'>
         <Card className='card  bg-[--admin-color] border' >
        

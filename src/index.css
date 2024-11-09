@@ -51,7 +51,7 @@
 
 }
 /* Hide content in landscape orientation */
-@media (orientation: landscape) and (max-width: 768px) {
+@media (orientation: landscape) and (max-width: 950px) {
   body {
     display: flex;
     align-items: center;

@@ -13,11 +13,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
- 
+  --main-1: #96B8C8;
+  --main-2: #217e3f;
+  --secondary-1:#0b859e;
+  --secondary-2:#ecbf1d;
   --admin-color: transparent;
   --map-color:#F0E483;
   --map-color:white;
-  --primary-color: #F6FFF8; /* Soft, light green for background */
+  --primary-color: white; /* Soft, light green for background */
   --secondary-color: #6B9080; /* Muted green for main elements */
   --main-color: green;
   --tertiary-color: #CAD2C5; /* Light, fresh green for accents */
@@ -34,11 +37,13 @@
   --icon-color: #6B9080; /* Matches muted green for icons */
   --icon-hover-color: #CCE3DE; /* Very light green for icon hover */
   --dark: rgb(4, 72, 41);
+  --dark: #52796F;
   --khaki: khaki;
   --contrast:white;
   --toggle-container-dark-gradient: linear-gradient(to left, var(--primary-color), var(--tertiary-color));
   --background: linear-gradient(to left,var(--highlight-color), rgba(84, 169, 140, .5),  var(--highlight-color) ), 
   url('https://gitgregoryjones.github.io/WaterWatchPro/Crew.jpeg') no-repeat center center/cover;
+  --background: #F4F4F5;
   --favorite-color:red;
   --shadow: box-shadow: 0 0 50px #ccc;
   --notification:rgb(71, 84, 102);
@@ -47,7 +52,13 @@
 }
 
 input::placeholder{
-    color:black;
+    color: var(--main-1);
+    font-weight: bold;
+    font-size: medium;
+    @media (max-width:550px) {
+      
+      font-size: .75rem;
+    }
 }
 
 .highlight {
@@ -56,8 +67,32 @@ input::placeholder{
 
 .big-container {
 
-   background-color: var(--highlight-color);
+   --background-color: var(--highlight-color);
+  min-height: 100vh; 
+   
 
+}
+
+.form {
+  & input{
+    height:2rem;
+    padding-left:1rem;
+    width:100%;
+    --border-radius: .25rem;
+  }
+
+  & label {
+    font-weight:bold;
+    color: var(--text-color)
+  }
+    & .logo {
+        margin-bottom:1.2rem;
+    }
+    
+    & button {
+        margin-top:1rem;
+        font-family: Poppins;
+    }
 }
 
 .big-card {
@@ -87,10 +122,12 @@ input::placeholder{
     background-color: #6AB187;
     background-color:  whitesmoke;
     
+    
 }
 .cardBackground {
       
   background-color: var(--card-background);
+  
   /* padding: 20px; */
   border-radius: 15px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
@@ -121,17 +158,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
+
 button:hover {
   border-color: #646cff;
 }
@@ -485,10 +512,7 @@ header {
   a:hover {
     color: #747bff;
   }
-  button {
-    background-color: #f9f9f9;
-  }
-
+  
   /** Move to styled components **/
   
 }

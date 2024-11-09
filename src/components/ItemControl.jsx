@@ -7,20 +7,10 @@ import styled from 'styled-components';
 import './ItemControl.css';
 
 // Styled components for the container layout
-const Container = styled.div`
-  
-  --background: var(--primary-color);
-  padding-top: 1rem;
-  padding-left:.25rem;
-  padding-right:.25rem;
-  border-radius: 10px;
-  font-family: Poppins, sans-serif;
-  display: flex;
-  --flex:1;
-  flex-direction: column;
-  overflow: auto;
-  
-`;
+export function Container({children, className}){
+
+  return (<div className={`flex flex-col h-full min-h-[20rem] ${className}`}>{children}</div>)
+}
 
 const Button = styled.button`
 
@@ -65,6 +55,7 @@ const Category = styled.div`
   margin: 10px 0;
   display: flex;
   flex-direction: column;
+  
   
 `;
 
@@ -135,12 +126,19 @@ const ItemControl = ({
   const [isChecked, setIsChecked] = useState(false);
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-  const handleItemClick = (item) => {
-    if (!enableMultiSelect) collectionList.forEach(i => i.highlight = false);
-    item.highlight = !item.highlight;
-    onItemClicked && onItemClicked(item);
-    forceUpdate();
+  const [cList,setCList] = useState(collectionList);
+
+  const handleItemClick = (clickedItem) => {
+    const updatedList = collectionList.map(i => ({
+      ...i,
+      highlight: i.id === clickedItem.id ? !i.highlight : false // toggle highlight for the clicked item, reset for others
+    }));
+    
+    setCList(updatedList);
+    onItemClicked && onItemClicked(clickedItem);
   };
+  
+  //setCList(copy);
 
   const handleSearch = (event) => setSearchTerm(event.target.value);
 
@@ -153,8 +151,11 @@ const ItemControl = ({
 
   const toggleShowFavorites = () => setShowFavorites(!showFavorites);
 
+
+  //console.log(`CollectionList is ${cList.length} and placeholder is ${searchPlaceholder}`)
+
   // Filter items based on search and favorites
-  const filteredItems = collectionList
+  const filteredItems = [...cList]
     .sort()
     .filter(item => {
       const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -171,21 +172,26 @@ const ItemControl = ({
   const handleSelectAll = () => setIsChecked(!isChecked);
 
   useEffect(()=>{
-    console.log(`The wrong thing was called correctly ${collectionList}`)
+    console.log(`The wrong thing was called correctly ${cList}`)
 
-    console.log(`Use Effect isChecked and cites.length is ${collectionList.length} and checked is ${isChecked}`)
+    console.log(`Use Effect isChecked and cites.length is ${cList.length} and checked is ${isChecked}`)
 
-    collectionList.map(cc => {
-      cc.highlight = isChecked ? true : false;
-      console.log(`Setting field to ${JSON.stringify(cc)}`)
-    });
+    const copy = cList.map(cc => ({
+      ...cc, 
+      highlight: isChecked ? true : false 
+    }));
+    
+    setCList(copy);
+    
+    
+    
 
     if(onSelectAllClicked) {
       
         onSelectAllClicked(cities)
     } 
     
-    forceUpdate();
+    
     
      
     
@@ -199,10 +205,10 @@ const ItemControl = ({
 
   },[favorites])
 
-  const numberHighlighted = collectionList.filter(meC => meC.highlight).length;
+  const numberHighlighted = cList.filter(meC => meC.highlight).length;
 
   return (
-    <Container className={`flex flex-1 h-full w-full shadow-2xl ${className}`}>
+    <Container className={`flex flex-1 w-full md:shadow-2xl h-[10rem] md:max-h-[40rem] md:h-full overflow-hidden  ${className}`}>
       {header}
       {showSearchBar && <SearchBarContainer>
         <SearchBar
@@ -217,7 +223,7 @@ const ItemControl = ({
         </FilterIcon>
         }
       </SearchBarContainer>}
-      <div className='overflow-scroll w-full mb-4  max-h-[13rem]'>
+      <div className='overflow-scroll w-full mb-2'>
         {Object.keys(groupedItems).map(category => (
           <Category key={category}>
             {/* <CategoryTitle>{category}</CategoryTitle>*/}
@@ -227,11 +233,11 @@ const ItemControl = ({
             </div>
             }
             {groupedItems[category].map((item, i) => (
-              <Item className={`shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-sm justify-between items-center py-2]`}
+              <Item className={`shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-sm justify-between items-center py-2 md:py-4]`}
                 key={item.name + i}
                 onClick={() => handleItemClick(item)}
               >
-                <div className='px-4'>{item.name}</div>
+                <div className='px-4 overflow-hidden whitespace-nowrap text-ellipsis'>{item.name}</div>
                 <FavoriteButton style={{visibility: !showFavoriteControls && "hidden"}} onClick={(e) => toggleFavorite(e, item.name)}>
                   {favorites.includes(item.name) ? <i className="fas fa-heart text-[--favorite-color]"></i> : <i className="far fa-heart"></i>}
                 </FavoriteButton>

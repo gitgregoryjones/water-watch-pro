@@ -14,6 +14,19 @@ export default function Forecast({local, className}) {
 
     moment().format("MM/DD/YYYY");
 
+    let handleFullScreen = (event)=>{
+
+        let elem = event.target;
+
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) { /* Safari */
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { /* IE11 */
+            elem.msRequestFullscreen();
+        }
+    }
+
     useEffect(()=>{
 
         console.log(`Local is ${local}`)
@@ -37,11 +50,17 @@ export default function Forecast({local, className}) {
     
         !local ?
 
-        <div className={`h-[90%] px-6 flex justify-start gap-2 overflow-scroll ${className}`}>
+        <div className={`px-6 min-h-[10rem] mb-4 flex justify-start gap-2 overflow-scroll ${className} `}>
 
             {
                 forecast.map((m,i)=> {
-                    return <img key={i} onClick={()=>setShow(true)} className="my-2" src={m}/>
+                    return (
+                        <div className='min-w-[fit-content] h-full relative overflow-hidden' onClick={handleFullScreen}>
+                            <img key={i} onClick={()=>setShow(true)} className="md:my-2" src={m}/>
+                            <div className='bg-[green] rotate-45 p-2 text-[white] font-bold flex justify-center md:justify-start pl-20 md:pl-12 items-center right-[-3rem] md:right-[-4rem]  w-[50%] md:w-[20%] md:top-[2rem] center text-sm z-index-5 top-0  absolute'>{headers[i]}</div>
+                        </div>
+                       
+                    )
                 }) 
 
                 
@@ -49,11 +68,11 @@ export default function Forecast({local, className}) {
     
         </div>  :
 
-<div className='flex md:flex-row flex-col h-full w-full flex-1 gap-2 md:p-2 border  justify-center items-center text-[--text-color]'>
+<div className='flex md:flex-row flex-row h-full min-h-[10rem] w-full flex-1 gap md:p-2 border  justify-center items-center text-[--text-color]'>
          {  headers.map(d => {
 	       return   (
-			<div className='flex flex-col flex-1 w-full '><div className='text-2xl p-4 bg-[--highlight-color]'>{d}</div>
-			<div className='text-xl p-4 font-bold'>{Math.random().toFixed(2)}</div>
+			<div className='flex flex-col flex-1 w-full '><div className='text-md font-bold md:text-2xl p-4 bg-[--highlight-color]'>{d}</div>
+			<div className='text-lg p-4 font-bold'>{Math.random().toFixed(2)}</div>
 	        </div>)
            })
         }

@@ -3,7 +3,7 @@ import CardContent from './CardContent'
 import Card from './Card'
 import ItemControl from './ItemControl'
 import FormContainer from './FormContainer'
-import Button from './Button'
+import Button from './WaterWatchProButton'
 
 
 export default function LocationManagement({locationList, setLocation, location, handleChange}) {

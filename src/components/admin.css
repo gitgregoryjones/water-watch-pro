@@ -1,0 +1,18 @@
+
+    :root {
+      --primary-color: #5e72e4;
+      --secondary-color: #324cdd;
+      --background-color: #f8f9fa;
+      --text-color: #344767;
+      --sidebar-color: #172b4d;
+      --card-shadow: rgba(0, 0, 0, 0.12);
+    }
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      font-family: 'Roboto', sans-serif;
+    }
+    .sidebar {
+      background-color: var(--sidebar-color);
+    }
+  

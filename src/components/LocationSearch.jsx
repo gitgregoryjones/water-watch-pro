@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { LocationListContext } from './LocationListContext';
-import Button from './Button';
+import Button from './WaterWatchProButton';
 
 
 // Styled components

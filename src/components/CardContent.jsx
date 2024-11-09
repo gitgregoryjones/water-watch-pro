@@ -36,7 +36,7 @@ display: grid;
           */
 export default function CardContent({children}) {
   return (
-    <div className='card-content w-full'>{children}</div>
+    <div className='card-content  w-full'>{children}</div>
   )
 }
 

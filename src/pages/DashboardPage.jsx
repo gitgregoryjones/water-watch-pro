@@ -9,8 +9,7 @@ import PillContent from '../components/PillContent'
 
 
 import Forecast from '../components/Forecast'
-import { BarChart } from '@mui/x-charts'
-import RainHistory from '../components/RainHistory'
+
 import { AdvancedMarker, APIProvider, Map, Marker, Pin } from '@vis.gl/react-google-maps'
 import LocationSearch from '../components/LocationSearch'
 
@@ -19,7 +18,7 @@ import { createContext, useContext } from 'react';
 import { LocationListContext } from '../components/LocationListContext'
 import FormContainer from '../components/FormContainer'
 import ButtonContainer from '../components/ButtonContainer'
-import Button from '../components/Button'
+import Button from '../components/WaterWatchProButton'
 import {getContactsFromDB, getLocationsFromDB} from './TestData';
 import ItemControl from '../components/ItemControl'
 import PillTabs from '../components/PillTabs'
@@ -28,10 +27,23 @@ import Header from '../components/Header'
 import ContactManagment from '../components/ContactManagment'
 import ContactAssignment from '../components/ContactAssignment'
 import LocationManagement from '../components/LocationManagement'
-
+import RainfallChart from '../components/RainfallChart'
+import { useSelector,useDispatch } from 'react-redux'
+import Upgrade from '../components/Upgrade'
+import { Link } from 'react-router-dom'
+import Alerts from '../components/Alerts'
 
 
 export default function DashboardPage() {
+
+  const contacts = useSelector((state) => state.locationContacts.contacts);
+
+  //const locations = useSelector((state) => state.locationContacts.locations);
+
+  const user = useSelector((state) => state.userInfo.user);
+
+  const locations = user.locations;
+  
 
   var [show, setShow] = useState(false);
 
@@ -41,9 +53,9 @@ export default function DashboardPage() {
 
   var [filteredList, setFilteredList] = useState([]);
 
-  var [locationList, setLocationList] = useState([]);
+  var [locationList, setLocationList] = useState(locations);
 
-  var [contactList, setContactList] = useState([]);
+  var [contactList, setContactList] = useState(contacts)
 
   var [contact, setContact] = useState({});
 
@@ -63,10 +75,16 @@ export default function DashboardPage() {
 
   var [favoriteList, setFavoriteList] = useState(0);
 
+
+
+  
+  //const locations = useSelector((state) => state.locationContacts.locations);
+  
+  const dispatch = useDispatch();
   
   
 
-  
+  //console.log(`Locations is ${JSON.stringify(contacts)}`)
 
   
  var citiesToDisplay = [];
@@ -83,14 +101,15 @@ export default function DashboardPage() {
     
         
     } else {
-      console.log(`The db recs is ${getLocationsFromDB}`)
-      let locationDBRecs = getLocationsFromDB();
-
-      console.log(`Location DB Records is ${JSON.stringify(locationDBRecs)}`)
       
-      setMapCoords(locationDBRecs[0].location)
+
+      console.log(`Location DB Records is ${JSON.stringify(locations)}`)
+      
+      setMapCoords(locations[0]?.location)
+      setLocation(locations[0]?.location);
       setMapZoom(10)
-      setLocationList(locationDBRecs);
+      setLocationList(locations);
+      
      
     }
     
@@ -103,12 +122,11 @@ export default function DashboardPage() {
     
   },[locationList])
 
-  useEffect(()=>{
-      let dbRecords = getContactsFromDB();
-      console.log(`Location DB Records Contact is ${JSON.stringify(dbRecords)}`)
-      setContactList(dbRecords)
-      setContact(dbRecords[0])
-  },[])
+  
+  useEffect(() => {
+    setContactList(contacts);
+    setContact(contacts[0]);
+  }, [contacts]);
 
   useEffect(()=>{
 
@@ -117,7 +135,7 @@ export default function DashboardPage() {
       !assignedContact.locations.some(assigned => assigned.id === location.id)
     ))
   } else {
-    setUnassignedList(getLocationsFromDB())
+    setUnassignedList(locations)
   }
   },[assignedContact])
 
@@ -131,13 +149,14 @@ export default function DashboardPage() {
   }
   );
 
-  function setMapCenter(locationObject){
+  function setMapCenter(locationObject, zoomIn){
     console.log(`Map Center called for ${locationObject.name}`)
-    setMapCoords(locationObject.location)
+    zoomIn && setMapCoords(locationObject.location)
+    
     if(filteredList.length == 2){
       setMapZoom(8)
     } else
-    setMapZoom(15);
+    zoomIn && setMapZoom(15);
 
     setLocation(locationObject)
   }
@@ -215,123 +234,131 @@ const handleChange = (event) => {
 };
 
 
+
   
   console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
   return (
     
-    <Dashboard className='md:py-28'>
-     
-        <Card className='big-card flex flex-col md:flex-row justify-center items-center bg-[--admin-color]' >
-          <CardContent>
-          
-          <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
-            <div className='md:text-3xl font-bold'>Water Watch Pro Insights</div>
-            <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
-            
-            <div className='stat1 bg-[--alert] shadow border rounded p-4 '>NOA Error detected. Stay tuned...</div>
-            </div>
-          </div>
-          <div className='content flex gap-4 md:flex-row flex-col'>
+    <Dashboard className='mt-20  md:my-4 px-8'>
+      <div className='hidden md:block flex justify-start items-center gap-2'><i className='p-3 border rounded text-[white] bg-[green] text-lg fas fa-home'></i><h2>Dashboard</h2></div>
           
          
-            <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
-            <div className='md:shadow-2xl h-[20rem] md:rounded-2xl md:border md:px-2 justify-center items-center flex flex-[3_3_0%]'>
-              <Map
-               
-                className='md:shadow-2xl md:h-[90%] h-full flex-[3_3_0%] md:border'
-                
-                
-                
-                mapId={'mainMap'}
-               
-                gestureHandling={'greedy'}
-                disableDefaultUI={false}
-                zoom={mapZoom}
-                center={mapCoords}
-                onCameraChanged={handleCameraChange}
-                
-                
-              >
-                 
-                { locationList.map((obj,i)=>{
-                  return ( <AdvancedMarker key={obj.location.lng}  position={obj.location}>
-                          <div className='flex p-2 text-xl justify-center items-center'>
-                             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
-                             </div>
-                          </AdvancedMarker> 
-                        )
-                })}
-               
-                
-                </Map>
-                </div>
-            </APIProvider>
-            <ItemControl className={``}
+      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >
+      <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
+      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+           
+           <Map
+            
+             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+             
+             
+             
+             mapId={'mainMap'}
+            
+             gestureHandling={'greedy'}
+             disableDefaultUI={true}
+             zoom={mapZoom}
+             center={mapCoords}
+             onCameraChanged={handleCameraChange}
+             
+             
+           >
+              
+             { locationList.map((obj,i)=>{
+               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.location.lng}  position={obj.location}>
+                       <div className='flex p-2 text-xl justify-center items-center'>
+                          <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
+                          </div>
+                       </AdvancedMarker> 
+                     )
+             })}
+            
+             
+             </Map>
+         
+         </APIProvider>
+      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
-            onItemClicked={setMapCenter}
+            onItemClicked={(obj)=>setMapCenter(obj,true)}
             showSelectButton={false}
             enableMultiSelect={false}
+            showFavoriteControls={false}
             
-            searchPlaceholder='Search Locations...'
+            searchPlaceholder='Search Your Locations...'
             addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
           />
-            <PillTabs className={"md:border md:rounded-2xl shadow-2xl header-mb-4 header-w-[80%] flex  flex-1 body-p-[20px] body-border-[unset]   tab-transition-all tab-duration-300 tab-ease-in-out tab-justify-center  tab-text-[white] header-rounded-2xl"}>
-            <div className='tab'>
-              National
-
-              <Forecast className={"items-end"}/>
-            </div>
-            <div className='tab'>
-          Local 
-          <Forecast local={true}/>
-        </div>
-          </PillTabs>
-            </div>
-         {location.location && <div className='footer my-2 p-8 justify-around flex flex-1 text-2xl'>{location.name} has a reported latitude of {location.location.lat} and a longitude of {location.location.lng}</div>}
-          </CardContent>
+          </Card>
+      </Card>
+      {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
+      {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
+      <Card  className={"md:hidden  shadow shadow-[#95b8c8]"}>
+        <PillTabs className="" mini={true} header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
+          <div className='tab'>24 Hour
+            <RainfallChart location={location} range={"daily"}/>
+          </div>
+          <div className='tab'>1 Hour
+            <RainfallChart location={location} range={"hourly"}/>
+          </div>
+          <div className='tab'>RAPIDRAIN
+            <Upgrade>
+              <RainfallChart location={location} range={"rapidrain"} />
+            </Upgrade>
+          </div>
+        
+      
+        </PillTabs>
         </Card>
+      <Card header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}  className={"md:block hidden shadow shadow-[#95b8c8]"}>
+        <PillTabs className="" mini={false}>
+          <div className='tab'>24 Hour
+            <RainfallChart location={location} range={"daily"}/>
+          </div>
+          <div className='tab'>1 Hour
+            <RainfallChart location={location} range={"hourly"}/>
+          </div>
+          <div className='tab'>RAPIDRAIN
+            <Upgrade>
+              <RainfallChart location={location} range={"rapidrain"} />
+            </Upgrade>
+          </div>
+         
+        </PillTabs>
+        
+      </Card>
   
-          <Card>
-          <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
-             <div className='md:text-3xl font-bold'>Contact Management</div>
-             <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
-             <div className='stat1 bg-[--notification] shadow border rounded p-4 '>{favoriteList.length} Contacts are Favorites</div>
-             <div className='stat1 bg-[--alert] shadow border rounded p-4 '>3 Contacts are unassigned...</div>
-             </div>
-           </div>  
-          <CardContent>
-            <PillTabs className={"content"}>
-              <div className='tab'>Edit Contacts
-                <ContactManagment contact={contact} contactList={contactList} setFavoriteList={setFavoriteList} setContact={setContact}/>
-              </div>
-              <div className='tab'>
-                Assign Locations
-                
-                <ContactAssignment unassignedList={unassignedList} deleteLocationsFromUser={deleteLocationsFromUser} addLocationsToUser={addLocationsToUser} contact={contact} assignedContact={assignedContact} setUnassignedList={setUnassignedList} setAssignedContact={setAssignedContact} contactList={contactList} />
-              </div>
-              <div className='tab'>Bulk Upload
-              <div class="cta-container border h-full  py-[10rem] border-4 rounded-2xl border-[gold] flex flex-col justify-center items-center">
-    <img src="https://img1.wsimg.com/isteam/ip/88056157-8118-4fa6-a40b-afa381a48cd5/Eye%20Words.png/:/rs=h:30" alt="Logo" class="cta-logo"/>
-    <p className="cta-text">Upgrade to the Gold Level for this feature!</p>
-</div>
-
-              </div>
-            </PillTabs>
-            </CardContent>
+      
+      <Card header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 hidden md:block"}>
+           <PillTabs mini={false}>
+            <div className='tab'>National
+              <Forecast className={"items-end"}/>
+           </div>
+           <div className='tab'>{location.name ? location.name : ''}
+            <Upgrade>
+              <Forecast local={true} className={"items-end"}/>
+            </Upgrade>
+           </div>
+           
+            </PillTabs> 
         </Card>
-                <Card>
-                <div className='header flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
-             <div className='md:text-3xl font-bold'>Location Management</div>
-             <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
-            
-             <div className='stat1 bg-[--notification] shadow border rounded p-4 '>{locationList.length} Locations are being managed</div>
-             </div>
-           </div> 
-                  <LocationManagement location={location} locationList={locationList} handleChange={handleChange} setLocation={setLocation} />
-                </Card>
+        <Card  className={"pb-0 md:hidden"}>
+           <PillTabs header={<div className='flex gap-2 items-center'><i className="text-[--main-1] fa-solid fa-circle-info text-md "></i>3 Day Forecast</div>} mini={true}>
+            <div className='tab'>National
+              <Forecast className={"items-end"}/>
+           </div>
+           <div className='tab'>{location.name ? location.name : ''}
+            <Upgrade>
+              <Forecast local={true} className={"items-end"}/>
+            </Upgrade>
+           </div>
+           
+            </PillTabs> 
+        </Card>
+     {/*</span>*/}
+     <a name="alerts"></a>
+      <Alerts/>
     </Dashboard>
    
   )

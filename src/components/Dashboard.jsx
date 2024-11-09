@@ -22,12 +22,12 @@ const Dashboard = styled.div`
    @media(max-width:600px){
   
       grid-template-columns:1fr;
-      gap:2rem;
+      
       padding:0rem;
       width:100vw;
-      height:50vh;
+      
       border-radius:0px;
-      background-color: var(--main-color)
+      
       
   
     }

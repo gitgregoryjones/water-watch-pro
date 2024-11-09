@@ -1,12 +1,12 @@
-import styled from "styled-components";
 
-const ButtonContainer = styled.div `
-    display:flex;
-   
-    justify-content:space-around;
 
-    gap:1rem;
+import React, { Children } from 'react'
 
-`;
+export default function ButtonContainer({children, className}) {
+  return (
+    <div className={`flex justify-around gap-4 w-full ${className}`}>{children}</div>
+  )
+}
 
-export default ButtonContainer;
+
+

@@ -239,8 +239,8 @@ const handleChange = (event) => {
   console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
   return (
     
-    <Dashboard className='mt-20  md:my-4 px-8'>
-      <div className='hidden md:block flex justify-start items-center gap-2'><i className='p-3 border rounded text-[white] bg-[green] text-lg fas fa-home'></i><h2>Dashboard</h2></div>
+    <Dashboard className='mt-20  md:my-[2rem] px-8'>
+      
           
          
       <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >

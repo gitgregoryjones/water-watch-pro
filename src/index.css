@@ -50,6 +50,38 @@
   --alert: red;
 
 }
+/* Hide content in landscape orientation */
+@media (orientation: landscape) and (max-width: 768px) {
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000;
+    color: white;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .landscape-message {
+    display: block;
+  }
+
+  .app-content {
+    display: none;
+  }
+}
+
+/* Show content normally in portrait orientation */
+@media (orientation: portrait) {
+  .landscape-message {
+    display: none;
+  }
+
+  .app-content {
+    display: block;
+  }
+}
+
 
 input::placeholder{
     color: var(--main-1);

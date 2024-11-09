@@ -18,6 +18,7 @@ import SwitchUser from "./pages/SwitchUser";
 import {slide as Menu} from 'react-burger-menu';
 import Upgrade from "./components/Upgrade";
 import { useState } from "react";
+import LandscapeOrientation from "./components/LandscapeOrientation";
 
 
 
@@ -46,6 +47,7 @@ function App() {
   
 
   return (
+    <LandscapeOrientation>
     <>
       
     {!isLoginPage && <Menu  onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
@@ -74,6 +76,7 @@ function App() {
       </Container>
       
     </>
+    </LandscapeOrientation>
   )
 }
 

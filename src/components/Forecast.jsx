@@ -18,6 +18,9 @@ export default function Forecast({local, className}) {
 
     let handleFullScreen = (event)=>{
 
+    
+        
+
     const element = imageRef.current;
 
     if (element.requestFullscreen) {
@@ -31,7 +34,10 @@ export default function Forecast({local, className}) {
       element.msRequestFullscreen();
     } else {
       // Fallback for iOS Safari - simulate full-screen using CSS
-      element.classList.add("ios-fullscreen");
+      let test = imageRef.current;
+        
+      test.classList.contains("ios-fullscreen") ? imageRef.current.classList.remove("ios-fullscreen") : imageRef.current.classList.add("ios-fullscreen")
+      
     }
     }
 
@@ -45,6 +51,7 @@ export default function Forecast({local, className}) {
         }
         // Remove fallback CSS class for iOS
         if (imageRef.current) {
+            
           imageRef.current.classList.remove("ios-fullscreen");
         }
       };

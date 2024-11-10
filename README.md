@@ -76,7 +76,7 @@ Welcome to **Water Watch Pro**, a React-based application that enables users to 
 - **Automatic Deployment**: Merging into `development` will trigger a Netlify build. The deployment can be viewed at:
   - **Development Build**: [Water Watch Pro Development Deployment](https://dev-water-watch-pro.netlify.app/)
 - **Automatic Deployment**: Merging into `main` will trigger a Production Netlify build. The deployment can be viewed at:
-- **Production Build**: [Water Watch Pro Development Deployment](https://dwater-watch-pro.netlify.app/)
+   - **Production Build**: [Water Watch Pro Development Deployment](https://dwater-watch-pro.netlify.app/)
 
 ### Netlify Dashboard
 

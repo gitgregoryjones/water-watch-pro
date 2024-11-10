@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Datatable from './Datatable';
 import moment from 'moment';
 
@@ -14,18 +14,40 @@ export default function Forecast({local, className}) {
 
     moment().format("MM/DD/YYYY");
 
+    const imageRef = useRef(null);
+
     let handleFullScreen = (event)=>{
 
-        let elem = event.target;
+    const element = imageRef.current;
 
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) { /* Safari */
-            elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) { /* IE11 */
-            elem.msRequestFullscreen();
-        }
+    if (element.requestFullscreen) {
+      // Standard Fullscreen API
+      element.requestFullscreen();
+    } else if (element.webkitRequestFullscreen) {
+      // Safari
+      element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+      // IE11
+      element.msRequestFullscreen();
+    } else {
+      // Fallback for iOS Safari - simulate full-screen using CSS
+      element.classList.add("ios-fullscreen");
     }
+    }
+
+    const exitFullScreen = () => {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+        // Remove fallback CSS class for iOS
+        if (imageRef.current) {
+          imageRef.current.classList.remove("ios-fullscreen");
+        }
+      };
 
     useEffect(()=>{
 
@@ -55,8 +77,18 @@ export default function Forecast({local, className}) {
             {
                 forecast.map((m,i)=> {
                     return (
-                        <div className='min-w-[fit-content] h-full relative overflow-hidden' onClick={handleFullScreen}>
-                            <img key={i} onClick={()=>setShow(true)} className="md:my-2" src={m}/>
+                        <div className='min-w-[fit-content] h-full relative overflow-hidden'>
+                           
+                            <img
+                            key={i}
+        ref={imageRef}
+        src={m}
+        alt={`${headers[i]}`}
+        title={headers[i]}
+        onClick={handleFullScreen}
+        onDoubleClick={exitFullScreen}
+        className={'md:my-2'}
+      />
                             <div className='bg-[green] rotate-45 p-2 text-[white] font-bold flex justify-center md:justify-start pl-20 md:pl-12 items-center right-[-3rem] md:right-[-4rem]  w-[50%] md:w-[20%] md:top-[2rem] center text-sm z-index-5 top-0  absolute'>{headers[i]}</div>
                         </div>
                        

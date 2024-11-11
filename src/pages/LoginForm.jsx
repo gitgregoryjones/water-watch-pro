@@ -58,7 +58,8 @@ export default function LoginForm(){
            
             <ButtonContainer>
                 <Button className="hidden" onClick={(e)=>{setLogView(true)}}>Login</Button>
-                <Button  className='bg-[#96B8C8]' onClick={(e)=>{setLogView(false)}}>Register</Button>
+                
+                {logView ? <Button >Login</Button> : <Button>Register</Button>}
             </ButtonContainer>
             <label hidden={logView}>Name</label>
             <input hidden={logView} name="name"  placeholder="Full Name"/>
@@ -72,9 +73,7 @@ export default function LoginForm(){
             <input hidden={logView} name="confirm" type="password" placeholder="Confirm your Password"/>  
             <label hidden={logView} >Registration Code</label>
             <input hidden={logView} name="code" type="text" placeholder="Registration Code" /> 
-            {
-                logView ? <Button >Login</Button> : <Button>Register</Button>
-            } 
+            <Button  className='bg-[#96B8C8]' onClick={(e)=>{setLogView(false)}}>Register</Button> 
             
             
         </FormContainer>

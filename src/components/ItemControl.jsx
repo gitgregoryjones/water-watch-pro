@@ -237,7 +237,7 @@ const ItemControl = ({
                 key={item.name + i}
                 onClick={() => handleItemClick(item)}
               >
-                <div className='px-4 overflow-hidden whitespace-nowrap text-ellipsis'>{item.name}</div>
+                <div className='px-4 overflow-hidden '>{item.name}</div>
                 <FavoriteButton style={{visibility: !showFavoriteControls && "hidden"}} onClick={(e) => toggleFavorite(e, item.name)}>
                   {favorites.includes(item.name) ? <i className="fas fa-heart text-[--favorite-color]"></i> : <i className="far fa-heart"></i>}
                 </FavoriteButton>

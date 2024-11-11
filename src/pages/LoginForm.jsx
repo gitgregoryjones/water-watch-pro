@@ -12,6 +12,8 @@ import  ButtonContainer from '../components/ButtonContainer';
 
 import { Link, useNavigate } from 'react-router-dom';
 
+import logo from '../assets/logo.png';
+
 export default function LoginForm(){
 
     const [logView, setLogView] = useState(true);
@@ -49,7 +51,7 @@ export default function LoginForm(){
     return(
 
         <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%]'>
-            <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'><img className="logo" src="https://img1.wsimg.com/isteam/ip/88056157-8118-4fa6-a40b-afa381a48cd5/Eye%20Words.png/:/rs=w:400,cg:true"/>
+            <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'><img className="w-[24rem]" src={logo} />
             </div>
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
             

@@ -239,7 +239,7 @@ const handleChange = (event) => {
   console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
   return (
     
-    <Dashboard className='mt-20  md:my-[2rem] px-8'>
+    <Dashboard className='mt-20  md:my-[8rem] px-8'>
       
           
          

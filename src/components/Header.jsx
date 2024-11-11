@@ -14,7 +14,7 @@ export default function Header() {
   
   return (
     
-    <div className='flex h-[4rem] overflow-x-show md:flex justify-around top-0 left-0 fixed  z-50 items-center  zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
+    <div className='flex h-[4rem] overflow-x-show md:flex justify-center md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center  zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex'>
         <img src={logo} className='w-[14rem] md:w-[20rem]' />
       </div>

@@ -52,9 +52,9 @@ function App() {
       
     {!isLoginPage && <Menu  onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
     <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Dashboard</Link>
-        <a id="about" className="hidden menu-item" href="/about">About</a>
+       
        <Upgrade tier={3} showMsg={false}><Link  to="/double" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>
-        <a onClick={ showSettings } className="hidden menu-item--small" href="">Settings</a>
+        
         <a href="/" onClick={showSettings} className="menu-item bm-item">Logout</a>
       </Menu>}
 

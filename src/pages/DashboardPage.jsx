@@ -32,6 +32,7 @@ import { useSelector,useDispatch } from 'react-redux'
 import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
+import ResponsiveTable from '../components/ResponsiveTable'
 
 
 export default function DashboardPage() {
@@ -307,6 +308,9 @@ const handleChange = (event) => {
               <RainfallChart location={location} range={"rapidrain"} />
             </Upgrade>
           </div>
+          <div className='tab'>NOAA Atlas 14
+          <ResponsiveTable/>
+          </div>
         
       
         </PillTabs>
@@ -323,6 +327,10 @@ const handleChange = (event) => {
             <Upgrade>
               <RainfallChart location={location} range={"rapidrain"} />
             </Upgrade>
+            
+          </div>
+          <div className='tab'>NOAA Atlas 14
+            <ResponsiveTable/>
           </div>
          
         </PillTabs>

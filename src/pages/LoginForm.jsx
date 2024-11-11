@@ -47,21 +47,21 @@ export default function LoginForm() {
 
             const accessToken = loginData.access_token;
 
+            console.log(`Read bearer token like ${accessToken}`)
+
             // Step 2: Verify the token and retrieve user information
-            const verifyResponse = await fetch("http://192.34.62.138:8000/auth/verify", {
-                method: "POST",
+            const verifyResponse = await fetch("http://192.34.62.138:8000/users/me", {
+                method: "GET",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
                     "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    
-                        "token": `${accessToken}`
-                      
-                })
+                }
             });
 
             const userData = await verifyResponse.json();
+
+            userData.firstName = userData.first_name;
+            userData.lastName = userData.last_name;
 
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");

@@ -58,7 +58,7 @@ const RainfallChart = ({location = {}, range = "daily"}) => {
       labels: theLabels,
       datasets: [
         {
-          label: `${location?.name} Rainfall (mm)`,
+          label: `${location?.name} Rainfall (in)`,
           data: data.map(entry => entry.rainfall),
           backgroundColor: 'rgba(54, 162, 235, 0.6)',
           borderColor: 'rgba(54, 162, 235, 1)',

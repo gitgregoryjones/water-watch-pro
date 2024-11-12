@@ -8,6 +8,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
+import { API_HOST, VITE_GOOGLE_API_KEY } from '../utility/constants';
+
+
 
 export default function LoginForm() {
     const [logView, setLogView] = useState(true);
@@ -24,7 +27,7 @@ export default function LoginForm() {
         try {
             setServerError(false);
             // Step 1: Log in to get the access token
-            const loginResponse = await fetch("http://192.34.62.138:8000/auth/jwt/login", {
+            const loginResponse = await fetch(`${API_HOST}/auth/jwt/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -50,7 +53,7 @@ export default function LoginForm() {
             console.log(`Read bearer token like ${accessToken}`)
 
             // Step 2: Verify the token and retrieve user information
-            const verifyResponse = await fetch("http://192.34.62.138:8000/users/me", {
+            const verifyResponse = await fetch(`${API_HOST}/users/me`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,

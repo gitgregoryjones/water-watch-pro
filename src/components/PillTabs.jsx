@@ -9,13 +9,19 @@ export default function PillTabs({children,className,mini, header}) {
     var [pills, setPills] = useState([])
 
     var [toggleActive, setToggleActive] = useState(0);
+    var [littleText,setLittleText] = useState("");
+
+    var menuActions = [];
 
     
     useEffect(()=>{
 
-    },[toggleActive])
+        //setLittleText(action);
+        setLittleText(menuActions[active]?.name)
+
+    },[active])
     
-    var menuActions = [];
+    
 
     const randomId = `lm${Math.random().toFixed(2) * 100}`;
     
@@ -23,7 +29,7 @@ export default function PillTabs({children,className,mini, header}) {
     function getChildContent(element,level,optionIndex){
         if(level == 0) {
             var action = Children.toArray(element.props.children).slice(0,1)
-            menuActions.push({name:action,onClick:()=> {document.querySelector(`.${randomId}`).textContent = action; setActive(optionIndex); console.log(`Index is ${optionIndex};`)}})
+            menuActions.push({name:action,onClick:()=> {setActive(optionIndex); console.log(`Index is ${optionIndex};`)}})
             
             return action;
         }else {
@@ -60,14 +66,14 @@ export default function PillTabs({children,className,mini, header}) {
                 children && Children.toArray(children).map((c,i) =>{
                     
 
-                    return c.props.className?.indexOf("tab") > -1 ?  (<div onClick={()=>setActive(i)} className={`justify-start text-sm md:text-lg transition-all duration-300 ease-in-out justify-center  text-[white]   bg-[#99ba93] flex w-full flex-1 p-2 hover:bg-lime-800/100  ease-in-out cursor-pointer  ${active == i ? 'activeTab': 'inactiveTab'} ${addUserSuppliedClasses(className,"tab")} ${c.props.className}` }>{getChildContent(c,0,i)}</div>)
+                    return c.props.className?.indexOf("tab") > -1 ?  (<div onClick={()=>{setActive(i); /*setLittleText(menuActions[i].name)*/}} className={`justify-start text-sm md:text-lg transition-all duration-300 ease-in-out justify-center  text-[white]   bg-[#99ba93] flex w-full flex-1 p-2 hover:bg-lime-800/100  ease-in-out cursor-pointer  ${active == i ? 'activeTab': 'inactiveTab'} ${addUserSuppliedClasses(className,"tab")} ${c.props.className}` }>{getChildContent(c,0,i)}</div>)
 
                     : c
                 })
             }
             
             </div>
-           {mini && <div className='flex gap-2 justify-center items-center w-full border'><div className={`font-bold text-sm flex flex-1 pl-4 h-full`}>{header}</div><span className={` text-sm lm-text ${randomId}`}></span><LittleMenu menuActions={menuActions}/></div>}
+           {mini && <div className='flex gap-2 justify-center items-center w-full border'><div className={`font-bold text-sm flex flex-1 pl-4 h-full`}>{header}</div><span className={` text-sm lm-text ${randomId}`}>{littleText}</span><LittleMenu menuActions={menuActions}/></div>}
         </div>
         <div className={`flex flex-1 h-full w-full justify-center items-center ${addUserSuppliedClasses(className,"body")}`}>
         {

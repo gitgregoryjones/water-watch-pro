@@ -73,7 +73,7 @@ export default function PillTabs({children,className,mini, header}) {
             }
             
             </div>
-           {mini && <div className='flex gap-2 justify-center items-center w-full border'><div className={`font-bold text-sm flex flex-1 pl-4 h-full`}>{header}</div><span className={` text-sm lm-text ${randomId}`}>{littleText}</span><LittleMenu menuActions={menuActions}/></div>}
+           {mini && <div className='flex gap-2 justify-center items-center w-full border'><div className={`font-bold text-sm flex flex-1 pl-0 h-full`}>{header}</div><span className={` text-sm lm-text ${randomId}`}>{littleText}</span><LittleMenu menuActions={menuActions}/></div>}
         </div>
         <div className={`flex flex-1 h-full w-full justify-center items-center ${addUserSuppliedClasses(className,"body")}`}>
         {

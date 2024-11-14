@@ -2,9 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'MyriadPro';
+  src: url('fonts/MYRIADPRO-SEMIBOLD.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 :root {
   
-  font-family: Poppins;
+  font-family: MyriadPro;
   line-height: 1;
   border-color:#e5e7eb;
 
@@ -185,9 +193,6 @@ a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
 }
 
 body {
@@ -554,9 +559,7 @@ header {
     color: #213547;
     background-color: #ffffff;
   }
-  a:hover {
-    color: #747bff;
-  }
+  
   
   /** Move to styled components **/
   

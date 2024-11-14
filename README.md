@@ -1,4 +1,4 @@
-# Water Watch Pro - Developer Onboarding Guide
+# Water Watch Pro - Developer Onboarding Guide 1.0
 
 Welcome to **Water Watch Pro**, a React-based application that enables users to monitor rainfall history and forecasts for specific lat/lng locations using raw data from the National Weather Center. This README will guide you through setting up the project locally, working with Jira, managing branches, and deploying to Netlify.
 

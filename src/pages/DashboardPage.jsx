@@ -33,6 +33,7 @@ import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
+import { VITE_GOOGLE_API_KEY } from '../utility/constants'
 
 
 export default function DashboardPage() {
@@ -238,7 +239,7 @@ const handleChange = (event) => {
 
 
   
-  console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
+  
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
@@ -249,9 +250,7 @@ const handleChange = (event) => {
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
-    
-        
-      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
            <Map
             

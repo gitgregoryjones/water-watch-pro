@@ -20,6 +20,7 @@ import LandscapeOrientation from "./components/LandscapeOrientation";
 import SettingsPage from "./pages/SettingsPage";
 import ReportsPage from "./pages/ReportsPage";
 import AssignmentsPage from "./pages/AssignmentsPage";
+import MyProfile from "./pages/MyProfile";
 
 
 
@@ -56,8 +57,9 @@ function App() {
     <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
     <Link to="/settings" onClick={showSettings} className="menu-item bm-item">Settings</Link>
     <Link to="/assigments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
+    <Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>
        
-       <Upgrade tier={3} showMsg={false}><Link  to="/double" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>
+       <Upgrade tier={3} showMsg={false}><Link  to="/switch" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>
           
         <a href="/" onClick={showSettings} className="menu-item bm-item">Logout</a>
       </Menu>}
@@ -74,6 +76,8 @@ function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/reports" element={<ReportsPage/>} />
         <Route path="/assignments" element={<AssignmentsPage/>} />
+        <Route path="/profile" element={<MyProfile/>} />
+        <Route path="/switch" element={<SwitchUser/>} />
       </Routes>
       
         

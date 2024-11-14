@@ -27,10 +27,10 @@ export default function Header() {
         <i className='fas fa-search absolute pl-4 pb-4 top-10 text-slate-400 text-sm'></i>
       </div>
       <div className='hidden md:flex justify-around gap-4 items-end'> 
-      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-[--main-2]"  : "text-[--main-1]"}`}>Data</Link>
-    <Link to="/dashboard"  onClick={()=> alert(location.pathname)} className={location.pathname == "/reports" ? "text-[--main-2]" : "text-[--main-1]"}>Reports</Link>
-    <Link to="/settings"  className={location.pathname == "/settings" ? "text-[--main-2]" : "text-[--main-1]"}>Settings</Link>
-    <Link to="/dashboard"  className={location.pathname == "/assignments" ? "text-[--main-2]" : "text-[--main-1]"}>Assignments</Link>
+      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Data</Link>
+    <Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link>
+    <Link to="/settings"  className={location.pathname == "/settings" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
+    <Link to="/assignments"  className={location.pathname == "/assignments" ? "text-slate-800"  : "text-[--main-2]"}>Assignments</Link>
     </div>
 
       <div className=' flex fa-stack relative flex justify-center items-center'>

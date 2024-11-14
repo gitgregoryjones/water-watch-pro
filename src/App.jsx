@@ -18,6 +18,8 @@ import Upgrade from "./components/Upgrade";
 import { useState } from "react";
 import LandscapeOrientation from "./components/LandscapeOrientation";
 import SettingsPage from "./pages/SettingsPage";
+import ReportsPage from "./pages/ReportsPage";
+import AssignmentsPage from "./pages/AssignmentsPage";
 
 
 
@@ -51,9 +53,9 @@ function App() {
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
     <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Data</Link>
-    <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Reports</Link>
+    <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
     <Link to="/settings" onClick={showSettings} className="menu-item bm-item">Settings</Link>
-    <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
+    <Link to="/assigments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
        
        <Upgrade tier={3} showMsg={false}><Link  to="/double" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>
           
@@ -70,8 +72,8 @@ function App() {
         <Route path="/" element={<LoginForm />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/test" element={<DashboardContent/>} />
-        <Route path="/double" element={<SwitchUser/>} />
+        <Route path="/reports" element={<ReportsPage/>} />
+        <Route path="/assignments" element={<AssignmentsPage/>} />
       </Routes>
       
         

@@ -153,7 +153,7 @@ export default function DashboardPage() {
   );
 
   function setMapCenter(locationObject, zoomIn){
-    console.log(`This is the location DUDE ${locationObject}`);
+    console.log(`This is the location DUDE ${JSON.stringify(locationObject)}`);
     console.log(`Map Center called for ${locationObject.name}`)
     zoomIn && setMapCoords({lat:locationObject.latitude, lng:locationObject.longitude})
     
@@ -377,7 +377,7 @@ const handleChange = (event) => {
             </Upgrade>
           </div>
           <div className='tab'>NOAA Atlas 14
-          <ResponsiveTable  location={location} />
+          {Object.keys(location).length > 0 && <ResponsiveTable  location={location} />}
           </div>
         
       

@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ResponsiveTable({location}) {
+function ResponsiveTable({location = {}}) {
   const data = [
     { years: 1, hour24: 3.14, hour1: 2.35 },
     { years: 2, hour24: 7.18, hour1: 4.56 },
@@ -14,6 +14,24 @@ function ResponsiveTable({location}) {
     { years: 1000, hour24: 7.33, hour1: 4.12 },
   ];
 
+  if (!location.atlas14_threshold) {
+    console.error("atlas14_threshold is undefined");
+    return;
+}
+
+
+  if(Object.keys(location).length ==0)
+    return;
+
+  //let threshold = {'1h': [1.33, 1.52, 1.84, 2.12, 2.53, 2.86, 3.19, 3.55, 4.04, 4.43], '24h': [3.33, 3.76, 4.48, 5.09, 5.96, 6.64, 7.35, 8.07, 9.06, 9.83]};
+  console.log("atlas14_threshold:", location.atlas14_threshold);
+
+  const threshold = location.atlas14_threshold;
+
+
+
+ 
+
   return (
     <div className="max-w-full overflow-x-auto">
       <table className="w-full max-h-80 overflow-y-auto table-auto border-collapse">
@@ -26,10 +44,11 @@ function ResponsiveTable({location}) {
         </thead>
         <tbody className="overflow-y-scroll h-[5rem] max-h-[5rem]">
           {data.map((row, index) => (
+            
             <tr key={index} className="odd:bg-white even:bg-gray-50">
               <td className="border px-4 py-2">{row.years}</td>
-              <td className="border px-4 py-2">{row.hour24.toFixed(2)}</td>
-              <td className="border px-4 py-2">{row.hour1.toFixed(2)}</td>
+              <td className="border px-4 py-2">{threshold['1h'] && threshold['1h'][index]}</td>
+              <td className="border px-4 py-2">{threshold['24h'] && threshold['24h'][index]}</td>
             </tr>
           ))}
         </tbody>

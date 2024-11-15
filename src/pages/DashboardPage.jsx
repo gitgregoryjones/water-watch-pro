@@ -76,6 +76,7 @@ export default function DashboardPage() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   var [favoriteList, setFavoriteList] = useState(0);
+  
 
 
 
@@ -246,7 +247,9 @@ const handleChange = (event) => {
       
           
          
-      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.latitude + "," +   location.longitude + ")" : ""}</div>}  >
+      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >
+      <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
+      <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
@@ -293,12 +296,75 @@ const handleChange = (event) => {
 
 
           />
+          
+      
+          
+         
           </Card>
+          </div>
+          <div className='tab'>24 Hr Accum
+      <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
+    
+        
+      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+           
+           <Map
+            
+             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+             
+             
+             
+             mapId={'mainMap'}
+            
+             gestureHandling={'greedy'}
+             disableDefaultUI={true}
+             zoom={mapZoom}
+             center={mapCoords}
+             onCameraChanged={handleCameraChange}
+             
+             
+           >
+              
+             { locationList.map((obj,i)=>{
+               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.longitude}  position={ {lat:obj.latitude,lng:obj.longitude} }>
+                       <div className='flex p-2 text-xl justify-center items-center'>
+                          <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
+                          </div>
+                       </AdvancedMarker> 
+                     )
+             })}
+            
+             
+             </Map>
+         
+         </APIProvider>
+      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+            collectionList={locationList}
+            showAddButton={false}
+            onItemClicked={(obj)=>setMapCenter(obj,true)}
+            showSelectButton={false}
+            enableMultiSelect={false}
+            showFavoriteControls={false}
+            
+            searchPlaceholder='Search Your Locations...'
+            addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
+
+
+          />
+          
+      
+          
+         
+          </Card>
+          </div>
+          </PillTabs>
+          
       </Card>
+      
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={"md:hidden  shadow shadow-[#95b8c8]"}>
-        <PillTabs className="" mini={true} header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
+        <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
             <RainfallChart location={location} range={"daily"}/>
           </div>
@@ -311,37 +377,17 @@ const handleChange = (event) => {
             </Upgrade>
           </div>
           <div className='tab'>NOAA Atlas 14
-          <ResponsiveTable/>
+          <ResponsiveTable  location={location} />
           </div>
         
       
         </PillTabs>
         </Card>
-      <Card header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}  className={"md:block hidden shadow shadow-[#95b8c8]"}>
-        <PillTabs className="" mini={false}>
-          <div className='tab'>24 Hour
-            <RainfallChart location={location} range={"daily"}/>
-          </div>
-          <div className='tab'>1 Hour
-            <RainfallChart location={location} range={"hourly"}/>
-          </div>
-          <div className='tab'>RAPIDRAIN
-            <Upgrade>
-              <RainfallChart location={location} range={"rapidrain"} />
-            </Upgrade>
-            
-          </div>
-          <div className='tab'>NOAA Atlas 14
-            <ResponsiveTable  location={location}/>
-          </div>
-         
-        </PillTabs>
-        
-      </Card>
+      
   
       
-      <Card header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 hidden md:block"}>
-           <PillTabs mini={false}>
+      <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
+           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
             <div className='tab'>National
               <Forecast className={"items-end"}/>
            </div>
@@ -353,19 +399,7 @@ const handleChange = (event) => {
            
             </PillTabs> 
         </Card>
-        <Card  className={"pb-0 md:hidden"}>
-           <PillTabs header={<div className='flex gap-2 items-center'><i className="text-[--main-1] fa-solid fa-circle-info text-md "></i>3 Day Forecast</div>} mini={true}>
-            <div className='tab'>National
-              <Forecast className={"items-end"}/>
-           </div>
-           <div className='tab'>{location.name ? location.name : ''}
-            <Upgrade>
-              <Forecast local={true} className={"items-end"}/>
-            </Upgrade>
-           </div>
-           
-            </PillTabs> 
-        </Card>
+        
      {/*</span>*/}
      <a name="alerts"></a>
       <Alerts/>

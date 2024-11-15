@@ -1,6 +1,8 @@
 import React, { useRef } from 'react'
 import logo from '../assets/logo.png';
 import ProfilePic from './ProfilePic';
+import { useLocation, Link } from 'react-router-dom';
+import Upgrade from './Upgrade';
 
 
 
@@ -9,8 +11,12 @@ export default function Header() {
 
   const menu = useRef(null);
 
-  
+  const location = useLocation();
 
+  // Check if the current path is the login page
+  const isLoginPage = location.pathname === "/";
+
+ 
   
   return (
     
@@ -21,7 +27,15 @@ export default function Header() {
       <div className='hidden flex '><input type="text" placeholder='Search Locations' className='relative flex text-sm p-2 pl-8 placeholder:text-slate-400 rounded-2xl min-w-[20rem]'/>
         <i className='fas fa-search absolute pl-4 pb-4 top-10 text-slate-400 text-sm'></i>
       </div>
-      <ProfilePic/>
+      <div className='hidden md:flex justify-around gap-4 items-end'> 
+      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Data</Link>
+    <Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link>
+    <Link to="/settings"  className={location.pathname == "/settings" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
+    <Link to="/assignments"  className={location.pathname == "/assignments" ? "text-slate-800"  : "text-[--main-2]"}>Assignments</Link>
+    <Link to="/profile"  className={location.pathname == "/profile" ? "text-slate-800"  : "text-[--main-2]"}>My Profile</Link>
+    <Upgrade tier={3} showMsg={false}><Link  to="/switch" className={location.pathname == "/switch" ? "text-slate-800"  : "text-[--main-2]"}>Switch User</Link></Upgrade>
+    </div>
+
       <div className=' flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
       

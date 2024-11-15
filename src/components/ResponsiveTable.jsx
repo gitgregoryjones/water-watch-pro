@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ResponsiveTable() {
+function ResponsiveTable({location}) {
   const data = [
     { years: 1, hour24: 3.14, hour1: 2.35 },
     { years: 2, hour24: 7.18, hour1: 4.56 },

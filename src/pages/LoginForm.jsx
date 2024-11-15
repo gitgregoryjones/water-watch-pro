@@ -52,7 +52,7 @@ export default function LoginForm() {
 
             console.log(`Read bearer token like ${accessToken}`)
 
-            // Step 2: Verify the token and retrieve user information
+            // Step 2: Use the Token To get The Full User Profile
             const verifyResponse = await fetch(`${API_HOST}/users/me`, {
                 method: "GET",
                 headers: {
@@ -69,6 +69,35 @@ export default function LoginForm() {
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");
             }
+
+
+            //Step 3. Get The Client/Account Information from the Returned User and Use that to get the locations for this client
+
+            let clients = userData.clients;
+
+            if(!clients){
+                throw new Error(`Client Account information missing for this user ${userData.firstName} ${userData.lastName}`);
+            }
+
+            //TODO
+            const locationResponse = await fetch(`${API_HOST}/api/locations/?client_id=${clients[0].id}&page=1&page_size=10`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                }
+            });
+
+            const myLocations = await locationResponse.json();
+
+            userData.locations = myLocations.map((l,i)=> {
+                l.location = {
+                lat:l.latitude,
+                lng : l.longitude
+                }
+                return l;
+            });
+            
 
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));

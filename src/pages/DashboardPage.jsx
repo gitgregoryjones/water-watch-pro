@@ -107,8 +107,8 @@ export default function DashboardPage() {
 
       console.log(`Location DB Records is ${JSON.stringify(locations)}`)
       
-      setMapCoords(locations[0]?.location)
-      setLocation(locations[0]?.location);
+      setMapCoords({lat:locations[0]?.latitude, lng:locations[0]?.longitude})
+      setLocation(locations[0]);
       setMapZoom(10)
       setLocationList(locations);
       
@@ -152,8 +152,9 @@ export default function DashboardPage() {
   );
 
   function setMapCenter(locationObject, zoomIn){
+    console.log(`This is the location DUDE ${locationObject}`);
     console.log(`Map Center called for ${locationObject.name}`)
-    zoomIn && setMapCoords(locationObject.location)
+    zoomIn && setMapCoords({lat:locationObject.latitude, lng:locationObject.longitude})
     
     if(filteredList.length == 2){
       setMapZoom(8)
@@ -245,7 +246,7 @@ const handleChange = (event) => {
       
           
          
-      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >
+      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.latitude + "," +   location.longitude + ")" : ""}</div>}  >
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
@@ -267,7 +268,7 @@ const handleChange = (event) => {
            >
               
              { locationList.map((obj,i)=>{
-               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.location.lng}  position={obj.location}>
+               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.longitude}  position={ {lat:obj.latitude,lng:obj.longitude} }>
                        <div className='flex p-2 text-xl justify-center items-center'>
                           <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
                           </div>
@@ -331,7 +332,7 @@ const handleChange = (event) => {
             
           </div>
           <div className='tab'>NOAA Atlas 14
-            <ResponsiveTable/>
+            <ResponsiveTable  location={location}/>
           </div>
          
         </PillTabs>

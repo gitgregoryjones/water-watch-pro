@@ -18,6 +18,13 @@ export default async function fetchJsonApi(accessToken,url, body = {}, method = 
         
         });
    
+        console.log(fetchResponse)
+
+        if (!fetchResponse.ok) {
+            console.error(`HTTP error! Status: ${fetchResponse.status}`);
+            return { error: `Request failed with status ${fetchResponse.status}` };
+        }
+      
     
         const jsonData = await fetchResponse.json();
 

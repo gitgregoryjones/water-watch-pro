@@ -24,7 +24,7 @@ export function getLocationsFromDB(){ return (
 
 export function getUserFromDB() {
 
-  return {id:1, locations:getLocationsFromDB(), name:"James Dodge", tier:3, firstName: "Steve", lastName: "Urkel", role: "Owner", companyId : -1,loggedIn:false, jwt:"x91jsk1838"}
+  return {id:1, locations:getLocationsFromDB(), clients:[], name:"James Dodge", tier:3, firstName: "Steve", lastName: "Urkel", role: "Owner", companyId : -1,loggedIn:false, jwt:"x91jsk1838"}
 
 }
 

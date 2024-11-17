@@ -65,6 +65,7 @@ export default function LoginForm() {
 
             userData.firstName = userData.first_name;
             userData.lastName = userData.last_name;
+            userData.accessToken = accessToken;
 
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");

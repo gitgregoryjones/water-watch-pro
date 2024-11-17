@@ -47,8 +47,9 @@ function ResponsiveTable({location = {}}) {
             
             <tr key={index} className="odd:bg-white even:bg-gray-50">
               <td className="border px-4 py-2">{row.years}</td>
-              <td className="border px-4 py-2">{threshold['1h'] && threshold['1h'][index]}</td>
+             
               <td className="border px-4 py-2">{threshold['24h'] && threshold['24h'][index]}</td>
+              <td className="border px-4 py-2">{threshold['1h'] && threshold['1h'][index]}</td>
             </tr>
           ))}
         </tbody>

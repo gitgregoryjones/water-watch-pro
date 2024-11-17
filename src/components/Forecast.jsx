@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Datatable from './Datatable';
 import moment from 'moment';
+import fetchJsonApi from '../utility/fetchJsonApi';
+import { useSelector } from 'react-redux';
 
 
 
-export default function Forecast({local, className}) {
+export default function Forecast({location, className}) {
 
    let [forecast,setForecast] = useState([]);
 
@@ -15,6 +17,11 @@ export default function Forecast({local, className}) {
     moment().format("MM/DD/YYYY");
 
     const imageRef = useRef(null);
+
+    const user = useSelector((state) => state.userInfo.user);
+
+    
+
 
     let handleFullScreen = (event)=>{
 
@@ -58,33 +65,47 @@ export default function Forecast({local, className}) {
 
     useEffect(()=>{
 
-        console.log(`Local is ${local}`)
+        console.log(`Local is ${JSON.stringify(location)}`)
 
-        if(!local){
+        if(!location){
             setForecast(["https://www.wpc.ncep.noaa.gov/qpf/fill_94qwbg.gif",
                 "https://www.wpc.ncep.noaa.gov/qpf/fill_98qwbg.gif",
                 "https://www.wpc.ncep.noaa.gov/qpf/fill_99qwbg.gif"]);
-        } else {
-            setForecast([{day:"MON", rain:.25},{day:"TUE", rain:.50},{day:"WED", rain:2.50}])
+        }  else {
+          console.log(` Location url called will be /api/locations/${location.id}/forecast`)
+          console.log(` Location url 2`)
+
+          fetchJsonApi(user.accessToken,`/api/locations/${location.id}/forecast`,{},"GET").then(data => {
+            if (data) {
+              console.log('Data received:', JSON.stringify(data));
+              setLocalForecastData(data.forecasts);
+            } else {
+              console.log('No data received or an error occurred.');
+            }
+          });
+          
+          
+         
+         
         }
 
-        setLocalForecastData(["0.25","0.50","2.50"])
+        
             
        
-    },[]);
+    },[location]);
 
    
 
   return (
     
-        !local ?
+        !location ?
 
         <div className={`px-6 min-h-[10rem] mb-4 flex justify-start gap-2 overflow-scroll ${className} `}>
 
             {
                 forecast.map((m,i)=> {
                     return (
-                        <div className='min-w-[fit-content] h-full relative overflow-hidden'>
+                        <div key={i} className='min-w-[fit-content] h-full relative overflow-hidden'>
                            
                             <img
                             key={i}
@@ -108,10 +129,12 @@ export default function Forecast({local, className}) {
         </div>  :
 
 <div className='flex md:flex-row flex-row h-full min-h-[10rem] w-full flex-1 gap md:p-2 border  justify-center items-center text-[--text-color]'>
-         {  headers.map(d => {
+         {  headers.map((d,i) => {
 	       return   (
-			<div className='flex flex-col flex-1 w-full '><div className='text-md font-bold md:text-2xl p-4 bg-[--highlight-color]'>{d}</div>
-			<div className='text-lg p-4 font-bold'>{Math.random().toFixed(2)}</div>
+			<div key={i} className='flex flex-col flex-1 w-full '>
+          <div className='text-md font-bold text-center md:text-2xl p-4 bg-[--highlight-color]'>{d}</div>
+          <div className='text-md font-bold md:text-2xl text-center p-4 '>{localForecastData[i]?.value}</div>
+			
 	        </div>)
            })
         }

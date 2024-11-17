@@ -34,6 +34,7 @@ import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
 import { VITE_GOOGLE_API_KEY } from '../utility/constants'
+import fetchJsonApi from '../utility/fetchJsonApi'
 
 
 export default function DashboardPage() {
@@ -393,7 +394,7 @@ const handleChange = (event) => {
            </div>
            <div className='tab'>{location.name ? location.name : ''}
             <Upgrade>
-              <Forecast local={true} className={"items-end"}/>
+              {<Forecast location={location} className={"items-end"}/>}
             </Upgrade>
            </div>
            

@@ -1,0 +1,35 @@
+
+import { API_HOST } from "./constants";
+
+export default async function fetchJsonApi(accessToken,url, body = {}, method = 'GET') {
+
+    console.log(`Location 2 Hello everyone!!!!  ${accessToken} ${API_HOST}/${url}`)
+  
+    try {
+
+        const fetchResponse = await fetch(`${API_HOST}${url}`, {
+            method: method,
+        
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            
+        
+        });
+   
+    
+        const jsonData = await fetchResponse.json();
+
+        console.log(`Location 2 Returned JSON is ${jsonData}`)
+
+   
+
+    return jsonData;
+
+}catch(e){
+    console.log(e);
+}
+
+
+}

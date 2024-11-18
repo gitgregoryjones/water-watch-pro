@@ -66,6 +66,22 @@ export default function LoginForm() {
             userData.firstName = userData.first_name;
             userData.lastName = userData.last_name;
             userData.accessToken = accessToken;
+            
+            switch(userData.clients[0].tier.toLowerCase()){
+
+                case "bronze":
+                    userData.tier = 1;
+                break;
+                case "admin":
+                    userData.tier = 3;
+                    break;
+                case "silver":
+                    userData.tier = 2
+                    break;
+                default:
+                    userData.tier = 0;
+                    break;
+            }
 
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");

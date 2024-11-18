@@ -35,6 +35,7 @@ import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
 import { VITE_GOOGLE_API_KEY } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchJsonApi'
+import Processing from '../components/Processing'
 
 
 export default function DashboardPage() {
@@ -238,7 +239,10 @@ const handleChange = (event) => {
 
 };
 
-
+/* Rest Page after 30 seconds */
+setTimeout(function() {
+  alert(`Page would refresh data after 15 mins if this was real`)
+}, 5 * 60 * 1000); // 5 minutes in milliseconds
 
   
   
@@ -248,7 +252,7 @@ const handleChange = (event) => {
       
           
          
-      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >
+      <Card  header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i className="text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing/></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >

@@ -242,7 +242,7 @@ const handleChange = (event) => {
 /* Rest Page after 30 seconds */
 setTimeout(function() {
   alert(`Page would refresh data after 15 mins if this was real`)
-}, 5 * 60 * 1000); // 5 minutes in milliseconds
+}, 15 * 60 * 1000); // 5 minutes in milliseconds
 
   
   

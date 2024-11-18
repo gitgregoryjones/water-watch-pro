@@ -36,6 +36,7 @@ import ResponsiveTable from '../components/ResponsiveTable'
 import { VITE_GOOGLE_API_KEY } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchJsonApi'
 import Processing from '../components/Processing'
+import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
 
 
 export default function DashboardPage() {
@@ -53,7 +54,7 @@ export default function DashboardPage() {
 
   var [rainInterval,setRainInterval] = useState("daily");
 
-  var [mapCoords, setMapCoords] = useState({lat:-33.8567844,lng:151.213108});
+  var [mapCoords, setMapCoords] = useState({lat:33.748783,lng:-84.388168});
 
   var [filteredList, setFilteredList] = useState([]);
 
@@ -79,6 +80,9 @@ export default function DashboardPage() {
 
   var [favoriteList, setFavoriteList] = useState(0);
   
+  const [showIndividualMarkers, setShowIndividualMarkers] = useState(false);
+
+  const groupedLocations = groupLocations(locationList);
 
 
 
@@ -183,6 +187,30 @@ export default function DashboardPage() {
 
   }
 
+  function groupLocations(locations, groupByKey = 'region') {
+    const grouped = {};
+  
+    locations.forEach(location => {
+      const groupKey = location[groupByKey] || 'default';
+      if (!grouped[groupKey]) {
+        grouped[groupKey] = [];
+      }
+      grouped[groupKey].push(location);
+    });
+  
+    return Object.values(grouped).map(group => {
+      const latSum = group.reduce((sum, loc) => sum + loc.latitude, 0);
+      const lngSum = group.reduce((sum, loc) => sum + loc.longitude, 0);
+  
+      return {
+        key: group[0][groupByKey], // First item's group key
+        latitude: latSum / group.length,
+        longitude: lngSum / group.length,
+        count: group.length,
+        locations: group,
+      };
+    });
+  }
   
 
 
@@ -244,6 +272,20 @@ setTimeout(function() {
   console.log(`Page would refresh data after 15 mins if this was real ${new Date()}`)
 }, 15 * 60 * 1000); // 5 minutes in milliseconds
 
+const resetMap = () => {
+  setMapZoom(mapZoom);
+  setMapCoords(mapCoords);
+  setShowIndividualMarkers(false);
+};
+
+const handleGroupClick = (group) => {
+  setMapZoom(12); // Zoom in when clicking a group
+  setMapCoords({ lat: group.latitude, lng: group.longitude });
+  setShowIndividualMarkers(group.locations);
+  //setMapCenter(group.locations[0])
+  //setLocation(group.locations[0])
+  //console.log('clicked')
+};
   
   
   return (
@@ -252,42 +294,21 @@ setTimeout(function() {
       
           
          
-      <Card  header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i className="text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing/></div>}  >
+      <Card  header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing location={location}/></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
-      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
-           
-           <Map
-            
-             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
-             
-             
-             
-             mapId={'mainMap'}
-            
-             gestureHandling={'greedy'}
-             disableDefaultUI={true}
-             zoom={mapZoom}
-             center={mapCoords}
-             onCameraChanged={handleCameraChange}
-             
-             
-           >
-              
-             { locationList.map((obj,i)=>{
-               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.longitude}  position={ {lat:obj.latitude,lng:obj.longitude} }>
-                       <div className='flex p-2 text-xl justify-center items-center'>
-                          <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
-                          </div>
-                       </AdvancedMarker> 
-                     )
-             })}
-            
-             
-             </Map>
-         
-         </APIProvider>
+        
+        <MapWithGroupedMarkers
+        locationList={locationList}
+        initialZoom={mapZoom}
+        initialCoords={mapCoords}
+        handleCameraChange={handleCameraChange}
+        setMapCenter={setMapCenter}
+
+        
+        />
+     
       <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
@@ -312,37 +333,61 @@ setTimeout(function() {
     
         
       <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
-           
-           <Map
-            
-             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
-             
-             
-             
-             mapId={'mainMap'}
-            
-             gestureHandling={'greedy'}
-             disableDefaultUI={true}
-             zoom={mapZoom}
-             center={mapCoords}
-             onCameraChanged={handleCameraChange}
-             
-             
-           >
+      <Map
+        className="max-h-[95%] md:h-[40rem] flex-[3_3_0%] md:border"
+        mapId="mainMap"
+        gestureHandling="greedy"
+        disableDefaultUI={true}
+        zoom={mapZoom}
+        center={mapCoords}
+        onCameraChanged={handleCameraChange} // Allow manual zoom and pan
+      >
+        {/* Render grouped markers if not zoomed in */}
+        {!showIndividualMarkers &&
+          groupedLocations.map((group, i) => (
+            <AdvancedMarker
+              onClick={() => handleGroupClick(group)}
               
-             { locationList.map((obj,i)=>{
-               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.longitude}  position={ {lat:obj.latitude,lng:obj.longitude} }>
-                       <div className='flex p-2 text-xl justify-center items-center'>
-                          <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
-                          </div>
-                       </AdvancedMarker> 
-                     )
-             })}
-            
-             
-             </Map>
-         
-         </APIProvider>
+              clickable={true}
+              key={group.key || `group-${i}`}
+              position={{ lat: group.latitude, lng: group.longitude }}
+            >
+              <div className="flex p-2 text-xl justify-center items-center">
+                <i className="fas fa-map-marker-alt flex flex-1 text-4xl text-[orange]"></i>
+                <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
+                  {group.count} locations
+                </div>
+              </div>
+            </AdvancedMarker>
+          ))}
+
+        {/* Render individual markers if zoomed in */}
+        {showIndividualMarkers &&
+          showIndividualMarkers.map((location, i) => (
+            <AdvancedMarker
+              onClick={() => setMapCenter(location)}
+              clickable={true}
+              key={location.longitude}
+              position={{ lat: location.latitude, lng: location.longitude }}
+            >
+              <div className="flex p-2 text-xl justify-center items-center">
+                <i className="fas fa-map-marker-alt flex flex-1 text-4xl text-[red]"></i>
+                <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[blue]">
+                  {location.name}
+                </div>
+              </div>
+            </AdvancedMarker>
+          ))}
+
+        {/* Add a reset button */}
+        <div
+          className="absolute top-4 left-4 bg-white text-black p-2 rounded shadow-md cursor-pointer"
+          onClick={resetMap}
+        >
+          Reset Map
+        </div>
+      </Map>
+    </APIProvider>
       <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
@@ -374,7 +419,7 @@ setTimeout(function() {
             <RainfallChart location={location} range={"daily"}/>
           </div>
           <div className='tab'>1 Hour
-            <RainfallChart location={location} range={"hourly"}/>
+            <RainfallChart location={location} range={"daily"}/>
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>

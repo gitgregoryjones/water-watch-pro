@@ -18,9 +18,20 @@ const RainfallChart = ({location, range = "daily"}) => {
 
     let samples = [["Date","Rainfall"]];
 
-    Object.keys(hourlyData).forEach((key)=>{
+    
 
-      samples.push([key, hourlyData[key].total + 1]);
+// Extract the hours and minutes
+
+
+    Object.keys(hourlyData).forEach((key)=>{
+      const date = new Date(key);
+      const hours = date.getHours().toString().padStart(2, '0'); // Ensures two digits
+      const minutes = date.getMinutes().toString().padStart(2, '0'); // Ensures two digits
+
+// Format as HH:MM
+      const formattedTime = `${hours}:${minutes}`;
+
+      samples.push([formattedTime, hourlyData[key].total]);
 
     })
 
@@ -57,13 +68,22 @@ const RainfallChart = ({location, range = "daily"}) => {
       
     });
   } else {
-    setData([
-     
-      ["Date","Rainfall"],
-      ["2024-11-17 09:00:00",0.3],
-      ["2024-11-18 09:00:00",0.2],
-      ["2024-11-19 09:00:00",0.4],
-    ])
+
+    fetchJsonApi(user.accessToken,`/api/locations/${location.id}/24h_data`,{},"GET").then(data => {
+      if (!data.error) {
+        console.log('Data received:', JSON.stringify(data));
+
+        let values = getHourlyData(data.hourly_data);
+        console.log(`Values are back`);
+        console.log(values)
+        setData(values)
+        
+      } else {
+        console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
+      }
+    
+  });
+
   }
 
 

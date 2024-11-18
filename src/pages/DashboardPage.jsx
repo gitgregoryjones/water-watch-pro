@@ -313,7 +313,7 @@ const handleGroupClick = (group) => {
       
           
          
-      <Card  header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing location={location}/></div>}  >
+      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'>Below Threshold<div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div>Close To Threshold<div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div> Exceeeds Threshold<div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing location={location}/></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
@@ -345,7 +345,7 @@ const handleGroupClick = (group) => {
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
             <div className="flex p-2 text-xl justify-center items-center">
-              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[orange]'}`}></i>
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
               <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                 {Math.random().toFixed(2)} inches
               </div>
@@ -418,7 +418,7 @@ const handleGroupClick = (group) => {
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
            <div className="flex p-2 text-xl justify-center items-center">
-             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[orange]'}`}></i>
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                {obj.total_rainfall} inches
              </div>

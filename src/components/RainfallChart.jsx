@@ -52,7 +52,7 @@ const RainfallChart = ({location, range = "daily"}) => {
 
    
 
-   if(range == "daily"){
+   if(theRange == "daily"){
       fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data`,{},"GET").then(data => {
         if (!data.error) {
           console.log('Data received:', JSON.stringify(data));

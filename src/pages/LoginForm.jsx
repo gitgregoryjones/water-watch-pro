@@ -105,16 +105,86 @@ export default function LoginForm() {
                 }
             });
 
-            const myLocations = await locationResponse.json();
+            let myLocations = await locationResponse.json();
 
-            userData.locations = myLocations.map((l,i)=> {
+            myLocations = myLocations.map((l,i)=> {
                 l.location = {
                 lat:l.latitude,
                 lng : l.longitude
                 }
+
+                
+
                 return l;
             });
+
+             const fetchPromises = myLocations.map((location)=>{
+                
+                fetch(`${API_HOST}/api/locations/${location.id}/hourly_data`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${accessToken}`,
+                        "Content-Type": "application/json",
+                    }
+                }).then( response => {
+                    if(!response.ok){
+                        throw new Error(`Failed to get location hourly data for location ${location.id}`)
+                    }
+                    return response.json();
+                }).then( data => ({location, data}))
+
+             });
+            //Add hourly history
+           
+            const results = await Promise.all(fetchPromises);
+
+            console.log(`Results of the History is ${JSON.stringify(results)}`)
+
+            //myLocations = results;
+
+
+            //Now get 24hr and 1hr data for each
+            let ids = myLocations.map(me => me.id)
+
+            console.log(`Location ids is ${ids}`)
+
+            const location24History = await fetch(`${API_HOST}/api/locations/24h_data`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(ids)
+            });
+
+            if(!location24History.ok){
+
+                throw new Error('Failed to read location rainfall history')
+
+            }
+
+            const loc24 = await location24History.json();
+
+            let finishedLocations = [];
+
+            console.log(`Location 24 History ${JSON.stringify(loc24)}`)
+
+             myLocations  = myLocations.map(k=>{
+                if(loc24.locations[k.id]){
+                    k.total_rainfall = loc24.locations[k.id].total_rainfall;
+                    console.log(`Found some rain!!! for ${k.name}`)
+                }
+
+                return k;
+            })
+
+         
+            console.log(`Finished locations is ${JSON.stringify(myLocations)}`)
+
+
             
+
+            userData.locations = myLocations;
 
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));

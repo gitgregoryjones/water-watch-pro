@@ -6,8 +6,10 @@ export default async function fetchJsonApi(accessToken,url, body = {}, method = 
     console.log(`Location 2 Hello everyone!!!!  ${accessToken} ${API_HOST}/${url}`)
   
     try {
+        const fetchResponse = {};
 
-        const fetchResponse = await fetch(`${API_HOST}${url}`, {
+        if(method == 'GET'){
+        fetchResponse = await fetch(`${API_HOST}${url}`, {
             method: method,
         
             headers: {
@@ -15,8 +17,24 @@ export default async function fetchJsonApi(accessToken,url, body = {}, method = 
                 "Content-Type": "application/json",
             },
             
+
         
         });
+        } else if(method == "POST") {
+            fetchResponse = await fetch(`${API_HOST}${url}`, {
+                method: method,
+            
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body : body
+                
+    
+            
+            });
+
+        }
    
         console.log(fetchResponse)
 

@@ -84,6 +84,8 @@ export default function DashboardPage() {
 
   const groupedLocations = groupLocations(locationList);
 
+  const [currentLocation, setCurrentLocation] = useState(null);
+
 
 
   
@@ -147,6 +149,23 @@ export default function DashboardPage() {
     setUnassignedList(locations)
   }
   },[assignedContact])
+
+  useEffect(() => {
+    // Get the user's current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error('Error fetching current location:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }, []);
 
   var [cameraProps,setCameraProps] = useState({center:{lat:-33.8567844,lng:151.213108},zoom:5});
 
@@ -299,15 +318,55 @@ const handleGroupClick = (group) => {
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
         
-        <MapWithGroupedMarkers
-        locationList={locationList}
-        initialZoom={mapZoom}
-        initialCoords={mapCoords}
-        handleCameraChange={handleCameraChange}
-        setMapCenter={setMapCenter}
-
-        
-        />
+      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
+           
+           <Map
+            
+             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+             
+             
+             
+             mapId={'mainMap'}
+            
+             gestureHandling={'greedy'}
+             disableDefaultUI={true}
+             zoom={mapZoom}
+             center={mapCoords}
+             onCameraChanged={handleCameraChange}
+             
+             
+           >
+              
+              {locationList.map((obj, i) => (
+          <AdvancedMarker
+            onClick={() => setMapCenter(obj)}
+            clickable={true}
+            key={obj.longitude}
+            position={{ lat: obj.latitude, lng: obj.longitude }}
+          >
+            <div className="flex p-2 text-xl justify-center items-center">
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[orange]'}`}></i>
+              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
+                {Math.random().toFixed(2)} inches
+              </div>
+            </div>
+          </AdvancedMarker>
+        ))}
+            
+              {/* Render marker for current location */}
+        {currentLocation && (
+          <AdvancedMarker position={currentLocation} clickable={false}>
+            <div className="flex p-2 text-xl justify-center items-center">
+              <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+              <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
+               
+              </div>
+            </div>
+          </AdvancedMarker>
+        )}
+             </Map>
+         
+         </APIProvider>
      
       <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
@@ -332,62 +391,56 @@ const handleGroupClick = (group) => {
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
     
         
-      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
+           
       <Map
-        className="max-h-[95%] md:h-[40rem] flex-[3_3_0%] md:border"
-        mapId="mainMap"
-        gestureHandling="greedy"
-        disableDefaultUI={true}
-        zoom={mapZoom}
-        center={mapCoords}
-        onCameraChanged={handleCameraChange} // Allow manual zoom and pan
-      >
-        {/* Render grouped markers if not zoomed in */}
-        {!showIndividualMarkers &&
-          groupedLocations.map((group, i) => (
-            <AdvancedMarker
-              onClick={() => handleGroupClick(group)}
+            
+            className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+            
+            
+            
+            mapId={'mainMap'}
+           
+            gestureHandling={'greedy'}
+            disableDefaultUI={true}
+            zoom={mapZoom}
+            center={mapCoords}
+            onCameraChanged={handleCameraChange}
+            
+            
+          >
+             
+             {locationList.map((obj, i) => (
+         <AdvancedMarker
+           onClick={() => setMapCenter(obj)}
+           clickable={true}
+           key={obj.longitude}
+           position={{ lat: obj.latitude, lng: obj.longitude }}
+         >
+           <div className="flex p-2 text-xl justify-center items-center">
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[orange]'}`}></i>
+             <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
+               {obj.total_rainfall} inches
+             </div>
+           </div>
+         </AdvancedMarker>
+       ))}
+           
+             {/* Render marker for current location */}
+       {currentLocation && (
+         <AdvancedMarker position={currentLocation} clickable={false}>
+           <div className="flex p-2 text-xl justify-center items-center">
+             <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+             <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
               
-              clickable={true}
-              key={group.key || `group-${i}`}
-              position={{ lat: group.latitude, lng: group.longitude }}
-            >
-              <div className="flex p-2 text-xl justify-center items-center">
-                <i className="fas fa-map-marker-alt flex flex-1 text-4xl text-[orange]"></i>
-                <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
-                  {group.count} locations
-                </div>
-              </div>
-            </AdvancedMarker>
-          ))}
-
-        {/* Render individual markers if zoomed in */}
-        {showIndividualMarkers &&
-          showIndividualMarkers.map((location, i) => (
-            <AdvancedMarker
-              onClick={() => setMapCenter(location)}
-              clickable={true}
-              key={location.longitude}
-              position={{ lat: location.latitude, lng: location.longitude }}
-            >
-              <div className="flex p-2 text-xl justify-center items-center">
-                <i className="fas fa-map-marker-alt flex flex-1 text-4xl text-[red]"></i>
-                <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[blue]">
-                  {location.name}
-                </div>
-              </div>
-            </AdvancedMarker>
-          ))}
-
-        {/* Add a reset button */}
-        <div
-          className="absolute top-4 left-4 bg-white text-black p-2 rounded shadow-md cursor-pointer"
-          onClick={resetMap}
-        >
-          Reset Map
-        </div>
-      </Map>
-    </APIProvider>
+             </div>
+           </div>
+         </AdvancedMarker>
+       )}
+            </Map>
+        
+         
+         </APIProvider>
       <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
@@ -416,10 +469,11 @@ const handleGroupClick = (group) => {
       <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
         <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
-            <RainfallChart location={location} range={"daily"}/>
+            
+            <div className='w-full h-full text-center'>Coming Soon</div>
           </div>
           <div className='tab'>1 Hour
-            <RainfallChart location={location} range={"daily"}/>
+            <div className='w-full h-full text-center'>Coming Soon</div>
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>

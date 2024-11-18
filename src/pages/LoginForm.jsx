@@ -97,7 +97,7 @@ export default function LoginForm() {
             }
 
             //TODO
-            const locationResponse = await fetch(`${API_HOST}/api/locations/?client_id=${clients[0].id}&page=1&page_size=10`, {
+            const locationResponse = await fetch(`${API_HOST}/api/locations/?client_id=${clients[0].id}&page=1&page_size=100`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,

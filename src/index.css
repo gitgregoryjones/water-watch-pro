@@ -513,12 +513,12 @@ Location {
 }
 
 
-
+/*
 .tab:last-child:after {
   content: "★";
   color:gold;
   padding-left:.25rem;
-}
+}*/
 
 /* Default Style to Show and Hide Pills */
 .pill-show {

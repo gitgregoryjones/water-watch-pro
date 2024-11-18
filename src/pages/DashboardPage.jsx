@@ -241,7 +241,7 @@ const handleChange = (event) => {
 
 /* Rest Page after 30 seconds */
 setTimeout(function() {
-  alert(`Page would refresh data after 15 mins if this was real`)
+  console.log(`Page would refresh data after 15 mins if this was real ${new Date()}`)
 }, 15 * 60 * 1000); // 5 minutes in milliseconds
 
   
@@ -382,7 +382,7 @@ setTimeout(function() {
             </Upgrade>
           </div>
           <div className='tab'>NOAA Atlas 14
-          {Object.keys(location).length > 0 && <ResponsiveTable  location={location} />}
+          {Object.keys(location).length > 0 && location.atlas14_threshold && <ResponsiveTable  location={location} />}
           </div>
         
       

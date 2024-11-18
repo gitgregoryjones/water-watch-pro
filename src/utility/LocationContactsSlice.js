@@ -13,6 +13,7 @@ const locationContactsSlice = createSlice({
     addLocation: (state, action) => {
       state.locations.push(action.payload);
     },
+   
     updateLocation: (state, action) => {
       const index = state.locations.findIndex(loc => loc.id === action.payload.id);
       if (index !== -1) state.locations[index] = action.payload;
@@ -30,6 +31,7 @@ const locationContactsSlice = createSlice({
     deleteContact: (state, action) => {
       state.contacts = state.contacts.filter(contact => contact.id !== action.payload);
     },
+
   },
 });
 

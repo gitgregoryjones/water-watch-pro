@@ -2,9 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'MyriadPro';
+  src: url('fonts/MYRIADPRO-SEMIBOLD.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 :root {
   
-  font-family: Poppins;
+  font-family: MyriadPro;
   line-height: 1;
   border-color:#e5e7eb;
 
@@ -50,6 +58,19 @@
   --alert: red;
 
 }
+
+/* Fallback for iOS Safari */
+.ios-fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: black;
+  object-fit: contain;
+}
+
 /* Hide content in landscape orientation */
 @media (orientation: landscape) and (max-width: 950px) {
   body {
@@ -172,9 +193,6 @@ a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
 }
 
 body {
@@ -495,12 +513,12 @@ Location {
 }
 
 
-
+/*
 .tab:last-child:after {
   content: "★";
   color:gold;
   padding-left:.25rem;
-}
+}*/
 
 /* Default Style to Show and Hide Pills */
 .pill-show {
@@ -541,9 +559,7 @@ header {
     color: #213547;
     background-color: #ffffff;
   }
-  a:hover {
-    color: #747bff;
-  }
+  
   
   /** Move to styled components **/
   

@@ -32,6 +32,11 @@ import { useSelector,useDispatch } from 'react-redux'
 import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
+import ResponsiveTable from '../components/ResponsiveTable'
+import { VITE_GOOGLE_API_KEY } from '../utility/constants'
+import fetchJsonApi from '../utility/fetchJsonApi'
+import Processing from '../components/Processing'
+import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
 
 
 export default function DashboardPage() {
@@ -49,7 +54,7 @@ export default function DashboardPage() {
 
   var [rainInterval,setRainInterval] = useState("daily");
 
-  var [mapCoords, setMapCoords] = useState({lat:-33.8567844,lng:151.213108});
+  var [mapCoords, setMapCoords] = useState({lat:33.748783,lng:-84.388168});
 
   var [filteredList, setFilteredList] = useState([]);
 
@@ -74,6 +79,12 @@ export default function DashboardPage() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   var [favoriteList, setFavoriteList] = useState(0);
+  
+  const [showIndividualMarkers, setShowIndividualMarkers] = useState(false);
+
+  const groupedLocations = groupLocations(locationList);
+
+  const [currentLocation, setCurrentLocation] = useState(null);
 
 
 
@@ -105,8 +116,8 @@ export default function DashboardPage() {
 
       console.log(`Location DB Records is ${JSON.stringify(locations)}`)
       
-      setMapCoords(locations[0]?.location)
-      setLocation(locations[0]?.location);
+      setMapCoords({lat:locations[0]?.latitude, lng:locations[0]?.longitude})
+      setLocation(locations[0]);
       setMapZoom(10)
       setLocationList(locations);
       
@@ -139,6 +150,23 @@ export default function DashboardPage() {
   }
   },[assignedContact])
 
+  useEffect(() => {
+    // Get the user's current location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error('Error fetching current location:', error);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }, []);
+
   var [cameraProps,setCameraProps] = useState({center:{lat:-33.8567844,lng:151.213108},zoom:5});
 
   const handleCameraChange = useCallback((ev) => {
@@ -150,8 +178,9 @@ export default function DashboardPage() {
   );
 
   function setMapCenter(locationObject, zoomIn){
+    console.log(`This is the location DUDE ${JSON.stringify(locationObject)}`);
     console.log(`Map Center called for ${locationObject.name}`)
-    zoomIn && setMapCoords(locationObject.location)
+    zoomIn && setMapCoords({lat:locationObject.latitude, lng:locationObject.longitude})
     
     if(filteredList.length == 2){
       setMapZoom(8)
@@ -177,6 +206,30 @@ export default function DashboardPage() {
 
   }
 
+  function groupLocations(locations, groupByKey = 'region') {
+    const grouped = {};
+  
+    locations.forEach(location => {
+      const groupKey = location[groupByKey] || 'default';
+      if (!grouped[groupKey]) {
+        grouped[groupKey] = [];
+      }
+      grouped[groupKey].push(location);
+    });
+  
+    return Object.values(grouped).map(group => {
+      const latSum = group.reduce((sum, loc) => sum + loc.latitude, 0);
+      const lngSum = group.reduce((sum, loc) => sum + loc.longitude, 0);
+  
+      return {
+        key: group[0][groupByKey], // First item's group key
+        latitude: latSum / group.length,
+        longitude: lngSum / group.length,
+        count: group.length,
+        locations: group,
+      };
+    });
+  }
   
 
 
@@ -233,19 +286,39 @@ const handleChange = (event) => {
 
 };
 
+/* Rest Page after 30 seconds */
+setTimeout(function() {
+  console.log(`Page would refresh data after 15 mins if this was real ${new Date()}`)
+}, 15 * 60 * 1000); // 5 minutes in milliseconds
 
+const resetMap = () => {
+  setMapZoom(mapZoom);
+  setMapCoords(mapCoords);
+  setShowIndividualMarkers(false);
+};
 
+const handleGroupClick = (group) => {
+  setMapZoom(12); // Zoom in when clicking a group
+  setMapCoords({ lat: group.latitude, lng: group.longitude });
+  setShowIndividualMarkers(group.locations);
+  //setMapCenter(group.locations[0])
+  //setLocation(group.locations[0])
+  //console.log('clicked')
+};
   
-  console.log(`Loaded Dashboard! ${import.meta.env.VITE_GOOGLE_API_KEY}`)
+  
   return (
     
-    <Dashboard className='mt-20  md:my-[2rem] px-8'>
+    <Dashboard className='mt-20  md:my-[8rem] px-8'>
       
           
          
-      <Card  header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-location-dot"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div>}  >
+      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'>Below Threshold<div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div>Close To Threshold<div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div> Exceeeds Threshold<div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing location={location}/></div>}  >
+      <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
+      <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
-      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+        
+      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
            <Map
             
@@ -264,17 +337,108 @@ const handleChange = (event) => {
              
            >
               
-             { locationList.map((obj,i)=>{
-               return ( <AdvancedMarker onClick={()=> setMapCenter(obj)} clickable={true} key={obj.location.lng}  position={obj.location}>
-                       <div className='flex p-2 text-xl justify-center items-center'>
-                          <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > .5 ? 'text-[red]' : 'text-[orange]'}`}></i><div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]`}>{Math.random().toFixed(2)} inches</div>
-                          </div>
-                       </AdvancedMarker> 
-                     )
-             })}
+              {locationList.map((obj, i) => (
+          <AdvancedMarker
+            onClick={() => setMapCenter(obj)}
+            clickable={true}
+            key={obj.longitude}
+            position={{ lat: obj.latitude, lng: obj.longitude }}
+          >
+            <div className="flex p-2 text-xl justify-center items-center">
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
+              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
+                {Math.random().toFixed(2)} inches
+              </div>
+            </div>
+          </AdvancedMarker>
+        ))}
             
-             
+              {/* Render marker for current location */}
+        {currentLocation && (
+          <AdvancedMarker position={currentLocation} clickable={false}>
+            <div className="flex p-2 text-xl justify-center items-center">
+              <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+              <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
+               
+              </div>
+            </div>
+          </AdvancedMarker>
+        )}
              </Map>
+         
+         </APIProvider>
+     
+      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+            collectionList={locationList}
+            showAddButton={false}
+            onItemClicked={(obj)=>setMapCenter(obj,true)}
+            showSelectButton={false}
+            enableMultiSelect={false}
+            showFavoriteControls={false}
+            
+            searchPlaceholder='Search Your Locations...'
+            addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
+
+
+          />
+          
+      
+          
+         
+          </Card>
+          </div>
+          <div className='tab'>24 Hr Accum
+      <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
+    
+        
+      <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
+           
+      <Map
+            
+            className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+            
+            
+            
+            mapId={'mainMap'}
+           
+            gestureHandling={'greedy'}
+            disableDefaultUI={true}
+            zoom={mapZoom}
+            center={mapCoords}
+            onCameraChanged={handleCameraChange}
+            
+            
+          >
+             
+             {locationList.map((obj, i) => (
+         <AdvancedMarker
+           onClick={() => setMapCenter(obj)}
+           clickable={true}
+           key={obj.longitude}
+           position={{ lat: obj.latitude, lng: obj.longitude }}
+         >
+           <div className="flex p-2 text-xl justify-center items-center">
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
+             <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
+               {obj.total_rainfall} inches
+             </div>
+           </div>
+         </AdvancedMarker>
+       ))}
+           
+             {/* Render marker for current location */}
+       {currentLocation && (
+         <AdvancedMarker position={currentLocation} clickable={false}>
+           <div className="flex p-2 text-xl justify-center items-center">
+             <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+             <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
+              
+             </div>
+           </div>
+         </AdvancedMarker>
+       )}
+            </Map>
+        
          
          </APIProvider>
       <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
@@ -290,72 +454,56 @@ const handleChange = (event) => {
 
 
           />
+          
+      
+          
+         
           </Card>
+          </div>
+          </PillTabs>
+          
       </Card>
+      
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={"md:hidden  shadow shadow-[#95b8c8]"}>
-        <PillTabs className="" mini={true} header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
+        <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
-            <RainfallChart location={location} range={"daily"}/>
+            
+            <div className='w-full h-full text-center'>Coming Soon</div>
           </div>
           <div className='tab'>1 Hour
-            <RainfallChart location={location} range={"hourly"}/>
+            <div className='w-full h-full text-center'>Coming Soon</div>
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>
               <RainfallChart location={location} range={"rapidrain"} />
             </Upgrade>
+          </div>
+          <div className='tab'>NOAA Atlas 14
+          {Object.keys(location).length > 0 && location.atlas14_threshold && <ResponsiveTable  location={location} />}
           </div>
         
       
         </PillTabs>
         </Card>
-      <Card header={<div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}  className={"md:block hidden shadow shadow-[#95b8c8]"}>
-        <PillTabs className="" mini={false}>
-          <div className='tab'>24 Hour
-            <RainfallChart location={location} range={"daily"}/>
-          </div>
-          <div className='tab'>1 Hour
-            <RainfallChart location={location} range={"hourly"}/>
-          </div>
-          <div className='tab'>RAPIDRAIN
-            <Upgrade>
-              <RainfallChart location={location} range={"rapidrain"} />
-            </Upgrade>
-          </div>
-         
-        </PillTabs>
-        
-      </Card>
+      
   
       
-      <Card header={<div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 hidden md:block"}>
-           <PillTabs mini={false}>
+      <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
+           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
             <div className='tab'>National
               <Forecast className={"items-end"}/>
            </div>
            <div className='tab'>{location.name ? location.name : ''}
             <Upgrade>
-              <Forecast local={true} className={"items-end"}/>
+              {<Forecast location={location} className={"items-end"}/>}
             </Upgrade>
            </div>
            
             </PillTabs> 
         </Card>
-        <Card  className={"pb-0 md:hidden"}>
-           <PillTabs header={<div className='flex gap-2 items-center'><i className="text-[--main-1] fa-solid fa-circle-info text-md "></i>3 Day Forecast</div>} mini={true}>
-            <div className='tab'>National
-              <Forecast className={"items-end"}/>
-           </div>
-           <div className='tab'>{location.name ? location.name : ''}
-            <Upgrade>
-              <Forecast local={true} className={"items-end"}/>
-            </Upgrade>
-           </div>
-           
-            </PillTabs> 
-        </Card>
+        
      {/*</span>*/}
      <a name="alerts"></a>
       <Alerts/>

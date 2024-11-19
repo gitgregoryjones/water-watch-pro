@@ -86,6 +86,7 @@ export default function DashboardPage() {
 
   const [currentLocation, setCurrentLocation] = useState(null);
 
+  const [noaaThreshold, setNOAAThreshold] = useState(10);
 
 
   
@@ -182,6 +183,8 @@ export default function DashboardPage() {
     console.log(`Map Center called for ${locationObject.name}`)
     zoomIn && setMapCoords({lat:locationObject.latitude, lng:locationObject.longitude})
     
+    setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
+
     if(filteredList.length == 2){
       setMapZoom(8)
     } else
@@ -329,7 +332,7 @@ const handleGroupClick = (group) => {
              mapId={'mainMap'}
             
              gestureHandling={'greedy'}
-             disableDefaultUI={true}
+             disableDefaultUI={false}
              zoom={mapZoom}
              center={mapCoords}
              onCameraChanged={handleCameraChange}
@@ -345,7 +348,7 @@ const handleGroupClick = (group) => {
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
             <div className="flex p-2 text-xl justify-center items-center">
-              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > obj?.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
               <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                 {Math.random().toFixed(2)} inches
               </div>
@@ -402,7 +405,7 @@ const handleGroupClick = (group) => {
             mapId={'mainMap'}
            
             gestureHandling={'greedy'}
-            disableDefaultUI={true}
+            disableDefaultUI={false}
             zoom={mapZoom}
             center={mapCoords}
             onCameraChanged={handleCameraChange}
@@ -418,7 +421,7 @@ const handleGroupClick = (group) => {
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
            <div className="flex p-2 text-xl justify-center items-center">
-             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > 0.5 ? 'text-[red]' : 'text-[green]'}`}></i>
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                {obj.total_rainfall} inches
              </div>

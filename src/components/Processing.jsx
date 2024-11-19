@@ -32,10 +32,7 @@ export default function Processing() {
               setStatus(data.status);
               setDisplayTime(convertTime(data.datetime))
 
-              if(data.status.toLowerCase() == "processing"){
-
-               setShowMsg(true);
-              }
+             
               
             } else {
               console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
@@ -48,6 +45,7 @@ export default function Processing() {
 
     
   return (
-    showMsg && <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status} {displayTime} data now</div>
+    status == "processing" ? <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} data now</div>
+    : <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} through {displayTime}</div>
   )
 }

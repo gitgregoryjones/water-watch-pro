@@ -15,7 +15,7 @@ export default function Processing({location}) {
     useEffect(()=>{
 
         if(location.id)
-        fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data`,{},"GET").then(data => {
+        fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data?client_id=${user.clients[0].id}`,{},"GET").then(data => {
             if (!data.error) {
               console.log('Data received:', JSON.stringify(data));
     
@@ -23,8 +23,8 @@ export default function Processing({location}) {
 
               let key = -1;
 
-              console.log(`Values are back Greg`);
-              console.log(values)
+              //console.log(`Values are back Greg`);
+              //console.log(values)
               if(Object.keys(values).length > 0){
                 console.log(`Latest Hour is ${new Date(Object.keys(values)[0]).getHours()}`)
                 key = Object.keys(values)[0];
@@ -46,6 +46,6 @@ export default function Processing({location}) {
 
     
   return (
-    showProcessing && <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>Processing {`${hour}`.padStart(2, '0') }00 am data now</div>
+    showProcessing && <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>Processing {`${hour}`.padStart(2, '0') }00 data now</div>
   )
 }

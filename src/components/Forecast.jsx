@@ -76,16 +76,19 @@ export default function Forecast({location, className}) {
         //  console.log(` Location url 2`)
 
           try {
-          fetchJsonApi(user.accessToken,`/api/locations/${location.id}/forecast?client_id=${user.clients[0].id}`,{},"GET").then(data => {
-            if (!data.error) {
-              console.log('Forecast Data received:', JSON.stringify(data));
-              setLocalForecastData(data.forecasts);
-            } else {
-              console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
-            }
-          });
+          if(location.id) {
+            fetchJsonApi(user.accessToken,`/api/locations/${location.id}/forecast?client_id=${user.clients[0].id}`,{},"GET").then(data => {
+              if (!data.error) {
+                console.log('Forecast Data received:', JSON.stringify(data));
+                setLocalForecastData(data.forecasts);
+              } else {
+                console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
+              }
+            });
+        }
         }catch (e){
           console.log(`The Error is ${e}`)
+
         }
           
           

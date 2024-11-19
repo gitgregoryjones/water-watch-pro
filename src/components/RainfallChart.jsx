@@ -71,6 +71,7 @@ const RainfallChart = ({location, range = "daily"}) => {
     });
   } else {
 
+    if(location.id) {
     fetchJsonApi(user.accessToken,`/api/locations/${location.id}/24h_data?client_id=${user.clients[0].id}`,{},"GET").then(data => {
       if (!data.error) {
         console.log('Data received:', JSON.stringify(data));
@@ -84,7 +85,9 @@ const RainfallChart = ({location, range = "daily"}) => {
         console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
       }
     
+    
   });
+  }
 
   }
 

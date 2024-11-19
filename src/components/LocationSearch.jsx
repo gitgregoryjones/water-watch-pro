@@ -155,9 +155,9 @@ const LocationControl = ({totalClicked, enableMultiSelect, broadcastSelectClick,
   },[showFavorites,favorites]);
 
   useEffect(()=>{
-    console.log(`The wrong thing was called correctly ${locationList}`)
+    //console.log(`The wrong thing was called correctly ${locationList}`)
 
-    console.log(`Use Effect isChecked and cites.length is ${cities.length} and checked is ${isChecked}`)
+    //console.log(`Use Effect isChecked and cites.length is ${cities.length} and checked is ${isChecked}`)
 
     cities.map(cc => {
       cc.highlight = isChecked ? true : false;

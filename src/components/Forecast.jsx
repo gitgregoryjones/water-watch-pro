@@ -65,15 +65,15 @@ export default function Forecast({location, className}) {
 
     useEffect(()=>{
 
-        console.log(`Local is ${JSON.stringify(location)}`)
+        //console.log(`Local is ${JSON.stringify(location)}`)
 
         if(!location){
             setForecast(["https://www.wpc.ncep.noaa.gov/qpf/fill_94qwbg.gif",
                 "https://www.wpc.ncep.noaa.gov/qpf/fill_98qwbg.gif",
                 "https://www.wpc.ncep.noaa.gov/qpf/fill_99qwbg.gif"]);
         }  else {
-          console.log(` Location url called will be /api/locations/${location.id}/forecast`)
-          console.log(` Location url 2`)
+          //console.log(` Location url called will be /api/locations/${location.id}/forecast`)
+        //  console.log(` Location url 2`)
 
           try {
           fetchJsonApi(user.accessToken,`/api/locations/${location.id}/forecast?client_id=${user.clients[0].id}`,{},"GET").then(data => {

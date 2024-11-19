@@ -104,7 +104,7 @@ export default function DashboardPage() {
 
   useEffect(()=>{
 
-    console.log(`Made it to Use Effect Dashboard MapCoords and Filtered Map Zoom to 15 cause length is ${filteredList.length}`)
+    //console.log(`Made it to Use Effect Dashboard MapCoords and Filtered Map Zoom to 15 cause length is ${filteredList.length}`)
    
 
     if(filteredList?.length > 0){
@@ -114,7 +114,7 @@ export default function DashboardPage() {
     } else {
       
 
-      console.log(`Location DB Records is ${JSON.stringify(locations)}`)
+      //console.log(`Location DB Records is ${JSON.stringify(locations)}`)
       
       setMapCoords({lat:locations[0]?.latitude, lng:locations[0]?.longitude})
       setLocation(locations[0]);
@@ -129,7 +129,7 @@ export default function DashboardPage() {
   },[filteredList])
 
   useEffect(()=>{
-    console.log(`Location List size is now ${locationList.length}`)
+    //console.log(`Location List size is now ${locationList.length}`)
     
   },[locationList])
 

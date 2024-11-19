@@ -24,7 +24,7 @@ function ResponsiveTable({location = {}}) {
     return;
 
   //let threshold = {'1h': [1.33, 1.52, 1.84, 2.12, 2.53, 2.86, 3.19, 3.55, 4.04, 4.43], '24h': [3.33, 3.76, 4.48, 5.09, 5.96, 6.64, 7.35, 8.07, 9.06, 9.83]};
-  console.log("atlas14_threshold:", location.atlas14_threshold);
+  //console.log("atlas14_threshold:", location.atlas14_threshold);
 
   const threshold = location.atlas14_threshold;
 

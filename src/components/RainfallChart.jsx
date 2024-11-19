@@ -7,8 +7,10 @@ import fetchJsonApi from '../utility/fetchJsonApi';
 
 
 
+
 const RainfallChart = ({location, range = "daily"}) => {
 
+  
   
   const [data,setData] = useState([])
 
@@ -48,12 +50,12 @@ const RainfallChart = ({location, range = "daily"}) => {
 
     //setData pull from DB when User Slice changes
 
-   console.log(`Location changed! and range is ${range}`)
+   //console.log(`Location changed! and range is ${range}`)
 
    
 
    if(theRange == "daily"){
-      fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data`,{},"GET").then(data => {
+      fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data?client_id=${user.clients[0].id}`,{},"GET").then(data => {
         if (!data.error) {
           console.log('Data received:', JSON.stringify(data));
 
@@ -69,7 +71,7 @@ const RainfallChart = ({location, range = "daily"}) => {
     });
   } else {
 
-    fetchJsonApi(user.accessToken,`/api/locations/${location.id}/24h_data`,{},"GET").then(data => {
+    fetchJsonApi(user.accessToken,`/api/locations/${location.id}/24h_data?client_id=${user.clients[0].id}`,{},"GET").then(data => {
       if (!data.error) {
         console.log('Data received:', JSON.stringify(data));
 

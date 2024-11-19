@@ -50,7 +50,7 @@ export default function PillTabs({children,className,mini, header}) {
         
         rawBodyClasses.map(c => refinedBodyClasses.push(c.substring(c.indexOf("-")+1)))
         
-        console.log(`modified string is ${refinedBodyClasses}`)
+        //console.log(`modified string is ${refinedBodyClasses}`)
 
         return refinedBodyClasses.join(" ");
 

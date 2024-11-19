@@ -173,9 +173,9 @@ const ItemControl = ({
   const handleSelectAll = () => setIsChecked(!isChecked);
 
   useEffect(()=>{
-    console.log(`The wrong thing was called correctly ${cList}`)
+    //console.log(`The wrong thing was called correctly ${cList}`)
 
-    console.log(`Use Effect isChecked and cites.length is ${cList.length} and checked is ${isChecked}`)
+    //console.log(`Use Effect isChecked and cites.length is ${cList.length} and checked is ${isChecked}`)
 
     const copy = cList.map(cc => ({
       ...cc, 

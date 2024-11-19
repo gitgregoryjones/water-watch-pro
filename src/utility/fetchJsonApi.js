@@ -6,7 +6,7 @@ export default async function fetchJsonApi(accessToken,url, body = {}, method = 
     console.log(`Location 2 Hello everyone!!!!  ${accessToken} ${API_HOST}/${url}`)
   
     try {
-        const fetchResponse = {};
+        let fetchResponse = {};
 
         if(method == 'GET'){
         fetchResponse = await fetch(`${API_HOST}${url}`, {

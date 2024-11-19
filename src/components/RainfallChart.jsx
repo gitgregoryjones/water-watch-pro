@@ -97,11 +97,11 @@ const RainfallChart = ({location, range = "daily"}) => {
   return (
     <div className={'w-full overflow-x-scroll md:h-[30rem]'}>
   
-       <div className='h-[10rem] md:h-full' style={{ width: `${data.length * 50}px` }}>
-        {
-         <Chart chartType="ColumnChart" width="100%" height="100%" data={data} />
+       <div className='h-[10rem] md:h-full' sstyle={{ width: `${data.length * 50}px` }}>
+        
+         {false && <Chart chartType="ColumnChart" width="100%" height="100%" data={data} />}
        
-      }
+      <div className='flex w-full h-full text-center justify-center items-center'>{theRange} Not This Sprint</div>
       </div>
     </div>
   );

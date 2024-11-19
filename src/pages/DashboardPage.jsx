@@ -339,6 +339,16 @@ const handleGroupClick = (group) => {
              
              
            >
+             {currentLocation && (
+          <AdvancedMarker position={currentLocation} clickable={false}>
+            <div className="flex p-2 text-xl justify-center items-center">
+              <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+              <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
+               
+              </div>
+            </div>
+          </AdvancedMarker>
+        )}
               
               {locationList.map((obj, i) => (
           <AdvancedMarker
@@ -357,16 +367,7 @@ const handleGroupClick = (group) => {
         ))}
             
               {/* Render marker for current location */}
-        {currentLocation && (
-          <AdvancedMarker position={currentLocation} clickable={false}>
-            <div className="flex p-2 text-xl justify-center items-center">
-              <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
-              <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
-               
-              </div>
-            </div>
-          </AdvancedMarker>
-        )}
+       
              </Map>
          
          </APIProvider>
@@ -412,6 +413,17 @@ const handleGroupClick = (group) => {
             
             
           >
+                   {/* Render marker for current location */}
+       {currentLocation && (
+         <AdvancedMarker position={currentLocation} clickable={false}>
+           <div className="flex p-2 text-xl justify-center items-center">
+             <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
+             <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
+              
+             </div>
+           </div>
+         </AdvancedMarker>
+       )}
              
              {locationList.map((obj, i) => (
          <AdvancedMarker
@@ -429,17 +441,7 @@ const handleGroupClick = (group) => {
          </AdvancedMarker>
        ))}
            
-             {/* Render marker for current location */}
-       {currentLocation && (
-         <AdvancedMarker position={currentLocation} clickable={false}>
-           <div className="flex p-2 text-xl justify-center items-center">
-             <i className="fas fa-map-marker-alt text-[black] text-4xl"></i>
-             <div className="px-2 border rounded text-[white] text-lg bg-[blue] " title="You Are Here">
-              
-             </div>
-           </div>
-         </AdvancedMarker>
-       )}
+      
             </Map>
         
          

@@ -67,7 +67,7 @@ export default function LoginForm() {
             userData.lastName = userData.last_name;
             userData.accessToken = accessToken;
             
-            console.log(`The User Tier I see is ${userData.clients[0].tier}`)
+            //console.log(`The User Tier I see is ${userData.clients[0].tier}`)
 
             switch(userData.clients[0].tier.toLowerCase()){
 
@@ -90,7 +90,7 @@ export default function LoginForm() {
                     break;
             }
 
-            console.log(`The User Tier I see AFTER is [${userData.clients[0].tier.toLowerCase()}] and tier is ${userData.tier}`)
+            //console.log(`The User Tier I see AFTER is [${userData.clients[0].tier.toLowerCase()}] and tier is ${userData.tier}`)
 
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");
@@ -129,7 +129,7 @@ export default function LoginForm() {
 
              const fetchPromises = myLocations.map((location)=>{
                 
-                fetch(`${API_HOST}/api/locations/${location.id}/hourly_data`, {
+                fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?client_id=${clients[0].id}`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${accessToken}`,
@@ -147,7 +147,7 @@ export default function LoginForm() {
            
             const results = await Promise.all(fetchPromises);
 
-            console.log(`Results of the History is ${JSON.stringify(results)}`)
+           // console.log(`Results of the History is ${JSON.stringify(results)}`)
 
             //myLocations = results;
 
@@ -155,7 +155,7 @@ export default function LoginForm() {
             //Now get 24hr and 1hr data for each
             let ids = myLocations.map(me => me.id)
 
-            console.log(`Location ids is ${ids}`)
+            //console.log(`Location ids is ${ids}`)
 
             const location24History = await fetch(`${API_HOST}/api/locations/24h_data`, {
                 method: "POST",
@@ -176,19 +176,19 @@ export default function LoginForm() {
 
             let finishedLocations = [];
 
-            console.log(`Location 24 History ${JSON.stringify(loc24)}`)
+            //console.log(`Location 24 History ${JSON.stringify(loc24)}`)
 
              myLocations  = myLocations.map(k=>{
                 if(loc24.locations[k.id]){
                     k.total_rainfall = loc24.locations[k.id].total_rainfall;
-                    console.log(`Found some rain!!! for ${k.name}`)
+                    //console.log(`Found some rain!!! for ${k.name}`)
                 }
 
                 return k;
             })
 
          
-            console.log(`Finished locations is ${JSON.stringify(myLocations)}`)
+            //console.log(`Finished locations is ${JSON.stringify(myLocations)}`)
 
 
             

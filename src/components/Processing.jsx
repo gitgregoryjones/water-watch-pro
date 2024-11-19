@@ -14,6 +14,7 @@ export default function Processing({location}) {
     
     useEffect(()=>{
 
+        if(location.id)
         fetchJsonApi(user.accessToken,`/api/locations/${location.id}/hourly_data`,{},"GET").then(data => {
             if (!data.error) {
               console.log('Data received:', JSON.stringify(data));

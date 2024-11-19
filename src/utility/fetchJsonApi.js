@@ -3,10 +3,10 @@ import { API_HOST } from "./constants";
 
 export default async function fetchJsonApi(accessToken,url, body = {}, method = 'GET') {
 
-    console.log(`Location 2 Hello everyone!!!!  ${accessToken} ${API_HOST}/${url}`)
+    //console.log(`Location 2 Hello everyone!!!!  ${accessToken} ${API_HOST}/${url}`)
   
     try {
-        let fetchResponse = {};
+        let  fetchResponse = {};
 
         if(method == 'GET'){
         fetchResponse = await fetch(`${API_HOST}${url}`, {
@@ -46,7 +46,7 @@ export default async function fetchJsonApi(accessToken,url, body = {}, method = 
     
         const jsonData = await fetchResponse.json();
 
-        console.log(`Location 2 Returned JSON is ${jsonData}`)
+       // console.log(`Location 2 Returned JSON is ${jsonData}`)
 
    
 

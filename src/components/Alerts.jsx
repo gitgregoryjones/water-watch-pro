@@ -18,8 +18,8 @@ export default function Alerts() {
         if(notification.name.indexOf("NOAA Atlas 14")> -1){
 
             //row.classList.add("text-[red]");
-            console.log(`NOA`)
-            console.log(row.props.className)
+            //console.log(`NOA`)
+            //console.log(row.props.className)
             
             let clone = React.cloneElement(row,{
                 style:{color:"red", fontWeight:"bold"}

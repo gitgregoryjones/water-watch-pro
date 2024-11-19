@@ -157,7 +157,7 @@ export default function LoginForm() {
 
             //console.log(`Location ids is ${ids}`)
 
-            const location24History = await fetch(`${API_HOST}/api/locations/24h_data`, {
+            const location24History = await fetch(`${API_HOST}/api/locations/24h_data?client_id=${clients[0].id}`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,

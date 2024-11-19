@@ -46,6 +46,6 @@ export default function Processing() {
     
   return (
     status == "processing" ? <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status} {displayTime} data now</div>
-    : <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status} through {displayTime}</div>
+    : <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0].toUpperCase()}{status.substring(1)} through {displayTime}</div>
   )
 }

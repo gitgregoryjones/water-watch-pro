@@ -67,7 +67,11 @@ export default function LoginForm() {
             userData.lastName = userData.last_name;
             userData.accessToken = accessToken;
             
+            console.log(`The User Tier I see is ${userData.clients[0].tier}`)
+
             switch(userData.clients[0].tier.toLowerCase()){
+
+                
 
                 case "bronze":
                     userData.tier = 1;
@@ -76,12 +80,17 @@ export default function LoginForm() {
                     userData.tier = 3;
                     break;
                 case "silver":
-                    userData.tier = 2
+                    userData.tier = 2;
+                    break;
+                case "gold":
+                    userData.tier = 3;
                     break;
                 default:
                     userData.tier = 0;
                     break;
             }
+
+            console.log(`The User Tier I see AFTER is [${userData.clients[0].tier.toLowerCase()}] and tier is ${userData.tier}`)
 
             if (!verifyResponse.ok) {
                 throw new Error("Token verification failed");

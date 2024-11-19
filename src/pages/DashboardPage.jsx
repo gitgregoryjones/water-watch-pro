@@ -313,7 +313,7 @@ const handleGroupClick = (group) => {
       
           
          
-      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'>Below Threshold<div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div>Close To Threshold<div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div> Exceeeds Threshold<div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing location={location}/></div>}  >
+      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >

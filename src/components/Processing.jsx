@@ -32,9 +32,9 @@ export default function Processing() {
               setStatus(data.status);
               setDisplayTime(convertTime(data.datetime))
 
-              if(setStatus.toLowerCase() == "processing"){
+              if(data.status.toLowerCase() == "processing"){
 
-                setShowMsg(true);
+               setShowMsg(true);
               }
               
             } else {

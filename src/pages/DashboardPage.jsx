@@ -423,7 +423,7 @@ const handleGroupClick = (group) => {
            <div className="flex p-2 text-xl justify-center items-center">
              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
-               {obj.total_rainfall} inches
+               {obj?.total_rainfall?.toFixed(2)} inches
              </div>
            </div>
          </AdvancedMarker>

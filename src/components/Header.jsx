@@ -20,7 +20,7 @@ export default function Header() {
   
   return (
     
-    <div className='flex h-[4rem] overflow-x-show md:flex justify-center md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center  zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
+    <div className='md:px-[10%] flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center  zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex items-center gap-4'>
         <img src={logo} className='w-[14rem] md:w-[20rem]' />
         <span className="text-[#ecbf1d] text-xl md:text-2xl">Trial Ends in X Days</span>

@@ -9,7 +9,7 @@ import './ItemControl.css';
 // Styled components for the container layout
 export function Container({children, className}){
 
-  return (<div className={`flex flex-col h-full min-h-[20rem] ${className}`}>{children}</div>)
+  return (<div className={`flex flex-col justify-center max-h-[20rem] overflow-scroll min-h-[20rem] ${className}`}>{children}</div>)
 }
 
 const Button = styled.button`
@@ -209,7 +209,7 @@ const ItemControl = ({
   const numberHighlighted = cList.filter(meC => meC.highlight).length;
 
   return (
-    <Container className={`flex flex-1 w-full md:shadow-2xl h-[10rem] md:max-h-[40rem] md:h-full overflow-hidden  ${className}`}>
+    <Container className={`flex flex-1 h-[unset] w-full md:shadow-2xl h-[10rem] md:max-h-[40rem] md:h-full overflow-hidden  ${className}`}>
       {header}
       {showSearchBar && <SearchBarContainer>
         <SearchBar
@@ -224,7 +224,7 @@ const ItemControl = ({
         </FilterIcon>
         }
       </SearchBarContainer>}
-      <div className='overflow-scroll w-full mb-2'>
+      <div className='overflow-scroll max-h-[20rem] md:max-h-full w-full mb-2'>
         {Object.keys(groupedItems).map(category => (
           <Category key={category}>
             {/* <CategoryTitle>{category}</CategoryTitle>*/}

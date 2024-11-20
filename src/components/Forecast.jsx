@@ -124,7 +124,7 @@ export default function Forecast({location, className}) {
         onDoubleClick={exitFullScreen}
         className={'md:my-2'}
       />
-                            <div className='bg-[black]  p-2 text-[white] font-bold flex justify-center  items-center right-[0rem] md:right-[0rem]  w-[20%] md:w-[20%] md:top-[.5rem] center text-2xl z-index-5 top-0  absolute'>{headers[i]}</div>
+                            <div className='bg-[black]  p-2 text-[white] font-bold flex justify-center  items-center right-[0rem] md:right-[0rem]  w-[10%] md:w-[20%] md:top-[.5rem] center text-sm md:text-2xl z-index-5 top-0  absolute'>{headers[i]}</div>
                         </div>
                        
                     )

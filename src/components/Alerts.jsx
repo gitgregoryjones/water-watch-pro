@@ -34,7 +34,7 @@ export default function Alerts() {
     }
 
   return (
-    <Card header={<div className='flex gap-2 justify-start items-center'><i class="fa fa-bell text-[#ecbf1d]"></i>Latest Alerts</div>}>
+    <Card header={<div className='flex gap-2 justify-start items-center'><i className="fa fa-bell text-[#ecbf1d]"></i>Latest Alerts</div>}>
         <ItemControl
           className='mt-4 max-w-[90%] w-full md:shadow-[unset]'
           showSearchBar={true}

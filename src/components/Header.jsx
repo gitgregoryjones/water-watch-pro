@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import logo from '../assets/logo.png';
-import ProfilePic from './ProfilePic';
+
 import { useLocation, Link } from 'react-router-dom';
 import Upgrade from './Upgrade';
 

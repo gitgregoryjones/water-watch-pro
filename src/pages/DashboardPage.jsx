@@ -37,6 +37,7 @@ import { VITE_GOOGLE_API_KEY } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchJsonApi'
 import Processing from '../components/Processing'
 import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
+import ProfilePic from '../components/ProfilePic'
 
 
 export default function DashboardPage() {
@@ -313,7 +314,7 @@ const handleGroupClick = (group) => {
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
-      
+      <ProfilePic/>
           
          
       <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >

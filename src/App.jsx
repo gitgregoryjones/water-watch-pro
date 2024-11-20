@@ -21,6 +21,7 @@ import SettingsPage from "./pages/SettingsPage";
 import ReportsPage from "./pages/ReportsPage";
 import AssignmentsPage from "./pages/AssignmentsPage";
 import MyProfile from "./pages/MyProfile";
+import ProfilePic from "./components/ProfilePic";
 
 
 
@@ -70,6 +71,7 @@ function App() {
      
        {!isLoginPage && <Header />}
        <Container className="big-container bg-[#CAD2C5] md:bg-[whitesmoke] h-full">
+        
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/dashboard" element={<DashboardPage />} />

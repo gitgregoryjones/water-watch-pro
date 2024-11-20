@@ -268,7 +268,7 @@ const LocationControl = ({totalClicked, enableMultiSelect, broadcastSelectClick,
         
         {broadcastFilteredList && <StarIcon onClick={toggleShowFavorites} active={showFavorites}>
          <div className='text-[--primary-color] text-sm '>{showFavorites? "Showing Favorite Locations Only" : "Show only Your Favorite Locations?"}</div>
-         {showFavorites ? <span className='text-red-800'><i class="fas fa-map-marker-alt"></i></span>
+         {showFavorites ? <span className='text-red-800'><i className="fas fa-map-marker-alt"></i></span>
             : <span className='border-2 border-[--primary-color] rounded-[50%] h-4 w-4'></span>
          }
         </StarIcon>}
@@ -289,7 +289,7 @@ const LocationControl = ({totalClicked, enableMultiSelect, broadcastSelectClick,
                 onClick={(e) => toggleFavorite(e,city.name)}
                 isfavorite={favorites.includes(city.name)}
               >
-                {favorites.includes(city.name) ? <i class="fas fa-map-marker-alt"></i> : <i class="fa-regular fa-circle"></i>}
+                {favorites.includes(city.name) ? <i className="fas fa-map-marker-alt"></i> : <i className="fa-regular fa-circle"></i>}
               </FavoriteButton>}
             </CityItem>
           ))}

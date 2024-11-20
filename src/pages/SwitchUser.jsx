@@ -86,7 +86,7 @@ export default function SwitchUser() {
         <i className="hidden pl-2 text-[--main-1] text-lg  fa-solid fa-user-group"></i>
         <span>{user.name}</span>
         <i className=" pl-0 text-[--secondary-2] text-lg  fa-solid fa-repeat"></i>
-        {newUser?.name ?  <div className='font-bold'>{newUser.name} : {newUser.role}</div> : <i class="fa-solid fa-question"></i> }
+        {newUser?.name ?  <div className='font-bold'>{newUser.name} : {newUser.role}</div> : <i className="fa-solid fa-question"></i> }
         
     </div>
     {newUser?.name  ? <div className='font-bold'>Subscription Level :  {subscriptionToString(newUser.tier)}</div> : ''}
@@ -114,7 +114,7 @@ export default function SwitchUser() {
            
            
             <label className='md:hidden font-bold  pt-2'>Choose or Search From Users Below</label>
-            <div className='hidden md:flex font-bold bg-[#fff7e3] px-8  text-lg border-2 border-[gold] items-start pt-8 border rounded-2xl w-full h-full leading-[3rem]'><div><i class="fa-solid fa-circle-info"></i> Choose a new user to mimic from the list and click the "Switch User" button to continue.  The user's name and role will show above as you toggle through your choices.</div></div>
+            <div className='hidden md:flex font-bold bg-[#fff7e3] px-8  text-lg border-2 border-[gold] items-start pt-8 border rounded-2xl w-full h-full leading-[3rem]'><div><i className="fa-solid fa-circle-info"></i> Choose a new user to mimic from the list and click the "Switch User" button to continue.  The user's name and role will show above as you toggle through your choices.</div></div>
             <div className='w-full md:hidden'>
             <ItemControl
                 collectionList={contacts}

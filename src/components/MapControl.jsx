@@ -47,7 +47,7 @@ export default function MapControl() {
     enableMultiSelect={false}
     
     searchPlaceholder='Search Locations...'
-    addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
+    addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
   />

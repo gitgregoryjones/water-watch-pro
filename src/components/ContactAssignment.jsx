@@ -21,7 +21,7 @@ export default function ContactAssignment({ contact, deleteLocationsFromUser,add
     <Card className={`big-card flex  flex-col md:flex-row justify-start  ${contact.id == -1 ? "bg-green-800/85" : `bg-[--admin-color]`}  `} >
      <CardContent>
      <div className='footer flex flex-1 justify-between m-4 md:rounded-2xl items-center text-[--text-color] md:shadow  md:border p-4'>
-             <div style={{textShadow:"none"}} className=' md:text-md drop-shadow-none text-[black]   flex gap-4 justify-center items-center w-full'><div className='border-2 p-8 rounded-2xl  text-[black]  flex gap-2'><i class="fa-solid fa-circle-info"></i> Tip:</div><div className='border-2 p-8 rounded-2xl text-lg border-[#B3C100] text-[black]  flex gap-2 text-start  flex-1 w-full'>Tired of assigning contacts to locations manually? Click here to learn more options.</div></div>
+             <div style={{textShadow:"none"}} className=' md:text-md drop-shadow-none text-[black]   flex gap-4 justify-center items-center w-full'><div className='border-2 p-8 rounded-2xl  text-[black]  flex gap-2'><i className="fa-solid fa-circle-info"></i> Tip:</div><div className='border-2 p-8 rounded-2xl text-lg border-[#B3C100] text-[black]  flex gap-2 text-start  flex-1 w-full'>Tired of assigning contacts to locations manually? Click here to learn more options.</div></div>
              <div className='alerts hidden md:flex flex-row gap-2 text-[--contrast] '>
             
             
@@ -37,7 +37,7 @@ export default function ContactAssignment({ contact, deleteLocationsFromUser,add
             onItemClicked={(person)=> {getTheCurrentName(person)}}
             searchPlaceholder='1. Find Contacts...'
             showFavoriteControls={false}
-            addButtonLabel={<span>Add Contact &nbsp;<i class="fa-solid fa-plus"></i></span>}
+            addButtonLabel={<span>Add Contact &nbsp;<i className="fa-solid fa-plus"></i></span>}
 
 
           />
@@ -52,7 +52,7 @@ export default function ContactAssignment({ contact, deleteLocationsFromUser,add
             showFavoriteControls={false}
             searchPlaceholder='2. View Unassigned Locations for this Contact...'
             showSearchBar={false}
-            addButtonLabel={<span>Assign Locations <i class="fa-solid fa-angles-right"></i>&nbsp;</span>}
+            addButtonLabel={<span>Assign Locations <i className="fa-solid fa-angles-right"></i>&nbsp;</span>}
 
 
           />
@@ -67,7 +67,7 @@ export default function ContactAssignment({ contact, deleteLocationsFromUser,add
             searchPlaceholder='3. See All Assigned Locations for this contact...'
             showFavoriteControls={false}
             showSearchBar={false}
-            addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Unassign Locations &nbsp;</span>}
+            addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Unassign Locations &nbsp;</span>}
 
 
           />

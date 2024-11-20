@@ -381,7 +381,7 @@ const handleGroupClick = (group) => {
             showFavoriteControls={false}
             
             searchPlaceholder='Search Your Locations...'
-            addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
+            addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
           />
@@ -433,7 +433,7 @@ const handleGroupClick = (group) => {
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
            <div className="flex p-2 text-xl justify-center items-center">
-             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['24h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['24h'][0] ? 'text-[red]' : obj.total_rainfall > obj.h24_threshold ? 'text-[orange]' :'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                {obj?.total_rainfall?.toFixed(2)}
              </div>
@@ -455,7 +455,7 @@ const handleGroupClick = (group) => {
             showFavoriteControls={false}
             
             searchPlaceholder='Search Your Locations...'
-            addButtonLabel={<span><i class="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
+            addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
           />
@@ -471,8 +471,8 @@ const handleGroupClick = (group) => {
       
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
-        <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i class="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
+        <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
             
             <div className='w-full h-full text-center'>Coming Soon</div>

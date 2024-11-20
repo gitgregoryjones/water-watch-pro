@@ -21,7 +21,7 @@ export default function Processing() {
         // Extract hours and minutes
         const hours = dateObj.getHours().toString().padStart(2, '0');
         const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-        return `${hours}${minutes}`;
+        return `${hours}:${minutes}`;
     }
     
     useEffect(()=>{
@@ -45,7 +45,7 @@ export default function Processing() {
 
     
   return (
-    status == "processing" ? <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} data now</div>
-    : <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} through {displayTime}</div>
+  <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} data </div>
+  
   )
 }

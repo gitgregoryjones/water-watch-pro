@@ -17,12 +17,17 @@ export default function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [serverError,setServerError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState("");
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    let [loggingIn, setLoggingIn] = useState(false);
+
     const handleLogin = async (event) => {
         event.preventDefault();
+
+        setLoggingIn(true);
 
         try {
             setServerError(false);
@@ -45,6 +50,8 @@ export default function LoginForm() {
             const loginData = await loginResponse.json();
 
             if (!loginResponse.ok || !loginData.access_token) {
+                setErrorMsg(loginData.detail);
+                setServerError(true);
                 throw new Error("Login failed");
             }
 
@@ -206,7 +213,10 @@ export default function LoginForm() {
         } catch (error) {
             console.error("Login error:", error);
             setServerError(true);
-            alert("Failed to log in. Please check your credentials and try again.");
+            console.log("Failed to log in. Please check your credentials and try again.");
+        } finally {
+
+            setLoggingIn(false);
         }
     };
 
@@ -216,10 +226,17 @@ export default function LoginForm() {
                 <img className="w-[24rem]" src={logo} alt="Logo" />
             </div>
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
-                {serverError && <div className={`text-[red] bg-[white] w-full p-4`}>The Login Service is Experiencing Errors. Please contact support</div>}
+                {serverError && <div className={`text-[red] bg-[white] w-full p-4`}>{serverError && errorMsg}</div>}
                 <ButtonContainer>
-                    <Button className="hidden" onClick={() => setLogView(true)}>Login</Button>
-                    {logView ? <Button type="submit">Login</Button> : <Button>Register</Button>}
+                    <Button className="hidden" onClick={() => setLogView(true)}>
+                        Login</Button>
+                    {logView ? <Button disabled className={`flex gap-2  ${loggingIn && 'bg-[white]'}`} type="submit">
+                        {!loggingIn && <div className={``}>Login</div>}
+                        {loggingIn && <div className='flex justify-center gap-2 items-center'>
+                        <i className="animate-spin text-[#128CA6] text-2xl fa-solid fa-spinner"></i> 
+                        <span className="animate-pulse text-[#128CA6]">Working...</span>
+                        </div>}
+                    </Button> : <Button>Register</Button>}
                 </ButtonContainer>
                 <label hidden={logView}>Name</label>
                 <input hidden={logView} name="name" placeholder="Full Name"/>
@@ -233,7 +250,7 @@ export default function LoginForm() {
                 <input hidden={logView} name="confirm" type="password" placeholder="Confirm your Password"/>
                 <label hidden={logView} >Registration Code</label>
                 <input hidden={logView} name="code" type="text" placeholder="Registration Code" />
-                <Button className='bg-[#96B8C8]' onClick={() => setLogView(false)}>Register</Button>
+                <Button className={`bg-[#96B8C8]  ${loggingIn && 'hidden'}`} onClick={() => setLogView(false)}>Register</Button>
             </FormContainer>
         </div>
     );

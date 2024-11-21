@@ -33,7 +33,7 @@ import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
-import { VITE_GOOGLE_API_KEY } from '../utility/constants'
+import { API_HOST, VITE_GOOGLE_API_KEY } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchJsonApi'
 import Processing from '../components/Processing'
 import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
@@ -88,6 +88,10 @@ export default function DashboardPage() {
   const [currentLocation, setCurrentLocation] = useState(null);
 
   const [noaaThreshold, setNOAAThreshold] = useState(10);
+
+  const [hourlyRainfallChartData, setHourlyRainFallChartData] = useState({})
+
+  const [dailyRainfallChartData,setDailyRainfallChartData] = useState({});
 
 
   
@@ -186,12 +190,14 @@ export default function DashboardPage() {
     
     setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
 
+    setLocation(locationObject)
+
     if(filteredList.length == 2){
       setMapZoom(8)
     } else
     zoomIn && setMapZoom(15);
 
-    setLocation(locationObject)
+    
   }
 
   /* Add Contact */
@@ -309,6 +315,56 @@ const handleGroupClick = (group) => {
   //setLocation(group.locations[0])
   //console.log('clicked')
 };
+
+useEffect(()=>{
+
+      //Populate Hourly Rainfall Chart Tab Data
+      fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${user.accessToken}`,
+            "Content-Type": "application/json",
+        }
+    }).then((response)=>{
+      if(!response.ok){
+        throw new Error(`HTTP Error ${response.status}`)
+      }
+
+      return response.json();
+    }).then(data=>{
+      setHourlyRainFallChartData(data.hourly_data);
+      console.log(`Hourly Rainfall Chart Data ${JSON.stringify(hourlyRainfallChartData)}`)
+     //console.log(`24 Hour Data ${JSON.stringify(data.hourly_data)}`)
+    });
+
+    const today = new Date();
+    const year = today.getFullYear(); // Get the full year
+    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
+    const day = today.getDate().toString().padStart(2, '0'); // Pad day to 2 digits
+
+    const todayStr = `${year}-${month}-${day}`; 
+
+    fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3&date=${todayStr}`, {
+      method: "GET",
+      headers: {
+          "Authorization": `Bearer ${user.accessToken}`,
+          "Content-Type": "application/json",
+      }
+  }).then((response)=>{
+    if(!response.ok){
+      throw new Error(`HTTP Error ${response.status}`)
+    }
+
+    return response.json();
+  }).then(data=>{
+    setDailyRainfallChartData(data.hourly_data);
+    console.log(`Daily Rainfall Chart Data ${JSON.stringify(dailyRainfallChartData)}`)
+   //console.log(`24 Hour Data ${JSON.stringify(data)}`)
+  });
+
+
+
+},[location])
   
   
   return (
@@ -359,9 +415,9 @@ const handleGroupClick = (group) => {
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
             <div className="flex p-2 text-xl justify-center items-center">
-              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > obj?.atlas14_threshold['24h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_hourly_rainfall > obj?.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
               <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
-                {Math.random().toFixed(2)}
+                {obj.total_hourly_rainfall}
               </div>
             </div>
           </AdvancedMarker>

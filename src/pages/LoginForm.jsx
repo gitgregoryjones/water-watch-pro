@@ -134,26 +134,7 @@ export default function LoginForm() {
                 return l;
             });
 
-             const fetchPromises = myLocations.map((location)=>{
-                
-                fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?client_id=${clients[0].id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                    }
-                }).then( response => {
-                    if(!response.ok){
-                        throw new Error(`Failed to get location hourly data for location ${location.id}`)
-                    }
-                    return response.json();
-                }).then( data => ({location, data}))
-
-             });
-            //Add hourly history
-           
-            const results = await Promise.all(fetchPromises);
-
+             
            // console.log(`Results of the History is ${JSON.stringify(results)}`)
 
             //myLocations = results;
@@ -193,6 +174,42 @@ export default function LoginForm() {
 
                 return k;
             })
+
+
+            const today = new Date(); // Get today's date
+
+            const year = today.getFullYear(); // Get the full year
+            const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
+            const day = today.getDate().toString().padStart(2, '0'); // Pad day to 2 digits
+
+            const todayStr = `${year}-${month}-${day}`; 
+
+            const locationHourlyHistory = await fetch(`${API_HOST}/api/locations/24h_data?client_id=${clients[0].id}&date=${todayStr}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(ids)
+            });
+
+            if(!locationHourlyHistory.ok){
+
+                throw new Error('Failed to read location hourly rainfall history')
+
+            }
+
+            const locHourly = await locationHourlyHistory.json();
+
+             myLocations  = myLocations.map(k=>{
+                if(locHourly.locations[k.id]){
+                    k.total_hourly_rainfall = locHourly.locations[k.id].total_rainfall;
+                    //console.log(`Found some rain!!! for ${k.name}`)
+                }
+
+                return k;
+            })
+
 
          
             //console.log(`Finished locations is ${JSON.stringify(myLocations)}`)

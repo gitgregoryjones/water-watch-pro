@@ -57,7 +57,7 @@ export default function ContactAssignment({ contact, deleteLocationsFromUser,add
 
           />
        
-        <ItemControl className={`flex-[2]`}
+        <ItemControl className={`flex-[1]`}
             collectionList={assignedContact.locations}
             showAddButton={true}
             showSelectButton={true}

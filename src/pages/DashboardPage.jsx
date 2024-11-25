@@ -579,6 +579,13 @@ useEffect(()=>{
            
             </PillTabs> 
         </Card>
+{/*
+        <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>Contact Assignment</div>} >
+          <ContactAssignment contact={contact} contactList={contactList} assignedContact={assignedContact} deleteLocationsFromUser={deleteLocationsFromUser} addLocationsToUser={addLocationsToUser}
+          setAssignedContact={setAssignedContact} unassignedList={unassignedList}
+          />
+        </Card>
+        */}
         
      {/*</span>*/}
      <a name="alerts"></a>

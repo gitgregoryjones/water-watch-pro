@@ -158,6 +158,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Get the user's current location
+
+    //document.querySelector(".item").click();
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -191,6 +194,13 @@ export default function DashboardPage() {
     setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
 
     setLocation(locationObject)
+
+    //document.querySelector(".mapList > .indiv")
+
+    let choice = Array.from(document.querySelectorAll(`.mapList div.item`)).find((m)=> m.innerHTML == `${locationObject.name}`);
+
+    choice.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    choice.click()
 
     if(filteredList.length == 2){
       setMapZoom(8)
@@ -366,14 +376,17 @@ useEffect(()=>{
 
 },[location])
   
+
   
+
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
           
          
-      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >
+      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
+      header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
@@ -414,10 +427,10 @@ useEffect(()=>{
             key={obj.longitude}
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
-            <div className="flex p-2 text-xl justify-center items-center">
+            <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
               <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_hourly_rainfall > obj?.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
-              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
-                {obj.total_hourly_rainfall}
+              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]" > 
+                {obj.total_hourly_rainfall?.toFixed(2)}
               </div>
             </div>
           </AdvancedMarker>
@@ -429,7 +442,7 @@ useEffect(()=>{
          
          </APIProvider>
      
-      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}
@@ -489,7 +502,7 @@ useEffect(()=>{
            key={obj.longitude}
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
-           <div className="flex p-2 text-xl justify-center items-center">
+           <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['24h'][0] ? 'text-[red]' : obj.total_rainfall > obj.h24_threshold ? 'text-[orange]' :'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                {obj?.total_rainfall?.toFixed(2)}
@@ -528,21 +541,21 @@ useEffect(()=>{
       
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
         <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
             
-            <div className='w-full h-full text-center'>Coming Soon</div>
+          <RainfallChart location={location} period={"daily"} />
           </div>
           <div className='tab'>1 Hour
-            <div className='w-full h-full text-center'>Coming Soon</div>
+          <RainfallChart location={location} period={"hourly"} />
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>
-              <RainfallChart location={location} range={"rapidrain"} />
+             { /*<RainfallChart location={location} period={"rapidrain"} />*/}
             </Upgrade>
           </div>
-          <div className='tab'>NOAA Atlas 14
+          <div className='tab min-h-[420]'>NOAA Atlas 14
           {Object.keys(location).length > 0 && location.atlas14_threshold && <ResponsiveTable  location={location} />}
           </div>
         

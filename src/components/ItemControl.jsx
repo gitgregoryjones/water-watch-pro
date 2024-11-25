@@ -234,20 +234,20 @@ const ItemControl = ({
             </div>
             }
             {groupedItems[category].map((item, i) => (
-              onRowRendered ? onRowRendered(item,<Item className={`shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-sm justify-between items-center py-2 md:py-4`}
+              onRowRendered ? onRowRendered(item,<Item className={` shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-sm justify-between items-center py-2 md:py-4`}
                 key={item.name + i}
                 onClick={() => handleItemClick(item)}
               >
-                <div className='px-4 overflow-hidden '>{item.name}</div>
+                <div className='item px-4 overflow-hidden '>{item.name}</div>
                 <FavoriteButton style={{visibility: !showFavoriteControls && "hidden"}} onClick={(e) => toggleFavorite(e, item.name)}>
                   {favorites.includes(item.name) ? <i className="fas fa-heart text-[--favorite-color]"></i> : <i className="far fa-heart"></i>}
                 </FavoriteButton>
               </Item>, i) 
-              : <Item className={`shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-sm justify-between items-center py-2 md:py-4`}
+              : <Item className={`shadow ${item.highlight ? 'bg-[--highlight-color]' : 'bg-[--background-card]'} text-md smd:text-sm justify-between items-center py-2 md:py-4`}
               key={item.name + i}
               onClick={() => handleItemClick(item)}
             >
-              <div className='px-4 overflow-hidden '>{item.name}</div>
+              <div className='item px-4 overflow-hidden '>{item.name}</div>
               <FavoriteButton style={{visibility: !showFavoriteControls && "hidden"}} onClick={(e) => toggleFavorite(e, item.name)}>
                 {favorites.includes(item.name) ? <i className="fas fa-heart text-[--favorite-color]"></i> : <i className="far fa-heart"></i>}
               </FavoriteButton>

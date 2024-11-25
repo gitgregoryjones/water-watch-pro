@@ -180,7 +180,7 @@ export default function LoginForm() {
 
             const year = today.getFullYear(); // Get the full year
             const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
-            const day = today.getDate().toString().padStart(2, '0'); // Pad day to 2 digits
+            const day = (today.getDate() + 1).toString().padStart(2, '0'); // Pad day to 2 digits
 
             const todayStr = `${year}-${month}-${day}`; 
 

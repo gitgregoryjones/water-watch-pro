@@ -14,7 +14,7 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
   const today = new Date();
   const year = today.getFullYear();
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  const day = today.getDate().toString().padStart(2, '0');
+  const day = (today.getDate()+1).toString().padStart(2, '0');
   const tomorrowDate = `${year}-${month}-${day}`;
 
   const convertTimestamp = (timestamp, rapidrain) => {

@@ -201,6 +201,7 @@ export default function DashboardPage() {
 
     choice.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
     choice.click()
+    console.log(`clicked for location ${locationObject.name}`)
 
     if(filteredList.length == 2){
       setMapZoom(8)
@@ -473,7 +474,7 @@ useEffect(()=>{
             
             
             
-            mapId={'mainMap'}
+            mapId={'mainMap2'}
            
             gestureHandling={'greedy'}
             disableDefaultUI={false}
@@ -516,7 +517,7 @@ useEffect(()=>{
         
          
          </APIProvider>
-      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}

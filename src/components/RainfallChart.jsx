@@ -17,6 +17,14 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
   const day = today.getDate().toString().padStart(2, '0');
   const tomorrowDate = `${year}-${month}-${day}`;
 
+  const convertTimestamp = (timestamp) => {
+    const [datePart, timePart] = timestamp.split(' '); // Split the date and time
+    const day = datePart.split('-')[2]; // Extract the day from the date
+    const hour = timePart.split(':')[0]; // Extract the hour from the time
+  
+    return `${day}d ${hour}h`; // Format as "24d 00h"
+  };
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobileView(window.innerWidth < 600);
@@ -56,7 +64,7 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
         const transformedData = [["Time", "Rainfall"]];
         Object.entries(data.hourly_data).forEach(([key, value]) => {
           transformedData.push([
-            key, // Full date as the time
+            convertTimestamp(key), // Full date as the time
             period === 'daily' ? value['24h_total'] : value['total'], // Use 24h_total or total
           ]);
         });
@@ -115,7 +123,7 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
           title: `Rainfall (${period}) for ${location.name}`,
           hAxis: { title: "Time" },
           vAxis: { title: "Rainfall (inches)" },
-          legend: { position: "bottom" },
+          legend: { position: "top" },
           curveType: "function",
           width: window.innerWidth < 600 ? window.innerWidth : window.innerWidth * 0.75,
           height: 420,

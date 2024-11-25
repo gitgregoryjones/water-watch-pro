@@ -136,10 +136,10 @@ const ItemControl = ({
       highlight: i.id === clickedItem.id ? !i.highlight : false // toggle highlight for the clicked item, reset for others
     }));
     
-
+    /*
     useEffect(()=>{
       
-    },[currentRow])
+    },[currentRow])*/
 
     setCList(updatedList);
     onItemClicked && onItemClicked(clickedItem);

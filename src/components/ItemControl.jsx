@@ -120,6 +120,7 @@ const ItemControl = ({
   header,
   showSearchBar = true,
   onRowRendered,
+  currentRow
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
@@ -135,6 +136,11 @@ const ItemControl = ({
       highlight: i.id === clickedItem.id ? !i.highlight : false // toggle highlight for the clicked item, reset for others
     }));
     
+
+    useEffect(()=>{
+      
+    },[currentRow])
+
     setCList(updatedList);
     onItemClicked && onItemClicked(clickedItem);
   };

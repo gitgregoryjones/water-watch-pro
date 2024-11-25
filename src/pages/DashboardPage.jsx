@@ -553,7 +553,7 @@ useEffect(()=>{
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>
-             { /*<RainfallChart location={location} period={"rapidrain"} />*/}
+             { <RainfallChart location={location} period={"rapidrain"} />}
             </Upgrade>
           </div>
           <div className='tab min-h-[420]'>NOAA Atlas 14

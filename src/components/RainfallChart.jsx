@@ -17,10 +17,17 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
   const day = today.getDate().toString().padStart(2, '0');
   const tomorrowDate = `${year}-${month}-${day}`;
 
-  const convertTimestamp = (timestamp) => {
+  const convertTimestamp = (timestamp, rapidrain) => {
     const [datePart, timePart] = timestamp.split(' '); // Split the date and time
     const day = datePart.split('-')[2]; // Extract the day from the date
     const hour = timePart.split(':')[0]; // Extract the hour from the time
+    const min = timePart.split(":")[1]
+
+    if(rapidrain){
+
+      return `${min}m`;
+
+    } else
   
     return `${day}d ${hour}h`; // Format as "24d 00h"
   };
@@ -44,7 +51,14 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
         return
       }
 
-      const API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
+
+      let API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
+
+      if(period == "rapidrain"){
+
+        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`
+      }
+
       try {
         const response = await fetch(API_URL, {
           method: 'GET',
@@ -62,11 +76,27 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
 
         // Transform the hourly data for chart
         const transformedData = [["Time", "Rainfall"]];
-        Object.entries(data.hourly_data).forEach(([key, value]) => {
-          transformedData.push([
-            convertTimestamp(key), // Full date as the time
-            period === 'daily' ? value['24h_total'] : value['total'], // Use 24h_total or total
-          ]);
+
+        let rr = ["45","30","15","00"];
+
+        let over = [];
+
+        Object.entries(data.hourly_data).forEach(([key, value],i) => {
+          let q = [
+            convertTimestamp(key,period == "rapidrain"), // Full date as the time
+            period === 'daily' ? parseInt(value['24h_total']) : parseInt(value['total']), // Use 24h_total or total
+          ];
+          /*
+          if(period == "rapidrain"){
+              over = rr.pop();
+              transformedData[transformedData.length] = [i,q[1]]
+          }else {
+            transformedData.push(q)
+          }*/
+
+          transformedData.push(q)
+
+
         });
 
         setChartData(transformedData);

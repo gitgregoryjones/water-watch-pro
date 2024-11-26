@@ -219,7 +219,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   return (
     <div className="flex flex-col w-full">
       {/* Dynamic Header */}
-      <div className="w-full flex justify-center font-bold text-lg mb-4">{header}</div>
+      <div className="w-full flex justify-center font-bold text-lg mb-4">{period == "hourly" && header}</div>
 
       {/* Scrollable Chart */}
       <div

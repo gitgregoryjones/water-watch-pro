@@ -1,18 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { API_HOST, VITE_GOOGLE_API_KEY } from '../utility/constants';
+import fetchContacts from '../utility/fetchContacts';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
   const [reportType, setReportType] = useState('daily');
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [selectedContacts, setSelectedContacts] = useState([]);
   const [contactEmail, setContactEmail] = useState('');
   const [displayFormat, setDisplayFormat] = useState('html'); // 'html' or 'csv'
   const [iframeSrc,setIFrameSrc] = useState(``)
+  const [contacts, setContacts] = useState([])
 
   const user = useSelector((state) => state.userInfo.user);
   const locations = user.locations;
+
+
+  useEffect(()=>{
+
+    fetchContacts(user).then((contacts)=> {
+        console.log(`Contacts Lengths is ${contacts.length}`)
+        setContacts(contacts)
+    })
+  },[user.id])
+
+  const handleContactsChange = (e) =>{
+    const options = Array.from(e.target.options);
+    const selected = options.filter((option) => option.selected).map((option) => option.value);
+    setSelectedContacts(selected);
+  }
 
   const handleReportTypeChange = (e) => {
     const selectedType = e.target.value;
@@ -104,6 +122,7 @@ const Reports = () => {
     e.preventDefault();
     console.log(`From Date: ${fromDate}, To Date: ${toDate}, Report Type: ${reportType}`);
     console.log(`Selected Locations: ${selectedLocations}`);
+    console.log(`Selected Locations: ${selectedContacts}`);
     console.log(`Contact Email: ${contactEmail}`);
     console.log(`Display Format: ${displayFormat}`);
     console.log(`Report type ${reportType}`)
@@ -197,8 +216,11 @@ const Reports = () => {
         {/* Row 3 */}
         <div className="col-span-1">
           <label htmlFor="contactList" className="block text-gray-700">Contact:</label>
-          <select id="contactList" className="border border-gray-300 rounded p-2 w-full">
+          <select onchange={handleContactsChange} id="contactList" className="border border-gray-300 rounded p-2 w-full">
             <option value="">-- Select Contact --</option>
+            {
+                contacts.map(contact => <option value={`${contact.email}`}>{contact.name}</option> )
+            }
             {/* Populate contacts dynamically if needed */}
           </select>
         </div>

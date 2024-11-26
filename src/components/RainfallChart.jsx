@@ -19,20 +19,16 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   const [error, setError] = useState(null);
   const [header, setHeader] = useState("");
   const chartContainerRef = useRef(null);
-  const labelsRef = useRef([]); // Store labels for easier access in scroll logic
+  const labelsRef = useRef([]); // Store full timestamps for tooltips
 
   const today = new Date();
   const year = today.getFullYear();
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const day = (today.getDate() + 1).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
-  const beginDay = (today.getDate()-2).toString().padStart(2,"0");
-  const endDay = today.getDate().toString().padStart(2,"0");
-  
+  const beginDay = (today.getDate() - 2).toString().padStart(2, "0");
+  const endDay = today.getDate().toString().padStart(2, "0");
   const beginEndRange = `${year}-${month}-${beginDay}/${year}-${month}-${endDay}`;
-
-
-
 
   const formatHeaderTimestamp = (timestamp) => {
     const [datePart, timePart] = timestamp.split(" ");
@@ -65,8 +61,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
       }
 
-      if(period == "daily"){
-        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/24h_data/${beginEndRange}`
+      if (period === "daily") {
+        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/24h_data/${beginEndRange}`;
       }
 
       try {
@@ -87,15 +83,12 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
 
         const data = await response.json();
 
-        if(period != "daily"){
-          
-
-      
+        if (period !== "daily") {
           const entries = Object.entries(data.hourly_data).reverse();
 
-          labelsRef.current = entries.map(([key]) => formatHeaderTimestamp(key)); // Store full timestamps
+          labelsRef.current = entries.map(([key]) => key); // Store full timestamps for tooltips
           setHeader(
-            `${labelsRef.current[0]} - ${labelsRef.current[labelsRef.current.length - 1]}`
+            `${formatHeaderTimestamp(entries[0][0])} - ${formatHeaderTimestamp(entries[entries.length - 1][0])}`
           );
 
           entries.forEach(([key, value], i) => {
@@ -104,13 +97,13 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
               values.push(period === "daily" ? value["24h_total"] : value["total"]);
             }
           });
-      } else {
+        } else {
           const days = data.total_rainfall;
-          days.forEach(day =>{
-              labels.push(day.date);
-              values.push(day.rainfall);
+          days.forEach((day) => {
+            labels.push(day.date);
+            values.push(day.rainfall);
           });
-      }
+        }
 
         setChartData({
           labels,
@@ -149,7 +142,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
 
     if (labelsRef.current.length > 1) {
       setHeader(
-        `${labelsRef.current[visibleStartIndex]} - ${labelsRef.current[visibleEndIndex]}`
+        `${formatHeaderTimestamp(labelsRef.current[visibleStartIndex])} - ${formatHeaderTimestamp(labelsRef.current[visibleEndIndex])}`
       );
     }
   };
@@ -193,9 +186,9 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       },
       y: {
         beginAtZero: true,
-       
+        max: 1,
         ticks: {
-          stepSize: 0.5
+          stepSize: 0.5,
         },
         grid: {
           display: true, // Show gridlines for y-axis
@@ -205,6 +198,15 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
     plugins: {
       legend: {
         display: false, // Hide the legend
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const label = labelsRef.current[context.dataIndex]; // Get full timestamp
+            const value = context.raw; // Rainfall value
+            return `${label != undefined ? label + ":" :' '} ${value}`;
+          },
+        },
       },
     },
     layout: {
@@ -225,7 +227,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         className="overflow-x-auto"
         style={{ position: "relative", width: "100%", height: "420px" }}
       >
-        <div style={{ width: `${period == "daily" ? window.innerWidth/1.3  :chartData.labels.length * 50}px`, height: "100%" }}>
+        <div style={{ width: `${period === "daily" ? ( window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
           <Bar data={chartData} options={options} />
         </div>
       </div>

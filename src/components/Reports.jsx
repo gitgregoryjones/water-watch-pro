@@ -214,7 +214,7 @@ const Reports = () => {
         </div>
 
         {/* Row 3 */}
-        <div className="col-span-1">
+        <div className="col-span-1 hidden">
           <label htmlFor="contactList" className="block text-gray-700">Contact:</label>
           <select onchange={handleContactsChange} id="contactList" className="border border-gray-300 rounded p-2 w-full">
             <option value="">-- Select Contact --</option>
@@ -243,8 +243,8 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full"
             disabled={selectedLocations.length > 1}
           >
-            <option value="html">HTML</option>
-            <option value="csv">CSV</option>
+            <option value="html">Display Only</option>
+            <option value="csv">Email</option>
           </select>
         </div>
 

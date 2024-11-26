@@ -33,7 +33,7 @@ import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
-import { VITE_GOOGLE_API_KEY } from '../utility/constants'
+import { API_HOST, VITE_GOOGLE_API_KEY } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchJsonApi'
 import Processing from '../components/Processing'
 import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
@@ -88,6 +88,10 @@ export default function DashboardPage() {
   const [currentLocation, setCurrentLocation] = useState(null);
 
   const [noaaThreshold, setNOAAThreshold] = useState(10);
+
+  const [hourlyRainfallChartData, setHourlyRainFallChartData] = useState({})
+
+  const [dailyRainfallChartData,setDailyRainfallChartData] = useState({});
 
 
   
@@ -154,6 +158,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Get the user's current location
+
+    //document.querySelector(".item").click();
+    
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -186,12 +193,22 @@ export default function DashboardPage() {
     
     setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
 
+    setLocation(locationObject)
+
+    //document.querySelector(".mapList > .indiv")
+
+    let choice = Array.from(document.querySelectorAll(`.mapList div.item`)).find((m)=> m.innerHTML == `${locationObject.name}`);
+
+    choice.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    choice.click()
+    console.log(`clicked for location ${locationObject.name}`)
+
     if(filteredList.length == 2){
       setMapZoom(8)
     } else
     zoomIn && setMapZoom(15);
 
-    setLocation(locationObject)
+    
   }
 
   /* Add Contact */
@@ -309,15 +326,68 @@ const handleGroupClick = (group) => {
   //setLocation(group.locations[0])
   //console.log('clicked')
 };
+
+useEffect(()=>{
+
+      //Populate Hourly Rainfall Chart Tab Data
+      fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${user.accessToken}`,
+            "Content-Type": "application/json",
+        }
+    }).then((response)=>{
+      if(!response.ok){
+        throw new Error(`HTTP Error ${response.status}`)
+      }
+
+      return response.json();
+    }).then(data=>{
+      setHourlyRainFallChartData(data.hourly_data);
+      console.log(`Hourly Rainfall Chart Data ${JSON.stringify(hourlyRainfallChartData)}`)
+     //console.log(`24 Hour Data ${JSON.stringify(data.hourly_data)}`)
+    });
+
+    const today = new Date();
+    const year = today.getFullYear(); // Get the full year
+    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
+    const day = today.getDate().toString().padStart(2, '0'); // Pad day to 2 digits
+
+    const todayStr = `${year}-${month}-${day}`; 
+
+    fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3&date=${todayStr}`, {
+      method: "GET",
+      headers: {
+          "Authorization": `Bearer ${user.accessToken}`,
+          "Content-Type": "application/json",
+      }
+  }).then((response)=>{
+    if(!response.ok){
+      throw new Error(`HTTP Error ${response.status}`)
+    }
+
+    return response.json();
+  }).then(data=>{
+    setDailyRainfallChartData(data.hourly_data);
+    console.log(`Daily Rainfall Chart Data ${JSON.stringify(dailyRainfallChartData)}`)
+   //console.log(`24 Hour Data ${JSON.stringify(data)}`)
+  });
+
+
+
+},[location])
   
+
   
+
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
           
          
-      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} header={<div className='flex md:flex-row flex-col justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >
+      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
+      header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div> <Processing /></div>}  >
       <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'>Daily Total
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
@@ -358,10 +428,10 @@ const handleGroupClick = (group) => {
             key={obj.longitude}
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
-            <div className="flex p-2 text-xl justify-center items-center">
-              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${Math.random() > obj?.atlas14_threshold['24h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
-              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
-                {Math.random().toFixed(2)}
+            <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.atlas14_threshold && obj.total_hourly_rainfall > obj?.atlas14_threshold['1h'][0] ? 'text-[red]' : 'text-[green]'}`}></i>
+              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]" > 
+                {obj.total_hourly_rainfall?.toFixed(2)}
               </div>
             </div>
           </AdvancedMarker>
@@ -373,7 +443,7 @@ const handleGroupClick = (group) => {
          
          </APIProvider>
      
-      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}
@@ -404,7 +474,7 @@ const handleGroupClick = (group) => {
             
             
             
-            mapId={'mainMap'}
+            mapId={'mainMap2'}
            
             gestureHandling={'greedy'}
             disableDefaultUI={false}
@@ -433,8 +503,8 @@ const handleGroupClick = (group) => {
            key={obj.longitude}
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
-           <div className="flex p-2 text-xl justify-center items-center">
-             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.total_rainfall > obj.atlas14_threshold['24h'][0] ? 'text-[red]' : obj.total_rainfall > obj.h24_threshold ? 'text-[orange]' :'text-[green]'}`}></i>
+           <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.atlas14_threshold && obj.total_rainfall > obj.atlas14_threshold['24h'][0] ? 'text-[red]' : obj.total_rainfall > obj.h24_threshold ? 'text-[orange]' :'text-[green]'}`}></i>
              <div className="px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[green]">
                {obj?.total_rainfall?.toFixed(2)}
              </div>
@@ -447,7 +517,7 @@ const handleGroupClick = (group) => {
         
          
          </APIProvider>
-      <ItemControl className={`px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}
@@ -472,21 +542,21 @@ const handleGroupClick = (group) => {
       
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
         <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
             
-            <div className='w-full h-full text-center'>Coming Soon</div>
+          <RainfallChart location={location} period={"daily"} max={3}/>
           </div>
           <div className='tab'>1 Hour
-            <div className='w-full h-full text-center'>Coming Soon</div>
+          <RainfallChart location={location} period={"hourly"}/>
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>
-              <RainfallChart location={location} range={"rapidrain"} />
+             { <RainfallChart location={location} period={"rapidrain"}  max={24}/>}
             </Upgrade>
           </div>
-          <div className='tab'>NOAA Atlas 14
+          <div className='tab min-h-[420]'>NOAA Atlas 14
           {Object.keys(location).length > 0 && location.atlas14_threshold && <ResponsiveTable  location={location} />}
           </div>
         
@@ -509,6 +579,13 @@ const handleGroupClick = (group) => {
            
             </PillTabs> 
         </Card>
+{/*
+        <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>Contact Assignment</div>} >
+          <ContactAssignment contact={contact} contactList={contactList} assignedContact={assignedContact} deleteLocationsFromUser={deleteLocationsFromUser} addLocationsToUser={addLocationsToUser}
+          setAssignedContact={setAssignedContact} unassignedList={unassignedList}
+          />
+        </Card>
+        */}
         
      {/*</span>*/}
      <a name="alerts"></a>

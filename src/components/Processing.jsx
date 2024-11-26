@@ -45,7 +45,7 @@ export default function Processing() {
 
     
   return (
-  <div className='md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} data </div>
+  <div className='text-xs md:text-lg md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} data </div>
   
   )
 }

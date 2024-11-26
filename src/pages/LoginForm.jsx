@@ -24,6 +24,18 @@ export default function LoginForm() {
 
     let [loggingIn, setLoggingIn] = useState(false);
 
+    const handleChange = (event) => {
+    
+
+        const data = new FormData(event.target.parentElement);
+    
+        // Do a bit of work to convert the entries to a plain JS object
+        const cObj = Object.fromEntries(data.entries());
+    
+        //setContact(cObj)
+      
+      };
+
     const handleLogin = async (event) => {
         event.preventDefault();
 
@@ -113,7 +125,7 @@ export default function LoginForm() {
             }
 
             //TODO
-            const locationResponse = await fetch(`${API_HOST}/api/locations/?client_id=${clients[0].id}&page=1&page_size=160`, {
+            const locationResponse = await fetch(`${API_HOST}/api/locations/?client_id=${clients[0].id}&page=1&page_size=250`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
@@ -134,26 +146,7 @@ export default function LoginForm() {
                 return l;
             });
 
-             const fetchPromises = myLocations.map((location)=>{
-                
-                fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?client_id=${clients[0].id}`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${accessToken}`,
-                        "Content-Type": "application/json",
-                    }
-                }).then( response => {
-                    if(!response.ok){
-                        throw new Error(`Failed to get location hourly data for location ${location.id}`)
-                    }
-                    return response.json();
-                }).then( data => ({location, data}))
-
-             });
-            //Add hourly history
-           
-            const results = await Promise.all(fetchPromises);
-
+             
            // console.log(`Results of the History is ${JSON.stringify(results)}`)
 
             //myLocations = results;
@@ -193,6 +186,42 @@ export default function LoginForm() {
 
                 return k;
             })
+
+
+            const today = new Date(); // Get today's date
+
+            const year = today.getFullYear(); // Get the full year
+            const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
+            const day = (today.getDate() + 1).toString().padStart(2, '0'); // Pad day to 2 digits
+
+            const todayStr = `${year}-${month}-${day}`; 
+
+            const locationHourlyHistory = await fetch(`${API_HOST}/api/locations/24h_data?client_id=${clients[0].id}&date=${todayStr}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(ids)
+            });
+
+            if(!locationHourlyHistory.ok){
+
+                throw new Error('Failed to read location hourly rainfall history')
+
+            }
+
+            const locHourly = await locationHourlyHistory.json();
+
+             myLocations  = myLocations.map(k=>{
+                if(locHourly.locations[k.id]){
+                    k.total_hourly_rainfall = locHourly.locations[k.id].total_rainfall;
+                    //console.log(`Found some rain!!! for ${k.name}`)
+                }
+
+                return k;
+            })
+
 
          
             //console.log(`Finished locations is ${JSON.stringify(myLocations)}`)
@@ -241,11 +270,11 @@ export default function LoginForm() {
                 <label hidden={logView}>Name</label>
                 <input hidden={logView} name="name" placeholder="Full Name"/>
                 <label className='hidden'>Email</label>
-                <input name="email" type="email" onInput={(e) => setEmail(e.target.value)} placeholder="Email Address" className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md  placeholder:font-bold'/>
+                <input name="email" type="email" onChange={handleChange} onInput={(e) => setEmail(e.target.value)} placeholder="Email Address" className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md  placeholder:font-bold'/>
                 <label hidden={logView}>Mobile Number</label>
                 <input hidden={logView} name="mobile" type="phone" placeholder="Phone Number"/>
                 <label className='hidden'>Password</label>
-                <input name="password" type="password" onInput={(e) => setPassword(e.target.value)} placeholder="Enter your Password" className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'/>
+                <input name="password" type="password" onChange={handleChange} onInput={(e) => setPassword(e.target.value)} placeholder="Enter your Password" className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'/>
                 <label hidden={logView} >Confirm Password</label>
                 <input hidden={logView} name="confirm" type="password" placeholder="Confirm your Password"/>
                 <label hidden={logView} >Registration Code</label>

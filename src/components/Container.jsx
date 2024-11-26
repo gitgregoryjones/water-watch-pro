@@ -13,7 +13,7 @@ const Container = styled.div`
     position:relative;
     background: #CAD2C5;
     padding-bottom:1rem;
-    background:url(https://i.postimg.cc/GhGPCkYv/image.png) top left / cover;
+    background:url(https://i.postimg.cc/GhGPCkYv/image.png) top left / contain;
     --background:url(https://i.postimg.cc/YCXvK9X1/Screenshot-2024-11-09-at-1-23-22-PM.png);
 
 

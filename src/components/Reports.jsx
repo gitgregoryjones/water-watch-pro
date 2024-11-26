@@ -83,7 +83,7 @@ const Reports = () => {
 
   const handleDownloadCSV = async () => {
     const formattedMonth = toDate.slice(0, 7); // Get YYYY-MM from the date
-    const csvUrl = `${API_HOST}/api/csv/data_by_month_pass1/${toDate}/${selectedLocations}`;
+    const csvUrl = `${API_HOST}/html/data_by_month_pass1/${toDate}/${selectedLocations}`;
   
     try {
       const response = await fetch(csvUrl, {
@@ -120,6 +120,7 @@ const Reports = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setIFrameSrc("")
     console.log(`From Date: ${fromDate}, To Date: ${toDate}, Report Type: ${reportType}`);
     console.log(`Selected Locations: ${selectedLocations}`);
     console.log(`Selected Locations: ${selectedContacts}`);
@@ -224,16 +225,7 @@ const Reports = () => {
             {/* Populate contacts dynamically if needed */}
           </select>
         </div>
-        <div className="col-span-1">
-          <label htmlFor="contactEmail" className="block text-gray-700">Email:</label>
-          <input
-            type="email"
-            id="contactEmail"
-            value={contactEmail}
-            onChange={(e) => setContactEmail(e.target.value)}
-            className="border border-gray-300 rounded p-2 w-full"
-          />
-        </div>
+        
         <div className="col-span-1">
           <label htmlFor="format" className="block text-gray-700">Format:</label>
           <select
@@ -244,10 +236,20 @@ const Reports = () => {
             disabled={selectedLocations.length > 1}
           >
             <option value="html">Display Only</option>
-            <option value="csv">Email</option>
+            <option value="csv">CSV</option>
+            <option value="email">Email</option>
           </select>
         </div>
-
+        {displayFormat == "email" && <div className="col-span-1">
+          <label htmlFor="contactEmail" className="block text-gray-700">Email:</label>
+          <input
+            type="email"
+            id="contactEmail"
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
+        </div>}
         {/* Row 4 */}
         <div className="col-span-4 flex justify-center">
           <button

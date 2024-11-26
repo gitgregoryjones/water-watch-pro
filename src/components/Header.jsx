@@ -44,7 +44,7 @@ export default function Header() {
       </div>
       <div className='hidden md:flex justify-around items-center gap-4 items-end'> 
       <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Data</Link>
-    <Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link>
+    <Upgrade showMsg={false} tier={2}><Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link></Upgrade>
     <Link to="/settings"  className={location.pathname == "/settings" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
     <Link to="/assignments"  className={location.pathname == "/assignments" ? "text-slate-800"  : "text-[--main-2]"}>Assignments</Link>
     <Link to="/"  className={location.pathname == "/" ? "text-slate-800"  : "text-[--main-2]"}>Logout</Link>

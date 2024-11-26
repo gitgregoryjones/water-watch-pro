@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  const [toDate, setToDate] = useState(new Date());
   const [reportType, setReportType] = useState('daily');
 
     const user = useSelector((state) => state.userInfo.user);
@@ -23,30 +23,6 @@ const Reports = () => {
         onSubmit={handleSubmit}
         className="flex items-end gap-4 mb-6"
       >
-        {/* From Date */}
-        <div className=''>
-          <label htmlFor="fromDate" className="block text-gray-700">From:</label>
-          <input
-            type="date"
-            id="fromDate"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            className="border border-gray-300 rounded p-2"
-          />
-        </div>
-
-        {/* To Date */}
-        <div>
-          <label htmlFor="toDate" className="block text-gray-700">To:</label>
-          <input
-            type="date"
-            id="toDate"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            className="border border-gray-300 rounded p-2"
-          />
-        </div>
-
         {/* Report Type */}
         <div>
           <label htmlFor="reportType" className="block text-gray-700">Report Type:</label>
@@ -61,6 +37,31 @@ const Reports = () => {
             <option value="monthly">Monthly</option>
           </select>
         </div>
+        {/* From Date */}
+        {reportType != "weekly" && reportType != "monthly" && <div className=''>
+          <label htmlFor="fromDate" className="block text-gray-700">From:</label>
+          <input
+            type="date"
+            id="fromDate"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border border-gray-300 rounded p-2"
+          />
+        </div>}
+
+        {/* To Date */}
+        <div>
+          <label htmlFor="toDate" className="block text-gray-700">To:</label>
+          <input
+            type={reportType == "monthly" ? "month" : "date"}
+            id="toDate"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border border-gray-300 rounded p-2"
+          />
+        </div>
+
+        
         <div>
           <label htmlFor="locList" className="block text-gray-700">Choose Location</label>
           <select

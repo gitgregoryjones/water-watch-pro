@@ -1,70 +1,80 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Chart } from "react-google-charts";
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
+import React, { useEffect, useState, useRef } from "react";
+import { useSelector } from "react-redux";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 
-const RainfallChart = ({ location, period = 'hourly' }) => {
-  const user = useSelector(state => state.userInfo.user); // Access user from Redux state
-  const [chartData, setChartData] = useState([]);
+// Register Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+
+const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
+  const user = useSelector((state) => state.userInfo.user); // Access user from Redux state
+  const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 600);
+  const [header, setHeader] = useState("");
+  const chartContainerRef = useRef(null);
+  const labelsRef = useRef([]); // Store labels for easier access in scroll logic
 
   const today = new Date();
   const year = today.getFullYear();
-  const month = (today.getMonth() + 1).toString().padStart(2, '0');
-  const day = (today.getDate()+1).toString().padStart(2, '0');
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
+  const day = (today.getDate() + 1).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
-
-  const convertTimestamp = (timestamp, rapidrain) => {
-    const [datePart, timePart] = timestamp.split(' '); // Split the date and time
-    const day = datePart.split('-')[2]; // Extract the day from the date
-    const hour = timePart.split(':')[0]; // Extract the hour from the time
-    const min = timePart.split(":")[1]
-
-    if(rapidrain){
-
-      return `${min}m`;
-
-    } else
+  const beginDay = (today.getDate()-2).toString().padStart(2,"0");
+  const endDay = today.getDate().toString().padStart(2,"0");
   
-    return `${day}d ${hour}h`; // Format as "24d 00h"
+  const beginEndRange = `${year}-${month}-${beginDay}/${year}-${month}-${endDay}`;
+
+
+
+
+  const formatHeaderTimestamp = (timestamp) => {
+    const [datePart, timePart] = timestamp.split(" ");
+    const [year, month, day] = datePart.split("-");
+    const hour = timePart.split(":")[0];
+    return `${month}-${day} ${hour}h`;
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 600);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  const formatXAxisLabel = (timestamp) => {
+    const [, timePart] = timestamp.split(" ");
+    if (period === "rapidrain") {
+      const minute = timePart.split(":")[1]; // Extract the minute
+      return `${minute}m`; // Label as "45m"
+    }
+    const hour = timePart.split(":")[0];
+    return `${hour}h`; // Label as "12h"
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       setError(null);
 
-      if(!location.id){
-        return
+      if (!location.id) {
+        return;
       }
-
 
       let API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
 
-      if(period == "rapidrain"){
+      if (period === "rapidrain") {
+        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
+      }
 
-        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`
+      if(period == "daily"){
+        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/24h_data/${beginEndRange}`
       }
 
       try {
         const response = await fetch(API_URL, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${user.accessToken}`,
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${user.accessToken}`,
           },
         });
 
@@ -72,34 +82,48 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
           throw new Error(`Failed to fetch data for location ${location.id}: ${response.statusText}`);
         }
 
+        const labels = [];
+        const values = [];
+
         const data = await response.json();
 
-        // Transform the hourly data for chart
-        const transformedData = [["Time", "Rainfall"]];
+        if(period != "daily"){
+          
 
-        let rr = ["45","30","15","00"];
+      
+          const entries = Object.entries(data.hourly_data).reverse();
 
-        let over = [];
+          labelsRef.current = entries.map(([key]) => formatHeaderTimestamp(key)); // Store full timestamps
+          setHeader(
+            `${labelsRef.current[0]} - ${labelsRef.current[labelsRef.current.length - 1]}`
+          );
 
-        Object.entries(data.hourly_data).forEach(([key, value],i) => {
-          let q = [
-            convertTimestamp(key,period == "rapidrain"), // Full date as the time
-            period === 'daily' ? parseInt(value['24h_total']) : parseInt(value['total']), // Use 24h_total or total
-          ];
-          /*
-          if(period == "rapidrain"){
-              over = rr.pop();
-              transformedData[transformedData.length] = [i,q[1]]
-          }else {
-            transformedData.push(q)
-          }*/
+          entries.forEach(([key, value], i) => {
+            if (i < max) {
+              labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
+              values.push(period === "daily" ? value["24h_total"] : value["total"]);
+            }
+          });
+      } else {
+          const days = data.total_rainfall;
+          days.forEach(day =>{
+              labels.push(day.date);
+              values.push(day.rainfall);
+          });
+      }
 
-          transformedData.push(q)
-
-
+        setChartData({
+          labels,
+          datasets: [
+            {
+              label: "Rainfall",
+              data: values,
+              backgroundColor: "rgba(54, 162, 235, 0.6)",
+              borderColor: "rgba(54, 162, 235, 1)",
+              borderWidth: 1,
+            },
+          ],
         });
-
-        setChartData(transformedData);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -108,57 +132,103 @@ const RainfallChart = ({ location, period = 'hourly' }) => {
     };
 
     fetchData();
-  }, [location.id]);
+  }, [location.id, period, max, tomorrowDate]);
+
+  const handleScroll = () => {
+    if (!chartContainerRef.current || !chartData) return;
+
+    const scrollLeft = chartContainerRef.current.scrollLeft;
+    const containerWidth = chartContainerRef.current.offsetWidth;
+    const totalWidth = chartContainerRef.current.scrollWidth;
+
+    const visibleStartIndex = Math.floor((scrollLeft / totalWidth) * (chartData.labels.length - 1));
+    const visibleEndIndex = Math.min(
+      Math.ceil(((scrollLeft + containerWidth) / totalWidth) * (chartData.labels.length - 1)),
+      chartData.labels.length - 1
+    );
+
+    if (labelsRef.current.length > 1) {
+      setHeader(
+        `${labelsRef.current[visibleStartIndex]} - ${labelsRef.current[visibleEndIndex]}`
+      );
+    }
+  };
+
+  useEffect(() => {
+    const container = chartContainerRef.current;
+
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
+      }
+    };
+  }, [chartData]); // Attach the scroll listener when chartData is ready
 
   if (loading) {
-    return <CircularProgress />;
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return <div>Error: {error}</div>;
   }
 
-  // Render the table for mobile view
-  if (isMobileView) {
-    return (
-      <div style={{ maxHeight: 400, overflowY: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead className="sticky top-0 bg-gray-100">
-            <tr>
-  
-              <th  style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>Date</th>
-              <th style={{ border: '1px solid #ccc', padding: '8px', textAlign: 'center' }}>Rainfall</th>
-            </tr>
-          </thead>
-          <tbody>
-            {chartData.slice(1).map(([time, rainfall], index) => (
-              <tr key={index}>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{time}</td>
-                <td style={{ border: '1px solid #ccc', padding: '8px' }}>{rainfall}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: {
+        title: {
+          display: false, // No title for x-axis
+        },
+        ticks: {
+          autoSkip: false, // Ensure all labels appear
+        },
+        grid: {
+          display: true, // Show gridlines for x-axis
+        },
+      },
+      y: {
+        beginAtZero: true,
+       
+        ticks: {
+          stepSize: 0.5
+        },
+        grid: {
+          display: true, // Show gridlines for y-axis
+        },
+      },
+    },
+    plugins: {
+      legend: {
+        display: false, // Hide the legend
+      },
+    },
+    layout: {
+      padding: {
+        left: 0, // Leave space for the y-axis to remain visible
+      },
+    },
+  };
 
-  // Render the chart for larger screens
   return (
-    <div>
-      <Chart
-        chartType="ColumnChart"
-        data={chartData}
-        options={{
-          title: `Rainfall (${period}) for ${location.name}`,
-          hAxis: { title: "Time" },
-          vAxis: { title: "Rainfall (inches)" },
-          legend: { position: "top" },
-          curveType: "function",
-          width: window.innerWidth < 600 ? window.innerWidth : window.innerWidth * 0.75,
-          height: 420,
-        }}
-      />
+    <div className="flex flex-col w-full">
+      {/* Dynamic Header */}
+      <div className="w-full flex justify-center font-bold text-lg mb-4">{header}</div>
+
+      {/* Scrollable Chart */}
+      <div
+        ref={chartContainerRef}
+        className="overflow-x-auto"
+        style={{ position: "relative", width: "100%", height: "420px" }}
+      >
+        <div style={{ width: `${period == "daily" ? window.innerWidth/1.3  :chartData.labels.length * 50}px`, height: "100%" }}>
+          <Bar data={chartData} options={options} />
+        </div>
+      </div>
     </div>
   );
 };

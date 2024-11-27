@@ -17,12 +17,12 @@ export default function Processing({showPlain = false}) {
 
     let [plainMsg,setPlainMsg] = useState("");
 
-    function convertTime(timeStr){
+    function convertTime(timeStr,minusDays = 0){
 
         const dateObj = new Date(timeStr);
 
         // Extract hours and minutes
-        const hours = dateObj.getHours().toString().padStart(2, '0');
+        const hours = (dateObj.getHours() - minusDays).toString().padStart(2, '0');
         const minutes = dateObj.getMinutes().toString().padStart(2, '0');
         return `${hours}${minutes}`;
     }
@@ -38,16 +38,9 @@ export default function Processing({showPlain = false}) {
              
               setStatus(data.status)
               setDisplayTime(convertTime(data.datetime))
-              if(data.status == "processing"){
-                setPlainMsg(`${(displayTime?.split(":")[0]-1).toString().padStart(2,"0")}00`)
+              data.status == "processing" ? setPlainMsg(convertTime(data.datetime,1)) : setPlainMsg(convertTime(data.datetime))
+             
                
-              } else {
-
-                
-                setPlainMsg(`${(displayTime?.split(":")[0]).toString()}00`)
-
-              }
-              //setPlainMsg(status == "processed" ? `${displayTime}` : `${(displayTime.split(":")[0]-1).toString().padStart(2,"0")}00`);
               
              
               

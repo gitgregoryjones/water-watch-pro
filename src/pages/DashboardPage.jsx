@@ -377,8 +377,44 @@ useEffect(()=>{
 
 },[location])
   
-
+/* Render A Row A Different Color Based on Rainfall for That Area Hourly */
+function onRenderedRowHourly(raw,row,index){
   
+  console.log(`Called Rendred Row`)
+
+  let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
+
+  let clone = React.cloneElement(row,{
+    
+      style:{color: raincolor, fontWeight:"bold"},
+      filter: raincolor
+  }
+      
+  );
+  
+  row = clone;
+  return row;
+}
+
+/* Render A Row A Different Color Based on Rainfall for That Area 24hrAccum */
+function onRenderedRow24HourAccum(raw,row,index){
+  
+  console.log(`Called Rendred Row`)
+
+  let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
+
+  let clone = React.cloneElement(row,{
+    
+      style:{color: raincolor, fontWeight:"bold"},
+      filter: raincolor
+  }
+      
+  );
+  
+  row = clone;
+  return row;
+}
+
 
   return (
     
@@ -450,8 +486,9 @@ useEffect(()=>{
             showSelectButton={false}
             enableMultiSelect={false}
             showFavoriteControls={false}
+            onRowRendered={onRenderedRowHourly}
             
-            searchPlaceholder='Search Your Locations...'
+            searchPlaceholder='Search Your Locations!...'
             addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
@@ -524,6 +561,7 @@ useEffect(()=>{
             showSelectButton={false}
             enableMultiSelect={false}
             showFavoriteControls={false}
+            onRowRendered={onRenderedRow24HourAccum}
             
             searchPlaceholder='Search Your Locations...'
             addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}

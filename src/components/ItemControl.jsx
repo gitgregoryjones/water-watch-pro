@@ -131,19 +131,20 @@ const ItemControl = ({
   const [cList,setCList] = useState(collectionList);
 
   const handleItemClick = (clickedItem) => {
-    const updatedList = collectionList.map(i => ({
-      ...i,
-      highlight: i.id === clickedItem.id ? !i.highlight : false // toggle highlight for the clicked item, reset for others
-    }));
-    
-    /*
-    useEffect(()=>{
-      
-    },[currentRow])*/
-
+    const updatedList = cList.map((item) => {
+      if (item.id === clickedItem.id) {
+        return {
+          ...item,
+          highlight: enableMultiSelect ? !item.highlight : true, // Toggle highlight for multi-select or set to true for single-select
+        };
+      }
+      return enableMultiSelect ? item : { ...item, highlight: false }; // Keep other items' state if multi-select, otherwise reset
+    });
+  
     setCList(updatedList);
     onItemClicked && onItemClicked(clickedItem);
   };
+  
   
   //setCList(copy);
 

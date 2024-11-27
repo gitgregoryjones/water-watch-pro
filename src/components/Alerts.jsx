@@ -22,6 +22,7 @@ export default function Alerts() {
             //console.log(row.props.className)
             
             let clone = React.cloneElement(row,{
+              ...row,
                 style:{color:"red", fontWeight:"bold"}
             }
                 

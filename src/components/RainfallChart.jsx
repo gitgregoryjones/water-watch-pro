@@ -198,10 +198,11 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       },
       tooltip: {
         callbacks: {
+          title: () => '', // Hide the default x-axis value
           label: function (context) {
-            const label = labelsRef.current[context.dataIndex]; // Get full timestamp
-            const value = context.raw; // Rainfall value
-            return `${label != undefined ? label + ":" : ""} ${value}`;
+            const value = context.raw; // Sample value
+            const label = labelsRef.current[context.dataIndex]; // Full date and time
+            return [`Value: ${value}`, `Date: ${label}`]; // Custom content for the tooltip
           },
         },
       },

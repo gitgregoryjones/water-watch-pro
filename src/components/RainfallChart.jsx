@@ -88,6 +88,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         const labels = [];
         const values = [];
 
+        const backgroundColors = [];
+
         const data = await response.json();
 
         if (period !== "daily") {
@@ -101,7 +103,9 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
           entries.forEach(([key, value], i) => {
             if (i < max) {
               labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
-              values.push(value["total"]);
+              let tt = value["total"];
+              values.push(tt);
+              backgroundColors.push(tt  > location.h24_threshold ? tt  > location.atlas14_threshold['1h'][0] ? "red" : "orange" : "green");
             }
           });
         } else {
@@ -109,6 +113,15 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
           days.forEach((day) => {
             labels.push(day.date);
             values.push(day.rainfall);
+
+            if(!location.atlas14_threshold){
+              location.atlas14_threshold = 9
+            }
+
+            
+              //console.log(`Day rainfall is ${day.rainfall} and threshold is ${location.h24_threshold}`)
+              backgroundColors.push(day.rainfall > location.h24_threshold ? day.rainfall  > location.atlas14_threshold['24h'][0] ? "red" : "orange" : "green");
+            
           });
         }
 
@@ -120,9 +133,9 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
             {
               label: "Rainfall",
               data: values,
-              backgroundColor: "rgba(54, 162, 235, 0.6)",
-              borderColor: "rgba(54, 162, 235, 1)",
-              borderWidth: 1,
+              backgroundColor: backgroundColors,
+              borderColor: backgroundColors,
+              borderWidth: 0,
             },
           ],
           yMax: yMax * 1.2,
@@ -197,11 +210,15 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         display: false, // Hide the legend
       },
       tooltip: {
+        enabled:true,
         callbacks: {
+          title: () => '', // Hide the default x-axis value
           label: function (context) {
-            const label = labelsRef.current[context.dataIndex]; // Get full timestamp
-            const value = context.raw; // Rainfall value
-            return `${label != undefined ? label + ":" : ""} ${value}`;
+            const value = context.raw; // Sample value
+            const label = labelsRef.current[context.dataIndex]; // Full date and time
+            const arr = label ? [`${value}`, `${label.substring(0,label?.lastIndexOf(":"))}`] : [`${value}`, `${context.label}`];
+            
+            return arr; // Custom content for the tooltip
           },
         },
       },

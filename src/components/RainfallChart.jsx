@@ -30,6 +30,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   const endDay = today.getDate().toString().padStart(2, "0");
   const beginEndRange = `${year}-${month}-${beginDay}/${year}-${month}-${endDay}`;
 
+  const [firstTime,setFirstTime] = useState(true);
+
   const formatHeaderTimestamp = (timestamp) => {
     const [datePart, timePart] = timestamp.split(" ");
     const [year, month, day] = datePart.split("-");
@@ -136,6 +138,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   }, [location.id, period, max, tomorrowDate]);
 
   const scrollToFirstNonZeroBar = () => {
+
+    
     if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current) return;
 
     const values = chartData.datasets[0].data;
@@ -145,10 +149,13 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       const container = chartContainerRef.current;
       const barWidth = 50; // Approximate width of each bar
       const scrollPosition = firstNonZeroIndex * barWidth - container.offsetWidth / 4;
+      
 
-      setTimeout(() => {
+     // setTimeout(() => {
+      
         container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
-      }, 500); // Add a delay to ensure rendering is complete
+        
+     // }, 1000); // Add a delay to ensure rendering is complete
     }
   };
 
@@ -214,7 +221,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         style={{ position: "relative", width: "100%", height: "420px" }}
       >
         {chartData ? (
-          <div style={{ width: `${period === "daily" ? (window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
+          <div tabIndex={0}  onMouseEnter={scrollToFirstNonZeroBar} style={{ width: `${period === "daily" ? (window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
             <Bar data={chartData} options={options} />
           </div>
         ) : (

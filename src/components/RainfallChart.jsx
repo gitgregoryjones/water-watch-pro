@@ -13,7 +13,7 @@ import { Bar } from "react-chartjs-2";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
-  const user = useSelector((state) => state.userInfo.user); // Access user from Redux state
+  const user = useSelector((state) => state.userInfo.user);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,6 +45,11 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
     }
     const hour = timePart.split(":")[0];
     return `${hour}h`; // Label as "12h"
+  };
+
+  const calculateYMax = (data) => {
+    const nonZeroMax = Math.max(...data.filter((value) => value > 0));
+    return nonZeroMax > 0 ? nonZeroMax : 1.0;
   };
 
   useEffect(() => {
@@ -94,7 +99,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
           entries.forEach(([key, value], i) => {
             if (i < max) {
               labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
-              values.push(period === "daily" ? value["24h_total"] : value["total"]);
+              values.push(value["total"]);
             }
           });
         } else {
@@ -104,6 +109,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
             values.push(day.rainfall);
           });
         }
+
+        const yMax = calculateYMax(values); // Dynamically calculate the Y-axis max
 
         setChartData({
           labels,
@@ -116,6 +123,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
               borderWidth: 1,
             },
           ],
+          yMax: yMax * 1.2,
         });
       } catch (err) {
         setError(err.message);
@@ -127,47 +135,29 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
     fetchData();
   }, [location.id, period, max, tomorrowDate]);
 
-  const handleScroll = () => {
-    if (!chartContainerRef.current || !chartData) return;
+  const scrollToFirstNonZeroBar = () => {
+    if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current) return;
 
-    const scrollLeft = chartContainerRef.current.scrollLeft;
-    const containerWidth = chartContainerRef.current.offsetWidth;
-    const totalWidth = chartContainerRef.current.scrollWidth;
+    const values = chartData.datasets[0].data;
+    const firstNonZeroIndex = values.findIndex((value) => value > 0);
 
-    const visibleStartIndex = Math.floor((scrollLeft / totalWidth) * (chartData.labels.length - 1));
-    const visibleEndIndex = Math.min(
-      Math.ceil(((scrollLeft + containerWidth) / totalWidth) * (chartData.labels.length - 1)),
-      chartData.labels.length - 1
-    );
+    if (firstNonZeroIndex !== -1) {
+      const container = chartContainerRef.current;
+      const barWidth = 50; // Approximate width of each bar
+      const scrollPosition = firstNonZeroIndex * barWidth - container.offsetWidth / 4;
 
-    if (labelsRef.current.length > 1) {
-      setHeader(
-        `${formatHeaderTimestamp(labelsRef.current[visibleStartIndex])} - ${formatHeaderTimestamp(labelsRef.current[visibleEndIndex])}`
-      );
+      setTimeout(() => {
+        container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
+      }, 500); // Add a delay to ensure rendering is complete
     }
   };
 
+
   useEffect(() => {
-    const container = chartContainerRef.current;
-
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
+    if (period === "hourly" && chartData) {
+      scrollToFirstNonZeroBar();
     }
-
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, [chartData]); // Attach the scroll listener when chartData is ready
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  }, [period, chartData]);
 
   const options = {
     responsive: true,
@@ -186,7 +176,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       },
       y: {
         beginAtZero: true,
-        max: 1,
+        max: chartData?.yMax || 1.0, // Use calculated max value
         ticks: {
           stepSize: 0.5,
         },
@@ -204,22 +194,18 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
           label: function (context) {
             const label = labelsRef.current[context.dataIndex]; // Get full timestamp
             const value = context.raw; // Rainfall value
-            return `${label != undefined ? label + ":" :' '} ${value}`;
+            return `${label != undefined ? label + ":" : ""} ${value}`;
           },
         },
       },
     },
-    layout: {
-      padding: {
-        left: 0, // Leave space for the y-axis to remain visible
-      },
-    },
+    animation: false,
   };
 
   return (
     <div className="flex flex-col w-full">
       {/* Dynamic Header */}
-      <div className="w-full flex justify-center font-bold text-lg mb-4">{period == "hourly" && header}</div>
+      <div className="w-full flex justify-center font-bold text-lg mb-4">{period === "hourly" && header}</div>
 
       {/* Scrollable Chart */}
       <div
@@ -227,9 +213,13 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         className="overflow-x-auto"
         style={{ position: "relative", width: "100%", height: "420px" }}
       >
-        <div style={{ width: `${period === "daily" ? ( window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
-          <Bar data={chartData} options={options} />
-        </div>
+        {chartData ? (
+          <div style={{ width: `${period === "daily" ? (window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
+            <Bar data={chartData} options={options} />
+          </div>
+        ) : (
+          <div>Loading...</div>
+        )}
       </div>
     </div>
   );

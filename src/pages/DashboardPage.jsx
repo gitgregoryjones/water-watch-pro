@@ -191,7 +191,14 @@ export default function DashboardPage() {
     console.log(`Map Center called for ${locationObject.name}`)
     zoomIn && setMapCoords({lat:locationObject.latitude, lng:locationObject.longitude})
     
-    setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
+    let nThresh = locationObject.atlas14_threshold;
+
+    if(nThresh){
+
+      setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
+    } else {
+      console.log(`No NOA!`)
+    }
 
     setLocation(locationObject)
 
@@ -380,7 +387,7 @@ useEffect(()=>{
 /* Render A Row A Different Color Based on Rainfall for That Area Hourly */
 function onRenderedRowHourly(raw,row,index){
   
-  console.log(`Called Rendred Row`)
+  
 
   let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
 
@@ -399,7 +406,7 @@ function onRenderedRowHourly(raw,row,index){
 /* Render A Row A Different Color Based on Rainfall for That Area 24hrAccum */
 function onRenderedRow24HourAccum(raw,row,index){
   
-  console.log(`Called Rendred Row`)
+  
 
   let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
 

@@ -19,7 +19,7 @@ const CheckboxGroup = ({ onClick, color }) => {
           value="green"
           checked={selectedValue === 'green'}
           onChange={() => handleClick('green')}
-          className="cursor-pointer"
+          className="cursor-pointer accent-[green] text-[white] "
         />
         <span>All</span>
       </label>
@@ -31,7 +31,7 @@ const CheckboxGroup = ({ onClick, color }) => {
           value="orange"
           checked={selectedValue === 'orange'}
           onChange={() => handleClick('orange')}
-          className="cursor-pointer"
+          className="cursor-pointer accent-orange-600 text-[white] "
         />
         <span>Above Threshold</span>
       </label>
@@ -43,7 +43,7 @@ const CheckboxGroup = ({ onClick, color }) => {
           value="red"
           checked={selectedValue === 'red'}
           onChange={() => handleClick('red')}
-          className="cursor-pointer"
+          className="text-[white] cursor-pointer  accent-[red]"
         />
         <span>Above NOAA 14</span>
       </label>

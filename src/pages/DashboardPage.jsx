@@ -455,7 +455,7 @@ function showThreshold(color){
            
            <Map
             
-             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border md:border-slate-800'
+             className='max-h-[95%]   md:h-[42rem] flex-[3_3_0%] md:border md:border-slate-800'
              
              
              

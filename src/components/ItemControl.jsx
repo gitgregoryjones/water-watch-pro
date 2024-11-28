@@ -9,7 +9,7 @@ import './ItemControl.css';
 // Styled components for the container layout
 export function Container({children, className}){
 
-  return (<div className={`flex flex-col justify-center max-h-[20rem] overflow-scroll min-h-[20rem] ${className}`}>{children}</div>)
+  return (<div className={`flex flex-col  max-h-[20rem] overflow-scroll min-h-[20rem] ${className}`}>{children}</div>)
 }
 
 const Button = styled.button`

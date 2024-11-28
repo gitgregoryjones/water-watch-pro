@@ -181,6 +181,9 @@ export default function LoginForm() {
              myLocations  = myLocations.map(k=>{
                 if(loc24.locations[k.id]){
                     k.total_rainfall = loc24.locations[k.id].total_rainfall;
+                    k.color_24 = k.total_rainfall  > k.h24_threshold ? k.total_rainfall  > k.atlas14_threshold['24h'][0] ? "red" : "orange" : "green";
+                    console.log(`Daily is ${JSON.stringify(k)}`)
+                
                     //console.log(`Found some rain!!! for ${k.name}`)
                 }
 
@@ -217,6 +220,8 @@ export default function LoginForm() {
                 if(locHourly.locations[k.id]){
                     k.total_hourly_rainfall = locHourly.locations[k.id].total_rainfall;
                     //console.log(`Found some rain!!! for ${k.name}`)
+                    k.color_hourly = k.total_hourly_rainfall  > k.h24_threshold ? k.total_hourly_rainfall  > k.atlas14_threshold['1h'][0] ? "red" : "orange" : "green";
+                    console.log(`Hourly is ${JSON.stringify(k)}`)
                 }
 
                 return k;

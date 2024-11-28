@@ -38,6 +38,8 @@ import fetchJsonApi from '../utility/fetchJsonApi'
 import Processing from '../components/Processing'
 import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
 import ProfilePic from '../components/ProfilePic'
+import CheckboxGroup from '../components/CheckboxGroup'
+import { color } from 'chart.js/helpers'
 
 
 export default function DashboardPage() {
@@ -92,6 +94,8 @@ export default function DashboardPage() {
   const [hourlyRainfallChartData, setHourlyRainFallChartData] = useState({})
 
   const [dailyRainfallChartData,setDailyRainfallChartData] = useState({});
+
+  const [currentColor, setCurrentColor] = useState("green")
 
 
   
@@ -388,12 +392,14 @@ useEffect(()=>{
 function onRenderedRowHourly(raw,row,index){
   
   
+  //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
+  let raincolor = raw.color_hourly;
 
-  let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
+  let display = (currentColor != "green" && currentColor != raw.color_hourly) ? "none" : "flex";
 
   let clone = React.cloneElement(row,{
     
-      style:{color: raincolor, fontWeight:"bold"},
+      style:{color: raincolor, fontWeight:"bold", display:display},
       filter: raincolor
   }
       
@@ -408,11 +414,14 @@ function onRenderedRow24HourAccum(raw,row,index){
   
   
 
-  let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
+  //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
+  let raincolor = raw.color_24;
+
+  let display = (currentColor != "green" && currentColor != raw.color_24) ? "none" : "flex";
 
   let clone = React.cloneElement(row,{
     
-      style:{color: raincolor, fontWeight:"bold"},
+      style:{color: raincolor, fontWeight:"bold", display:display},
       filter: raincolor
   }
       
@@ -422,6 +431,11 @@ function onRenderedRow24HourAccum(raw,row,index){
   return row;
 }
 
+function showThreshold(color){
+
+  setCurrentColor(color)
+
+}
 
   return (
     
@@ -431,7 +445,7 @@ function onRenderedRow24HourAccum(raw,row,index){
         {user.processedThrough}
       <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
       header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full justify-around items-center'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}<Processing showPlain={true}/></div> <Processing /></div>}  >
-      <PillTabs className={"pb-8 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
+      <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'><span>Daily Total</span>
       <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
         
@@ -439,7 +453,7 @@ function onRenderedRow24HourAccum(raw,row,index){
            
            <Map
             
-             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+             className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border md:border-slate-800'
              
              
              
@@ -465,7 +479,7 @@ function onRenderedRow24HourAccum(raw,row,index){
         )}
               
               {locationList.map((obj, i) => (
-          <AdvancedMarker
+          (currentColor == "green" || currentColor == obj.color_hourly) && <AdvancedMarker
             onClick={() => setMapCenter(obj)}
             clickable={true}
             key={obj.longitude}
@@ -486,7 +500,10 @@ function onRenderedRow24HourAccum(raw,row,index){
          
          </APIProvider>
      
-      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <div className='w-[30%] md:w-[20%]'>
+        <CheckboxGroup color={currentColor} onClick={showThreshold}/>
+        <hr className='hidden md:block m-2'/>
+      <ItemControl className={`mapList px-2  justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}
@@ -495,12 +512,12 @@ function onRenderedRow24HourAccum(raw,row,index){
             showFavoriteControls={false}
             onRowRendered={onRenderedRowHourly}
             
-            searchPlaceholder='Search Your Locations!...'
+            searchPlaceholder='Search...'
             addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 
           />
-          
+        </div>
       
           
          
@@ -541,7 +558,7 @@ function onRenderedRow24HourAccum(raw,row,index){
        )}
              
              {locationList.map((obj, i) => (
-         <AdvancedMarker
+       (currentColor == "green" || currentColor == obj.color_24) &&  <AdvancedMarker
            onClick={() => setMapCenter(obj)}
            clickable={true}
            key={obj.longitude}

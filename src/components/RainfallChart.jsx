@@ -36,7 +36,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
     const [datePart, timePart] = timestamp.split(" ");
     const [year, month, day] = datePart.split("-");
     const hour = timePart.split(":")[0];
-    return `${month}-${day} ${hour}h`;
+    return `${month}-${day}`;
   };
 
   const formatXAxisLabel = (timestamp) => {

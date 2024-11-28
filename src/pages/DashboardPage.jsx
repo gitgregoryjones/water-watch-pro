@@ -477,8 +477,8 @@ function showThreshold(color){
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
             <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
-              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.atlas14_threshold && obj.total_hourly_rainfall > obj?.atlas14_threshold['1h'][0] ? 'text-[red]' : obj.total_hourly_rainfall > obj.h24_threshold ? 'text-[orange]':'text-[green]'}`}></i>
-              <div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg ${obj.atlas14_threshold && obj.total_hourly_rainfall > obj?.atlas14_threshold['1h'][0] ? 'bg-[red]' : obj.total_hourly_rainfall > obj.h24_threshold ? 'bg-[orange]':'bg-[green]'}`} > 
+              <i className={`fas fa-map-marker-alt flex flex-1 text-4xl text-[${obj.color_hourly}]`}></i>
+              <div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[${obj.color_hourly}]`} > 
                 {obj.total_hourly_rainfall?.toFixed(2)}
               </div>
             </div>
@@ -556,8 +556,8 @@ function showThreshold(color){
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
            <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
-             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl ${obj.atlas14_threshold && obj.total_hourly_rainfall > obj?.atlas14_threshold['24h'][0] ? 'text-[red]' : obj.total_hourly_rainfall > obj.h24_threshold ? 'text-[orange]':'text-[green]'}`}></i>
-             <div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg ${obj.atlas14_threshold && obj.total_hourly_rainfall > obj?.atlas14_threshold['24h'][0] ? 'bg-[red]' : obj.total_hourly_rainfall > obj.h24_threshold ? 'bg-[orange]':'bg-[green]'}`}>
+             <i className={`fas fa-map-marker-alt flex flex-1 text-4xl text-[${obj.color_24}]`}></i>
+             <div className={`px-2 border rounded flex flex-2 text-nowrap text-[white] text-lg bg-[${obj.color_24}]`}>
                {obj?.total_rainfall?.toFixed(2)}
              </div>
            </div>

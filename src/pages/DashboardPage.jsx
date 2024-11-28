@@ -97,6 +97,8 @@ export default function DashboardPage() {
 
   const [currentColor, setCurrentColor] = useState("green")
 
+  const [currentColor24, setCurrentColor24] = useState("green")
+
 
   
   //const locations = useSelector((state) => state.locationContacts.locations);
@@ -501,7 +503,7 @@ function showThreshold(color){
          </APIProvider>
      
       <div className='w-[30%] md:w-[20%]'>
-        <CheckboxGroup color={currentColor} onClick={showThreshold}/>
+        <CheckboxGroup color={currentColor} onClick={setCurrentColor}/>
         <hr className='hidden md:block m-2'/>
       <ItemControl className={`mapList px-2  justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
@@ -558,7 +560,7 @@ function showThreshold(color){
        )}
              
              {locationList.map((obj, i) => (
-       (currentColor == "green" || currentColor == obj.color_24) &&  <AdvancedMarker
+       (currentColor24 == "green" || currentColor24 == obj.color_24) &&  <AdvancedMarker
            onClick={() => setMapCenter(obj)}
            clickable={true}
            key={obj.longitude}
@@ -578,6 +580,9 @@ function showThreshold(color){
         
          
          </APIProvider>
+       <div className='w-[30%] md:w-[20%]'>
+      <CheckboxGroup color={currentColor24} onClick={setCurrentColor24}/>
+      <hr className='hidden md:block m-2'/>
       <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
@@ -592,6 +597,7 @@ function showThreshold(color){
 
 
           />
+          </div>
           
       
           

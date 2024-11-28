@@ -147,25 +147,26 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
     fetchData();
   }, [location.id, period, max, tomorrowDate]);
 
-  const scrollToFirstNonZeroBar = () => {
+  const scrollToLastNonZeroBar = () => {
     if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current)
       return;
-
+  
     const values = chartData.datasets[0].data;
-    const firstNonZeroIndex = values.findIndex((value) => value > 0);
-
-    if (firstNonZeroIndex !== -1) {
+    const lastNonZeroIndex = values.lastIndexOf(values.slice().reverse().find((value) => value > 0));
+  
+    if (lastNonZeroIndex !== -1) {
       const container = chartContainerRef.current;
       const barWidth = 50; // Approximate width of each bar
-      const scrollPosition = firstNonZeroIndex * barWidth - container.offsetWidth / 4;
-
+      const scrollPosition = lastNonZeroIndex * barWidth - container.offsetWidth / 4;
+  
       container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
     }
   };
+  
 
   useEffect(() => {
     if (period === "hourly" && chartData) {
-      scrollToFirstNonZeroBar();
+      scrollToLastNonZeroBar();
     }
   }, [period, chartData]);
 
@@ -233,7 +234,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         ) : chartData ? (
           <div
             tabIndex={0}
-            onMouseEnter={scrollToFirstNonZeroBar}
+            onMouseEnter={scrollToLastNonZeroBar}
             style={{
               width: `${
                 period === "daily"

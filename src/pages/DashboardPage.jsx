@@ -386,7 +386,7 @@ function onRenderedRowHourly(raw,row,index){
   //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
   let raincolor = raw.color_hourly;
 
-  let display = (currentColor != "green" && currentColor != raw.color_hourly) ? "none" : "flex";
+  let display = (currentColor != "green" || currentColor != raw.color_hourly) ? "none" : "flex";
 
   let clone = React.cloneElement(row,{
     
@@ -408,7 +408,9 @@ function onRenderedRow24HourAccum(raw,row,index){
   //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
   let raincolor = raw.color_24;
 
-  let display = (currentColor != "green" && currentColor != raw.color_24) ? "none" : "flex";
+  let display = (currentColor24 != "green" && currentColor24 != raw.color_24) ? "none" : "flex";
+
+  //console.log(`Setting ${raw.name} to display ${display} because [${raw.color_24}] and current color is ${currentColor24} `)
 
   let clone = React.cloneElement(row,{
     
@@ -473,7 +475,7 @@ function showThreshold(color){
           (currentColor == "green" || currentColor == obj.color_hourly) && <AdvancedMarker
             onClick={() => setMapCenter(obj)}
             clickable={true}
-            key={obj.longitude}
+            key={i}
             position={{ lat: obj.latitude, lng: obj.longitude }}
           >
             <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>
@@ -552,7 +554,7 @@ function showThreshold(color){
        (currentColor24 == "green" || currentColor24 == obj.color_24) &&  <AdvancedMarker
            onClick={() => setMapCenter(obj)}
            clickable={true}
-           key={obj.longitude}
+           key={i}
            position={{ lat: obj.latitude, lng: obj.longitude }}
          >
            <div className="flex p-2 text-xl justify-center items-center" title={`${obj.name}`}>

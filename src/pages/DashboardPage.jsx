@@ -616,7 +616,7 @@ function showThreshold(color){
             </Upgrade>
           </div>
           <div className='tab min-h-[420]'>NOAA Atlas 14
-          {Object.keys(location).length > 0 && location.atlas14_threshold && <ResponsiveTable  location={location} />}
+          {Object.keys(location).length > 0  && <ResponsiveTable  location={location} />}
           </div>
         
       

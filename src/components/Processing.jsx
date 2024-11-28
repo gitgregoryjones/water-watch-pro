@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import fetchJsonApi from '../utility/fetchJsonApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
+import api from '../utility/api';
 
 
 export default function Processing({showPlain = false}) {
@@ -31,24 +32,15 @@ export default function Processing({showPlain = false}) {
     
     useEffect(()=>{
 
-        
-        fetchJsonApi(user.accessToken,`/api/services/process_status`,{},"GET").then(data => {
-            if (!data.error) {
-              
-             
-              setStatus(data.status)
-              setDisplayTime(convertTime(data.datetime))
-              data.status == "processing" ? setPlainMsg(convertTime(data.datetime,1)) : setPlainMsg(convertTime(data.datetime))
-             
-               
-              
-             
-              
-            } else {
-              console.log(`No data received or an error occurred. ${JSON.stringify(data.error)}`);
-            }
-          
-        });
+      const fetchProcessStatus = async () => {
+       
+            const {data} = await api.get(`/api/services/process_status`)
+            setStatus(data.status)
+            setDisplayTime(convertTime(data.datetime))
+            data.status == "processing" ? setPlainMsg(convertTime(data.datetime,1)) : setPlainMsg(convertTime(data.datetime))
+         
+      }
+      fetchProcessStatus();
 
         
     },[showPlain])

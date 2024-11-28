@@ -503,8 +503,8 @@ function showThreshold(color){
          </APIProvider>
      
       <div className='w-[30%] md:w-[20%]'>
-        <CheckboxGroup color={currentColor} onClick={setCurrentColor}/>
-        <hr className='hidden md:block m-2'/>
+        <CheckboxGroup className={`border rounded mx-2 mb-2`} color={currentColor} onClick={setCurrentColor}/>
+       
       <ItemControl className={`mapList px-2  justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}

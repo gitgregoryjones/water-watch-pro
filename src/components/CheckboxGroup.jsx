@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const CheckboxGroup = ({ onClick, color }) => {
+const CheckboxGroup = ({ onClick, color, className }) => {
   const [selectedValue, setSelectedValue] = useState(color);
 
   const handleClick = (value) => {
@@ -11,9 +11,9 @@ const CheckboxGroup = ({ onClick, color }) => {
   };
 
   return (
-    <div className="flex flex-col p-2 ">
+    <div className={`flex flex-col p-2 ${className}`}>
       {/* Normal */}
-      <label className="flex items-center space-x-2 text-sm">
+      <label className={`flex items-center space-x-2 text-sm `}>
         <input
           type="checkbox"
           value="green"

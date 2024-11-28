@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {  getUserFromDB} from '../pages/TestData';
 
 const initialState = {
-  user: getUserFromDB(),
+  user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : getUserFromDB(),
   
 };
 
@@ -10,7 +10,7 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    updateUser:  (state,action) => {state.user = action.payload}
+    updateUser:  (state,action) => {state.user = action.payload; localStorage.setItem("user",JSON.stringify(state.user))}
   },
 });
 

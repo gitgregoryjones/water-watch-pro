@@ -8,6 +8,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import api from "../utility/api"; // Import the api utility
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
@@ -29,8 +30,6 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   const beginDay = (today.getDate() - 2).toString().padStart(2, "0");
   const endDay = today.getDate().toString().padStart(2, "0");
   const beginEndRange = `${year}-${month}-${beginDay}/${year}-${month}-${endDay}`;
-
-  const [firstTime,setFirstTime] = useState(true);
 
   const formatHeaderTimestamp = (timestamp) => {
     const [datePart, timePart] = timestamp.split(" ");
@@ -62,35 +61,24 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         return;
       }
 
-      let API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
+      let endpoint = `/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
 
       if (period === "rapidrain") {
-        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
+        endpoint = `/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
       }
 
       if (period === "daily") {
-        API_URL = `https://waterwatchpro.synovas.dev/api/locations/${location.id}/24h_data/${beginEndRange}`;
+        endpoint = `/api/locations/${location.id}/24h_data/${beginEndRange}`;
       }
 
       try {
-        const response = await fetch(API_URL, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data for location ${location.id}: ${response.statusText}`);
-        }
+        const response = await api.get(endpoint); // Use the `api` utility to make GET requests
 
         const labels = [];
         const values = [];
-
         const backgroundColors = [];
 
-        const data = await response.json();
+        const data = response.data;
 
         if (period !== "daily") {
           const entries = Object.entries(data.hourly_data).reverse();
@@ -105,7 +93,13 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
               labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
               let tt = value["total"];
               values.push(tt);
-              backgroundColors.push(tt  > location.h24_threshold ? tt  > location.atlas14_threshold['1h'][0] ? "red" : "orange" : "green");
+              backgroundColors.push(
+                tt > location.h24_threshold
+                  ? tt > location.atlas14_threshold["1h"][0]
+                    ? "red"
+                    : "orange"
+                  : "green"
+              );
             }
           });
         } else {
@@ -114,14 +108,17 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
             labels.push(day.date);
             values.push(day.rainfall);
 
-            if(!location.atlas14_threshold){
-              location.atlas14_threshold = 9
+            if (!location.atlas14_threshold) {
+              location.atlas14_threshold = 9;
             }
 
-            
-              //console.log(`Day rainfall is ${day.rainfall} and threshold is ${location.h24_threshold}`)
-              backgroundColors.push(day.rainfall > location.h24_threshold ? day.rainfall  > location.atlas14_threshold['24h'][0] ? "red" : "orange" : "green");
-            
+            backgroundColors.push(
+              day.rainfall > location.h24_threshold
+                ? day.rainfall > location.atlas14_threshold["24h"][0]
+                  ? "red"
+                  : "orange"
+                : "green"
+            );
           });
         }
 
@@ -151,9 +148,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   }, [location.id, period, max, tomorrowDate]);
 
   const scrollToFirstNonZeroBar = () => {
-
-    
-    if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current) return;
+    if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current)
+      return;
 
     const values = chartData.datasets[0].data;
     const firstNonZeroIndex = values.findIndex((value) => value > 0);
@@ -162,16 +158,10 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       const container = chartContainerRef.current;
       const barWidth = 50; // Approximate width of each bar
       const scrollPosition = firstNonZeroIndex * barWidth - container.offsetWidth / 4;
-      
 
-     // setTimeout(() => {
-      
-        container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
-        
-     // }, 1000); // Add a delay to ensure rendering is complete
+      container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
     }
   };
-
 
   useEffect(() => {
     if (period === "hourly" && chartData) {
@@ -210,14 +200,16 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         display: false, // Hide the legend
       },
       tooltip: {
-        enabled:true,
+        enabled: true,
         callbacks: {
-          title: () => '', // Hide the default x-axis value
+          title: () => "", // Hide the default x-axis value
           label: function (context) {
             const value = context.raw; // Sample value
             const label = labelsRef.current[context.dataIndex]; // Full date and time
-            const arr = label ? [`${value}`, `${label.substring(0,label?.lastIndexOf(":"))}`] : [`${value}`, `${context.label}`];
-            
+            const arr = label
+              ? [`${value}`, `${label.substring(0, label?.lastIndexOf(":"))}`]
+              : [`${value}`, `${context.label}`];
+
             return arr; // Custom content for the tooltip
           },
         },
@@ -228,17 +220,31 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Dynamic Header */}
-      <div className="w-full flex justify-center font-bold text-lg mb-4">{period === "hourly" && header}</div>
-
-      {/* Scrollable Chart */}
+      <div className="w-full flex justify-center font-bold text-lg mb-4">
+        {period === "hourly" && header}
+      </div>
       <div
         ref={chartContainerRef}
         className="overflow-x-auto"
         style={{ position: "relative", width: "100%", height: "420px" }}
       >
-        {chartData ? (
-          <div tabIndex={0}  onMouseEnter={scrollToFirstNonZeroBar} style={{ width: `${period === "daily" ? (window.innerWidth < 600 ? window.innerWidth * 0.9 : window.innerWidth * 0.75) : chartData.labels.length * 50}px`, height: "100%" }}>
+        {error ? (
+          <div>Error loading data. Please try again later.</div>
+        ) : chartData ? (
+          <div
+            tabIndex={0}
+            onMouseEnter={scrollToFirstNonZeroBar}
+            style={{
+              width: `${
+                period === "daily"
+                  ? window.innerWidth < 600
+                    ? window.innerWidth * 0.9
+                    : window.innerWidth * 0.75
+                  : chartData.labels.length * 50
+              }px`,
+              height: "100%",
+            }}
+          >
             <Bar data={chartData} options={options} />
           </div>
         ) : (
@@ -247,6 +253,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       </div>
     </div>
   );
+  
 };
 
 export default RainfallChart;

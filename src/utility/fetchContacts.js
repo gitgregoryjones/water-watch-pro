@@ -1,26 +1,17 @@
-import { API_HOST } from "/src/utility/constants.js";
+import api from "/src/utility/api.js"; // Import your api utility
 
-// Function accepts the user object as a parameter
 const fetchContacts = async (user) => {
   console.log(`Contacts called`);
 
-  const apiUrl = `${API_HOST}/api/contacts/?page=1&page_size=250`;
-
   try {
-    const response = await fetch(apiUrl, {
-      method: "GET",
+    const response = await api.get("/api/contacts/", {
+      params: { page: 1, page_size: 250 }, // Use params for query string handling
       headers: {
-        "Authorization": `Bearer ${user.accessToken}`,
-        "Content-Type": "application/json",
+        "Authorization": `Bearer ${user.accessToken}`, // Authorization header if required
       },
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch contacts: ${response.statusText}`);
-    }
-
-    const contacts = await response.json();
-    return contacts;
+    return response.data; // Assuming contacts are in the `data` field
   } catch (error) {
     console.error("Error fetching contacts:", error);
     return [];

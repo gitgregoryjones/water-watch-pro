@@ -340,55 +340,44 @@ const handleGroupClick = (group) => {
   //console.log('clicked')
 };
 
-useEffect(()=>{
+useEffect(() => {
+  const fetchHourlyData = async () => {
+    if (!currentLocation?.id) return;
 
-      //Populate Hourly Rainfall Chart Tab Data
-      fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${user.accessToken}`,
-            "Content-Type": "application/json",
-        }
-    }).then((response)=>{
-      if(!response.ok){
-        throw new Error(`HTTP Error ${response.status}`)
-      }
-
-      return response.json();
-    }).then(data=>{
+    try {
+      const { data } = await api.get(`/api/locations/${currentLocation.id}/hourly_data`, {
+        params: { days: 3 },
+      });
       setHourlyRainFallChartData(data.hourly_data);
-      console.log(`Hourly Rainfall Chart Data ${JSON.stringify(hourlyRainfallChartData)}`)
-     //console.log(`24 Hour Data ${JSON.stringify(data.hourly_data)}`)
-    });
-
-    const today = new Date();
-    const year = today.getFullYear(); // Get the full year
-    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Months are zero-indexed, pad to 2 digits
-    const day = today.getDate().toString().padStart(2, '0'); // Pad day to 2 digits
-
-    const todayStr = `${year}-${month}-${day}`; 
-
-    fetch(`${API_HOST}/api/locations/${location.id}/hourly_data?days=3&date=${todayStr}`, {
-      method: "GET",
-      headers: {
-          "Authorization": `Bearer ${user.accessToken}`,
-          "Content-Type": "application/json",
-      }
-  }).then((response)=>{
-    if(!response.ok){
-      throw new Error(`HTTP Error ${response.status}`)
+      console.log('Hourly Rainfall Data:', data.hourly_data);
+    } catch (error) {
+      console.error('Failed to fetch hourly rainfall data:', error);
     }
+  };
 
-    return response.json();
-  }).then(data=>{
-    setDailyRainfallChartData(data.hourly_data);
-    console.log(`Daily Rainfall Chart Data ${JSON.stringify(dailyRainfallChartData)}`)
-   //console.log(`24 Hour Data ${JSON.stringify(data)}`)
-  });
+  const fetchDailyData = async () => {
+    if (!currentLocation?.id) return;
 
+    try {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const day = today.getDate().toString().padStart(2, '0');
+      const todayStr = `${year}-${month}-${day}`;
 
+      const { data } = await api.get(`/api/locations/${currentLocation.id}/hourly_data`, {
+        params: { days: 3, date: todayStr },
+      });
+      setDailyRainfallChartData(data.hourly_data);
+      console.log('Daily Rainfall Data:', data.hourly_data);
+    } catch (error) {
+      console.error('Failed to fetch daily rainfall data:', error);
+    }
+  };
 
-},[location])
+  fetchHourlyData();
+  fetchDailyData();
+}, [currentLocation]);
   
 /* Render A Row A Different Color Based on Rainfall for That Area Hourly */
 function onRenderedRowHourly(raw,row,index){
@@ -455,7 +444,7 @@ function showThreshold(color){
            
            <Map
             
-             className='max-h-[95%]   md:h-[42rem] flex-[3_3_0%] md:border md:border-slate-800'
+             className='max-h-[95%]   md:h-[45rem] flex-[3_3_0%] md:border md:border-slate-800'
              
              
              

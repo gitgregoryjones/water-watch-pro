@@ -83,10 +83,10 @@ function getBeginEndRange() {
         return;
       }
 
-      let endpoint = `/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
+      let endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
 
       if (period === "rapidrain") {
-        endpoint = `/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
+        endpoint = `/api/locations/${location.id}/15m_data?days=${max}&date=${tomorrowDate}`;
       }
 
       if (period === "daily") {
@@ -111,7 +111,7 @@ function getBeginEndRange() {
           );
 
           entries.forEach(([key, value], i) => {
-            if (i < max) {
+            if (i < max * 24) {
               labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
               let tt = value["total"];
               values.push(tt);

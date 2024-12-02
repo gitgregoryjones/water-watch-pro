@@ -46,7 +46,8 @@ export default function Header() {
       <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Data</Link>
     <Upgrade showMsg={false} tier={0}><Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link></Upgrade>
     <Link to="/assignments"  className={location.pathname == "/assignments" ? "text-slate-800"  : "text-[--main-2]"}>Assignments</Link>
-    <Link to="/settings"  className={location.pathname == "/settings" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
+    
+    <Link to="/location-list"  className={location.pathname == "/location-list"  || location.pathname == "/contact-list" || location.pathname == "/settings-general" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
     
     <Link to="/"  className={location.pathname == "/" ? "text-slate-800"  : "text-[--main-2]"}>Logout</Link>
     <div className=' flex fa-stack relative flex justify-center items-center'>

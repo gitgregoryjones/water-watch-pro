@@ -54,8 +54,10 @@ const LocationListPage = () => {
   };
 
   return (
-    <div className="mt-14 md:mt-28 p-6 w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28'>
         <SubHeader/>
+    <div className="mt-14 p-6 w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+        
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Locations</h2>
         <button
@@ -133,6 +135,7 @@ const LocationListPage = () => {
           Next
         </button>
       </div>
+    </div>
     </div>
   );
 };

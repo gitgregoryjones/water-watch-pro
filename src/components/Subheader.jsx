@@ -2,26 +2,26 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const SubHeader = () => {
-  const linkStyle = "px-4 py-2 mx-2 rounded hover:bg-gray-100";
-  const activeStyle = "bg-blue-500 text-white font-bold";
+  const linkStyle = "py-4 text-center hover:bg-lime-800/100 ";
+  const activeStyle = "bg-blue-500 text-white font-bold ";
 
   return (
-    <div className="flex justify-center items-center bg-[white] rounded py-4 shadow-md mb-24">
+    <div className="flex justify-center items-center  rounded-2xl min-w-full overflow-hidden shadow-md mb-4 bg-[#99ba93] ">
       <NavLink
         to="/location-list"
-        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-gray-700'}`}
+        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-[white]'}` + ` w-full`}
       >
         Locations
       </NavLink>
       <NavLink
         to="/contact-list"
-        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-gray-700'}`}
+        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-[white]'}` + ` w-full`}
       >
         Contacts
       </NavLink>
       <NavLink
         to="/settings-general"
-        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-gray-700'}`}
+        className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-[white]'}` + ` w-full`}
       >
         General Settings
       </NavLink>

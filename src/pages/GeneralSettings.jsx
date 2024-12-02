@@ -34,8 +34,10 @@ const GeneralSettingsPage = () => {
   };
 
   return (
-    <div className="p-6 w-full md:w-1/2 mx-auto bg-white shadow-md rounded-lg mt-28">
+    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28'>
         <SubHeader/>
+    <div className="p-6 w-full  mx-auto bg-white shadow-md rounded-lg">
+        
       <h1 className="text-2xl font-bold mb-6 text-center">General Notification Settings</h1>
       <div className='w-full rounded bg-yellow-200 h-12 flex justify-center items-center m-2'>These settings override all user settings</div>
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
@@ -128,6 +130,7 @@ const GeneralSettingsPage = () => {
           </button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

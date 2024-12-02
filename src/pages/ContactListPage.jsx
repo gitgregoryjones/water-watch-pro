@@ -39,8 +39,10 @@ const ContactListPage = () => {
   }, [currentPage]);
 
   return (
-    <div className="mt-28 p-6 bg-white rounded w-1/2">
+    <div className='h-full min-h-full flex flex-col mt-28'>
         <SubHeader/>
+    <div className=" p-6 bg-white rounded w-full h-[20rem] max-h=[20rem] overflow-scroll">
+        
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Contact List</h1>
         <button
@@ -120,6 +122,7 @@ const ContactListPage = () => {
           Next
         </button>
       </div>
+    </div>
     </div>
   );
 };

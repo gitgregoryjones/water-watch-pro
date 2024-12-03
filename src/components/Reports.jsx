@@ -297,7 +297,12 @@ const Reports = () => {
             multiple
             value={selectedLocations}
             
-            onChange={onChange={handleSelectAllChange}}
+            onChange={(e) => {
+              const options = Array.from(e.target.options);
+              const selected = options.filter((option) => option.selected).map((option) => option.value);
+              setSelectedLocations(selected);
+              //if (selected.length > 1) setDisplayFormat('csv'); // Force CSV if more than one location
+            }}
             className="border border-gray-300 w-full rounded p-2 "
           >
             {locations.map((l) => (

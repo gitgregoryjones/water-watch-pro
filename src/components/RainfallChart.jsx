@@ -205,16 +205,18 @@ function getBeginEndRange() {
         const tickValue = parseInt(tick.value, 10);
         
         const labelDate = labels ? labels : ""; // Extract YYYY-MM-DD
-  
+        
         // Determine background color
+       
         if (tickValue >= 0 && tickValue <= 23) {
-          ctx.fillStyle = "pink";
+          ctx.fillStyle = "#D1FFBD";
           console.log(`pink is in`)
         } else if (tickValue >= 24 && tickValue <= 45) {
-          ctx.fillStyle = "lightblue";
+          ctx.fillStyle = "#FFFFC5";
           console.log(`blue is in`)
         } else {
-          ctx.fillStyle = "lightgreen";
+          //ctx.fillStyle = "#D1FFBD";
+          ctx.fillStyle = "#E4F6F8";
           console.log(`black is in`)
         }
 
@@ -299,7 +301,7 @@ function getBeginEndRange() {
   return (
     <div className="flex flex-col w-full">
       <div className="w-full flex justify-center font-bold text-lg mb-4">
-        {period === "hourly" && header}
+        {period === "notest" && header}
       </div>
       <div
         ref={chartContainerRef}

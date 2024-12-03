@@ -127,7 +127,8 @@ export default function LoginForm() {
             const loc24 = location24History.data;
 
             myLocations = myLocations.map((location) => {
-                const loc24Data = loc24.locations[location.id];
+                location.atlas14_threshold = JSON.parse(location.atlas14_threshold);
+                let loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
                     try {
                     location.total_rainfall = loc24Data.total_rainfall;
@@ -135,9 +136,9 @@ export default function LoginForm() {
                         ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"
                         : "green";
 
-                        console.error(`Location DOES  have atlas 24 ${JSON.stringify(location)}`)
+                        console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
                     }catch (e){
-                        console.error(`Location does not have atlas 24 ${JSON.stringify(location)}`)
+                        console.error(`Location GReg does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)["24h"][0]}`)
                     }
                 }
                 return location;

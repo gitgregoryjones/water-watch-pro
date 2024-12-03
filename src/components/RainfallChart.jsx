@@ -1,12 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js';
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+
 import { Bar } from "react-chartjs-2";
 import api from "../utility/api"; // Import the api utility
 
@@ -192,54 +188,113 @@ function getBeginEndRange() {
     }
   }, [period, chartData]);
 
+  const chartAreaBackground = {
+    id: "chartAreaBackground",
+    beforeDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      const { left, right, top, bottom } = chartArea;
+  
+      // Clear previous background
+      ctx.save();
+      ctx.fillStyle = "white"; // Default background
+      ctx.fillRect(left, top, right - left, bottom - top);
+  
+     const labels = labelsRef.current; // Ensure this is populated with full timestamps
+  
+      scales.x.ticks.forEach((tick, index) => {
+        const tickValue = parseInt(tick.value, 10);
+        
+        const labelDate = labels ? labels : ""; // Extract YYYY-MM-DD
+  
+        // Determine background color
+        if (tickValue >= 0 && tickValue <= 23) {
+          ctx.fillStyle = "pink";
+          console.log(`pink is in`)
+        } else if (tickValue >= 24 && tickValue <= 45) {
+          ctx.fillStyle = "lightblue";
+          console.log(`blue is in`)
+        } else {
+          ctx.fillStyle = "lightgreen";
+          console.log(`black is in`)
+        }
+
+       // console.log(`Tick ${tickValue} represents ${labelsRef.current[index]}`);
+  
+        // Draw the segment
+        const barWidth = (right - left) / scales.x.ticks.length;
+        ctx.fillRect(left + index * barWidth, top, barWidth, bottom - top);
+        console.log(`The lable is ${labelDate}`)
+        // Add the date text
+        if (labelDate) {
+          ctx.fillStyle = "black"; // Text color
+          ctx.font = "12px Arial"; // Text font and size
+          ctx.textAlign = "center";
+          
+          ctx.fillText(
+            labelDate, // Text to display
+            left + index * barWidth + barWidth / 2, // Center the text in the segment
+            bottom + 15 // Position below the chart area
+          );
+        } 
+      });
+  
+      ctx.restore();
+    },
+  };
+  
+  // Register the plugin
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, chartAreaBackground);
+  
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       x: {
         title: {
-          display: false, // No title for x-axis
+          display: false,
         },
         ticks: {
-          autoSkip: false, // Ensure all labels appear
+          autoSkip: false,
         },
         grid: {
-          display: true, // Show gridlines for x-axis
+          display: true,
         },
       },
       y: {
         beginAtZero: true,
-        max: chartData?.yMax || 1.0, // Use calculated max value
+        max: chartData?.yMax || 1.0,
         ticks: {
           stepSize: 0.5,
         },
         grid: {
-          display: true, // Show gridlines for y-axis
+          display: true,
         },
       },
     },
     plugins: {
       legend: {
-        display: false, // Hide the legend
+        display: false,
       },
       tooltip: {
         enabled: true,
         callbacks: {
-          title: () => "", // Hide the default x-axis value
+          title: () => "",
           label: function (context) {
-            const value = context.raw; // Sample value
-            const label = labelsRef.current[context.dataIndex]; // Full date and time
+            const value = context.raw;
+            const label = labelsRef.current[context.dataIndex];
             const arr = label
               ? [`${value}`, `${label.substring(0, label?.lastIndexOf(":"))}`]
               : [`${value}`, `${context.label}`];
-
-            return arr; // Custom content for the tooltip
+  
+            return arr;
           },
         },
       },
     },
-    animation: false,
   };
+  
+  
+  
 
   return (
     <div className="flex flex-col w-full">

@@ -201,7 +201,7 @@ export default function DashboardPage() {
 
     if(nThresh){
 
-      setNOAAThreshold(0);
+      setNOAAThreshold(nThresh['1h'][0]);
     } else {
       console.log(`No NOAA!`)
     }
@@ -386,7 +386,7 @@ function onRenderedRowHourly(raw,row,index){
   //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['1h'][0] ? "red" : "orange" : "black";
   let raincolor = raw.color_hourly;
 
-  let display = (currentColor != "green" || currentColor != raw.color_hourly) ? "none" : "flex";
+  let display = (currentColor != "green" && currentColor != raw.color_hourly) ? "none" : "flex";
 
   let clone = React.cloneElement(row,{
     

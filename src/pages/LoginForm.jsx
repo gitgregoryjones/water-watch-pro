@@ -129,10 +129,16 @@ export default function LoginForm() {
             myLocations = myLocations.map((location) => {
                 const loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
+                    try {
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
                         ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"
                         : "green";
+
+                        console.error(`Location DOES  have atlas 24 ${JSON.stringify(location)}`)
+                    }catch (e){
+                        console.error(`Location does not have atlas 24 ${JSON.stringify(location)}`)
+                    }
                 }
                 return location;
             });
@@ -212,8 +218,9 @@ export default function LoginForm() {
                     name="email"
                     type="email"
                     onInput={(e) => setEmail(e.target.value)}
+                    value={email}
                     placeholder="Email Address"
-                    className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
+                    className='p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
                 />
                 <label hidden={logView}>Password</label>
                 <input
@@ -221,6 +228,7 @@ export default function LoginForm() {
                     type="password"
                     onInput={(e) => setPassword(e.target.value)}
                     placeholder="Enter your Password"
+                    value={password}
                     className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
                 />
             </FormContainer>

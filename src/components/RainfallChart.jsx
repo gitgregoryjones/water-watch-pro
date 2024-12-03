@@ -27,9 +27,31 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const day = (today.getDate() + 1).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
-  const beginDay = (today.getDate() - 2).toString().padStart(2, "0");
+  const beginDay = new Date(today.getDate() - 2);
+
   const endDay = today.getDate().toString().padStart(2, "0");
-  const beginEndRange = `${year}-${month}-${beginDay}/${year}-${month}-${endDay}`;
+function getBeginEndRange() {
+  const currentDate = new Date();
+  
+  // Calculate end date (current date)
+  const endYear = currentDate.getFullYear();
+  const endMonth = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+  const endDay = String(currentDate.getDate()).padStart(2, '0');
+
+  // Calculate begin date (2 days before current date)
+  const beginDate = new Date(currentDate);
+  beginDate.setDate(beginDate.getDate() - 2); // Subtract 2 days
+  const beginYear = beginDate.getFullYear();
+  const beginMonth = String(beginDate.getMonth() + 1).padStart(2, '0');
+  const beginDay = String(beginDate.getDate()).padStart(2, '0');
+
+  // Format the range
+  const beginEndRange = `${beginYear}-${beginMonth}-${beginDay}/${endYear}-${endMonth}-${endDay}`;
+  return beginEndRange;
+}
+
+
+
 
   const formatHeaderTimestamp = (timestamp) => {
     const [datePart, timePart] = timestamp.split(" ");
@@ -61,14 +83,14 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
         return;
       }
 
-      let endpoint = `/api/locations/${location.id}/hourly_data?days=3&date=${tomorrowDate}`;
+      let endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
 
       if (period === "rapidrain") {
-        endpoint = `/api/locations/${location.id}/15m_data?days=3&date=${tomorrowDate}`;
+        endpoint = `/api/locations/${location.id}/15m_data?days=${max}&date=${tomorrowDate}`;
       }
 
       if (period === "daily") {
-        endpoint = `/api/locations/${location.id}/24h_data/${beginEndRange}`;
+        endpoint = `/api/locations/${location.id}/24h_data/${getBeginEndRange()}`;
       }
 
       try {
@@ -89,7 +111,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
           );
 
           entries.forEach(([key, value], i) => {
-            if (i < max) {
+            if (i < max * 24) {
               labels.push(formatXAxisLabel(key)); // Adjust x-axis label based on period
               let tt = value["total"];
               values.push(tt);

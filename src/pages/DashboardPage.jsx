@@ -201,9 +201,9 @@ export default function DashboardPage() {
 
     if(nThresh){
 
-      setNOAAThreshold(locationObject.atlas14_threshold['1h'][0]);
+      setNOAAThreshold(0);
     } else {
-      console.log(`No NOA!`)
+      console.log(`No NOAA!`)
     }
 
     setLocation(locationObject)
@@ -608,7 +608,7 @@ function showThreshold(color){
           <RainfallChart location={location} period={"daily"} max={3}/>
           </div>
           <div className='tab'>1 Hour
-          <RainfallChart location={location} period={"hourly"} max={48}/>
+          <RainfallChart location={location} period={"hourly"} max={3}/>
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>

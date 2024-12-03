@@ -9,7 +9,7 @@ import './ItemControl.css';
 // Styled components for the container layout
 export function Container({children, className}){
 
-  return (<div className={`flex flex-col  max-h-[20rem] overflow-scroll min-h-[20rem] ${className}`}>{children}</div>)
+  return (<div className={`flex flex-col  max-h-[20rem] overflow-auto min-h-[20rem] ${className}`}>{children}</div>)
 }
 
 const Button = styled.button`
@@ -231,7 +231,7 @@ const ItemControl = ({
         </FilterIcon>
         }
       </SearchBarContainer>}
-      <div className='overflow-scroll max-h-[20rem] md:max-h-full w-full mb-2'>
+      <div className='overflow-auto max-h-[20rem] md:max-h-full w-full mb-2'>
         {Object.keys(groupedItems).map(category => (
           <Category key={category}>
             {/* <CategoryTitle>{category}</CategoryTitle>*/}

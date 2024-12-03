@@ -22,6 +22,14 @@ import ReportsPage from "./pages/ReportsPage";
 import AssignmentsPage from "./pages/AssignmentsPage";
 import MyProfile from "./pages/MyProfile";
 import ProfilePic from "./components/ProfilePic";
+import AssignLocations from "./pages/AssignLocations";
+import LocationForm from "./components/LocationForm";
+import LocationListPage from "./pages/LocationListPage";
+import LocationPage from "./pages/LocationPage";
+import ContactListPage from "./pages/ContactListPage";
+import ContactPage from "./pages/ContactPage";
+import GeneralSettingsPage from "./pages/GeneralSettings";
+
 
 
 
@@ -75,11 +83,18 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings" element={<LocationListPage/>} />
         <Route path="/reports" element={<ReportsPage/>} />
         <Route path="/assignments" element={<AssignmentsPage/>} />
+        <Route path="/assign-locations" element={<AssignLocations/>} />
         <Route path="/profile" element={<MyProfile/>} />
         <Route path="/switch" element={<SwitchUser/>} />
+        <Route path="/location-form" element={<LocationPage/>} />
+        <Route path="/location-list" element={<LocationListPage/>} />
+        <Route path="/contact-list" element={<ContactListPage />} />
+        <Route path="/settings-general" element={<GeneralSettingsPage />} />
+<Route path="/contact-form" element={<ContactPage />} />
+
       </Routes>
       
         

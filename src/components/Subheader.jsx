@@ -6,7 +6,7 @@ const SubHeader = () => {
   const activeStyle = "bg-blue-500 text-white font-bold ";
 
   return (
-    <div className="flex justify-center items-center  rounded-2xl min-w-full overflow-hidden shadow-md mb-4 bg-[#99ba93] ">
+    <div className="hidden flex justify-center items-center  rounded-2xl w-1/2 md:min-w-full overflow-hidden shadow-md mb-4 bg-[#99ba93] ">
       <NavLink
         to="/location-list"
         className={({ isActive }) => `${linkStyle} ${isActive ? activeStyle : 'text-[white]'}` + ` w-full`}

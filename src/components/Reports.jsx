@@ -50,6 +50,7 @@ const Reports = () => {
       const pastDate = new Date(currentDate);
       pastDate.setDate(currentDate.getDate() - 7);
       setFromDate(pastDate.toISOString().slice(0, 10));
+      //setToDate(new Date().toISOString().slice(0, 10))
     } else {
       setFromDate(''); // Clear From date
       setToDate(new Date().toISOString().slice(0, 10)); // Default to today
@@ -102,6 +103,39 @@ const Reports = () => {
     e.preventDefault();
     setReportContent(''); // Clear previous content
   
+    // Validation logic
+    if (selectedLocations.length === 0) {
+      const errorMessage = `
+        <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+          <p><strong>Error:</strong> Please select at least one location.</p>
+        </div>
+      `;
+      setReportContent(errorMessage);
+      return;
+    }
+  
+    if (reportType === 'weekly' || reportType === 'daily') {
+      if (!fromDate || !toDate) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Please specify both a from date and a to date for weekly or custom date ranges.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        return;
+      }
+    }
+  
+    if ((displayFormat === 'csv' || selectedLocations.length > 1) && selectedContacts.length === 0) {
+      const errorMessage = `
+        <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+          <p><strong>Error:</strong> Please select at least one contact when generating a CSV report or selecting multiple locations.</p>
+        </div>
+      `;
+      setReportContent(errorMessage);
+      return;
+    }
+  
     console.log(`Report Type: ${reportType}`);
     console.log(`To Date: ${toDate}`);
     console.log(`From Date: ${fromDate}`);
@@ -123,7 +157,7 @@ const Reports = () => {
       query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
     }
   
-    if (selectedLocations.length > 1) {
+    if (selectedLocations.length > 1 || displayFormat === 'csv') {
       // POST Request for multiple locations
       requestData = {
         email_format: displayFormat,
@@ -134,34 +168,56 @@ const Reports = () => {
       try {
         const response = await api.post(query, requestData);
   
-        alert(response.data.task_id)
-       
+        // Display task_id in the report area
+        const taskIdMessage = `
+          <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
+            <p>Report job submitted successfully!</p>
+            <p><strong>Task ID:</strong> ${response.data.task_id}</p>
+            <p>Please check your email for the report.</p>
+          </div>
+        `;
+        setReportContent(taskIdMessage);
       } catch (error) {
-        console.error('Error fetching report:', error.message);
+        console.error('Error submitting report:', error.message);
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> An error occurred while submitting the report.</p>
+            <p>Please try again later.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
       }
     } else {
       // GET Request for a single location
       query = `${query}/${selectedLocations[0]}`;
-      if (displayFormat === 'csv') {
-        handleDownloadCSV(query);
-      } else {
-        try {
-          const response = await api.get(query);
-          console.log('Report Data:', response.data);
-          setReportContent(response.data);
-        } catch (error) {
-          console.error('Error fetching report:', error.message);
-        }
+  
+      try {
+        const response = await api.get(query);
+        console.log('Report Data:', response.data);
+        setReportContent(response.data);
+      } catch (error) {
+        console.error('Error fetching report:', error.message);
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> An error occurred while fetching the report.</p>
+            <p>Please try again later.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
       }
     }
   };
   
   
   
+  
+  
+  
 
   return (
-    <div className="mt-[8rem] p-6 w-full flex flex-col items-center">
-      <form onSubmit={handleSubmit} className="grid grid-cols-4 gap-6 w-full max-w-3xl bg-[white] p-6 rounded-xl">
+    <div className="  w-full flex mt-28  flex-col md:flex-row md:items-start text-sm  gap-2 md:h-full md:min-h-full md:p-6">
+        
+      <form onSubmit={handleSubmit} className="flex flex-col md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
         {/* Row 1 */}
         <div className="col-span-1">
           <label htmlFor="reportType" className="font-bold block text-gray-700">Report Type:</label>
@@ -169,7 +225,7 @@ const Reports = () => {
             id="reportType"
             value={reportType}
             onChange={handleReportTypeChange}
-            className="border border-gray-300 rounded p-2 w-full"
+            className="border border-gray-300 rounded p-2 w-full text-sm"
           >
             <Upgrade showMsg={false} tier={2}>
               <option value="daily">Custom</option>
@@ -179,7 +235,8 @@ const Reports = () => {
           </select>
         </div>
         {/* Dude */}
-        <div className={`col-span-1 `}>
+        <div className='flex flex-col justify-start gap-4'>
+        <div className={`${reportType == "monthly" ? "hidden" : ""} `}>
           <label htmlFor="fromDate" className="font-bold block text-gray-700">From:</label>
          
           <input
@@ -188,11 +245,11 @@ const Reports = () => {
             value={fromDate}
            
             onChange={(e) => setFromDate(e.target.value)}
-            
+            disabled={reportType == "monthly"}
             className={`border border-gray-300 rounded p-2 w-full  ${reportType == "monthly" ? 'opacity-[.1]' : ''} `}
           />
         </div>
-        <div className="col-span-1">
+        <div className="">
           <label htmlFor="toDate" className="font-bold block text-gray-700">{reportType === 'monthly' ? 'Choose Month:' : 'To:'}</label>
           <input
             type={reportType === 'monthly' ? 'month' : 'date'}
@@ -204,14 +261,15 @@ const Reports = () => {
             max={reportType === 'monthly' && user.tier < 2 ? lastMonth : undefined} // Disable current month for tier < 2
           />
         </div>
-        <div className="col-span-1">
-          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display Format:</label>
+        </div>
+        <div className="">
+          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Data Format:</label>
           <select
             id="displayFormat"
             value={displayFormat}
             onChange={(e) => setDisplayFormat(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            disabled={selectedLocations.length > 1}
+            
           >
             <option value="html">HTML</option>
             <option value="csv">CSV</option>
@@ -219,19 +277,21 @@ const Reports = () => {
         </div>
 
         {/* Row 3 */}
-        <div className="col-span-1">
-          <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox"/><span> All</span></div></label>
+        
+        <div className="w-full border">
+          <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox"/><span> Select All</span></div></label>
           <select
             id="locList"
             multiple
             value={selectedLocations}
+            
             onChange={(e) => {
               const options = Array.from(e.target.options);
               const selected = options.filter((option) => option.selected).map((option) => option.value);
               setSelectedLocations(selected);
-              if (selected.length > 1) setDisplayFormat('csv'); // Force CSV if more than one location
+              //if (selected.length > 1) setDisplayFormat('csv'); // Force CSV if more than one location
             }}
-            className="border border-gray-300 rounded p-2 w-full h-20"
+            className="border border-gray-300 w-full rounded p-2 "
           >
             {locations.map((l) => (
               <option key={l.id} value={l.id}>
@@ -242,8 +302,8 @@ const Reports = () => {
         </div>
 
         {/* Row 2 */}
-        {displayFormat == "csv" &&  selectedLocations.length > 1 && <div className="col-span-1">
-          <label htmlFor="contacts" className="font-bold block text-gray-700">Contacts:</label>
+        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="col-span-1">
+          <label htmlFor="contacts" className="font-bold block text-gray-700">Email Contacts:</label>
           <select
             id="contacts"
             multiple
@@ -271,14 +331,14 @@ const Reports = () => {
             type="submit"
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
-            Generate Report
+            {selectedLocations.length > 1 || displayFormat == "csv" ? "Email Report" : "View Report"}
           </button>
         </div>
       </form>
 
       {/* Report Content */}
-      <div
-        className="w-full h-[600px] border border-gray-300 rounded mt-6 p-4 overflow-auto"
+      <div id="reportArea"
+        className="flex flex-col md:flex-[4] w-full h-[600px]  rounded mt-6  md:mt-0 p-4 overflow-auto"
         dangerouslySetInnerHTML={{ __html: reportContent }}
       ></div>
     </div>

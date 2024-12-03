@@ -39,9 +39,9 @@ const ContactListPage = () => {
   }, [currentPage]);
 
   return (
-    <div className='h-full min-h-full flex flex-col mt-28'>
+    <div className='h-full min-h-full flex flex-col mt-28 md:min-h-[600]' >
         <SubHeader/>
-    <div className=" p-6 bg-white rounded w-full h-[20rem] max-h=[20rem] overflow-scroll">
+    <div className=" p-6 bg-white rounded w-full h-[20rem] max-h-[20rem] overflow-scroll">
         
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Contact List</h1>

@@ -12,6 +12,7 @@ const LocationListPage = () => {
   const [locations, setLocations] = useState([]); // Initialize as an empty array
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const pageSize = 250;
 
@@ -53,13 +54,24 @@ const LocationListPage = () => {
     navigate('/location-form', { state: { location } });
   };
 
+  const filterLocations = (e)=> setSearchTerm(e.target.value);
+    
+      
+     
+  
+
+  const  filtered = locations.filter(l => l.name.startsWith(searchTerm)  );
+
+  console.log(`Filtered is ${JSON.stringify(filtered)}`)
+
   return (
-    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28'>
+    <div className='h-full w-full md:w-[80%]  flex flex-col mt-28 '>
         <SubHeader/>
-    <div className="mt-14 p-6 w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+    <div className="mt-14 p-6 w-full md:w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
         
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Locations</h2>
+        <input type="text" className='p-2 border border-green-800 rounded text-md' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
         <button
           onClick={handleAddLocation}
           className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
@@ -67,27 +79,29 @@ const LocationListPage = () => {
           Add Location
         </button>
       </div>
-      {locations.length > 0 ? (
-        <table className="table-auto w-full border-collapse border border-gray-300">
+    
+        <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2 text-left">Name</th>
-              <th className="border border-gray-300 p-2 text-left">Latitude</th>
-              <th className="border border-gray-300 p-2 text-left">Longitude</th>
-              <th className="border border-gray-300 p-2 text-left">H24 Threshold</th>
-              <th className="border border-gray-300 p-2 text-left">RapidRain Threshold</th>
-              <th className="border border-gray-300 p-2 text-left">Actions</th>
+            <tr className="bg-gray-100 sticky top-0 ">
+              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[350px]">Name</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 hidden md:table-cell">Latitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 hidden md:table-cell">Longitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">24h Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  sticky top-0">RapidRain Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0">Actions</th>
             </tr>
           </thead>
+          {filtered.length > 0 ? 
           <tbody>
-            {locations.map((location) => (
-              <tr key={location.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-2">{location.name}</td>
-                <td className="border border-gray-300 p-2">{location.latitude}</td>
-                <td className="border border-gray-300 p-2">{location.longitude}</td>
-                <td className="border border-gray-300 p-2">{location.h24_threshold}</td>
-                <td className="border border-gray-300 p-2">{location.rapidrain_threshold}</td>
-                <td className="border border-gray-300 p-2 flex items-center gap-4">
+       
+            {filtered.map((location) => (
+              <tr key={location.id} className={`hover:bg-gray-50`}>
+                <td className="text-sm border border-gray-300 p-2 text-left">{location.name}</td>
+                <td className="text-sm border border-gray-300 p-2 hidden md:table-cell">{location.latitude}</td>
+                <td className="text-sm border border-gray-300 p-2 hidden md:table-cell">{location.longitude}</td>
+                <td className="text-sm border border-gray-300 p-2 ">{location.h24_threshold}</td>
+                <td className="text-sm border border-gray-300 p-2  ">{location.rapidrain_threshold}</td>
+                <td className="text-smm border border-gray-300 p-2 flex items-center gap-4">
                   <button
                     onClick={() => handleEditLocation(location)}
                     className="text-blue-500 hover:text-blue-700"
@@ -105,12 +119,11 @@ const LocationListPage = () => {
                 </td>
               </tr>
             ))}
+         
           </tbody>
+           : <tbody className='relative'><i className='absolute text-[green] fa fa-spinner top-[5rem] text-4xl left-1/2 animate-spin'></i></tbody>}
         </table>
-      ) : (
-        <p className="text-gray-500 text-center">No locations available.</p>
-      )}
-
+     
       {/* Pagination Controls */}
       <div className="flex justify-between items-center mt-6">
         <button
@@ -122,7 +135,7 @@ const LocationListPage = () => {
         >
           Previous
         </button>
-        <span className="text-gray-700">
+        <span className="hidden text-gray-700">
           Page {currentPage} of {totalPages}
         </span>
         <button

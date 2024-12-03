@@ -95,7 +95,7 @@ const AssignLocations = () => {
   };
 
   return (
-    <div className="mt-16 p-6 w-full flex flex-col items-center font-sans bg-gray-50">
+    <div className="mt-16 p-6 w-full flex flex-col items-center font-sans ">
       {/* Top Navigation Links */}
       <div className="flex justify-center space-x-6 mb-8">
         <span className="text-gray-800 font-bold border-b-2 border-blue-500">
@@ -113,9 +113,9 @@ const AssignLocations = () => {
       <h1 className="text-2xl font-bold text-gray-800 mb-8">Assign Locations</h1>
       <div className="grid grid-cols-3 gap-8 w-full max-w-5xl">
         {/* Contacts Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="contacts" className="block text-gray-700 font-bold mb-2">
-            Contacts:
+            1. Choose a Contact:
           </label>
           <select
             id="contacts"
@@ -133,9 +133,9 @@ const AssignLocations = () => {
         </div>
 
         {/* Unassigned Locations Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="unassignedLocations" className="block text-gray-700 font-bold mb-2">
-            Unassigned Locations:
+            2. Choose one or more Locations:
           </label>
           <select
             id="unassignedLocations"
@@ -161,14 +161,14 @@ const AssignLocations = () => {
             onClick={handleAssign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            Assign Location(s) >>
+            3. Click to Assign Locations >>
           </button>
         </div>
 
         {/* Assigned Locations Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="assignedLocations" className="block text-gray-700 font-bold mb-2">
-            Assigned Locations:
+            View Assigned Locations:
           </label>
           <select
             id="assignedLocations"
@@ -194,7 +194,7 @@ const AssignLocations = () => {
             onClick={handleUnassign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            &lt;&lt; Unassign Location(s)
+            4.Unassign Location(s)
           </button>
         </div>
       </div>

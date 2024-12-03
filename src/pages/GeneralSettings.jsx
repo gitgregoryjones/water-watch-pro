@@ -34,7 +34,7 @@ const GeneralSettingsPage = () => {
   };
 
   return (
-    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28'>
+    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28 md:min-h-[600]'>
         <SubHeader/>
     <div className="p-6 w-full  mx-auto bg-white shadow-md rounded-lg">
         

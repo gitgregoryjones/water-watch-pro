@@ -118,7 +118,7 @@ const AssignmentsPage = () => {
   };
 
   return (
-    <div className="mt-16 p-6 w-full flex flex-col items-center font-sans bg-gray-50">
+    <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
       {/* Top Navigation Links */}
       <div className="flex justify-center space-x-6 mb-8">
         <Link
@@ -134,15 +134,15 @@ const AssignmentsPage = () => {
 
       {/* Page Content */}
       <h1 className="text-2xl font-bold text-gray-800 mb-8">Assign Contacts</h1>
-      <div className="grid grid-cols-3 gap-8 w-full max-w-5xl">
+      <div className="grid grid-cols-3 gap-8 w-full max-w-5xl ">
         {/* Locations Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="locations" className="block text-gray-700 font-bold mb-2">
-            Locations:
+            1. Choose A Location:
           </label>
           <select
             id="locations"
-            className="border border-gray-300 rounded p-2 w-full h-40"
+            className="border border-gray-300 rounded p-2 w-full h-40 "
             size="10"
             onChange={(e) => setSelectedLocation(e.target.value)}
           >
@@ -156,9 +156,9 @@ const AssignmentsPage = () => {
         </div>
 
         {/* Unassigned Contacts Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="unassignedContacts" className="block text-gray-700 font-bold mb-2">
-            Contacts:
+            2. Choose one or more Contacts:
           </label>
           <select
             id="unassignedContacts"
@@ -184,14 +184,14 @@ const AssignmentsPage = () => {
             onClick={handleAssign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            Assign >>
+            3. Click To Assign >>
           </button>
         </div>
 
         {/* Assigned Contacts Select */}
-        <div>
+        <div className='bg-[white] p-4 rounded shadow'>
           <label htmlFor="assignedContacts" className="block text-gray-700 font-bold mb-2">
-            Assigned Contacts:
+            View Assigned Contacts:
           </label>
           <select
             id="assignedContacts"
@@ -217,7 +217,7 @@ const AssignmentsPage = () => {
             onClick={handleUnassign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            &lt;&lt; Unassign Contact
+            &lt;&lt; 4. Unassign Contact
           </button>
         </div>
       </div>

@@ -131,21 +131,26 @@ export default function LoginForm() {
                 let loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
                     try {
+                        if(location.name == "Brownsville"){
+                            console.log(`Brownsville ${JSON.stringify(loc24Data)}`)
+                        }
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
                         ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"
                         : "green";
 
-                        console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
+                        //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
                     }catch (e){
-                        console.error(`Location GReg does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)["24h"][0]}`)
+                        console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)["24h"][0]}`)
                     }
                 }
                 return location;
             });
 
             // Step 5: Get hourly data for locations
-            const today = new Date();
+            let today = new Date();
+            today.setDate(today.getDate() + 1);
+            
             const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
             const locationHourlyHistory = await api.post(`/api/locations/24h_data`, ids, {
@@ -160,9 +165,14 @@ export default function LoginForm() {
 
             const locHourly = locationHourlyHistory.data;
 
+            console.log(`Hourly Data is ${todayStr} ${JSON.stringify(locHourly)}`)
+
             myLocations = myLocations.map((location) => {
                 const locHourlyData = locHourly.locations[location.id];
                 if (locHourlyData) {
+                    if(location.name == "Brownsville Daily"){
+                        console.log(`Brownsville ${JSON.stringify(locHourlyData)}`)
+                    }
                     location.total_hourly_rainfall = locHourlyData.total_rainfall;
                     location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
                         ? location.total_hourly_rainfall > location.atlas14_threshold['1h'][0] ? "red" : "orange"

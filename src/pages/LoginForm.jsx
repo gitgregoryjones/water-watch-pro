@@ -129,10 +129,16 @@ export default function LoginForm() {
             myLocations = myLocations.map((location) => {
                 const loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
+                    try {
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
                         ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"
                         : "green";
+
+                        console.error(`Location DOES  have atlas 24 ${JSON.stringify(location)}`)
+                    }catch (e){
+                        console.error(`Location does not have atlas 24 ${JSON.stringify(location)}`)
+                    }
                 }
                 return location;
             });

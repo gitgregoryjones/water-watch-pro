@@ -14,6 +14,7 @@ const Reports = () => {
   const [displayFormat, setDisplayFormat] = useState('html'); // 'html' or 'csv'
   const [reportContent, setReportContent] = useState(''); // HTML content for the report
   const [contacts, setContacts] = useState([]);
+  const [selectAll, setSelectAll] = useState(false); 
 
   const user = useSelector((state) => state.userInfo.user);
   const locations = user.locations;
@@ -22,6 +23,17 @@ const Reports = () => {
   const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
     .toISOString()
     .slice(0, 7); // Get last month in YYYY-MM
+
+    const handleSelectAllChange = () => {
+        if (selectAll) {
+          // Deselect all
+          setSelectedLocations([]);
+        } else {
+          // Select all
+          setSelectedLocations(locations.map((l) => l.id));
+        }
+        setSelectAll(!selectAll); // Toggle "Select All" state
+      };
 
   useEffect(() => {
     // Initialize the `toDate` for monthly based on user tier
@@ -285,12 +297,7 @@ const Reports = () => {
             multiple
             value={selectedLocations}
             
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options.filter((option) => option.selected).map((option) => option.value);
-              setSelectedLocations(selected);
-              //if (selected.length > 1) setDisplayFormat('csv'); // Force CSV if more than one location
-            }}
+            onChange={onChange={handleSelectAllChange}}
             className="border border-gray-300 w-full rounded p-2 "
           >
             {locations.map((l) => (

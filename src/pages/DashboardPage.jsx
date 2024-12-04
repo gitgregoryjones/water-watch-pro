@@ -605,14 +605,14 @@ function showThreshold(color){
         <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
           <div className='tab'>24 Hour
             
-          <RainfallChart location={location} period={"daily"} max={3}/>
+          <RainfallChart location={location} period={"daily"} max={3} />
           </div>
           <div className='tab'>1 Hour
-          <RainfallChart location={location} period={"hourly"} max={3}/>
+          <RainfallChart location={location} period={"hourly"} max={3} />
           </div>
           <div className='tab'>RAPIDRAIN
             <Upgrade>
-             { <RainfallChart location={location} period={"rapidrain"}  max={24}/>}
+             { <RainfallChart location={location} period={"rapidrain"}  max={24} overlay={false}/>}
             </Upgrade>
           </div>
           <div className='tab min-h-[420]'>NOAA Atlas 14

@@ -9,7 +9,7 @@ import api from "../utility/api"; // Import the api utility
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
+const RainfallChart = ({ location, period = "hourly", max = 72, overlay = 1 }) => {
   const user = useSelector((state) => state.userInfo.user);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +98,7 @@ function getBeginEndRange() {
 
         const data = response.data;
 
-        if (period !== "daily") {
+        if (period != "daily") {
           const entries = Object.entries(data.hourly_data).reverse();
 
           labelsRef.current = entries.map(([key]) => key); // Store full timestamps for tooltips
@@ -120,6 +120,63 @@ function getBeginEndRange() {
               );
             }
           });
+
+          const chartAreaBackground = {
+            id: "chartAreaBackground",
+            beforeDraw(chart) {
+              const { ctx, chartArea, scales } = chart;
+              const { left, right, top, bottom } = chartArea;
+          
+              const labels = labelsRef.current; // Ensure this is populated with full timestamps
+          
+              // Extract unique days and their indices
+              const uniqueDays = labels.reduce((unique, dateString, index) => {
+                const day = dateString.split(" ")[0];
+                if (!unique.some((item) => item.day === day)) {
+                  unique.push({ day, startIndex: index });
+                }
+                return unique;
+              }, []);
+          
+              // Determine the width of each bar
+              const barWidth = (right - left) / labels.length;
+          
+              uniqueDays.pop();
+              // Calculate positions for the dates
+              const datePositions = uniqueDays.map(({ day, startIndex }, idx) => {
+                const nextStartIndex =
+                  idx < uniqueDays.length - 1 ? uniqueDays[idx + 1].startIndex : labels.length;
+          
+                // Calculate the center of the current 24-hour period
+                const centerIndex = startIndex + Math.floor((nextStartIndex - startIndex) / 2);
+                const centerX = left + centerIndex * barWidth + barWidth / 2 + 100;
+          
+                return { day, x: centerX };
+              });
+          
+              // Draw the dates
+              ctx.save();
+              ctx.textAlign = "center";
+              ctx.textBaseline = "middle";
+              ctx.font = "16px Arial";
+              ctx.fillStyle = "black";
+          
+              
+             datePositions.forEach(({ day, x }) => {
+                const centerY = top + (bottom - top) / 2; // Center vertically
+                
+                ctx.fillText(day, x, centerY);
+              });
+          
+              ctx.restore();
+            },
+          };
+          
+          
+          
+  
+  // Register the plugin
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, chartAreaBackground);
         } else {
           const days = data.total_rainfall;
           days.forEach((day) => {
@@ -166,20 +223,34 @@ function getBeginEndRange() {
   }, [location.id, period, max, tomorrowDate]);
 
   const scrollToLastNonZeroBar = () => {
-    if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current)
-      return;
-  
+
+    
+    if (!chartData || !chartData.datasets[0].data || !chartContainerRef.current) return;
+
+ 
     const values = chartData.datasets[0].data;
-    const lastNonZeroIndex = values.lastIndexOf(values.slice().reverse().find((value) => value > 0));
-  
+    const lastNonZeroIndex = values.lastIndexOf(values.find((value) => value > 0));
+
     if (lastNonZeroIndex !== -1) {
       const container = chartContainerRef.current;
       const barWidth = 50; // Approximate width of each bar
       const scrollPosition = lastNonZeroIndex * barWidth - container.offsetWidth / 4;
-  
-      container.scrollLeft = Math.max(scrollPosition, 0); // Scroll to the calculated position
+// Debugging logs
+console.log("Bar Width:", barWidth);
+console.log("Scroll Position:", scrollPosition, container.scrollLeft, container.scrollTop);
+console.log("Container Width:", container.clientWidth);
+
+// Apply the scroll position
+container.scrollTo({
+  left: scrollPosition,
+  top:scrollPosition,
+  behavior: "smooth", // Adds smooth scrolling
+});
+
+console.log("Scroll Position After:", scrollPosition, container.scrollLeft, container.scrollTop);
+
     }
-  };
+  }
   
 
   useEffect(() => {
@@ -188,64 +259,7 @@ function getBeginEndRange() {
     }
   }, [period, chartData]);
 
-  const chartAreaBackground = {
-    id: "chartAreaBackground",
-    beforeDraw(chart) {
-      const { ctx, chartArea, scales } = chart;
-      const { left, right, top, bottom } = chartArea;
-  
-      // Clear previous background
-      ctx.save();
-      ctx.fillStyle = "white"; // Default background
-      ctx.fillRect(left, top, right - left, bottom - top);
-  
-     const labels = labelsRef.current; // Ensure this is populated with full timestamps
-  
-      scales.x.ticks.forEach((tick, index) => {
-        const tickValue = parseInt(tick.value, 10);
-        
-        const labelDate = labels ? labels : ""; // Extract YYYY-MM-DD
-        
-        // Determine background color
-       
-        if (tickValue >= 0 && tickValue <= 23) {
-          ctx.fillStyle = "#D1FFBD";
-          console.log(`pink is in`)
-        } else if (tickValue >= 24 && tickValue <= 45) {
-          ctx.fillStyle = "#FFFFC5";
-          console.log(`blue is in`)
-        } else {
-          //ctx.fillStyle = "#D1FFBD";
-          ctx.fillStyle = "#E4F6F8";
-          console.log(`black is in`)
-        }
-
-       // console.log(`Tick ${tickValue} represents ${labelsRef.current[index]}`);
-  
-        // Draw the segment
-        const barWidth = (right - left) / scales.x.ticks.length;
-        ctx.fillRect(left + index * barWidth, top, barWidth, bottom - top);
-        console.log(`The lable is ${labelDate}`)
-        // Add the date text
-        if (labelDate) {
-          ctx.fillStyle = "black"; // Text color
-          ctx.font = "12px Arial"; // Text font and size
-          ctx.textAlign = "center";
-          
-          ctx.fillText(
-            labelDate, // Text to display
-            left + index * barWidth + barWidth / 2, // Center the text in the segment
-            bottom + 15 // Position below the chart area
-          );
-        } 
-      });
-  
-      ctx.restore();
-    },
-  };
-  
-  // Register the plugin
-  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, chartAreaBackground);
+ 
   
   const options = {
     responsive: true,
@@ -266,11 +280,12 @@ function getBeginEndRange() {
         beginAtZero: true,
         max: chartData?.yMax || 1.0,
         ticks: {
-          stepSize: 0.5,
+          stepSize: 0.25,
         },
         grid: {
           display: true,
         },
+        display:false
       },
     },
     plugins: {
@@ -294,19 +309,66 @@ function getBeginEndRange() {
       },
     },
   };
+
+    
+  const yAxisCanvasRef = useRef(null);
   
-  
+  useEffect(() => {
+    const drawYAxis = () => {
+      const canvas = yAxisCanvasRef.current;
+      if (!canvas || !chartData) return; // Ensure canvas and data are ready
+    
+      //const ctx = canvas.getContext("2d");
+      const chartHeight = 420; // Total height of the chart area
+      const xAxisHeight = 30; // Estimated height of the X-axis labels row
+      const usableHeight = chartHeight - xAxisHeight; // Adjust for X-axis labels
+    
+      // Calculate min and max values
+      const dataValues = chartData.datasets[0].data; // Assume the data series is in the first dataset
+      const maxValue = Math.max(...dataValues, 0); // Get the maximum value in the dataset
+      console.log(`period is ${period} and maxValue is ${maxValue}`)
+      const tickStep = 0.25; // Increment by 0.25
+      const tickValues = [];
+    
+      // Generate tick values from 0 to greater than maxValue
+      for (let i = 0; i <= maxValue + 0.25; i += tickStep) {
+        tickValues.push(i);
+      }
+
+      console.log(`period is ${period} and tickValues is ${tickValues} `)
+    
+      const stepHeight = usableHeight / (tickValues.length - 1); // Space between ticks
+    
+      canvas.width = 50;
+      canvas.height = chartHeight;
+    
+      //clear old values
+      canvas.innerHTML = "";
+    
+      tickValues.reverse().forEach((value, i) => {
+        const y = usableHeight - i * stepHeight * .85; // Align ticks within usable space
+        //ctx.fillText(value.toFixed(2), 40, y); // Draw tick value with two decimal places
+        let d = document.createElement("div")
+        if(tickValues[i+1] == undefined){
+          d.setAttribute("class",`relative top-[0px]`)
+        }
+        d.innerHTML = value.toFixed(2);
+        canvas.append(d)
+      });
+    };
+    
+    if (chartData) drawYAxis(); // Ensure chartData is ready before drawing
+  }, [chartData]);
   
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="w-full flex justify-center font-bold text-lg mb-4">
-        {period === "notest" && header}
-      </div>
+    <div className="flex flex-row w-full">
+    
+      <div ref={yAxisCanvasRef} className=" flex flex-col justify-between h-[380px] relative">TACO MEAT</div>
       <div
         ref={chartContainerRef}
         className="overflow-x-auto"
-        style={{ position: "relative", width: "100%", height: "420px" }}
+        style={{ position: "relative", width: "100%", height: "25rem" }}
       >
         {error ? (
           <div>Error loading data. Please try again later.</div>
@@ -325,6 +387,7 @@ function getBeginEndRange() {
               height: "100%",
             }}
           >
+          
             <Bar data={chartData} options={options} />
           </div>
         ) : (

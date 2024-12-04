@@ -275,7 +275,7 @@ const Reports = () => {
         </div>
         </div>
         <div className="">
-          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Data Format:</label>
+          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display:</label>
           <select
             id="displayFormat"
             value={displayFormat}
@@ -283,7 +283,7 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full"
             
           >
-            <option value="html">HTML</option>
+            <option value="html">Formatted</option>
             <option value="csv">CSV</option>
           </select>
         </div>

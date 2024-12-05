@@ -57,7 +57,12 @@ const ContactListPage = () => {
         >
           Modify Locations
         </Link>
-        
+        <Link
+          to="/settings-general"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Preferences
+        </Link>
       </div>
       }>
     <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">

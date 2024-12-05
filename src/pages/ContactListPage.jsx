@@ -5,6 +5,7 @@ import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
 import api from '../utility/api';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
+import FileUploadDialog from '../components/FileUploadDialog';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -154,12 +155,7 @@ const ContactListPage = () => {
           Next
         </button>
       </div>
-      <button
-          className="bg-green-700 text-white px-4 mt-2 py-2 rounded hover:bg-green-600"
-          onClick={() => navigate('/contact-form')}
-        >
-          Bulk Upload
-        </button>
+     <FileUploadDialog className={'mt-2'}/>
     </div>
     </Card>
     </div>

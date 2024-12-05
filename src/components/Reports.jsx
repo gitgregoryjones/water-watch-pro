@@ -4,6 +4,7 @@ import { API_HOST } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
+import EmailRowManager from './EmailRowManager';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
@@ -123,6 +124,7 @@ const Reports = () => {
         </div>
       `;
       setReportContent(errorMessage);
+      window.scrollTo({top: 0, behavior: 'smooth'});
       return;
     }
   
@@ -134,6 +136,7 @@ const Reports = () => {
           </div>
         `;
         setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
         return;
       }
     }
@@ -145,6 +148,7 @@ const Reports = () => {
         </div>
       `;
       setReportContent(errorMessage);
+      window.scrollTo({top: 0, behavior: 'smooth'});
       return;
     }
   
@@ -189,6 +193,7 @@ const Reports = () => {
           </div>
         `;
         setReportContent(taskIdMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
       } catch (error) {
         console.error('Error submitting report:', error.message);
         const errorMessage = `
@@ -314,25 +319,13 @@ const Reports = () => {
         </div>
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="col-span-1">
-          <label htmlFor="contacts" className="font-bold block text-gray-700">Email Contacts:</label>
-          <select
-            id="contacts"
-            multiple
-            value={selectedContacts}
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options.filter((option) => option.selected).map((option) => option.value);
-              setSelectedContacts(selected);
-            }}
-            className="border border-gray-300 rounded p-2 w-full h-20"
-          >
-            {contacts.map((contact) => (
-              <option key={contact.email} value={contact.email}>
-                {contact.name}
-              </option>
-            ))}
-          </select>
+        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="">
+          <div className={`flex justify-between items-center`}>
+            <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
+          
+          </div>
+         
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
         

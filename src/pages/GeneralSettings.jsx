@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import SubHeader from '../components/Subheader';
+import { Link } from 'react-router-dom';
+import Card from '../components/Card';
 
 const GeneralSettingsPage = () => {
   const [settings, setSettings] = useState({
@@ -39,9 +41,27 @@ const GeneralSettingsPage = () => {
   };
 
   return (
-    <div className='h-full w-full md:w-[80%]  flex flex-col mt-28 '>
-    <SubHeader/>
-<div className="mt-14 p-6 w-full md:w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+    <div className='h-full w-full   flex flex-col mt-28 '>
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt;  Preferences</h1> 
+ <Card header={<div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[transparent] w-full p-2">
+        <Link
+          to="/contact-list"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Modify Contacts
+        </Link> 
+
+        <Link
+          to="/location-list"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Modify Locations
+        </Link>
+        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+          Preferences
+        </span>
+        </div>} className={' border-[whitesmoke] bg-[whitesmoke]  md:rounded-[unset]'}>
+<div className=" p-6 w-full md:w-full  mx-auto bg-white shadow-md rounded-lg">
         
     <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='fa fa-gear'></i>General Notification Settings</div>
       
@@ -159,6 +179,7 @@ const GeneralSettingsPage = () => {
         </div>
       </form>
     </div>
+    </Card>
     </div>
   );
 };

@@ -67,7 +67,7 @@ const LocationListPage = () => {
 
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center  ">
-      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings >  Locations</h1>  
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt;  Locations</h1>  
       <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
         <Link
           to="/contact-list"
@@ -78,8 +78,14 @@ const LocationListPage = () => {
         <span className="text-gray-800 font-bold border-b-2 border-blue-500">
           Modify Locations
         </span>
+        <Link
+          to="/settings-general"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Preferences
+        </Link>
       </div>
-}>
+      }>
     <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white  rounded-lg">
     <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='text-yellow-500 fa fa-location-dot'></i>Locations : {filtered.length} locations viewable. Scroll to see more</div>
       <div className="flex justify-around items-end md:items-center gap-4 mb-6">

@@ -141,7 +141,7 @@ export default function LoginForm() {
 
                         //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
                     }catch (e){
-                        console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)["24h"][0]}`)
+                        console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)}`)
                     }
                 }
                 return location;

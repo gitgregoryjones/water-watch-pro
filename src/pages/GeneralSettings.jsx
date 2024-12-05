@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import SubHeader from '../components/Subheader';
 import { Link } from 'react-router-dom';
 import Card from '../components/Card';
+import { useSelector } from 'react-redux';
 
 const GeneralSettingsPage = () => {
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const user = useSelector((state) => state.userInfo.user);
   const [settings, setSettings] = useState({
     dailyReport: {
       enabled: true,
@@ -26,6 +29,18 @@ const GeneralSettingsPage = () => {
   });
 
   const handleToggle = (section, key) => {
+    if(key == "rapidRain" && user.tier < 2){
+      setShowUpgrade(true)
+      setSettings((prevSettings) => ({
+        ...prevSettings,
+        [section]: {
+          ...prevSettings[section],
+          [key]: false,
+        },
+      }));
+      
+      return;
+    }
     setSettings((prevSettings) => ({
       ...prevSettings,
       [section]: {
@@ -155,6 +170,7 @@ const GeneralSettingsPage = () => {
             />
             RapidRain 15 Minute
           </label>
+          {showUpgrade && <div className='flex flex-col justify-center items-center gap-2 m-2  p-4 w-[20rem] border-[gold] bg-[white] border-4 rounded  border'><div>Go For The Gold!</div><a href="https://waterwatchpro.com/prices">Click Here to Upgrade</a></div>}
           <label className="flex items-center mb-2">
             <input
               type="checkbox"

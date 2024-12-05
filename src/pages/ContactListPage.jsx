@@ -25,7 +25,7 @@ const ContactListPage = () => {
 
   const filterContacts = (e)=> setSearchTerm(e.target.value);
 
-  const  filtered = contacts.filter(l => l.name.startsWith(searchTerm)  );
+  const  filtered = contacts.filter(l => l.name.toLowerCase().startsWith(searchTerm.toLocaleLowerCase())  );
 
   const handleDelete = async (contactId) => {
     try {

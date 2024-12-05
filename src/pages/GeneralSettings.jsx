@@ -16,6 +16,11 @@ const GeneralSettingsPage = () => {
       '1Hour': false,
       first: false,
     },
+    thresholdAlerts : {
+      enabled:true,
+      'rapidRain':false,
+      '24Hour':true
+    }
   });
 
   const handleToggle = (section, key) => {
@@ -34,12 +39,12 @@ const GeneralSettingsPage = () => {
   };
 
   return (
-    <div className='h-full min-h-full md:w-[50%] flex flex-col mt-28 md:min-h-[600]'>
-        <SubHeader/>
-    <div className="p-6 w-full  mx-auto bg-white shadow-md rounded-lg">
+    <div className='h-full w-full md:w-[80%]  flex flex-col mt-28 '>
+    <SubHeader/>
+<div className="mt-14 p-6 w-full md:w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
         
-      <h1 className="text-2xl font-bold mb-6 text-center">General Notification Settings</h1>
-      <div className='w-full rounded bg-yellow-200 h-12 flex justify-center items-center m-2'>These settings override all user settings</div>
+    <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='fa fa-gear'></i>General Notification Settings</div>
+      
       <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
         {/* Daily Report Section */}
         <div className="border p-4 rounded">
@@ -117,6 +122,29 @@ const GeneralSettingsPage = () => {
             />
             First
           </label>
+        </div>
+        <div className="border p-4 rounded">
+          <h2 className="text-xl font-bold mb-2">Other Alerts</h2>
+         
+          <label className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              checked={settings.thresholdAlerts['rapidRain']}
+              onChange={() => handleToggle('thresholdAlerts', 'rapidRain')}
+              className="mr-2"
+            />
+            RapidRain 15 Minute
+          </label>
+          <label className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              checked={settings.thresholdAlerts['24Hour']}
+              onChange={() => handleToggle('thresholdAlerts', '24Hour')}
+              className="mr-2"
+            />
+            24 Hour Threshold Exceeded
+          </label>
+         
         </div>
 
         {/* Submit Button */}

@@ -130,6 +130,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             onChange={(e) => setLatitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
             required
+            disabled={isEditMode}
           />
         </div>
 
@@ -146,6 +147,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             onChange={(e) => setLongitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
             required
+            disabled={isEditMode}
           />
         </div>
 

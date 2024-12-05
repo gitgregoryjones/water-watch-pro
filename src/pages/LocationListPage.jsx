@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import api from '../utility/api';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import SubHeader from '../components/Subheader';
+import Card from '../components/Card';
 
 const LocationListPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -65,13 +66,26 @@ const LocationListPage = () => {
   console.log(`Filtered is ${JSON.stringify(filtered)}`)
 
   return (
-    <div className='h-full w-full md:w-[80%]  flex flex-col mt-28 '>
-        <SubHeader/>
-    <div className="mt-14 p-6 w-full md:w-full max-w-4xl mx-auto bg-white shadow-md rounded-lg">
-        
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Locations</h2>
-        <input type="text" className='p-2 border border-green-800 rounded text-md' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
+    <div className="mt-16 p-6 w-full text-sm flex flex-col items-center  ">
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings >  Locations</h1>  
+      <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
+        <Link
+          to="/contact-list"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Modify Contacts
+        </Link>
+        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+          Modify Locations
+        </span>
+      </div>
+}>
+    <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white  rounded-lg">
+    <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='text-yellow-500 fa fa-location-dot'></i>Locations : {filtered.length} locations viewable. Scroll to see more</div>
+      <div className="flex justify-around items-end md:items-center gap-4 mb-6">
+        <div className='flex md:flex-row flex-col md:justify-end  flex-1'>
+        <input type="text" className='p-2 border border-green-800 rounded text-md w-full' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
+        </div>
         <button
           onClick={handleAddLocation}
           className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
@@ -81,14 +95,14 @@ const LocationListPage = () => {
       </div>
     
         <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">
-          <thead>
+        <thead>
             <tr className="bg-gray-100 sticky top-0 ">
-              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[350px]">Name</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 hidden md:table-cell">Latitude</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 hidden md:table-cell">Longitude</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">24h Threshold</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  sticky top-0">RapidRain Threshold</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0">Actions</th>
+              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[250px] w-full">Name</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Latitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Longitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">Text Alert</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Email Alert</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>
           </thead>
           {filtered.length > 0 ? 
@@ -148,7 +162,14 @@ const LocationListPage = () => {
           Next
         </button>
       </div>
+      <button
+          className="bg-green-700 text-white px-4 mt-2 py-2 rounded hover:bg-green-600"
+          onClick={() => navigate('/contact-form')}
+        >
+          Bulk Upload
+        </button>
     </div>
+    </Card>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { API_HOST } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
+import EmailRowManager from './EmailRowManager';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
@@ -43,6 +44,26 @@ const Reports = () => {
       } else {
         setToDate(currentYearMonth); // Default to current month if tier >= 2
       }
+    } else if(reportType == 'weekly' && user.tier < 2){
+
+      setReportContent(`
+        <center><div class="flex flex-col gap-4  items-center justify-center bg-[white] text-center border-[gold]  border-4 text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
+          Go for the gold
+          <p>
+          <a href={link}>Click Here to Upgrade</a>
+        </div></center>
+      `)
+
+    }else if(reportType == 'daily' && user.tier < 2){
+
+      setReportContent(`
+        <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
+          Go for the gold
+          <p>
+          <a href={link}>Click Here to Upgrade</a>
+        </div></center>
+      `)
+
     }
   }, [reportType, user.tier]);
 
@@ -58,6 +79,7 @@ const Reports = () => {
       }
       setFromDate(''); // Clear From date
     } else if (selectedType === 'weekly') {
+      
       const currentDate = new Date(toDate);
       const pastDate = new Date(currentDate);
       pastDate.setDate(currentDate.getDate() - 7);
@@ -123,6 +145,7 @@ const Reports = () => {
         </div>
       `;
       setReportContent(errorMessage);
+      window.scrollTo({top: 0, behavior: 'smooth'});
       return;
     }
   
@@ -134,6 +157,7 @@ const Reports = () => {
           </div>
         `;
         setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
         return;
       }
     }
@@ -145,6 +169,7 @@ const Reports = () => {
         </div>
       `;
       setReportContent(errorMessage);
+      window.scrollTo({top: 0, behavior: 'smooth'});
       return;
     }
   
@@ -189,6 +214,7 @@ const Reports = () => {
           </div>
         `;
         setReportContent(taskIdMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
       } catch (error) {
         console.error('Error submitting report:', error.message);
         const errorMessage = `
@@ -228,8 +254,11 @@ const Reports = () => {
 
   return (
     <div className="  w-full flex mt-28  flex-col md:flex-row md:items-start text-sm  gap-2 md:h-full md:min-h-full md:p-6">
+      
         
-      <form onSubmit={handleSubmit} className="flex flex-col md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
+      <form onSubmit={handleSubmit} className="flex flex-col  md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
+       
+      <div className={`p-2 px-2  border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i class="fa fa-table"></i> Report Query</div>
         {/* Row 1 */}
         <div className="col-span-1">
           <label htmlFor="reportType" className="font-bold block text-gray-700">Report Type:</label>
@@ -239,10 +268,10 @@ const Reports = () => {
             onChange={handleReportTypeChange}
             className="border border-gray-300 rounded p-2 w-full text-sm"
           >
-            <Upgrade showMsg={false} tier={2}>
+            
               <option value="daily">Custom</option>
               <option value="weekly">Weekly</option>
-            </Upgrade>
+            
             <option value="monthly">Monthly</option>
           </select>
         </div>
@@ -275,7 +304,7 @@ const Reports = () => {
         </div>
         </div>
         <div className="">
-          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Data Format:</label>
+          <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display:</label>
           <select
             id="displayFormat"
             value={displayFormat}
@@ -283,7 +312,7 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full"
             
           >
-            <option value="html">HTML</option>
+            <option value="html">Formatted</option>
             <option value="csv">CSV</option>
           </select>
         </div>
@@ -314,25 +343,13 @@ const Reports = () => {
         </div>
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="col-span-1">
-          <label htmlFor="contacts" className="font-bold block text-gray-700">Email Contacts:</label>
-          <select
-            id="contacts"
-            multiple
-            value={selectedContacts}
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options.filter((option) => option.selected).map((option) => option.value);
-              setSelectedContacts(selected);
-            }}
-            className="border border-gray-300 rounded p-2 w-full h-20"
-          >
-            {contacts.map((contact) => (
-              <option key={contact.email} value={contact.email}>
-                {contact.name}
-              </option>
-            ))}
-          </select>
+        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="">
+          <div className={`flex justify-between items-center`}>
+            <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
+          
+          </div>
+         
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
         

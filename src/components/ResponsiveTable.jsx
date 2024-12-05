@@ -29,7 +29,7 @@ function ResponsiveTable({location = {}}) {
  
 
   return (
-    <div className="max-w-full overflow-x-auto">
+    <div className="max-w-full w-full overflow-x-auto">
       <table className="w-full max-h-80 overflow-y-auto table-auto border-collapse">
         <thead className="sticky top-0 bg-gray-100">
           <tr>

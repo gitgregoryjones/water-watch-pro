@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import api from '../utility/api';
+import Card from '../components/Card';
 
 const AssignmentsPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -16,6 +17,7 @@ const AssignmentsPage = () => {
   const [locations, setLocations] = useState([]); // Initialize as an empty array
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const pageSize = 250;
 
   useEffect(() => {
@@ -117,10 +119,16 @@ const AssignmentsPage = () => {
     setSelectedAssignedContacts([]); // Clear selection
   };
 
+  const filterLocations = (e)=> setSearchTerm(e.target.value);
+ 
+  const  filtered = locations.filter(l => l.name.startsWith(searchTerm)  );
+
   return (
-    <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
+    <div className="mt-16 md:p-6 w-full text-sm flex flex-col items-center ">
       {/* Top Navigation Links */}
-      <div className="flex justify-center space-x-6 mb-8">
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Assignments > Assign Contacts</h1>
+     
+      <div className="hidden flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
         <Link
           to="/assign-locations"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
@@ -133,36 +141,47 @@ const AssignmentsPage = () => {
       </div>
 
       {/* Page Content */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-8">Assign Contacts</h1>
-      <div className="grid grid-cols-3 gap-8 w-full max-w-5xl ">
+     <Card header={<div className="flex justify-start rounded space-x-6 mb-8 self-start  w-full p-2">
+        <Link
+          to="/assign-locations"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Assign Locations
+        </Link>
+        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+          Assign Contacts
+        </span>
+      </div>} footer={``} className={'w-full  border-[whitesmoke] bg-[whitesmoke]  md:rounded-[unset]'}> 
+      <div className="gap-4 flex flex-col md:flex-row  w-full  ">
         {/* Locations Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="locations" className="block text-gray-700 font-bold mb-2">
-            1. Choose A Location:
-          </label>
+        <div className='flex flex-col bg-[white] p-4 rounded shadow md:w-1/2  md:h-[30rem]'>
+        <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><span className='text-sm text-[white] px-3 py-1 rounded-2xl font-bold bg-[black]'>1</span> 
+            Choose A Location
+          </div>
           <select
             id="locations"
-            className="border border-gray-300 rounded p-2 w-full h-40 "
+            className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
             size="10"
             onChange={(e) => setSelectedLocation(e.target.value)}
           >
             <option value="">-- Select Location --</option>
-            {locations.map((location) => (
+            {filtered.map((location) => (
               <option key={location.id} value={location.id}>
                 {location.name}
               </option>
             ))}
           </select>
+          <input type="text" className='p-2 mt-2 border border-green-800 rounded text-md' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
         </div>
 
         {/* Unassigned Contacts Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="unassignedContacts" className="block text-gray-700 font-bold mb-2">
-            2. Choose one or more Contacts:
-          </label>
+        <div className='bg-[white] p-4 rounded shadow min-w-[400px]'>
+        <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><span className='text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]'>2</span> 
+            Choose 1 or more contacts
+          </div>
           <select
             id="unassignedContacts"
-            className="border border-gray-300 rounded p-2 w-full h-40"
+            className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
             size="10"
             multiple
             value={selectedUnassignedContacts.map((contact) => contact.id)}
@@ -184,18 +203,19 @@ const AssignmentsPage = () => {
             onClick={handleAssign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            3. Click To Assign >>
+            <span className='text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black]'>3</span>  Click To Assign >>
           </button>
         </div>
 
         {/* Assigned Contacts Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="assignedContacts" className="block text-gray-700 font-bold mb-2">
-            View Assigned Contacts:
-          </label>
+        <div className='bg-[white] p-4 rounded shadow min-w-[400px]'>
+        <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><span className='text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]'>4</span> 
+            View Assigned Contacts
+          </div>
           <select
             id="assignedContacts"
-            className="border border-gray-300 rounded p-2 w-full h-40"
+            className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
+            
             size="10"
             multiple
             value={selectedAssignedContacts.map((contact) => contact.id)}
@@ -217,11 +237,14 @@ const AssignmentsPage = () => {
             onClick={handleUnassign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            &lt;&lt; 4. Unassign Contact
+            &lt;&lt;<span className='text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black]'>5</span>  Unassign Contact
           </button>
         </div>
       </div>
+      </Card>
+
     </div>
+    
   );
 };
 

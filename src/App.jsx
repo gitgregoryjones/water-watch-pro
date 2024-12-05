@@ -29,6 +29,7 @@ import LocationPage from "./pages/LocationPage";
 import ContactListPage from "./pages/ContactListPage";
 import ContactPage from "./pages/ContactPage";
 import GeneralSettingsPage from "./pages/GeneralSettings";
+import ScrollToTop from "./components/ScrollToTop";
 
 
 
@@ -59,6 +60,7 @@ function App() {
 
   return (
     <LandscapeOrientation>
+      <ScrollToTop/>
     <div className={"md:hidden"}>
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>

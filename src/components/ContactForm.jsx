@@ -28,7 +28,7 @@ const ContactForm = ({ contactToEdit }) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
         await api.delete(`/api/contacts/${contactToEdit.id}`);
-        alert('Contact deleted successfully!');
+       // alert('Contact deleted successfully!');
         navigate('/contact-list');
       } catch (error) {
         console.error('Error deleting contact:', error.message);
@@ -112,6 +112,7 @@ const ContactForm = ({ contactToEdit }) => {
             id="email"
             type="email"
             value={email}
+            required
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
           />
@@ -123,6 +124,7 @@ const ContactForm = ({ contactToEdit }) => {
           <input
             id="phone"
             type="tel"
+            required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"

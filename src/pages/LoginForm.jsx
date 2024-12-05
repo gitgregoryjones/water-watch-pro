@@ -149,7 +149,7 @@ export default function LoginForm() {
 
             // Step 5: Get hourly data for locations
             let today = new Date();
-            today.setDate(today.getDate() + 1);
+            today.setDate(today.getDate());
             
             const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
@@ -175,7 +175,7 @@ export default function LoginForm() {
                     }
                     location.total_hourly_rainfall = locHourlyData.total_rainfall;
                     location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
-                        ? location.total_hourly_rainfall > location.atlas14_threshold['1h'][0] ? "red" : "orange"
+                       ? "orange"
                         : "green";
                 }
                 return location;

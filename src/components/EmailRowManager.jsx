@@ -39,7 +39,7 @@ const EmailRowManager = ({ contacts, onModify}) => {
   function getEmails(rows){
     let oe = [];
     rows.forEach((row)=>{validateEmail(row.email) && oe.push(row.email)})
-    console.log(`oe ${oe}`)
+ 
     return oe;
   }
 

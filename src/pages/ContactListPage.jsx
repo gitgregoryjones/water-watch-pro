@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
 
 import api from '../utility/api';
 import SubHeader from '../components/Subheader';
+import Card from '../components/Card';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const fetchContacts = async (page) => {
@@ -20,6 +22,10 @@ const ContactListPage = () => {
       console.error('Error fetching contacts:', error.message);
     }
   };
+
+  const filterContacts = (e)=> setSearchTerm(e.target.value);
+
+  const  filtered = contacts.filter(l => l.name.startsWith(searchTerm)  );
 
   const handleDelete = async (contactId) => {
     try {
@@ -39,71 +45,92 @@ const ContactListPage = () => {
   }, [currentPage]);
 
   return (
-    <div className='h-full min-h-full flex flex-col mt-28 md:min-h-[600]' >
-        <SubHeader/>
-    <div className=" p-6 bg-white rounded w-full h-[20rem] max-h-[20rem] overflow-scroll">
+    <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings >  Contacts</h1>
+      <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
+        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+          Modify Contacts
+        </span>
+        <Link
+          to="/location-list"
+          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+        >
+          Modify Locations
+        </Link>
         
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Contact List</h1>
+      </div>
+      }>
+    <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
+        <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='text-yellow-500 fa fa-person'></i>{filtered.length} contacts are viewable. Scroll down see more</div>
+         <div className="flex justify-around items-end md:items-center gap-4 mb-6">
+        <div className='flex md:flex-row flex-col md:justify-between  flex-1'>
+        <input type="text" className='p-2 border border-green-800 rounded text-md flex flex-1' onChange={filterContacts} placeholder='Search Contacts...' value={searchTerm}/>
+        </div>
         <button
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          onClick={() => navigate('/contact-form')}
+          onClick={()=>navigate("/contact-form")}
+          className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
         >
           Add Contact
         </button>
       </div>
 
-      <table className="min-w-full bg-white border">
-        <thead>
-          <tr>
-            <th className="py-2 px-4 border">Name</th>
-            <th className="py-2 px-4 border">Email</th>
-            <th className="py-2 px-4 border">Phone</th>
-            <th className="hidden py-2 px-4 border">Text Alert</th>
-            <th className="hidden py-2 px-4 border">Email Alert</th>
-            <th className="py-2 px-4 border">Actions</th>
-          </tr>
-        </thead>
+      <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">
+      <thead>
+            <tr className="bg-gray-100 sticky top-0 ">
+              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[250px]">Name</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Email</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell w-full">Phone</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">Text Alert</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Email Alert</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
+            </tr>
+          </thead>
+       {filtered.length > 0 ?
         <tbody>
-          {contacts.map((contact) => (
+          {filtered.map((contact) => (
             <tr key={contact.id}>
-              <td className="py-2 px-4 border">{contact.name}</td>
-              <td className="py-2 px-4 border">{contact.email || 'N/A'}</td>
-              <td className="py-2 px-4 border">{contact.phone || 'N/A'}</td>
-              <td className="hidden py-2 px-4 border text-center">
+              <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
+              <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
+              <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
+              <td className="text-sm border border-gray-300 flex text-center p-2  hidden md:table-cell">
                 {contact.sms_notification ? (
-                  <FaCheck className="text-green-500" />
+                  <FaCheck className="text-green-500 text-center flex justify-center w-full" />
+                  
                 ) : (
-                  ''
+                  <div></div>
                 )}
               </td>
-              <td className="hidden py-2 px-4 border text-center">
+              <td className="text-sm border text-center border-gray-300 p-2 hidden md:table-cell">
                 {contact.email_notification ? (
-                  <FaCheck className="text-green-500" />
+                  <FaCheck className="text-green-500 text-center flex justify-center w-full" />
                 ) : (
                   ''
                 )}
               </td>
-              <td className="py-2 px-4 border">
-                <button
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 mr-2"
-                  onClick={() => handleEdit(contact)}
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                  onClick={() => handleDelete(contact.id)}
-                >
-                  <FaTrashAlt />
-                </button>
-              </td>
+              <td className="text-smm border border-gray-300 p-2  items-center gap-4 ">
+                  <button
+                    onClick={() => handleEdit(contact)}
+                    className="text-blue-500 hover:text-blue-700 px-2"
+                    title="Edit Location"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(contact.id)}
+                    className="text-red-500 hover:text-red-700"
+                    title="Delete Location"
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </td>
             </tr>
           ))}
         </tbody>
+        : <tbody className='relative'><i className='absolute text-[green] fa fa-spinner top-[5rem] text-4xl left-1/2 animate-spin'></i></tbody>}
       </table>
 
-      <div className="flex justify-between items-center mt-4">
+      <div className="hidden flex justify-between items-center mt-4">
+        
         <button
           className="hidden bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
           disabled={currentPage === 1}
@@ -122,7 +149,14 @@ const ContactListPage = () => {
           Next
         </button>
       </div>
+      <button
+          className="bg-green-700 text-white px-4 mt-2 py-2 rounded hover:bg-green-600"
+          onClick={() => navigate('/contact-form')}
+        >
+          Bulk Upload
+        </button>
     </div>
+    </Card>
     </div>
   );
 };

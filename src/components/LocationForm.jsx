@@ -95,7 +95,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         <FaTimes />
       </button>
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        {isEditMode ? `Update ${name}` : 'Create New Location'}
+        {isEditMode ? `Update :  ${name}` : 'Create New Location'}
       </h2>
      
       <form onSubmit={handleSubmit}>
@@ -156,15 +156,20 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="h24Threshold" className="block text-gray-700 font-bold mb-2">
             24-Hour Rain Threshold (inches)
           </label>
-          <input
-            type="number"
+          <select
+            
             step="0.01"
             id="h24Threshold"
             value={h24Threshold}
             onChange={(e) => setH24Threshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
             required
-          />
+          >
+           {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
+                return <option value={o} key={i}>{o}</option>
+            })
+            }
+            </select>
         </div>
 
         {/* RapidRain Threshold */}
@@ -172,15 +177,21 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="rapidRainThreshold" className="block text-gray-700 font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
-          <input
-            type="number"
-            step="0.01"
+          <select
+            
+            
             id="rapidRainThreshold"
             value={rapidRainThreshold}
             onChange={(e) => setRapidRainThreshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
             required
-          />
+            >
+          
+            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
+                return <option value={o} key={i}>{o}</option>
+            })
+            }
+            </select>
         </div>
 
         {/* Action Buttons */}

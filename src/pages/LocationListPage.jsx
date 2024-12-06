@@ -106,8 +106,8 @@ const LocationListPage = () => {
               <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[250px] w-full">Name</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Latitude</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Longitude</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">Text Alert</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Email Alert</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">24 Hour Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Rapid Rain Threshold</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>
           </thead>

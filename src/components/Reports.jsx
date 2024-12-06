@@ -253,7 +253,7 @@ const Reports = () => {
   
 
   return (
-    <div className="  w-full flex mt-28  flex-col md:flex-row md:items-start text-sm  gap-2 md:h-full md:min-h-full md:p-6">
+    <div className={`w-full max-w-[${window.innerWidth}] flex mt-28  flex-col md:flex-row md:items-start text-sm  gap-2 md:h-full md:min-h-full md:p-6`}>
       
         
       <form onSubmit={handleSubmit} className="flex flex-col  md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
@@ -367,7 +367,7 @@ const Reports = () => {
 
       {/* Report Content */}
       <div id="reportArea"
-        className="flex flex-col md:flex-[4] w-full h-[600px]  rounded mt-6  md:mt-0 p-4 overflow-auto"
+        className={`flex flex-col md:flex-[4] self-center sm:max-w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-y-scroll`}
         dangerouslySetInnerHTML={{ __html: reportContent }}
       ></div>
     </div>

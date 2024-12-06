@@ -97,7 +97,7 @@ export default function Forecast({ location, className }) {
     <div className="flex md:flex-row flex-row h-full min-h-[10rem] w-full flex-1 gap md:p-2 border justify-center items-center text-[--text-color]">
       {headers.map((d, i) => (
         <div key={i} className="flex flex-col flex-1 w-full">
-          <div className="text-md font-bold text-center md:text-2xl p-4 bg-[--highlight-color]">{d}</div>
+          <div className="text-md font-bold text-center md:text-2xl p-4 bg-[#128CA6]">{d}</div>
           <div className="text-md font-bold md:text-2xl text-center p-4">{localForecastData[i]?.value}</div>
         </div>
       ))}

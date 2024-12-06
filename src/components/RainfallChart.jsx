@@ -95,12 +95,16 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   
         entries.forEach(([key, value]) => {
           labels.push(
-            new Date(key).toLocaleString("en-US", {
+           period != "rapidrain" ? new Date(key).toLocaleString("en-US", {
               hour: "2-digit",
               hour12: false,
               month:'short',
               day:'numeric'
-            }) + "h"
+            }) + "h" : new Date(key).toLocaleString("en-US", {
+             day:'numeric',
+             hour: "2-digit", 
+             minute:'numeric'
+            }) 
           );
           values.push(value.total);
           backgroundColors.push(value.total > location.h24_threshold ? (value.total > location.atlas14_threshold["1h"][0] ? "red" : "orange") : "green");
@@ -184,17 +188,58 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   }, [chartData]);
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      x: { ticks: { autoSkip: false }, grid: { display: true } },
-      y: {
-        beginAtZero: true,
-        ticks: { stepSize: 0.25 },
-        grid: { display: true }, // Hide gridlines if Y-axis is hidden
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    x: {
+      title: {
+        display: false,
+      },
+      ticks: {
+        autoSkip: false,
+      },
+      grid: {
+        display: true,
       },
     },
-  };
+    y: {
+      beginAtZero: true,
+      max: chartData?.yMax || 1.0,
+      ticks: {
+        stepSize: 0.25,
+      },
+      grid: {
+        display: true,
+      },
+    },
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      enabled: true,
+      callbacks: {
+        title: () => "",
+        label: function (context) {
+          const value = context.raw;
+          const label = labelsRef.current[context.dataIndex];
+          const arr = label
+            ? [`${value}`, `${label.substring(0, label?.lastIndexOf(":"))}`]
+            : [`${value}`, `${context.label}`];
+
+          return arr;
+        },
+      },
+    },
+  },
+  elements: {
+    bar: {
+      maxBarThickness: 100, // Constrain maximum bar width
+    },
+  },
+};
+
 
   return (
     <div className="flex flex-row w-full">

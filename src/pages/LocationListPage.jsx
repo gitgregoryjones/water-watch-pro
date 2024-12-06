@@ -82,7 +82,7 @@ const LocationListPage = () => {
           to="/settings-general"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
-          Preferences
+          Notifications
         </Link>
       </div>
       }>

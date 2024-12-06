@@ -40,6 +40,7 @@ import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
 import ProfilePic from '../components/ProfilePic'
 import CheckboxGroup from '../components/CheckboxGroup'
 import { color } from 'chart.js/helpers'
+import PrettyHeader from '../components/PrettyHeader'
 
 
 export default function DashboardPage() {
@@ -598,35 +599,15 @@ function showThreshold(color){
           </PillTabs>
           
       </Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2 p-2 px-4  border rounded bg-[#128CA6] text-[white]'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>24 Hour Rainfall {location.name ? location.name : ''}  (<div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold} ) or (<div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA 14 of {location.atlas14_threshold ? location.atlas14_threshold['24h'][0] : "'no data'"} ) </div>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2 p-2 border rounded bg-[#128CA6] text-[white]'><i className="fa-solid fa-droplet text-[--main-1] text-md "></i>1 Hour Rainfall {location.name ? location.name : ''}  (<div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold} ) or (<div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA 14 of {location.atlas14_threshold ? location.atlas14_threshold['1h'][0] : "'no data'"} ) </div>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2 p-2 border rounded bg-[#128CA6] text-[white]'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>RapidRain Rainfall {location.name ? location.name : ''}  (<div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold} ) or (<div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA 14 of {location.atlas14_threshold ? location.atlas14_threshold['1h'][0] : "'no data'"} ) </div>} >
+      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
+      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>1 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA Atlas 14   </PrettyHeader>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
+      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>RapidRain Rainfall {location.name ? location.name : ''}   </PrettyHeader>} >
         <Upgrade><RainfallChart location={location} period={"rapidrain"} max={1} /></Upgrade>
       </Card>
-      <Card header={<div className={`p-2 px-4  border rounded bg-[#128CA6] text-[white]`}> NOAA Atlas 14 </div>} ><ResponsiveTable  location={location} /></Card>
+      <Card header={<PrettyHeader  className={'text-[white] justify-center px-0'} > NOAA Atlas 14 </PrettyHeader>} ><ResponsiveTable  location={location} /></Card>
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-      <Card  className={'hidden shadow'}header={window.outerWidth >= 600 && <div className='mx-2 flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>} >
-        <PillTabs className={"md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex items-center gap-2'><i className="fa-solid fa-droplet text-[--main-1] text-md"></i>Rainfall {location.name ? location.name : ''} </div>}>
-          <div className='tab'>24 Hour
-            
-          <RainfallChart location={location} period={"daily"} max={3} />
-          </div>
-          <div className='tab'>1 Hour
-          <RainfallChart location={location} period={"hourly"} max={3} />
-          </div>
-          <div className='tab'>RAPIDRAIN
-            <Upgrade>
-             { <RainfallChart location={location} period={"rapidrain"}  max={6} overlay={false}/>}
-            </Upgrade>
-          </div>
-          <div className='tab min-h-[420]'>NOAA Atlas 14
-          {Object.keys(location).length > 0  && <ResponsiveTable  location={location} />}
-          </div>
-        
-      
-        </PillTabs>
-        </Card>
+     
       
   
       
@@ -653,7 +634,7 @@ function showThreshold(color){
         
      {/*</span>*/}
      <a name="alerts"></a>
-      <Alerts/>
+      
     </Dashboard>
    
   )

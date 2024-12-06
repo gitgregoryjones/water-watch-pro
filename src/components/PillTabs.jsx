@@ -66,7 +66,7 @@ export default function PillTabs({children,className,mini, header}) {
                 children && Children.toArray(children).map((c,i) =>{
                     
 
-                    return c.props.className?.indexOf("tab") > -1 ?  (<div key={i} onClick={()=>{setActive(i); /*setLittleText(menuActions[i].name)*/}} className={`justify-start text-sm md:text-lg transition-all duration-300 ease-in-out justify-center  text-[white]   bg-[#99ba93] flex w-full flex-1 p-2 hover:bg-lime-800/100  ease-in-out cursor-pointer  ${active == i ? 'activeTab': 'inactiveTab'} ${addUserSuppliedClasses(className,"tab")} ${c.props.className}` }>{getChildContent(c,0,i)}</div>)
+                    return c.props.className?.indexOf("tab") > -1 ?  (<div key={i} onClick={()=>{setActive(i); /*setLittleText(menuActions[i].name)*/}} className={`justify-start text-sm md:text-lg transition-all duration-300 ease-in-out justify-center  text-[white]  bg-[black] flex w-full flex-1 p-2 hover:bg-lime-800/100  ease-in-out cursor-pointer  ${active == i ? 'activeTab': 'inactiveTab'} ${addUserSuppliedClasses(className,"tab")} ${c.props.className}` }>{getChildContent(c,0,i)}</div>)
 
                     : c
                 })

@@ -20,6 +20,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   const day = (today.getDate() ).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
 
+  const [speriod,setSperiod] = useState(period)
+
   const [originalKeys, setOriginalKeys] = useState([]);
 
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -49,7 +51,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   
             const x = bar.x; // X position of the bar
             const y = bar.base - bar.height -10; // Center Y position in the bar
-  
+           
             ctx.fillText(dateLabel.split(",")[0], x, y); // Draw the formatted date inside the bar
             ctx.restore();
           }

@@ -599,14 +599,7 @@ function showThreshold(color){
           </PillTabs>
           
       </Card>
-     <span className='hidden'>{/* Hiding Until Gene Makes a final decision */}
-        <Card  className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
-        <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>1 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA Atlas 14   </PrettyHeader>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
-        <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>RapidRain Rainfall {location.name ? location.name : ''}   </PrettyHeader>} >
-          <Upgrade><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
-        </Card>
-        <Card header={<PrettyHeader  className={'text-[white] justify-center px-0'} > NOAA Atlas 14 </PrettyHeader>} ><ResponsiveTable  location={location} /></Card>
-      </span>
+     
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
       <div id="graphs" className='h-[10px]'></div>

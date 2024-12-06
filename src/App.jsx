@@ -30,6 +30,7 @@ import ContactListPage from "./pages/ContactListPage";
 import ContactPage from "./pages/ContactPage";
 import GeneralSettingsPage from "./pages/GeneralSettings";
 import ScrollToTop from "./components/ScrollToTop";
+import ScrollToHash from "./components/ScrollToHash";
 
 
 
@@ -65,6 +66,12 @@ function App() {
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
     <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Data</Link>
+    <Link to="/dashboard#graphs" className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    Graphs
+  </Link>
+  <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    Forecasts
+  </Link>
     <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
     <Link to="/settings" onClick={showSettings} className="menu-item bm-item">Settings</Link>
     <Link to="/assigments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
@@ -81,7 +88,7 @@ function App() {
      
        {!isLoginPage && <Header />}
        <Container className="big-container bg-[#CAD2C5] md:bg-[whitesmoke] h-full">
-        
+       <ScrollToHash />
       <Routes>
         <Route path="/" element={<LoginForm />} />
         <Route path="/dashboard" element={<DashboardPage />} />

@@ -115,9 +115,15 @@ export default function LoginForm() {
             // Step 4: Get 24-hour data for locations
             const ids = myLocations.map((me) => me.id);
 
+            let todayHr = new Date();
+            todayHr.setDate(todayHr.getDate() + 1);
+
+            const todayStrHr = `${todayHr.getFullYear()}-${(todayHr.getMonth() + 1).toString().padStart(2, '0')}-${todayHr.getDate().toString().padStart(2, '0')}`;
+
             const location24History = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
                     client_id: clients[0].id,
+                    
                 },
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,

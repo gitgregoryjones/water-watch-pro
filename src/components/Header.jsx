@@ -43,15 +43,29 @@ export default function Header() {
         <i className='fas fa-search absolute pl-4 pb-4 top-10 text-slate-400 text-sm'></i>
       </div>
       <div className='hidden md:flex justify-around items-center gap-4 items-end'> 
-      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Data</Link>
-      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Graphs</Link>
-      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname == "/dashboard" ? "text-slate-800"  : "text-[--main-2]"}`}>Forecasts</Link>
-    <Upgrade showMsg={false} tier={0}><Link to="/reports"  onClick={()=>{} } className={location.pathname == "/reports" ? "text-slate-800"  : "text-[--main-2]"}>Reports</Link></Upgrade>
-    <Link to="/assignments"  className={location.pathname == "/assignments" ? "text-slate-800"  : "text-[--main-2]"}>Assignments</Link>
-    
-    <Link to="/location-list"  className={location.pathname == "/location-list"  || location.pathname == "/contact-list" || location.pathname == "/settings-general" ? "text-slate-800"  : "text-[--main-2]"}>Settings</Link>
-    
-    <Link to="/"  className={location.pathname == "/" ? "text-slate-800"  : "text-[--main-2]"}>Logout</Link>
+      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    Data
+  </Link>
+  <Link to="/dashboard#graphs" className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    Graphs
+  </Link>
+  <Link to="/dashboard#forecast" className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    Forecasts
+  </Link>
+  <Upgrade showMsg={false} tier={0}>
+    <Link to="/reports" className={location.pathname === "/reports" ? "text-slate-800" : "text-[--main-2]"}>
+      Reports
+    </Link>
+  </Upgrade>
+  <Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+    Assignments
+  </Link>
+  <Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+    Settings
+  </Link>
+  <Link to="/" className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
+    Logout
+  </Link>
     <div className=' flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
       

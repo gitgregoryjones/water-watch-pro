@@ -599,7 +599,8 @@ function showThreshold(color){
           </PillTabs>
           
       </Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
+      
+      <Card  className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
       <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>1 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA Atlas 14   </PrettyHeader>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
       <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>RapidRain Rainfall {location.name ? location.name : ''}   </PrettyHeader>} >
         <Upgrade><RainfallChart location={location} period={"rapidrain"} max={1} /></Upgrade>
@@ -610,10 +611,11 @@ function showThreshold(color){
      
       
   
-      
+      <div id="forecast" className='h-[20px]'></div>
       <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
            <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
             <div className='tab'>National
+              
               <Forecast className={"items-end"}/>
            </div>
            <div className='tab'>{location.name ? location.name : ''}

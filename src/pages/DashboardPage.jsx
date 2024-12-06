@@ -599,19 +599,37 @@ function showThreshold(color){
           </PillTabs>
           
       </Card>
-      
-      <Card  className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>1 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA Atlas 14   </PrettyHeader>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
-      <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>RapidRain Rainfall {location.name ? location.name : ''}   </PrettyHeader>} >
-        <Upgrade><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
-      </Card>
-      <Card header={<PrettyHeader  className={'text-[white] justify-center px-0'} > NOAA Atlas 14 </PrettyHeader>} ><ResponsiveTable  location={location} /></Card>
+     <span className='hidden'>{/* Hiding Until Gene Makes a final decision */}
+        <Card  className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>24 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 24h NOAA Atlas 14  </PrettyHeader>} ><RainfallChart location={location} period={"daily"} max={3} /></Card>
+        <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>1 Hour Rainfall {location.name ? location.name : ''}  <div className='bg-[orange] w-[1rem] h-[.5rem]'></div> Exceeds 24h threshold of {location.h24_threshold}  or <div className='bg-[red] w-[1rem] h-[.5rem]'></div> Exceeds 1h NOAA Atlas 14   </PrettyHeader>} ><RainfallChart location={location} period={"hourly"} max={3} /></Card>
+        <Card className={'shadow'}header={window.outerWidth >= 600 && <PrettyHeader className={'justify-center'}>RapidRain Rainfall {location.name ? location.name : ''}   </PrettyHeader>} >
+          <Upgrade><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
+        </Card>
+        <Card header={<PrettyHeader  className={'text-[white] justify-center px-0'} > NOAA Atlas 14 </PrettyHeader>} ><ResponsiveTable  location={location} /></Card>
+      </span>
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
-     
+      <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i>Rainfall {location.name}</div>} >
+           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
+            <div className='tab'>24 Hour
+              
+            <RainfallChart location={location} period={"daily"} max={3} />
+            </div>
+            <div className='tab'>1 Hour 
+            <RainfallChart location={location} period={"hourly"} max={3} />
+            </div>
+            <div className='tab'>RAPIDRAIN
+            <RainfallChart location={location} period={"hourly"} max={3} />
+            </div>
+            <div className='tab'>NOAA Atlas 14
+            <ResponsiveTable  location={location} />
+            </div>
+            </PillTabs>
+        </Card>
+  
       
   
-      <div id="forecast" className='h-[20px]'></div>
+      <span id="forecast" className=''></span>
       <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
            <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
             <div className='tab'>National

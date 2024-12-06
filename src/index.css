@@ -490,7 +490,7 @@ Location {
 }
 
 .active, .activeTab, a:visited {
-  background-color:var(--main-color) !important;
+  background-color:#4DCAE9 !important;
   opacity:1;
   --font-weight:bold;
   --border-bottom: 0px solid transparent;

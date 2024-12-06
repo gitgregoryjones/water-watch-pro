@@ -133,7 +133,8 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       
   
       if (period !== "daily") {
-        const entries = Object.entries(data.hourly_data);
+
+        const entries = Object.entries(data.hourly_data).reverse();
 
         
   

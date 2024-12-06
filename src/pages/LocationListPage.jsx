@@ -5,6 +5,7 @@ import api from '../utility/api';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
+import LocationCSVFileUploadDialog from '../components/LocationCSVUploadDialog';
 
 const LocationListPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -168,12 +169,7 @@ const LocationListPage = () => {
           Next
         </button>
       </div>
-      <button
-          className="bg-green-700 text-white px-4 mt-2 py-2 rounded hover:bg-green-600"
-          onClick={() => navigate('/contact-form')}
-        >
-          Bulk Upload
-        </button>
+      <LocationCSVFileUploadDialog onClose={()=> location.reload()}/>
     </div>
     </Card>
     </div>

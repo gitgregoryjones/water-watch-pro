@@ -2,18 +2,17 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
+import Toggle from './Toggle'; // Import the Toggle component
 
 const ContactForm = ({ contactToEdit }) => {
   const [name, setName] = useState(contactToEdit?.name || '');
   const [email, setEmail] = useState(contactToEdit?.email || '');
   const [phone, setPhone] = useState(contactToEdit?.phone || '');
-  const [emailNotification, setEmailNotification] = useState(contactToEdit?.email_notification || false);
-  const [smsNotification, setSmsNotification] = useState(contactToEdit?.sms_notification || false);
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(false);
   const [alertSettings, setAlertSettings] = useState({
     'Daily Report': { email: true, sms: true },
     Forecast: { email: true, sms: true },
-    'NOAA Atlas 14': { email: true, sms: true }
+    'NOAA Atlas 14': { email: true, sms: true },
   });
 
   const isEditMode = contactToEdit !== null;
@@ -28,7 +27,6 @@ const ContactForm = ({ contactToEdit }) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
         await api.delete(`/api/contacts/${contactToEdit.id}`);
-       // alert('Contact deleted successfully!');
         navigate('/contact-list');
       } catch (error) {
         console.error('Error deleting contact:', error.message);
@@ -45,8 +43,7 @@ const ContactForm = ({ contactToEdit }) => {
       email,
       phone,
       status: 'active',
-      email_notification: emailNotification,
-      sms_notification: smsNotification,
+      
       alert_settings: alertSettings,
     };
 
@@ -130,28 +127,8 @@ const ContactForm = ({ contactToEdit }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
-        <div className='hidden'>
-          <label className="block text-gray-700 font-bold">
-            <input
-              type="checkbox"
-              checked={emailNotification}
-              onChange={(e) => setEmailNotification(e.target.checked)}
-              className="mr-2"
-            />
-            Email Notifications
-          </label>
-        </div>
-        <div className='hidden'>
-          <label className="block text-gray-700 font-bold">
-            <input
-              type="checkbox"
-              checked={smsNotification}
-              onChange={(e) => setSmsNotification(e.target.checked)}
-              className="mr-2"
-            />
-            SMS Notifications
-          </label>
-        </div>
+
+       
 
         {/* Expandable Alert Settings */}
         <div className="mt-6">
@@ -168,24 +145,20 @@ const ContactForm = ({ contactToEdit }) => {
               {Object.keys(alertSettings).map((alertType) => (
                 <div key={alertType} className="flex flex-col">
                   <span className="font-bold text-gray-700">{alertType}</span>
-                  <label className="flex items-center mt-2">
-                    <input
-                      type="checkbox"
+                  <div className="flex items-center mt-2">
+                    <span className="mr-2">Email</span>
+                    <Toggle
                       checked={alertSettings[alertType].email}
                       onChange={() => toggleAlertSetting(alertType, 'email')}
-                      className="mr-2"
                     />
-                    Email
-                  </label>
-                  <label className="flex items-center mt-2">
-                    <input
-                      type="checkbox"
+                  </div>
+                  <div className="flex items-center mt-2">
+                    <span className="mr-2">SMS</span>
+                    <Toggle
                       checked={alertSettings[alertType].sms}
                       onChange={() => toggleAlertSetting(alertType, 'sms')}
-                      className="mr-2"
                     />
-                    SMS
-                  </label>
+                  </div>
                 </div>
               ))}
             </div>

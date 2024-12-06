@@ -5,7 +5,7 @@ import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
 import api from '../utility/api';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
-import FileUploadDialog from '../components/FileUploadDialog';
+import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -29,12 +29,15 @@ const ContactListPage = () => {
   const  filtered = contacts.filter(l => l.name.toLowerCase().startsWith(searchTerm.toLocaleLowerCase())  );
 
   const handleDelete = async (contactId) => {
+ 
+    if (window.confirm('Are you sure you want to delete this contact?')) {
     try {
       await api.delete(`/api/contacts/${contactId}`);
       fetchContacts(currentPage); // Refresh the list
     } catch (error) {
       console.error('Error deleting contact:', error.message);
     }
+  }
   };
 
   const handleEdit = (contact) => {
@@ -83,22 +86,22 @@ const ContactListPage = () => {
       <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">
       <thead>
             <tr className="bg-gray-100 sticky top-0 ">
-              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[250px]">Name</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Email</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell w-full">Phone</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">Text Alert</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Email Alert</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
+              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0  md:min-w-[300px]">Name</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Email</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full md:min-w-[300px]">Phone</th>
+              <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden  top-0">Text Alert</th>
+              <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap  hidden  sticky top-0">Email Alert</th>
+              <th className="hidden text-sm border border-gray-300 p-2 text-left sticky top-0 md:table-cell">Actions</th>
             </tr>
           </thead>
        {filtered.length > 0 ?
         <tbody>
           {filtered.map((contact) => (
-            <tr key={contact.id}>
+            <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
               <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
               <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
-              <td className="text-sm border border-gray-300 flex text-center p-2  hidden md:table-cell">
+              <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">
                 {contact.sms_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />
                   
@@ -106,14 +109,14 @@ const ContactListPage = () => {
                   <div></div>
                 )}
               </td>
-              <td className="text-sm border text-center border-gray-300 p-2 hidden md:table-cell">
+              <td className="text-sm border text-center border-gray-300 p-2 hidden ">
                 {contact.email_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />
                 ) : (
                   ''
                 )}
               </td>
-              <td className="text-smm border border-gray-300 p-2  items-center gap-4 ">
+              <td className="text-sm border border-gray-300 p-2  items-center gap-4 hidden md:table-cell ">
                   <button
                     onClick={() => handleEdit(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
@@ -155,7 +158,7 @@ const ContactListPage = () => {
           Next
         </button>
       </div>
-     <FileUploadDialog className={'mt-2'}/>
+     <ContactCSVFileUploadDialog className={'mt-2'} onClose={()=> location.reload()}/>
     </div>
     </Card>
     </div>

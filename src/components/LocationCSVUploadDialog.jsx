@@ -2,36 +2,54 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import api from "../utility/api"; // Replace with your actual API utility
 
-const FileUploadDialog = ({className, onClose}) => {
+const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [successRows,setSuccessRows] = useState([])
 
-  const requiredFields = ["name", "email", "phone"];
+  const requiredFields = ["name", "lat", "lng", "limit24", "limitrapidrain"];
+  const validThresholdValues = [0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4];
 
   const validateRow = (row) => {
     const errorMessages = [];
 
     // Check for required fields
     requiredFields.forEach((field) => {
+        
       if (!row[field]) {
         errorMessages.push(`Missing required field: ${field}`);
       }
     });
 
-    // Validate email format
-    if (row.email && !/\S+@\S+\.\S+/.test(row.email)) {
-      errorMessages.push(`Invalid email format: ${row.email}`);
+    // Validate latitude
+    const latitude = parseFloat(row.lat);
+    if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+      errorMessages.push(`Invalid latitude: ${row.lat}. Must be between -90 and 90.`);
     }
 
-    row.phone = row.phone.replace(/\./g,"-")
-    // Validate phone number (simple check for digits and length)
-    if (row.phone && !/^\d{10}$|^\d{11}$/.test(row.phone.trim().replace(/[^0-9]/g, ""))) {
-      errorMessages.push(`Invalid phone number: ${row.phone}`);
-    } 
+    // Validate longitude
+    const longitude = parseFloat(row.lng);
+    if (isNaN(longitude) || longitude < -180 || longitude > -66) {
+      errorMessages.push(`Invalid longitude: ${row.lng}. Must be between -180 and -66.`);
+    }
 
-    
+    // Validate limit24
+    const limit24 = parseFloat(row.limit24);
+    if (!validThresholdValues.includes(limit24)) {
+      errorMessages.push(
+        `Invalid limit24: ${row.limit24}. Must be one of ${validThresholdValues.join(", ")}.`
+      );
+    }
+
+    // Validate limitrapidrain
+    const limitrapidrain = parseFloat(row.limitrapidrain);
+    if (!validThresholdValues.includes(limitrapidrain)) {
+      errorMessages.push(
+        `Invalid limitrapidrain: ${row.limitrapidrain}. Must be one of ${validThresholdValues.join(", ")}.`
+      );
+    }
 
     return errorMessages;
   };
@@ -67,7 +85,6 @@ const FileUploadDialog = ({className, onClose}) => {
 
         // Validate each row
         data.forEach((row, index) => {
-          console.log(row)
           const rowErrors = validateRow(row);
           if (rowErrors.length) {
             validationErrors.push(`Row ${index + 1}: ${rowErrors.join(", ")}`);
@@ -76,24 +93,37 @@ const FileUploadDialog = ({className, onClose}) => {
           }
         });
 
+        setSuccessRows(validRows)
+
         if (validationErrors.length) {
           setErrors(validationErrors);
-          setProcessing(false);
-          return;
+         
+          //return;
+          if(validRows.length > 0){
+            setProcessing(true)
+          } else {
+            setProcessing(false);
+            return;
+          }
         }
+
+      
 
         // POST valid rows to the backend
         const postErrors = [];
         for (const row of validRows) {
           try {
-            await api.post("/api/contacts/", {
+            await api.post("/api/locations/", {
               name: row.name,
-              email: row.email,
-              phone: row.phone,
-              status: "active",
+              latitude: parseFloat(row.lat),
+              longitude: parseFloat(row.lng),
+              active:true,
+              h24_threshold: parseFloat(row.limit24),
+              rapidrain_threshold: parseFloat(row.limitrapidrain),
             });
+            
           } catch (error) {
-            postErrors.push(`Failed to process row with email ${row.email}: ${error.message}`);
+            postErrors.push(`Failed to process row with name ${row.name}: ${error.message}`);
           }
         }
 
@@ -108,20 +138,26 @@ const FileUploadDialog = ({className, onClose}) => {
   };
 
   const closeDialog = () => {
+    onClose && onClose();
     setFile(null);
     setErrors([]);
     setSuccess(false);
+    setSuccessRows([])
     setProcessing(false);
-    onClose && onClose();
+    
+    
   };
 
   return (
-    <div className={`relative  items-center justify-center  ${className}`}>
+    <div className={`relative items-center justify-center ${className}`}>
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
-        onClick={() => {document.getElementById("fileUpload").value = ""; document.getElementById("fileUpload").click()}}
+        onClick={() => {
+          document.getElementById("fileUpload").value = "";
+          document.getElementById("fileUpload").click();
+        }}
       >
-        Bulk Upload CSV
+        Bulk Upload Locations CSV
       </button>
 
       <input
@@ -151,6 +187,13 @@ const FileUploadDialog = ({className, onClose}) => {
               ) : (
                 <p className="text-gray-500">No errors reported.</p>
               )}
+              {successRows.length > 0 ? (
+                <ul className="text-green">
+                {successRows.map((v,i)=> (
+                    <li className key={i}>{v.name} was successfully added</li>
+                ))}
+                </ul>
+              ) : <></>}
             </div>
 
             <div className="flex justify-end gap-4">
@@ -180,4 +223,4 @@ const FileUploadDialog = ({className, onClose}) => {
   );
 };
 
-export default FileUploadDialog;
+export default LocationCSVFileUploadDialog;

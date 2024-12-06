@@ -609,6 +609,7 @@ function showThreshold(color){
       </span>
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
+      <div id="graphs" className='h-[10px]'></div>
       <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i>Rainfall {location.name}</div>} >
            <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
             <div className='tab'>24 Hour
@@ -626,6 +627,7 @@ function showThreshold(color){
             </div>
             </PillTabs>
         </Card>
+  
   
       
   

@@ -352,7 +352,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   
 
   return (
-    <div id="graphs" className="flex flex-row w-full">
+    <div className="flex flex-row w-full">
       <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (

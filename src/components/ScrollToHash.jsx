@@ -12,7 +12,8 @@ const ScrollToHash = () => {
 
     // Scroll to the calculated position
     window.scrollTo({
-      top: targetPosition + (window.scrollY < 1200 ? 150 : 0),
+      stop: targetPosition + (window.scrollY < 1200 ? 150 : 0),
+      top: targetPosition,
       behavior: "smooth", // Enable smooth scrolling
     });
   };

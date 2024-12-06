@@ -114,7 +114,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
   
     // Determine the appropriate endpoint based on the `period`
     if (period === "rapidrain") {
-      endpoint = `/api/locations/${location.id}/15m_data?days=${max}`;
+      endpoint = `/api/locations/${location.id}/15m_data?hours=${max}`;
     } else if (period === "daily") {
       endpoint = `/api/locations/${location.id}/24h_data/${getBeginEndRange()}`;
     } else {
@@ -133,7 +133,7 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
       
   
       if (period !== "daily") {
-        const entries = Object.entries(data.hourly_data).reverse();
+        const entries = Object.entries(data.hourly_data);
 
         
   

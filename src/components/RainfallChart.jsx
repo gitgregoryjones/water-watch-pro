@@ -25,12 +25,14 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   const [originalKeys, setOriginalKeys] = useState([]);
 
   const [scrollPosition, setScrollPosition] = useState(0);
+
   const barValuePlugin = {
     id: 'barValuePlugin',
-    beforeDraw(chart) {
+    afterDraw(chart) {
       const { ctx } = chart;
       const datasets = chart.data.datasets;
       const labels = chart.data.labels;
+      const period = chart.options.plugins.customPeriod; // Access the dynamic period
   
       datasets.forEach((dataset, datasetIndex) => {
         const meta = chart.getDatasetMeta(datasetIndex);
@@ -45,20 +47,22 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
             ctx.save();
             ctx.font = '12px Arial';
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
   
             const x = bar.x; // X position of the bar
-            const y = bar.base - bar.height -10; // Center Y position in the bar
-           
-            ctx.fillText(dateLabel.split(",")[0], x, y); // Draw the formatted date inside the bar
+            const y = bar.base - bar.height + 20; // Center Y position in the bar
+            if (period !== 'daily') {
+              ctx.fillText(period == "hourly" ? dateLabel.split(",")[0] : formattedDate, x, y); // Draw the formatted date inside the bar
+            }
             ctx.restore();
           }
         });
       });
     },
   };
+  
 
 
   ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip,barValuePlugin);
@@ -175,6 +179,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
             data: values,
             maxBarThickness: 150,
             
+            
             backgroundColor: backgroundColors,
 
           },
@@ -232,7 +237,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
 
   useEffect(() => {
     fetchChartData();
-  }, [ period]);
+  }, [ location.id,period]);
 
   useEffect(() => {
     if (chartData) {
@@ -246,18 +251,17 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       const { ctx, chartArea, scales } = chart;
       const { left, right, top, bottom } = chartArea;
       const xScale = scales.x;
+      //takeSnapshot();
   
-      if (!originalKeys || originalKeys.length === 0) return;
+      if (!chart.config.options.plugins.originalKeys || chart.config.options.plugins.originalKeys.length === 0) return;
   
       ctx.save();
   
       let currentDay = null;
       let currentColorIndex = 0;
-      const colors = ["#d1c4e9", "#f8bbd0"]; // Purple and Pink
+      const colors = ["#ffcccb", "#ffe4b5"]; // Pink and Orange
   
-      console.log("Original Keys in Plugin:", originalKeys); // Debug originalKeys
-  
-      originalKeys.forEach((key, index) => {
+      chart.config.options.plugins.originalKeys.forEach((key, index) => {
         const day = key.split(" ")[0]; // Extract the date part (YYYY-MM-DD)
         const isNewDay = currentDay !== day;
   
@@ -268,12 +272,12 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
         const barStartX = xScale.getPixelForValue(index) - xScale.getPixelForValue(1) / 2;
         const barEndX =
-          index < originalKeys.length - 1
+          index < chart.config.options.plugins.originalKeys.length - 1
             ? xScale.getPixelForValue(index + 1) - xScale.getPixelForValue(1) / 2
             : right;
   
         // Ensure valid bar positions
-        if (barStartX !== undefined && barEndX !== undefined) {
+        if (!isNaN(barStartX) && !isNaN(barEndX)) {
           ctx.fillStyle = colors[currentColorIndex];
           ctx.fillRect(barStartX, top, barEndX - barStartX, bottom - top);
         }
@@ -283,17 +287,16 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     },
   };
   
+  
   // Register the plugin
-  ChartJS.register(dayChangeBackgroundPlugin);
+  //ChartJS.register(dayChangeBackgroundPlugin);
 
   
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    
     scales: {
-      
       x: {
         title: {
           display: false,
@@ -301,17 +304,13 @@ const RainfallChart = ({ location, period, max = 72 }) => {
         ticks: {
           autoSkip: false,
           callback: function (value, index, ticks) {
-            // Use the value to fetch the corresponding label
-            const labelIndex = value; // `value` corresponds to the label index
-            const label = this.getLabels()[labelIndex]; // Fetch the label from the chart data
-           // console.log("Label:", label);
+            const labelIndex = value;
+            const label = this.getLabels()[labelIndex];
   
-            if (period !== "daily") {
-              //console.log("Formatting for rapidrain");
-              return `${label.split(",")[1]}`;
+            if (period !== 'daily') {
+              return `${label.split(',')[1]}`;
             }
   
-            // Default formatting
             return label;
           },
         },
@@ -333,11 +332,13 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       legend: {
         display: false,
       },
-      dayChangeBackgroundPlugin,
+      customPeriod: period, // Pass the period dynamically
+      originalKeys, // Pass the original keys for day detection
+      //dayChangeBackgroundPlugin,
       tooltip: {
         enabled: true,
         callbacks: {
-          title: () => "",
+          title: () => '',
           label: function (context) {
             return [`Value: ${context.raw}`, context.label];
           },
@@ -345,10 +346,11 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       },
     },
     interaction: {
-      mode: "index",
+      mode: 'index',
       intersect: false,
-    }
+    },
   };
+  
   
   
   

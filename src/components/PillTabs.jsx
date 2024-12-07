@@ -78,7 +78,7 @@ export default function PillTabs({children,className,mini, header}) {
         <div className={`flex flex-1 h-full w-full justify-center items-center ${addUserSuppliedClasses(className,"body")}`}>
         {
              children && Children.toArray(children).map((c,i) =>{
-                return  <div key={i} className={`${active == i ? 'activeTabContent' : 'inactiveTabContent'} tabContent w-full`} >{getChildContent(c,1)}</div>
+                return  (active == i ? <div key={i} className={`${active == i ? 'activeTabContent' : 'inactiveTabContent'} tabContent w-full`} >{getChildContent(c,1)}</div> : <div></div>)
             })
         }
         </div>

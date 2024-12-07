@@ -6,7 +6,7 @@ import api from "../utility/api";
 
 
 
-const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
+const RainfallChart = ({ location, period, max = 72 }) => {
   const user = useSelector((state) => state.userInfo.user);
   const [chartData, setChartData] = useState(null);
   const [error, setError] = useState(null);
@@ -232,13 +232,13 @@ const RainfallChart = ({ location, period = "hourly", max = 72 }) => {
 
   useEffect(() => {
     fetchChartData();
-  }, [location.id, period, max, tomorrowDate]);
+  }, [ period]);
 
   useEffect(() => {
     if (chartData) {
       setTimeout(takeSnapshot, 500); // Delay to ensure chart is rendered
     }
-  }, [chartData]);
+  }, [chartData,period]);
 
   const dayChangeBackgroundPlugin = {
     id: "dayChangeBackgroundPlugin",

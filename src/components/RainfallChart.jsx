@@ -231,16 +231,17 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     if (!canvas) return;
 
     const snapshotCanvas = document.createElement("canvas");
-    snapshotCanvas.width = 50; // Snapshot width
+    const theWidth = window.innerWidth < 600 ? 150 : 110;
+    snapshotCanvas.width = theWidth; // Snapshot width
     snapshotCanvas.height = canvas.height; // Full chart height
 
     const ctx = snapshotCanvas.getContext("2d");
-    ctx.drawImage(canvas, 0, 0, 50, canvas.height, 0, 0, 50, canvas.height);
+    ctx.drawImage(canvas, 0, 0, theWidth, canvas.height, 0, 0, theWidth, canvas.height);
 
     const dataUrl = snapshotCanvas.toDataURL();
     snapshotDivRef.current.style.backgroundImage = `url(${dataUrl})`;
     snapshotDivRef.current.style.backgroundRepeat = "no-repeat";
-    snapshotDivRef.current.style.backgroundSize = "contain";
+    snapshotDivRef.current.style.backgroundSize = "cover";
     snapshotDivRef.current.style.backgroundPosition = "center";
     //setHideYAxis(true);
   };
@@ -316,6 +317,11 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+          left: 15, // Fixed width for the y-axis
+      },
+  },
     scales: {
       x: {
         title: {
@@ -343,10 +349,17 @@ const RainfallChart = ({ location, period, max = 72 }) => {
         beginAtZero: true,
         ticks: {
           stepSize: 0.25,
+          callback: function (value) {
+            return value.toFixed(2); // Adjust formatting if needed
+        },
+        font: {
+            size: 12, // Control font size
+        },
         },
         grid: {
           display: true,
         },
+        
       },
     },
     plugins: {

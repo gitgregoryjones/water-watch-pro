@@ -54,7 +54,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
             const x = bar.x; // X position of the bar
             const y = bar.base - bar.height + 20; // Center Y position in the bar
             if (period !== 'daily') {
-              ctx.fillText(period == "hourly" ? dateLabel.split(",")[0] : formattedDate, x, y); // Draw the formatted date inside the bar
+              ctx.fillText(period == "rapidrain" ? dateLabel.split(",")[0] : formattedDate, x, y); // Draw the formatted date inside the bar
             }
             ctx.restore();
           }
@@ -65,7 +65,8 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
 
 
-  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip,barValuePlugin);
+  ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
+  //ChartJS.register(barValuePlugin);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -113,6 +114,19 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     return beginEndRange;
   }
 
+  const formatDate = (key) => {
+    const date = new Date(key);
+  
+    // Extract specific parts of the date
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const day = date.toLocaleString("en-US", { day: "numeric" });
+    const hour = date.toLocaleString("en-US", { hour: "2-digit", hour12: false });
+  
+    // Construct the desired format
+    return `${month} ${day}, ${hour}h`;
+  };
+  
+
   const fetchChartData = async () => {
     if (!location.id) return;
   
@@ -147,12 +161,8 @@ const RainfallChart = ({ location, period, max = 72 }) => {
         entries.forEach(([key, value]) => {
           keys.push(key);
           labels.push(
-           period != "rapidrain" ? new Date(key).toLocaleString("en-US", {
-              hour: "2-digit",
-              hour12: false,
-              month:'short',
-              day:'numeric'
-            }) + "h" : new Date(key).toLocaleString("en-US", {
+           period != "rapidrain" ? formatDate(key)
+           : new Date(key).toLocaleString("en-US", {
               month:'numeric',
              day:'numeric',
              hour: "2-digit", 
@@ -244,6 +254,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       setTimeout(takeSnapshot, 500); // Delay to ensure chart is rendered
     }
   }, [chartData,period]);
+  
 
   const dayChangeBackgroundPlugin = {
     id: "dayChangeBackgroundPlugin",
@@ -251,35 +262,43 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       const { ctx, chartArea, scales } = chart;
       const { left, right, top, bottom } = chartArea;
       const xScale = scales.x;
-      //takeSnapshot();
   
-      if (!chart.config.options.plugins.originalKeys || chart.config.options.plugins.originalKeys.length === 0) return;
+      // Ensure originalKeys is available and valid
+      const originalKeys = chart.config.options.plugins.originalKeys;
+      if (!originalKeys || originalKeys.length === 0) return;
   
       ctx.save();
   
       let currentDay = null;
       let currentColorIndex = 0;
-      const colors = ["#ffcccb", "#ffe4b5"]; // Pink and Orange
+      const colors = ["#C5D7EF", "#D6E3F7","#F1F6FA"].reverse(); // Pink and Orange
+      let color = null;
   
-      chart.config.options.plugins.originalKeys.forEach((key, index) => {
+      originalKeys.forEach((key, index) => {
         const day = key.split(" ")[0]; // Extract the date part (YYYY-MM-DD)
         const isNewDay = currentDay !== day;
   
         if (isNewDay) {
           currentDay = day;
-          currentColorIndex = (currentColorIndex + 1) % colors.length; // Alternate colors
+          color = colors[currentColorIndex++] // Alternate colors
         }
   
-        const barStartX = xScale.getPixelForValue(index) - xScale.getPixelForValue(1) / 2;
+        const barStartX =
+          index === 0
+            ? left // Start at the leftmost edge for the first index
+            : xScale.getPixelForValue(index - 1) + (xScale.getPixelForValue(1) - xScale.getPixelForValue(0)) / 2;
+  
         const barEndX =
-          index < chart.config.options.plugins.originalKeys.length - 1
-            ? xScale.getPixelForValue(index + 1) - xScale.getPixelForValue(1) / 2
-            : right;
+          index < originalKeys.length - 1
+            ? xScale.getPixelForValue(index) + (xScale.getPixelForValue(1) - xScale.getPixelForValue(0)) / 2
+            : right; // For the last bar, fill to the right edge
   
         // Ensure valid bar positions
         if (!isNaN(barStartX) && !isNaN(barEndX)) {
-          ctx.fillStyle = colors[currentColorIndex];
+         ctx.fillStyle = color;
+         
           ctx.fillRect(barStartX, top, barEndX - barStartX, bottom - top);
+          
         }
       });
   
@@ -288,8 +307,9 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   };
   
   
+  
   // Register the plugin
-  //ChartJS.register(dayChangeBackgroundPlugin);
+  ChartJS.register(dayChangeBackgroundPlugin);
 
   
 
@@ -309,6 +329,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
             if (period !== 'daily') {
               return `${label.split(',')[1]}`;
+              //return label;
             }
   
             return label;
@@ -356,7 +377,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
 
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex flex-row w-full ">
       <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (

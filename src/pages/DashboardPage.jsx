@@ -610,7 +610,7 @@ function showThreshold(color){
             <RainfallChart location={location} period={"daily"} max={3} />
             </div>
             <div className='tab'>1 Hour 
-            <RainfallChart location={location} period={"hourly"} max={3} />
+            <RainfallChart location={location} period={"hourly"} max={2} />
             </div>
             <div className='tab'>RAPIDRAIN
             <RainfallChart location={location} period={"rapidrain"} max={12} />

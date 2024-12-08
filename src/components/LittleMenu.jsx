@@ -7,7 +7,7 @@ import React, { useReducer, useState } from 'react'
 
 export default function LittleMenu({menuActions}) {
     console.log(`Messages`)
-    console.log(menuActions[0].onClick)
+    console.log(menuActions[0] && menuActions[0].onClick)
     const [, forceUpdate] = useReducer(x => x + 1, 0);
     
     var [isOpen, setIsOpen] = useState(false);

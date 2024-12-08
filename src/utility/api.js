@@ -50,9 +50,10 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Handle refresh token failure (e.g., redirect to login)
         console.error("Token refresh failed:", refreshError);
+
         //localStorage.removeItem("accessToken"); // Remove the invalid token
-        
-        //window.location.href = "/login"; // Redirect to login page
+        //alert("You will be logged out due to inactivity");
+        window.location.href = "/"; // Redirect to login page
         return Promise.reject(refreshError);
       }
     }

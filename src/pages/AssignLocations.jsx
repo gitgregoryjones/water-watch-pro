@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import api from '../utility/api';
+import Card from '../components/Card';
 
 const AssignLocations = () => {
   const user = useSelector((state) => state.userInfo.user);
-  const locations = user.locations; // User's locations
+  const locations = user.locations;
   const [contacts, setContacts] = useState([]);
   const [unassignedLocations, setUnassignedLocations] = useState([]);
   const [assignedLocations, setAssignedLocations] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedUnassignedLocations, setSelectedUnassignedLocations] = useState([]);
   const [selectedAssignedLocations, setSelectedAssignedLocations] = useState([]);
+  const [working,setWorking] = useState(false)
 
   useEffect(() => {
     // Fetch all contacts for the user
@@ -29,9 +31,10 @@ const AssignLocations = () => {
   }, []);
 
   const fetchAssignedLocations = () => {
+    setWorking(true)
     if (selectedContact) {
       api
-        .get(`/api/contacts/${selectedContact}/locations?page=1&page_size=50`)
+        .get(`/api/contacts/${selectedContact}/locations?page=1&page_size=250`)
         .then((response) => {
           const assigned = response.data.map((location) => ({
             id: location.id,
@@ -46,7 +49,7 @@ const AssignLocations = () => {
         })
         .catch((error) => {
           console.error('Error fetching assigned locations:', error.message);
-        });
+        }).finally(()=>setWorking(false));
     }
   };
 
@@ -57,20 +60,20 @@ const AssignLocations = () => {
       alert('Please select a contact first.');
       return;
     }
+  
 
     selectedUnassignedLocations.forEach((location) => {
       api
         .post(`/api/contacts/${selectedContact}/locations/${location.id}`)
         .then(() => {
-          console.log(`Successfully assigned ${location.name} to contact ${selectedContact}`);
-          fetchAssignedLocations(); // Refresh assigned locations
+          fetchAssignedLocations();
         })
         .catch((error) => {
           console.error(`Error assigning location ${location.name}:`, error.message);
-        });
+        })
     });
 
-    setSelectedUnassignedLocations([]); // Clear selection
+    setSelectedUnassignedLocations([]);
   };
 
   const handleUnassign = () => {
@@ -79,125 +82,135 @@ const AssignLocations = () => {
       return;
     }
 
+
+
     selectedAssignedLocations.forEach((location) => {
+ 
       api
         .delete(`/api/contacts/${selectedContact}/locations/${location.id}?client_id=${user.clients[0].id}`)
         .then(() => {
-          console.log(`Successfully unassigned ${location.name} from contact ${selectedContact}`);
-          fetchAssignedLocations(); // Refresh both unassigned and assigned locations
+          fetchAssignedLocations();
         })
         .catch((error) => {
           console.error(`Error unassigning location ${location.name}:`, error.message);
-        });
+        })
     });
 
-    setSelectedAssignedLocations([]); // Clear selection
+    setSelectedAssignedLocations([]);
   };
 
   return (
-    <div className="mt-16 p-6 w-full flex flex-col items-center font-sans ">
-      {/* Top Navigation Links */}
-      <div className="flex justify-center space-x-6 mb-8">
-        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
-          Assign Locations
-        </span>
-        <Link
-          to="/assignments"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-        >
-          Assign Contacts
-        </Link>
-      </div>
+    <div className="mt-16 md:p-6 w-full text-sm flex flex-col items-center">
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Assignments > Assign Locations</h1>
 
-      {/* Page Content */}
-      <h1 className="text-2xl font-bold text-gray-800 mb-8">Assign Locations</h1>
-      <div className="grid grid-cols-3 gap-8 w-full max-w-5xl">
-        {/* Contacts Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="contacts" className="block text-gray-700 font-bold mb-2">
-            1. Choose a Contact:
-          </label>
-          <select
-            id="contacts"
-            className="border border-gray-300 rounded p-2 w-full h-40"
-            size="10"
-            onChange={(e) => setSelectedContact(e.target.value)}
-          >
-            <option value="">-- Select Contact --</option>
-            {contacts.map((contact) => (
-              <option key={contact.id} value={contact.id}>
-                {contact.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <Card
+        header={
+          <div className="flex justify-start rounded space-x-6 mb-8 self-start w-full p-2">
+            <span className="text-gray-800 font-bold border-b-2 border-blue-500">Assign Locations</span>
+            <Link
+              to="/assignments"
+              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+            >
+              Assign Contacts
+            </Link>
+          </div>
+        }
+        className="w-full border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]"
+      >
+        <div className="gap-4 flex flex-col md:flex-row w-full">
+          {/* Contacts Select */}
+          <div className="bg-[white] p-4 rounded shadow md:w-1/2 md:h-[30rem]">
+            <div className="p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center">
+              <span className="text-sm text-[white] px-3 py-1 rounded-2xl font-bold bg-[black]">1</span> Choose a Contact
+            </div>
+            <select
+              id="contacts"
+              className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
+              size="10"
+              onChange={(e) => setSelectedContact(e.target.value)}
+            >
+              <option value="">-- Select Contact --</option>
+              {contacts.map((contact) => (
+                <option key={contact.id} value={contact.id}>
+                  {contact.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Unassigned Locations Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="unassignedLocations" className="block text-gray-700 font-bold mb-2">
-            2. Choose one or more Locations:
-          </label>
-          <select
-            id="unassignedLocations"
-            className="border border-gray-300 rounded p-2 w-full h-40"
-            size="10"
-            multiple
-            value={selectedUnassignedLocations.map((location) => location.id)}
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options
-                .filter((option) => option.selected)
-                .map((option) => unassignedLocations.find((location) => location.id === Number(option.value)));
-              setSelectedUnassignedLocations(selected);
-            }}
-          >
-            {unassignedLocations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleAssign}
-            className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
-          >
-            3. Click to Assign Locations >>
-          </button>
-        </div>
+          {/* Unassigned Locations Select */}
+          <div className="bg-[white] p-4 rounded shadow min-w-[400px]">
+            <div className="p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center">
+              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">2</span> Choose Locations
+            </div>
+            <select
+              id="unassignedLocations"
+              className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
+              size="10"
+              multiple
+              value={selectedUnassignedLocations.map((location) => location.id)}
+              onChange={(e) => {
+                setWorking(true)
+                const options = Array.from(e.target.options);
+                const selected = options
+                  .filter((option) => option.selected)
+                  .map((option) => unassignedLocations.find((location) => location.id === Number(option.value)));
+                setSelectedUnassignedLocations(selected);
+                setWorking(false)
+              }}
+            >
+              {unassignedLocations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+            
+            <button
+              onClick={handleAssign}
+              className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
+            >
+            <span className="text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black] mr-2 ">3</span>{!working ? <span>  Assign Locations >></span>
+             : <span className="animate-pulse text-[white]">Working...</span>}
+            </button>
+          </div>
 
-        {/* Assigned Locations Select */}
-        <div className='bg-[white] p-4 rounded shadow'>
-          <label htmlFor="assignedLocations" className="block text-gray-700 font-bold mb-2">
-            View Assigned Locations:
-          </label>
-          <select
-            id="assignedLocations"
-            className="border border-gray-300 rounded p-2 w-full h-40"
-            size="10"
-            multiple
-            value={selectedAssignedLocations.map((location) => location.id)}
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options
-                .filter((option) => option.selected)
-                .map((option) => assignedLocations.find((location) => location.id === Number(option.value)));
-              setSelectedAssignedLocations(selected);
-            }}
-          >
-            {assignedLocations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={handleUnassign}
-            className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
-          >
-            4.Unassign Location(s)
-          </button>
+          {/* Assigned Locations Select */}
+          <div className="bg-[white] p-4 rounded shadow min-w-[400px]">
+            <div className="p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center">
+              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">4</span> View Assigned
+            </div>
+            <select
+              id="assignedLocations"
+              className="border border-gray-300 rounded p-2 w-full md:h-[75%]"
+              size="10"
+              multiple
+              value={selectedAssignedLocations.map((location) => location.id)}
+              onChange={(e) => {
+                const options = Array.from(e.target.options);
+                setWorking(true)
+                const selected = options
+                  .filter((option) => option.selected)
+                  .map((option) => assignedLocations.find((location) => location.id === Number(option.value)));
+                setSelectedAssignedLocations(selected);
+                setWorking(false)
+              }}
+            >
+              {assignedLocations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleUnassign}
+              className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
+            >
+             &lt;&lt; Unassign Locations
+            </button>
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -73,8 +73,8 @@ function App() {
     Forecasts
   </Link>
     <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
-    <Link to="/settings" onClick={showSettings} className="menu-item bm-item">Settings</Link>
-    <Link to="/assigments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
+    <Link to="/location-list" onClick={showSettings} className="menu-item bm-item">Settings</Link>
+    <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}
        
       {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>*/}

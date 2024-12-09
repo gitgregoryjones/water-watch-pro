@@ -6,6 +6,7 @@ import api from '../utility/api';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
 import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog';
+import { useSelector } from 'react-redux';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -13,20 +14,22 @@ const ContactListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const user = useSelector((state) => state.userInfo.user);
 
   const fetchContacts = async (page) => {
     try {
-      const response = await api.get(`/api/contacts/?page=${page}&page_size=250`);
+      console.log(user)
+      const response = await api.get(`/api/contacts/?client_id=${user.clients[0].id}&page=${page}&page_size=250`);
       setContacts(response.data);
       //setTotalPages(response.data.total_pages);
     } catch (error) {
-      console.error('Error fetching contacts:', error.message);
+      console.error('Error fetching contacts:', user);
     }
   };
 
   const filterContacts = (e)=> setSearchTerm(e.target.value);
 
-  const  filtered = contacts.filter(l => l.name.toLowerCase().startsWith(searchTerm.toLocaleLowerCase())  );
+  const  filtered = contacts.filter(l => (l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()) || l.email?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))  );
 
   const handleDelete = async (contactId) => {
  

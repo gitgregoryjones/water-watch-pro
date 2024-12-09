@@ -32,6 +32,9 @@ import GeneralSettingsPage from "./pages/GeneralSettings";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToHash from "./components/ScrollToHash";
 import UserAccountProvisioning from "./pages/UserAccountProvisioning";
+import ClientListPage from "./pages/ClientListPage";
+import ClientForm from "./components/ClientForm";
+import ClientPage from "./pages/ClientPage";
 
 
 
@@ -104,9 +107,10 @@ function App() {
         <Route path="/contact-list" element={<ContactListPage />} />
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
        
-        <Route path="/settings-admin" element={<UserAccountProvisioning />} />
+        <Route path="/settings-admin" element={<ClientListPage />} />
        
 <Route path="/contact-form" element={<ContactPage />} />
+<Route path="/client-form" element={<ClientPage />} />
 
       </Routes>
       

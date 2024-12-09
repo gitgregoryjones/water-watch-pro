@@ -4,6 +4,7 @@ import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
 import Toggle from './Toggle'; // Import the Toggle component
 import { useSelector } from 'react-redux';
+import WorkingDialog from './WorkingDialog';
 
 const ContactForm = ({ contactToEdit }) => {
   const [name, setName] = useState(contactToEdit?.name || '');
@@ -11,24 +12,12 @@ const ContactForm = ({ contactToEdit }) => {
   const [phone, setPhone] = useState(contactToEdit?.phone || '');
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(false);
   const user = useSelector((state) => state.userInfo.user);
+  const [showDialog, setShowDialog] = useState(false);
+
   const [alertSettings, setAlertSettings] = useState({
     'Daily Report': { email: true, sms: true },
     Forecast: { email: true, sms: true },
     'NOAA Atlas 14': { email: true, sms: true },
-  });
-  const [additionalSettings, setAdditionalSettings] = useState({
-    turnAccountOn: false,
-    suspendAccount: false,
-    convertToDemo: false,
-    convertToPaid: false,
-    sendMarketingTexts: false,
-    enableGroupReportService: false,
-    enable15MinReports: false,
-    accountTier: {
-      bronze: false,
-      silver: false,
-      gold: false,
-    },
   });
 
   const isEditMode = contactToEdit !== null;
@@ -43,7 +32,10 @@ const ContactForm = ({ contactToEdit }) => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
         await api.delete(`/api/contacts/${contactToEdit.id}`);
-        navigate('/contact-list');
+        setTimeout(() => {
+          setShowDialog(false);
+          navigate('/contact-list');
+        }, 2000);
       } catch (error) {
         console.error('Error deleting contact:', error.message);
         alert('An error occurred while deleting the contact.');
@@ -54,13 +46,14 @@ const ContactForm = ({ contactToEdit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    setShowDialog(true);
+
     const payload = {
       name,
       email,
       phone,
       status: 'active',
       alert_settings: alertSettings,
-      additional_settings: additionalSettings,
     };
 
     try {
@@ -69,7 +62,11 @@ const ContactForm = ({ contactToEdit }) => {
       } else {
         await api.post(`/api/contacts/`, payload);
       }
-      navigate('/contact-list');
+
+      setTimeout(() => {
+        setShowDialog(false);
+        navigate('/contact-list');
+      }, 2000);
     } catch (error) {
       console.error('Error saving contact:', error.message);
     }
@@ -81,23 +78,6 @@ const ContactForm = ({ contactToEdit }) => {
       [alertType]: {
         ...prev[alertType],
         [setting]: !prev[alertType][setting],
-      },
-    }));
-  };
-
-  const toggleAdditionalSetting = (key) => {
-    setAdditionalSettings((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
-  };
-
-  const toggleAccountTier = (key) => {
-    setAdditionalSettings((prev) => ({
-      ...prev,
-      accountTier: {
-        ...prev.accountTier,
-        [key]: !prev.accountTier[key],
       },
     }));
   };
@@ -162,103 +142,6 @@ const ContactForm = ({ contactToEdit }) => {
           />
         </div>
 
-        {/* Additional Settings */}
-        {user.tier >= 4 && 
-        (
-        <div className="border p-4 rounded">
-          <h2 className="text-xl font-bold mb-4">Account Actions</h2>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.turnAccountOn}
-              onChange={() => toggleAdditionalSetting('turnAccountOn')}
-            />
-            <span className="ml-2">Turn Account On</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.suspendAccount}
-              onChange={() => toggleAdditionalSetting('suspendAccount')}
-            />
-            <span className="ml-2">Suspend Account</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.convertToDemo}
-              onChange={() => toggleAdditionalSetting('convertToDemo')}
-            />
-            <span className="ml-2">Convert To Demo Account</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.convertToPaid}
-              onChange={() => toggleAdditionalSetting('convertToPaid')}
-            />
-            <span className="ml-2">Convert To Paid Account</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.sendMarketingTexts}
-              onChange={() => toggleAdditionalSetting('sendMarketingTexts')}
-            />
-            <span className="ml-2">Send Marketing Texts</span>
-          </div>
-          <div className="flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.enableGroupReportService}
-              onChange={() => toggleAdditionalSetting('enableGroupReportService')}
-            />
-            <span className="ml-2">Enable Group Report Service</span>
-          </div>
-          <div className="flex items-center">
-            <Toggle
-              checked={additionalSettings.enable15MinReports}
-              onChange={() => toggleAdditionalSetting('enable15MinReports')}
-            />
-            <span className="ml-2">Enable 15 Minute Data Reports</span>
-          </div>
-        </div>)}
-
-        {/* Upgrade/Downgrade Account Tier */}
-       { user.tier >= 4 && ( <div className="border p-4 rounded">
-          <h2 className="text-xl font-bold mb-4">Upgrade/Downgrade Account Tier</h2>
-          <div className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              id="bronze"
-              checked={additionalSettings.accountTier.bronze}
-              onChange={() => toggleAccountTier('bronze')}
-              className="mr-2"
-            />
-            <label htmlFor="bronze" className="ml-2">
-              Bronze
-            </label>
-          </div>
-          <div className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              id="silver"
-              checked={additionalSettings.accountTier.silver}
-              onChange={() => toggleAccountTier('silver')}
-              className="mr-2"
-            />
-            <label htmlFor="silver" className="ml-2">
-              Silver
-            </label>
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="gold"
-              checked={additionalSettings.accountTier.gold}
-              onChange={() => toggleAccountTier('gold')}
-              className="mr-2"
-            />
-            <label htmlFor="gold" className="ml-2">
-              Gold
-            </label>
-          </div>
-        </div>)}
-
         {/* Alert Settings */}
         <div className="mt-6">
           <button
@@ -313,6 +196,7 @@ const ContactForm = ({ contactToEdit }) => {
           )}
         </div>
       </form>
+      <WorkingDialog showDialog={showDialog} />
     </div>
   );
 };

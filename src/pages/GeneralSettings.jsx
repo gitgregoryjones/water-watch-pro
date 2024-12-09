@@ -84,12 +84,12 @@ const GeneralSettingsPage = () => {
             <span className="text-gray-800 font-bold border-b-2 border-blue-500">
               Notifications
             </span>
-            <Upgrade showMsg={false} tier={8}>
+            <Upgrade showMsg={false} tier={4}>
             <Link
               to="/settings-admin"
               className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
             >
-              Accounts Management
+              Client Management
             </Link>
             </Upgrade>
           </div>

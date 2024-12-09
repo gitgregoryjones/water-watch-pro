@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import api from '../utility/api';
 import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import WorkingDialog from './WorkingDialog';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -12,6 +13,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [h24Threshold, setH24Threshold] = useState('');
   const [rapidRainThreshold, setRapidRainThreshold] = useState('');
   const [responseData, setResponseData] = useState(null); // Store response data
+  const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
 
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   }, [locationToEdit, isEditMode]);
 
   const handleSubmit = async (e) => {
+    setIsWorking(true)
     e.preventDefault();
 
     if (!name || !latitude || !longitude || !h24Threshold || !rapidRainThreshold) {
@@ -60,10 +63,13 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       }
       setResponseData(response.data); // Store response data for display
       console.log('Response Data:', response.data); // Log the response data
-      onSubmitSuccess && onSubmitSuccess(); // Callback to refresh the parent list or close the form
+      
+      setTimeout(()=>{
+        setIsWorking(false); onSubmitSuccess && onSubmitSuccess();},2000)
     } catch (error) {
       console.error('Error submitting location:', error.message);
-      alert('An error occurred while saving the location.');
+      alert(`An error occurred while saving the location. ${error.message}`);
+      setIsWorking(false)
     }
   };
 
@@ -165,6 +171,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             className="border border-gray-300 rounded p-2 w-full"
             required
           >
+                 <option value="">-- Select Threshhold --</option>
            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
             })
@@ -186,6 +193,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             className="border border-gray-300 rounded p-2 w-full"
             required
             >
+              <option value="">-- Select Threshhold --</option>
           
             {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
@@ -216,11 +224,12 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
       {/* Display Response Data */}
       {responseData && (
-        <div className="mt-6 p-4 bg-gray-100 rounded shadow">
+        <div className="hidden mt-6 p-4 bg-gray-100 rounded shadow">
           <h3 className="font-bold text-lg text-gray-700">Response Data:</h3>
           <pre className="text-sm text-gray-600">{JSON.stringify(responseData, null, 2)}</pre>
         </div>
       )}
+      <WorkingDialog showDialog={isWorking}/>
     </div>
   );
 };

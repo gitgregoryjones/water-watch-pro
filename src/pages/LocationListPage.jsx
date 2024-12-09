@@ -39,7 +39,7 @@ const LocationListPage = () => {
     if (window.confirm('Are you sure you want to delete this location?')) {
       try {
         await api.delete(`/api/locations/${locationId}?client_id=${user.clients[0].id}`);
-        alert('Location deleted successfully!');
+        
         fetchLocations(currentPage); // Refresh the list
       } catch (error) {
         console.error('Error deleting location:', error.message);

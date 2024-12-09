@@ -18,6 +18,7 @@ const Reports = () => {
   const [selectAll, setSelectAll] = useState(false); 
 
   const user = useSelector((state) => state.userInfo.user);
+  const [isSelectAll,setIsSelectAll] = useState(false);
   const locations = user.locations;
   const currentDate = new Date();
   const currentYearMonth = currentDate.toISOString().slice(0, 7); // Get current month in YYYY-MM
@@ -245,6 +246,13 @@ const Reports = () => {
       }
     }
   };
+
+  
+  
+  
+
+  
+
   
   
   
@@ -325,7 +333,7 @@ const Reports = () => {
         {/* Row 3 */}
         
         {(reportType == "daily" || reportType == "monthly" || reportType == "custom") && <div className="w-full border">
-          <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox"/><span> Select All</span></div></label>
+          <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
             id="locList"
             multiple

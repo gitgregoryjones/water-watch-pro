@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Toggle from '../components/Toggle';
 import { useSelector } from 'react-redux';
+import Upgrade from '../components/Upgrade';
 
 
 const GeneralSettingsPage = () => {
@@ -83,6 +84,14 @@ const GeneralSettingsPage = () => {
             <span className="text-gray-800 font-bold border-b-2 border-blue-500">
               Notifications
             </span>
+            <Upgrade showMsg={false} tier={8}>
+            <Link
+              to="/settings-admin"
+              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+            >
+              Accounts Management
+            </Link>
+            </Upgrade>
           </div>
         }
         className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}

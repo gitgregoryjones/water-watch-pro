@@ -268,7 +268,12 @@ const Reports = () => {
             onChange={handleReportTypeChange}
             className="border border-gray-300 rounded p-2 w-full text-sm"
           >
-            
+            <Upgrade tier={4}>
+            <option value="sms">Files Processed</option>
+              <option value="sms">SMS Sent/Received</option>
+              <option value="emails">Emails Sent/Received</option>
+              <option value="unpaid">Unpaid By Tier</option>
+            </Upgrade>
               <option value="daily">Custom</option>
               <option value="weekly">Weekly</option>
             
@@ -319,7 +324,7 @@ const Reports = () => {
 
         {/* Row 3 */}
         
-        <div className="w-full border">
+        {(reportType == "daily" || reportType == "monthly" || reportType == "custom") && <div className="w-full border">
           <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox"/><span> Select All</span></div></label>
           <select
             id="locList"
@@ -340,7 +345,7 @@ const Reports = () => {
               </option>
             ))}
           </select>
-        </div>
+        </div>}
 
         {/* Row 2 */}
         {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="">

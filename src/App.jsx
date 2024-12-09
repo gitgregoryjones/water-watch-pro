@@ -31,6 +31,7 @@ import ContactPage from "./pages/ContactPage";
 import GeneralSettingsPage from "./pages/GeneralSettings";
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToHash from "./components/ScrollToHash";
+import UserAccountProvisioning from "./pages/UserAccountProvisioning";
 
 
 
@@ -102,6 +103,9 @@ function App() {
         <Route path="/location-list" element={<LocationListPage/>} />
         <Route path="/contact-list" element={<ContactListPage />} />
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
+       
+        <Route path="/settings-admin" element={<UserAccountProvisioning />} />
+       
 <Route path="/contact-form" element={<ContactPage />} />
 
       </Routes>

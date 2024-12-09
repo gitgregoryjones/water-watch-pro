@@ -150,13 +150,13 @@ const AssignLocations = () => {
               multiple
               value={selectedUnassignedLocations.map((location) => location.id)}
               onChange={(e) => {
-                setWorking(true)
+                
                 const options = Array.from(e.target.options);
                 const selected = options
                   .filter((option) => option.selected)
                   .map((option) => unassignedLocations.find((location) => location.id === Number(option.value)));
                 setSelectedUnassignedLocations(selected);
-                setWorking(false)
+                
               }}
             >
               {unassignedLocations.map((location) => (
@@ -170,8 +170,8 @@ const AssignLocations = () => {
               onClick={handleAssign}
               className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
             >
-            <span className="text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black] mr-2 ">3</span>{!working ? <span>  Assign Locations >></span>
-             : <span className="animate-pulse text-[white]">Working...</span>}
+            <span className="text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black] mr-2 ">3</span><span>  Assign Locations >></span>
+            
             </button>
           </div>
 
@@ -188,12 +188,12 @@ const AssignLocations = () => {
               value={selectedAssignedLocations.map((location) => location.id)}
               onChange={(e) => {
                 const options = Array.from(e.target.options);
-                setWorking(true)
+               
                 const selected = options
                   .filter((option) => option.selected)
                   .map((option) => assignedLocations.find((location) => location.id === Number(option.value)));
                 setSelectedAssignedLocations(selected);
-                setWorking(false)
+                
               }}
             >
               {assignedLocations.map((location) => (
@@ -206,7 +206,7 @@ const AssignLocations = () => {
               onClick={handleUnassign}
               className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
             >
-             &lt;&lt; Unassign Locations
+            Unassign Locations  &lt;&lt; 
             </button>
           </div>
         </div>

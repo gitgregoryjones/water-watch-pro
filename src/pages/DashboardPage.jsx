@@ -41,6 +41,8 @@ import ProfilePic from '../components/ProfilePic'
 import CheckboxGroup from '../components/CheckboxGroup'
 import { color } from 'chart.js/helpers'
 import PrettyHeader from '../components/PrettyHeader'
+import Stats from '../components/Stats'
+import AdminCards from '../components/AdminCards'
 
 
 export default function DashboardPage() {
@@ -434,7 +436,11 @@ function showThreshold(color){
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
-      <ProfilePic/> 
+      <ProfilePic/>
+
+      {user.tier >= 4 && (<AdminCards/>)}
+      
+      
           
         {user.processedThrough}
       <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 

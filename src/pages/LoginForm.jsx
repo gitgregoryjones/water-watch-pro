@@ -75,7 +75,7 @@ export default function LoginForm() {
                 case "bronze":
                     userData.tier = 1;
                     break;
-                case "admin":
+              
                 case "gold":
                     userData.tier = 3;
                     break;
@@ -85,6 +85,10 @@ export default function LoginForm() {
                 default:
                     userData.tier = 0;
                     break;
+            }
+
+            if(userData.is_superuser == true){
+                userData.tier = 4;
             }
 
             // Step 3: Get the locations for this client

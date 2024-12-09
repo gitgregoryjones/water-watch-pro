@@ -18,6 +18,7 @@ const AssignmentsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [working,setWorking] = useState(false)
   const pageSize = 250;
 
   useEffect(() => {
@@ -55,6 +56,7 @@ const AssignmentsPage = () => {
 
   const fetchAssignedContacts = () => {
     if (selectedLocation) {
+      setWorking(true)
       api
         .get(`/api/locations/${selectedLocation}/contacts?page=1&page_size=50`)
         .then((response) => {
@@ -71,7 +73,7 @@ const AssignmentsPage = () => {
         })
         .catch((error) => {
           console.error('Error fetching assigned contacts:', error.message);
-        });
+        }).finally(()=> setWorking(false));
     }
   };
 

@@ -46,12 +46,16 @@ export default function Header() {
       <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Data
   </Link>
+  {user.tier != 4 && (
+    <div className='flex gap-4'>
   <Link to="/dashboard#graphs" className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs
   </Link>
   <Link to="/dashboard#forecast" className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Forecasts
   </Link>
+  </div>
+)}
   <Upgrade showMsg={false} tier={0}>
     <Link to="/reports" className={location.pathname === "/reports" ? "text-slate-800" : "text-[--main-2]"}>
       Reports
@@ -60,13 +64,19 @@ export default function Header() {
   <Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>
-  <Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+  <div>
+
+    {user.tier == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>
+  </Link>): (<Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+    Settings
+  </Link>)}
+  </div>
+  
   <Link to="/" className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
     Logout
   </Link>
-    <div className=' flex fa-stack relative flex justify-center items-center'>
+    <div className=' hidden flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
       
         <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>

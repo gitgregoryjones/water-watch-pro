@@ -70,7 +70,7 @@ const LocationListPage = () => {
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center  ">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt;  Locations</h1>  
       <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
-        <Link
+        {user.tier !=4 &&(<div className='flex gap-4'><Link
           to="/contact-list"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
@@ -84,7 +84,7 @@ const LocationListPage = () => {
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
           Notifications
-        </Link>
+        </Link></div>)}
       </div>
       }>
     <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white  rounded-lg">

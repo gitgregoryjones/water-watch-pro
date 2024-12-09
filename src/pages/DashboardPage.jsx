@@ -443,7 +443,9 @@ function showThreshold(color){
       
           
         {user.processedThrough}
-      <Card  footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
+      
+      <Card  className={`${user.tier == 4 && 'hidden'}`}
+      footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
       header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full justify-around items-center'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}<Processing showPlain={true}/></div> <Processing /></div>}  >
       <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
       <div className='tab'><span>Daily Total</span>
@@ -524,7 +526,7 @@ function showThreshold(color){
           </Card>
           </div>
           <div className='tab'>24 Hr Accum
-      <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
+      <Card className={`${user.tier == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
     
         
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
@@ -609,8 +611,8 @@ function showThreshold(color){
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
       <div id="graphs" className='h-[10px]'></div>
-      <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i>Rainfall {location.name}</div>} >
-           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
+      <Card className={`${user.tier == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i>Rainfall {location.name}</div>} >
+           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${user.tier == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               
             <RainfallChart location={location} period={"daily"} max={3} />
@@ -631,8 +633,9 @@ function showThreshold(color){
       
   
       <span id="forecast" className=''></span>
-      <Card header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
-           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={"pb-8 md:border-0 md:shadow-[unset]"}>
+      <Card className={`${user.tier == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
+           <PillTabs mini={window.outerWidth < 600} 
+           header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${user.tier == 4 && 'hidden'}`}>
             <div className='tab'>National
               
               <Forecast className={"items-end"}/>

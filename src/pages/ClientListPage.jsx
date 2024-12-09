@@ -12,7 +12,7 @@ const ClientListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
-  
+
   const user = useSelector((state) => state.userInfo.user);
 
   const fetchClients = async (page) => {
@@ -68,12 +68,12 @@ const ClientListPage = () => {
             >
               Modify Contacts
             </Link>
-            <Link
+            {user.tier < 4 && <Link
               to="/location-list"
               className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
             >
               Modify Locations
-            </Link>
+            </Link>}
           </div>
         }
       >

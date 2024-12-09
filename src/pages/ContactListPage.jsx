@@ -58,18 +58,26 @@ const ContactListPage = () => {
         <span className="text-gray-800 font-bold border-b-2 border-blue-500">
           Modify Contacts
         </span>
+        <div>
+          {user.tier !=4 && (
+         
         <Link
           to="/location-list"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
           Modify Locations
         </Link>
-        <Link
-          to="/settings-general"
+            )}
+        {user.tier == 4 && <Link
+          to="/settings-admin"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
-          Notifications
-        </Link>
+          Client Management
+        </Link>}
+        </div>
+    
+     
+        
       </div>
       }>
     <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">

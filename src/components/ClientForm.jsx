@@ -56,12 +56,12 @@ const ClientForm = ({ clientToEdit }) => {
     setShowDialog(true);
 
     const payload = {
-      name: accountName,
+      account_name: accountName,
       invoice_email:email,
       phone,
       status,
       tier,
-      additional_settings: additionalSettings,
+      
       account_type
       
     };
@@ -105,34 +105,7 @@ const ClientForm = ({ clientToEdit }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         
         {/* Account Name */}
-        <div>
-          <label htmlFor="account_type" className="block text-gray-700 font-bold">
-            Last Payment Status
-          </label>
-          <input
-            id="paymentStatus"
-            type="text"
-            value={paymentStatus}
-            disabled
-            onChange={(e) => setLastPaymentStatus(e.target.value)}
-            className="border border-gray-300 rounded p-2 w-full"
-            required
-          />
-        </div>
-        <div>
-        <label htmlFor="invoiceDate" className="block text-gray-700 font-bold">
-            Invoice Day
-          </label>
-          <input
-            id="invoiceDate"
-            type="text"
-            value={invoiceDate}
-            disabled
-            onChange={(e) => setInvoiceDate(e.target.value)}
-            className="border border-gray-300 rounded p-2 w-full"
-            required
-          />
-        </div>
+       
         <div>
           <label htmlFor="accountName" className="block text-gray-700 font-bold">
             Account Name
@@ -214,6 +187,34 @@ const ClientForm = ({ clientToEdit }) => {
            
             </div>
           </div>
+          <div>
+          <label htmlFor="account_type" className="block text-gray-700 font-bold">
+            Last Payment Status
+          </label>
+          <input
+            id="paymentStatus"
+            type="text"
+            value={paymentStatus}
+            disabled
+            onChange={(e) => setLastPaymentStatus(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+            required
+          />
+        </div>
+        <div>
+        <label htmlFor="invoiceDate" className="block text-gray-700 font-bold">
+            Invoice Day
+          </label>
+          <input
+            id="invoiceDate"
+            type="text"
+            value={invoiceDate}
+            disabled
+            onChange={(e) => setInvoiceDate(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+            required
+          />
+        </div>
           <div className="hidden flex items-center mb-2">
             <Toggle
               checked={additionalSettings.sendMarketingTexts}

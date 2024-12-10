@@ -154,17 +154,17 @@ export default function AdminCards() {
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.bronze.unpaid)}{summary.bronze.unpaid} unpaid</div>
           </div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
+        {/*<Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{0}</div>
         
           </div>
-        </Stats>
+        </Stats>*/}
         <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Accounts</div>}>
           <div className='flex items-center justify-center text-3xl'>{summary.totalAccounts}</div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Unpaid</div>}>
-          <div className='flex items-center justify-center  text-3xl'>{summary.totalUnpaid}/{summary.totalPaid}</div>
+        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
+          <div className='flex items-center justify-center  text-3xl'>{summary.totalUnpaid}/{summary.totalAccounts}</div>
         </Stats>
       
       </div>

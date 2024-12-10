@@ -1,0 +1,10 @@
+#Your CSV file should contain all 4 columns for each row.  Note: Do not delete the header row
+#All fields are required and the following validations are performed
+#Invalid latitude: ${row.lat}. Must be between -90 and 90
+#Invalid longitude: ${row.lng}. Must be between -180 and -66.`
+#Invalid limit24: ${row.limit24}. 
+#Invalid threshold value of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4]
+name,lat,lng,limit24
+A Good Location,-89,-150,.5
+Bad Part of Town Bad Lat or Long,-91,70,.01
+Good Times University With Bad Lat or Long, 50, -62,.01

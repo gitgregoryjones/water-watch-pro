@@ -66,7 +66,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           `/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`,
           locationData
         );
-        alert('Location updated successfully!');
+        
       } else {
         // Create new location using POST
         response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData);

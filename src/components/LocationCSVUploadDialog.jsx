@@ -7,9 +7,9 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [successRows,setSuccessRows] = useState([])
+  const [successRows, setSuccessRows] = useState([]);
 
-  const requiredFields = ["name", "lat", "lng", "limit24", "limitrapidrain"];
+  const requiredFields = ["name", "lat", "lng", "limit24"];
   const validThresholdValues = [0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4];
 
   const validateRow = (row) => {
@@ -17,7 +17,6 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
 
     // Check for required fields
     requiredFields.forEach((field) => {
-        
       if (!row[field]) {
         errorMessages.push(`Missing required field: ${field}`);
       }
@@ -43,13 +42,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       );
     }
 
-    // Validate limitrapidrain
-    const limitrapidrain = parseFloat(row.limitrapidrain);
-    if (!validThresholdValues.includes(limitrapidrain)) {
-      errorMessages.push(
-        `Invalid limitrapidrain: ${row.limitrapidrain}. Must be one of ${validThresholdValues.join(", ")}.`
-      );
-    }
+   
 
     return errorMessages;
   };
@@ -70,6 +63,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      comments: "#",
       complete: async (results) => {
         const { data, errors: parseErrors } = results;
 
@@ -93,21 +87,17 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
           }
         });
 
-        setSuccessRows(validRows)
+        setSuccessRows(validRows);
 
         if (validationErrors.length) {
           setErrors(validationErrors);
-         
-          //return;
-          if(validRows.length > 0){
-            setProcessing(true)
+          if (validRows.length > 0) {
+            setProcessing(true);
           } else {
             setProcessing(false);
             return;
           }
         }
-
-      
 
         // POST valid rows to the backend
         const postErrors = [];
@@ -117,11 +107,10 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
               name: row.name,
               latitude: parseFloat(row.lat),
               longitude: parseFloat(row.lng),
-              active:true,
+              active: true,
               h24_threshold: parseFloat(row.limit24),
-              rapidrain_threshold: parseFloat(row.limitrapidrain),
+              rapidrain_threshold: parseFloat(row.limit24)
             });
-            
           } catch (error) {
             postErrors.push(`Failed to process row with name ${row.name}: ${error.message}`);
           }
@@ -142,14 +131,12 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
     setFile(null);
     setErrors([]);
     setSuccess(false);
-    setSuccessRows([])
+    setSuccessRows([]);
     setProcessing(false);
-    
-    
   };
 
   return (
-    <div className={`relative items-center justify-center ${className}`}>
+    <div className={`flex flex-col relative items-start justify-start gap-2 ${className}`}>
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
         onClick={() => {
@@ -159,6 +146,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       >
         Bulk Upload Locations CSV
       </button>
+      <a className="text-md" href="/example_locations.csv">click here to download the example locations file</a>
 
       <input
         type="file"
@@ -183,17 +171,17 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
                   ))}
                 </ul>
               ) : success ? (
-                <p className="text-green-500">All rows processed successfully!</p>
+                <p className="text-green-500">All locations processed successfully!</p>
               ) : (
                 <p className="text-gray-500">No errors reported.</p>
               )}
               {successRows.length > 0 ? (
                 <ul className="text-green">
-                {successRows.map((v,i)=> (
-                    <li className key={i}>{v.name} was successfully added</li>
-                ))}
+                  {successRows.map((v, i) => (
+                    <li key={i}>{v.name} was successfully added</li>
+                  ))}
                 </ul>
-              ) : <></>}
+              ) : null}
             </div>
 
             <div className="flex justify-end gap-4">

@@ -52,6 +52,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      comments: "#",
       complete: async (results) => {
         const { data, errors: parseErrors } = results;
 
@@ -116,14 +117,14 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
   };
 
   return (
-    <div className={`relative  items-center justify-center  ${className}`}>
+    <div className={`flex flex-col relative  items-start justify-start gap-2  ${className}`}>
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
         onClick={() => {document.getElementById("fileUpload").value = ""; document.getElementById("fileUpload").click()}}
       >
         Bulk Upload CSV
       </button>
-
+      <a className="text-md" href="/example_contacts.csv">click here to download the example contacts file</a>
       <input
         type="file"
         id="fileUpload"
@@ -147,7 +148,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
                   ))}
                 </ul>
               ) : success ? (
-                <p className="text-green-500">All rows processed successfully!</p>
+                <p className="text-green-500">All contacts uploaded successfully!</p>
               ) : (
                 <p className="text-gray-500">No errors reported.</p>
               )}

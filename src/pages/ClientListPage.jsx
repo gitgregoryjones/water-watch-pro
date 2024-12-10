@@ -5,6 +5,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import api from '../utility/api';
 import Card from '../components/Card';
 import { useSelector } from 'react-redux';
+import SettingsMenu from '../components/SettingsMenu';
 
 const ClientListPage = () => {
   const [clients, setClients] = useState([]);
@@ -30,7 +31,9 @@ const ClientListPage = () => {
 
   const filtered = clients.filter(
     (client) =>
-      client.account_name.toLowerCase().includes(searchTerm.toLowerCase()))
+     ( client.account_name.toLowerCase().includes(searchTerm.toLowerCase()) 
+    ||  client.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    ||  client.phone?.toLowerCase().includes(searchTerm.toLowerCase()))) 
   ;
 
   const handleDelete = async (clientId) => {
@@ -58,23 +61,8 @@ const ClientListPage = () => {
       <Card
         className={'w-full'}
         header={
-          <div className="flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
-            <span className="text-gray-800 font-bold border-b-2 border-blue-500">
-              Modify Clients
-            </span>
-            <Link
-              to="/contact-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-            >
-              Modify Contacts
-            </Link>
-            {user.tier < 4 && <Link
-              to="/location-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-            >
-              Modify Locations
-            </Link>}
-          </div>
+         
+          <SettingsMenu activeTab={"clients"}/>
         }
       >
         <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">

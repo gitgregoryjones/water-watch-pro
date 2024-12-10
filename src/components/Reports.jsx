@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { API_HOST } from '../utility/constants';
+import { API_HOST, VITE_PRICES_LINK } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
@@ -25,6 +25,8 @@ const Reports = () => {
   const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
     .toISOString()
     .slice(0, 7); // Get last month in YYYY-MM
+  
+  
 
     const handleSelectAllChange = () => {
         if (selectAll) {
@@ -49,9 +51,9 @@ const Reports = () => {
 
       setReportContent(`
         <center><div class="flex flex-col gap-4  items-center justify-center bg-[white] text-center border-[gold]  border-4 text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
-          Go for the gold
+          This feature is not available at your current service level
           <p>
-          <a href={link}>Click Here to Upgrade</a>
+          <a href=${VITE_PRICES_LINK}>Click Here to Upgrade</a>
         </div></center>
       `)
 
@@ -59,9 +61,9 @@ const Reports = () => {
 
       setReportContent(`
         <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
-          Go for the gold
+          GThis feature is not available at your current service level
           <p>
-          <a href={link}>Click Here to Upgrade</a>
+          <a href=${VITE_PRICES_LINK}>Click Here to Upgrade</a>
         </div></center>
       `)
 

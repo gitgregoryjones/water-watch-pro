@@ -7,6 +7,7 @@ import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
 import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog';
 import { useSelector } from 'react-redux';
+import SettingsMenu from '../components/SettingsMenu';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -18,8 +19,14 @@ const ContactListPage = () => {
 
   const fetchContacts = async (page) => {
     try {
-      console.log(user)
-      const response = await api.get(`/api/contacts/?client_id=${user.clients[0].id}&page=${page}&page_size=250`);
+
+      let url = `/api/contacts/?client_id=${user.clients[0].id}`
+      
+      if(user.role == "admin"){
+        url = `/api/contacts/all/?a=true`;
+      }
+
+      const response = await api.get(`${url}&page=${page}&page_size=250`);
       setContacts(response.data);
       //setTotalPages(response.data.total_pages);
     } catch (error) {
@@ -29,7 +36,9 @@ const ContactListPage = () => {
 
   const filterContacts = (e)=> setSearchTerm(e.target.value);
 
-  const  filtered = contacts.filter(l => (l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()) || l.email?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))  );
+  const  filtered = contacts.filter(l => (l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()) 
+  || l.email?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
+  || l.phone?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))  );
 
   const handleDelete = async (contactId) => {
  
@@ -51,10 +60,13 @@ const ContactListPage = () => {
     fetchContacts(currentPage);
   }, [currentPage]);
 
+  //setAccountName(clients.filter((f)=> f.id == contact.client_id)?[0].account_name);
+
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings >  Contacts</h1>
       <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
+        {/*
         <span className="text-gray-800 font-bold border-b-2 border-blue-500">
           Modify Contacts
         </span>
@@ -74,7 +86,8 @@ const ContactListPage = () => {
         >
           Client Management
         </Link>}
-        </div>
+        </div>*/}
+        <SettingsMenu activeTab={"contacts"}/>
     
      
         
@@ -98,8 +111,9 @@ const ContactListPage = () => {
       <thead>
             <tr className="bg-gray-100 sticky top-0 ">
               <th className="text-sm border border-gray-300 p-2 text-center sticky top-0  md:min-w-[300px]">Name</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Email</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full md:min-w-[300px]">Phone</th>
+              <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Account Name</th>
+              <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Email</th>
+              <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full md:min-w-[300px]">Phone</th>
               <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden  top-0">Text Alert</th>
               <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap  hidden  sticky top-0">Email Alert</th>
               <th className="hidden text-sm border border-gray-300 p-2 text-left sticky top-0 md:table-cell">Actions</th>
@@ -110,8 +124,9 @@ const ContactListPage = () => {
           {filtered.map((contact) => (
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
-              <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
-              <td className="text-sm border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
+              <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
               <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">
                 {contact.sms_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />

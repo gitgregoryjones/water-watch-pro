@@ -620,7 +620,7 @@ function showThreshold(color){
             <div className='tab'>1 Hour 
             <RainfallChart location={location} period={"hourly"} max={2} />
             </div>
-            <div className='tab'>RAPIDRAIN
+            <div className='tab'>RapidRain
            <Upgrade tier={3}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
             </div>
             <div className='tab'>NOAA Atlas 14

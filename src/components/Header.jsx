@@ -61,9 +61,9 @@ export default function Header() {
       Reports
     </Link>
   </Upgrade>
-  <Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+  {user.role != "admin" && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
-  </Link>
+  </Link>)}
   <div>
 
     {user.tier == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>

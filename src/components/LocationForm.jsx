@@ -4,6 +4,7 @@ import api from '../utility/api';
 import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
+import { VITE_PRICES_LINK } from '../utility/constants';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -11,10 +12,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [h24Threshold, setH24Threshold] = useState('');
-  const [rapidRainThreshold, setRapidRainThreshold] = useState('');
+  const [rapidRainThreshold, setRapidRainThreshold] = useState();
   const [responseData, setResponseData] = useState(null); // Store response data
   const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
+  
 
   const navigate = useNavigate();
 
@@ -24,8 +26,17 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setName(locationToEdit.name || '');
       setLatitude(locationToEdit.latitude || '');
       setLongitude(locationToEdit.longitude || '');
-      setH24Threshold(locationToEdit.h24_threshold || '');
-      setRapidRainThreshold(locationToEdit.rapidrain_threshold || '');
+      setH24Threshold(locationToEdit.h24_threshold || .5);
+      
+      if(user.tier < 2){
+        if(locationToEdit.h24Threshold){
+          setRapidRainThreshold(locationToEdit.h24Threshold)
+        }else {
+          setRapidRainThreshold(0.5)
+        }
+      } else {
+        setRapidRainThreshold(locationToEdit.rapidRainThreshold || 0.5)
+      }
     }
   }, [locationToEdit, isEditMode]);
 
@@ -111,7 +122,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
             Location Name
           </label>
-          {isEditMode && <Link to="/assignments"  className={`text-sm`}>Assign Contacts</Link>}
+          {isEditMode && user.role != "admin" && <Link to="/assignments"  className={`text-sm`}>Assign Contacts</Link>}
           </div>
           <input
             type="text"
@@ -167,7 +178,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             step="0.01"
             id="h24Threshold"
             value={h24Threshold}
-            onChange={(e) => setH24Threshold(e.target.value)}
+            onChange={(e) => {setH24Threshold(e.target.value); if(user.tier < 2){setRapidRainThreshold(e.target.value)}}}
             className="border border-gray-300 rounded p-2 w-full"
             required
           >
@@ -184,7 +195,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="rapidRainThreshold" className="block text-gray-700 font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
-          <select
+          {user.tier > 2 ? (<select
             
             
             id="rapidRainThreshold"
@@ -192,6 +203,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             onChange={(e) => setRapidRainThreshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
             required
+            
             >
               <option value="">-- Select Threshhold --</option>
           
@@ -199,7 +211,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                 return <option value={o} key={i}>{o}</option>
             })
             }
-            </select>
+            </select>) : (<div className='flex w-full flex-col'><input type="text" readonly value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
+                          <div className='flex text-sm gap-2'>Upgrade to access this feature <a href={VITE_PRICES_LINK}>Upgrade Now</a></div>
+            </div>)}
         </div>
 
         {/* Action Buttons */}

@@ -28,7 +28,7 @@ const AssignmentsPage = () => {
   const fetchLocations = async (page) => {
     try {
       const response = await api.get(
-        `/api/locations/?client_id=${user.clients[0].id}&page=${page}&page_size=${pageSize}`
+        `/api/locations/?client_id=${user.clients[0]?.id}&page=${page}&page_size=${pageSize}`
       );
       setLocations(response.data || []); // Ensure `results` is always an array
       //setTotalPages(Math.ceil(response.data.total / pageSize));
@@ -40,7 +40,7 @@ const AssignmentsPage = () => {
 
   useEffect(() => {
     // Fetch all contacts for the user
-    api.get('/api/contacts')
+    api.get(`/api/contacts/?client_id=${user.clients[0]?.id}`)
       .then((response) => {
         const contactNames = response.data.map((contact) => ({
           id: contact.id,
@@ -58,7 +58,7 @@ const AssignmentsPage = () => {
     if (selectedLocation) {
       setWorking(true)
       api
-        .get(`/api/locations/${selectedLocation}/contacts?page=1&page_size=50`)
+        .get(`/api/locations/${selectedLocation}/contacts?client_id=${user.clients[0]?.id}&page=1&page_size=50`)
         .then((response) => {
           const assigned = response.data.map((contact) => ({
             id: contact.id,
@@ -87,7 +87,7 @@ const AssignmentsPage = () => {
 
     selectedUnassignedContacts.forEach((contact) => {
       api
-        .post(`/api/contacts/${contact.id}/locations/${selectedLocation}`)
+        .post(`/api/contacts/${contact.id}/locations/${selectedLocation}/?client_id=${user.clients[0]?.id}&`)
         .then(() => {
           console.log(`Successfully assigned ${contact.name} to location ${selectedLocation}`);
           fetchAssignedContacts(); // Refresh assigned contacts

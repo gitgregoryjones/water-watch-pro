@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
@@ -10,15 +10,46 @@ const ContactForm = ({ contactToEdit }) => {
   const [name, setName] = useState(contactToEdit?.name || '');
   const [email, setEmail] = useState(contactToEdit?.email || '');
   const [phone, setPhone] = useState(contactToEdit?.phone || '');
+  const [client_id, setClient_Id] = useState(contactToEdit?.client_id)
+  const [accountName, setAccountName] = useState(contactToEdit?.account_name)
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(false);
   const user = useSelector((state) => state.userInfo.user);
   const [showDialog, setShowDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [clients, setClients] = useState([])
+
+  const fetchClients = async (page) => {
+
+    if(user.role != "admin")
+      return;
+
+    try {
+      const response = await api.get(`/api/clients/?client_id=${user.clients[0].id}&page=${page}&page_size=250`);
+      setClients(response.data);
+      /*let me = response.data.find((c)=> c.id == user.clients[0]?.id)
+     
+      if(me){
+        setAccountName(me.account_name);
+      }*/
+      // Update total pages if API provides pagination metadata
+      // setTotalPages(response.data.total_pages);
+    } catch (error) {
+      console.error('Error fetching clients:', error.message);
+    }
+  };
+
+  useEffect(() => {
+   fetchClients(currentPage)
+   
+  }, [currentPage])
+  
 
   const [alertSettings, setAlertSettings] = useState({
     'Daily Report': { email: true, sms: true },
     Forecast: { email: true, sms: true },
     'NOAA Atlas 14': { email: true, sms: true },
   });
+  
 
   const isEditMode = contactToEdit !== null;
   const navigate = useNavigate();
@@ -58,9 +89,9 @@ const ContactForm = ({ contactToEdit }) => {
 
     try {
       if (contactToEdit) {
-        await api.patch(`/api/contacts/${contactToEdit.id}`, payload);
+        await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${user.clients[0]?.id}`, payload);
       } else {
-        await api.post(`/api/contacts/`, payload);
+        await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
       }
 
       setTimeout(() => {
@@ -93,6 +124,7 @@ const ContactForm = ({ contactToEdit }) => {
       </button>
 
       <h1 className="text-2xl font-bold mb-4">{contactToEdit ? `Edit ${name}` : 'Add Contact'}</h1>
+      <h2 style={{visibility:"hidden"}}>{user.clients[0]?.id}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Basic Info */}
         <div>
@@ -100,7 +132,7 @@ const ContactForm = ({ contactToEdit }) => {
             <label htmlFor="name" className="block text-gray-700 font-bold">
               Name
             </label>
-            {contactToEdit && (
+            {contactToEdit && user.role != "admin" && (
               <Link to="/assign-locations" className="text-sm">
                 Assign Locations
               </Link>
@@ -141,6 +173,27 @@ const ContactForm = ({ contactToEdit }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
+       { user.role == "admin" && (<div>
+          <label htmlFor="accountName" className="block text-gray-700 font-bold">
+            Account Name
+          </label>
+          <input type="text" name="account_name" id="account_name" value={accountName} readOnly/>
+          {/*
+          <select
+            
+           
+            id="client_id"
+            value={client_id}
+            onChange={(e) => setClient_id(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+            required
+          >
+            {clients.map((c,i)=>{
+              return <option value={c.id}>{c.account_name}</option>
+            })}
+            </select>
+            */}
+        </div>)}
 
         {/* Alert Settings */}
         <div className="mt-6">

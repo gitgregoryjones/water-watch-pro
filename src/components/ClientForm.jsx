@@ -146,13 +146,13 @@ const ClientForm = ({ clientToEdit }) => {
         {/* Status Toggle */}
         <div className="flex items-center">
           <Toggle checked={status} onChange={() => setStatus(!status)} />
-          <span className="ml-2">Active Account</span>
+          <span className="ml-2">Archive Account</span>
         </div>
 
         {/* Account Actions */}
         <div className="border p-4 rounded">
           <h2 className="text-xl font-bold mb-4">Account Actions</h2>
-          <div className="flex items-center mb-2">
+          <div className="hidden flex items-center mb-2">
             <Toggle
               checked={additionalSettings.turnAccountOn}
               onChange={() => toggleAdditionalSetting('turnAccountOn')}
@@ -166,35 +166,38 @@ const ClientForm = ({ clientToEdit }) => {
             />
             <span className="ml-2">Suspend Account</span>
           </div>
-          <div className="flex items-center mb-2">
+          <div className="hidden flex items-center mb-2">
             <Toggle
               checked={additionalSettings.convertToDemo}
               onChange={() => toggleAdditionalSetting('convertToDemo')}
             />
             <span className="ml-2">Convert To Demo Account</span>
           </div>
-          <div className="flex items-center mb-2">
+          <div className="flex items-center mb-2 gap-2">
             <Toggle
               checked={additionalSettings.convertToPaid}
               onChange={() => toggleAdditionalSetting('convertToPaid')}
             />
-            <span className="ml-2">Convert To Paid Account</span>
+            <div className='flex flex-row gap-2'>
+            <span className="">Convert To Paid Account</span>
+            <span>Billing Date: 2024-12-03</span>
+            </div>
           </div>
-          <div className="flex items-center mb-2">
+          <div className="hidden flex items-center mb-2">
             <Toggle
               checked={additionalSettings.sendMarketingTexts}
               onChange={() => toggleAdditionalSetting('sendMarketingTexts')}
             />
             <span className="ml-2">Send Marketing Texts</span>
           </div>
-          <div className="flex items-center mb-2">
+          <div className="hidden flex items-center mb-2">
             <Toggle
               checked={additionalSettings.enableGroupReportService}
               onChange={() => toggleAdditionalSetting('enableGroupReportService')}
             />
             <span className="ml-2">Enable Group Report Service</span>
           </div>
-          <div className="flex items-center">
+          <div className="hidden flex items-center">
             <Toggle
               checked={additionalSettings.enable15MinReports}
               onChange={() => toggleAdditionalSetting('enable15MinReports')}

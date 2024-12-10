@@ -105,7 +105,7 @@ export default function Dashboard() {
             <PillSwap>
             <Pill>Daily</Pill>
             <Pill>Hourly</Pill>
-            <Pill className="rapidrain">RAPIDRAIN</Pill>
+            <Pill className="rapidrain">RapidRain</Pill>
             </PillSwap>
             <CardContent>
                <div className="header">hello</div>

@@ -6,6 +6,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
 import LocationCSVFileUploadDialog from '../components/LocationCSVUploadDialog';
+import SettingsMenu from '../components/SettingsMenu';
 
 const LocationListPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -70,21 +71,7 @@ const LocationListPage = () => {
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center  ">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt;  Locations</h1>  
       <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
-        {user.tier !=4 &&(<div className='flex gap-4'><Link
-          to="/contact-list"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-        >
-          Modify Contacts
-        </Link>
-        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
-          Modify Locations
-        </span>
-        <Link
-          to="/settings-general"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-        >
-          Notifications
-        </Link></div>)}
+       <SettingsMenu activeTab={"locations"}/>
       </div>
       }>
     <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white  rounded-lg">
@@ -108,7 +95,7 @@ const LocationListPage = () => {
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Latitude</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Longitude</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">24 Hour Threshold</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">Rapid Rain Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">RapidRain Threshold</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>
           </thead>

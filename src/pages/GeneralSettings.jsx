@@ -1,208 +1,210 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import SubHeader from '../components/Subheader';
-import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Toggle from '../components/Toggle';
-import { useSelector } from 'react-redux';
+import api from '../utility/api';
 import Upgrade from '../components/Upgrade';
-
+import { useSelector } from 'react-redux';
+import WorkingDialog from '../components/WorkingDialog';
+import SettingsMenu from '../components/SettingsMenu';
 
 const GeneralSettingsPage = () => {
-  const [showUpgrade, setShowUpgrade] = useState(false);
+  const { state } = useLocation();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
-  const [settings, setSettings] = useState({
-    dailyReport: {
-      enabled: true,
-    },
-    forecast: {
-      enabled: true,
-      combineLocations: false,
-    },
-    noaaAtlas14: {
-      enabled: true,
-      '24Hour': false,
-      '1Hour': false,
-      first: false,
-    },
-    thresholdAlerts: {
-      enabled: true,
-      rapidRain: false,
-    },
-    Exceeded24HourThreshold: {
-      enabled: true,
-      combineLocations: false,
-    },
-  });
+  const [settings, setSettings] = useState({});
+  const [client, setClient] = useState(user.clients[0] ? user.clients[0] : {})
+  const [working, setWorking] = useState(false);
 
-  const handleToggle = (section, key) => {
-    if (key === 'rapidRain' && user.tier < 2) {
-      setShowUpgrade(true);
-      setSettings((prevSettings) => ({
-        ...prevSettings,
-        [section]: {
-          ...prevSettings[section],
-          [key]: false,
-        },
-      }));
-      return;
-    }
-    setSettings((prevSettings) => ({
-      ...prevSettings,
-      [section]: {
-        ...prevSettings[section],
-        [key]: !prevSettings[section][key],
-      },
+  
+
+  useEffect(() => {
+    // Fetch client data on component load
+    
+    const fetchClientData = async () => {
+      if (!client.id) return;
+
+      try {
+        const response = await api.get(`/api/clients/${client.id}`);
+        setClient(response.data);
+        setSettings({
+          account_name: response.data.account_name || '',
+          status: response.data.status || 'inactive',
+          account_type: response.data.account_type || 'trial',
+          tier: response.data.tier || 'bronze',
+          manual_invoice: response.data.manual_invoice || false,
+          invoice_period: response.data.invoice_period || '',
+          invoice_day: response.data.invoice_day || 0,
+          invoice_email: response.data.invoice_email || '',
+          daily_report_on: response.data.daily_report_on || false,
+          daily_report_combine_locations: response.data.daily_report_combine_locations || false,
+          forecast_on: response.data.forecast_on || false,
+          forecast_combine_locations: response.data.forecast_combine_locations || false,
+          atlas14_on: response.data.atlas14_on || false,
+          atlas14_24h_on: response.data.atlas14_24h_on || false,
+          atlas14_1h_on: response.data.atlas14_1h_on || false,
+          atlas14_first_on: response.data.atlas14_first_on || false,
+          exceed24h_on: response.data.exceed24h_on || false,
+          exceed24h_combine_locations: response.data.exceed24h_combine_locations || false,
+          rapidrain_on: response.data.rapidrain_on || false,
+          rapidrain_combine_locations: response.data.rapidrain_combine_locations || false,
+        });
+      } catch (error) {
+        console.error('Error fetching client data:', error.message);
+        alert('Failed to load client data.');
+      }
+    };
+
+    fetchClientData();
+  }, [client.id]);
+
+ 
+
+  const handleToggle = (key) => {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: !prev[key],
     }));
   };
 
-  const handleSubmit = () => {
-    console.log('Updated Settings:', settings);
-    alert('Settings updated successfully!');
+  const handleSubmit = async () => {
+    setWorking(true)
+    try {
+      await api.patch(`/api/clients/${client.id}`, settings);
+      //alert('Settings updated successfully!');
+      setTimeout(() => {
+        setWorking(false);
+        navigate('/location-list');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error updating settings:', error.message);
+      alert('An error occurred while updating settings.');
+    }
   };
 
   return (
     <div className="h-full w-full flex flex-col mt-28">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
-        Settings &gt; Preferences
+        Settings &gt; Client: {client.account_name}  
       </h1>
       <Card
         header={
-          <div className="flex justify-start rounded space-x-6 mb-8 self-start bg-[transparent] w-full p-2">
-            <Link
-              to="/contact-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-            >
-              Modify Contacts
-            </Link>
-
-            <Link
-              to="/location-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-            >
-              Modify Locations
-            </Link>
-            <span className="text-gray-800 font-bold border-b-2 border-blue-500">
-              Notifications
-            </span>
-            <Upgrade showMsg={false} tier={4}>
-            <Link
-              to="/settings-admin"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
-            >
-              Client Management
-            </Link>
-            </Upgrade>
-          </div>
+          <SettingsMenu activeTab={"notifications"}/>
         }
         className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}
       >
         <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
-          <div
-            className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}
-          >
-            <i className="fa fa-gear"></i>General Notification Settings
-          </div>
-
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+            <h2 className='py-4 px-2 border rounded bg-[#128CA6] text-[white]'>Note: The options below set notifications system wide. Modify contact settings to override settings for individual users</h2>
             {/* Daily Report Section */}
-            <div className="border p-4 rounded">
-              <h2 className="text-xl font-bold mb-2">Daily Report</h2>
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">Daily Report</h2>
+              <div className="flex items-center mb-4">
+                <Toggle
+                  checked={settings.daily_report_on}
+                  onChange={() => handleToggle('daily_report_on')}
+                />
+                <span className="ml-4">Enabled</span>
+              </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.dailyReport.enabled}
-                  onChange={() => handleToggle('dailyReport', 'enabled')}
+                  checked={settings.daily_report_combine_locations}
+                  onChange={() => handleToggle('daily_report_combine_locations')}
                 />
-                <span className="ml-2">Enabled</span>
+                <span className="ml-4">Combine Locations</span>
               </div>
             </div>
 
             {/* 24 Hour Threshold Section */}
-            <div className="border p-4 rounded">
-              <h2 className="text-xl font-bold mb-2">24 Hour Threshold Exceeded</h2>
-              <div className="flex items-center mb-2">
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">24 Hour Threshold Exceeded</h2>
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.Exceeded24HourThreshold.enabled}
-                  onChange={() => handleToggle('Exceeded24HourThreshold', 'enabled')}
+                  checked={settings.exceed24h_on}
+                  onChange={() => handleToggle('exceed24h_on')}
                 />
-                <span className="ml-2">Enabled</span>
+                <span className="ml-4">Enabled</span>
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.Exceeded24HourThreshold.combineLocations}
-                  onChange={() => handleToggle('Exceeded24HourThreshold', 'combineLocations')}
+                  checked={settings.exceed24h_combine_locations}
+                  onChange={() => handleToggle('exceed24h_combine_locations')}
                 />
-                <span className="ml-2">Combine Locations</span>
+                <span className="ml-4">Combine Locations</span>
               </div>
             </div>
 
             {/* Forecast Section */}
-            <div className="border p-4 rounded">
-              <h2 className="text-xl font-bold mb-2">Forecast</h2>
-              <div className="flex items-center mb-2">
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">Forecast</h2>
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.forecast.enabled}
-                  onChange={() => handleToggle('forecast', 'enabled')}
+                  checked={settings.forecast_on}
+                  onChange={() => handleToggle('forecast_on')}
                 />
-                <span className="ml-2">Enabled</span>
+                <span className="ml-4">Enabled</span>
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.forecast.combineLocations}
-                  onChange={() => handleToggle('forecast', 'combineLocations')}
+                  checked={settings.forecast_combine_locations}
+                  onChange={() => handleToggle('forecast_combine_locations')}
                 />
-                <span className="ml-2">Combine Locations</span>
+                <span className="ml-4">Combine Locations</span>
               </div>
             </div>
 
             {/* NOAA Atlas 14 Section */}
-            <div className="border p-4 rounded">
-              <h2 className="text-xl font-bold mb-2">NOAA Atlas 14</h2>
-              <div className="flex items-center mb-2">
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">NOAA Atlas 14</h2>
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.noaaAtlas14.enabled}
-                  onChange={() => handleToggle('noaaAtlas14', 'enabled')}
+                  checked={settings.atlas14_on}
+                  onChange={() => handleToggle('atlas14_on')}
                 />
-                <span className="ml-2">Enabled</span>
+                <span className="ml-4">Enabled</span>
               </div>
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.noaaAtlas14['24Hour']}
-                  onChange={() => handleToggle('noaaAtlas14', '24Hour')}
+                  checked={settings.atlas14_24h_on}
+                  onChange={() => handleToggle('atlas14_24h_on')}
                 />
-                <span className="ml-2">24 Hour</span>
+                <span className="ml-4">24 Hour</span>
               </div>
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.noaaAtlas14['1Hour']}
-                  onChange={() => handleToggle('noaaAtlas14', '1Hour')}
+                  checked={settings.atlas14_1h_on}
+                  onChange={() => handleToggle('atlas14_1h_on')}
                 />
-                <span className="ml-2">1 Hour</span>
+                <span className="ml-4">1 Hour</span>
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.noaaAtlas14.first}
-                  onChange={() => handleToggle('noaaAtlas14', 'first')}
+                  checked={settings.atlas14_first_on}
+                  onChange={() => handleToggle('atlas14_first_on')}
                 />
-                <span className="ml-2">First</span>
+                <span className="ml-4">First</span>
               </div>
             </div>
 
-            {/* Other Alerts */}
-            <div className="border p-4 rounded">
-              <h2 className="text-xl font-bold mb-2">Other Alerts</h2>
-              <div className="flex items-center mb-2">
+            {/* RapidRain Alerts */}
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">RapidRain Alerts</h2>
+              <div className="flex items-center mb-4">
                 <Toggle
-                  checked={settings.thresholdAlerts.rapidRain}
-                  onChange={() => handleToggle('thresholdAlerts', 'rapidRain')}
+                  checked={settings.rapidrain_on}
+                  onChange={() => handleToggle('rapidrain_on')}
                 />
-                <span className="ml-2">RapidRain 15 Minute</span>
+                <span className="ml-4">Enabled</span>
               </div>
-              {showUpgrade && (
-                <div className="flex flex-col justify-center items-center gap-2 m-2 p-4 w-[20rem] border-[gold] bg-[white] border-4 rounded">
-                  <div>Go For The Gold!</div>
-                  <a href="https://waterwatchpro.com/prices">Click Here to Upgrade</a>
-                </div>
-              )}
+              <div className="flex items-center">
+                <Toggle
+                  checked={settings.rapidrain_combine_locations}
+                  onChange={() => handleToggle('rapidrain_combine_locations')}
+                />
+                <span className="ml-4">Combine Locations</span>
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -210,11 +212,12 @@ const GeneralSettingsPage = () => {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 shadow-md"
               >
                 Save Settings
               </button>
             </div>
+            <WorkingDialog showDialog={working}/>
           </form>
         </div>
       </Card>

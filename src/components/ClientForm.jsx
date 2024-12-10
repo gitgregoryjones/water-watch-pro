@@ -7,9 +7,12 @@ import WorkingDialog from './WorkingDialog';
 
 const ClientForm = ({ clientToEdit }) => {
   const [accountName, setAccountName] = useState(clientToEdit?.account_name || '');
-  const [email, setEmail] = useState(clientToEdit?.email || '');
+  const [email, setEmail] = useState(clientToEdit?.invoice_email || '');
   const [phone, setPhone] = useState(clientToEdit?.phone || '');
   const [status, setStatus] = useState(clientToEdit?.status || false); // Toggle for account status
+  const [account_type, setAccount_Type] = useState(clientToEdit?.account_type);
+  const [invoiceDate, setInvoiceDate] = useState(clientToEdit?.invoice_day);
+  const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
 
@@ -54,11 +57,13 @@ const ClientForm = ({ clientToEdit }) => {
 
     const payload = {
       name: accountName,
-      email,
+      invoice_email:email,
       phone,
       status,
       tier,
       additional_settings: additionalSettings,
+      account_type
+      
     };
 
     try {
@@ -98,7 +103,36 @@ const ClientForm = ({ clientToEdit }) => {
         {clientToEdit ? `Edit ${accountName}` : 'Add Client'}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        
         {/* Account Name */}
+        <div>
+          <label htmlFor="account_type" className="block text-gray-700 font-bold">
+            Last Payment Status
+          </label>
+          <input
+            id="paymentStatus"
+            type="text"
+            value={paymentStatus}
+            disabled
+            onChange={(e) => setLastPaymentStatus(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+            required
+          />
+        </div>
+        <div>
+        <label htmlFor="invoiceDate" className="block text-gray-700 font-bold">
+            Invoice Day
+          </label>
+          <input
+            id="invoiceDate"
+            type="text"
+            value={invoiceDate}
+            disabled
+            onChange={(e) => setInvoiceDate(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+            required
+          />
+        </div>
         <div>
           <label htmlFor="accountName" className="block text-gray-700 font-bold">
             Account Name
@@ -144,8 +178,8 @@ const ClientForm = ({ clientToEdit }) => {
         </div>
 
         {/* Status Toggle */}
-        <div className="flex items-center">
-          <Toggle checked={status} onChange={() => setStatus(!status)} />
+        <div className="hidden flex items-center">
+          <Toggle checked={account_type == "paid" ? true : false} onChange={() => setAccount_Type(account_type)} />
           <span className="ml-2">Archive Account</span>
         </div>
 
@@ -161,8 +195,8 @@ const ClientForm = ({ clientToEdit }) => {
           </div>
           <div className="flex items-center mb-2">
             <Toggle
-              checked={additionalSettings.suspendAccount}
-              onChange={() => toggleAdditionalSetting('suspendAccount')}
+              checked={status != "active" ? true : false }
+              onChange={() => setStatus(status == "active" ? "inactive" : "active")} 
             />
             <span className="ml-2">Suspend Account</span>
           </div>
@@ -174,13 +208,10 @@ const ClientForm = ({ clientToEdit }) => {
             <span className="ml-2">Convert To Demo Account</span>
           </div>
           <div className="flex items-center mb-2 gap-2">
-            <Toggle
-              checked={additionalSettings.convertToPaid}
-              onChange={() => toggleAdditionalSetting('convertToPaid')}
-            />
+          <Toggle checked={account_type == "paid" ? true : false} onChange={() => setAccount_Type(account_type == "paid" ? "trial" : "paid")} />
             <div className='flex flex-row gap-2'>
             <span className="">Convert To Paid Account</span>
-            <span>Billing Date: 2024-12-03</span>
+           
             </div>
           </div>
           <div className="hidden flex items-center mb-2">
@@ -228,7 +259,7 @@ const ClientForm = ({ clientToEdit }) => {
               name="tier"
               value="silver"
               checked={tier === 'silver'}
-              onChange={() => setTier('Silver')}
+              onChange={() => setTier('silver')}
               className="mr-2"
             />
             <label htmlFor="silver">Silver</label>

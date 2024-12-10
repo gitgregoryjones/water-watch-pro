@@ -146,7 +146,7 @@ const ClientListPage = () => {
                 onChange={() => handleFilterChange("bronze")}
               />
             </div>
-            <div className="font-bold">
+            <div className="hidden font-bold">
               Trial{" "}
               <input
                 type="checkbox"
@@ -155,7 +155,7 @@ const ClientListPage = () => {
                 onChange={() => handleFilterChange("trial")}
               />
             </div>
-            <div className="font-bold">
+            <div className="hidden font-bold">
               Unpaid{" "}
               <input
                 type="checkbox"
@@ -173,7 +173,7 @@ const ClientListPage = () => {
                   Account Name
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
-                  Status
+                  Account Type
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
                   Tier

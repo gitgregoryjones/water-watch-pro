@@ -63,7 +63,7 @@ const LocationListPage = () => {
      
   
 
-  const  filtered = locations.filter(l => l.name.toLowerCase().startsWith(searchTerm.toLocaleLowerCase())  );
+  const  filtered = locations.filter(l => l.name.toLowerCase().indexOf(searchTerm.toLocaleLowerCase()) > -1  );
 
   console.log(`Filtered is ${JSON.stringify(filtered)}`)
 

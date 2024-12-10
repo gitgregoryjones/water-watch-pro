@@ -111,7 +111,7 @@ const ContactListPage = () => {
       <thead>
             <tr className="bg-gray-100 sticky top-0 ">
               <th className="text-sm border border-gray-300 p-2 text-center sticky top-0  md:min-w-[300px]">Name</th>
-              <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Account Name</th>
+              {user.role == "admin" && <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Account Name</th>}
               <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Email</th>
               <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full md:min-w-[300px]">Phone</th>
               <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden  top-0">Text Alert</th>
@@ -124,7 +124,7 @@ const ContactListPage = () => {
           {filtered.map((contact) => (
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
-              <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>
+              {user.role == "admin" && <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>}
               <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
               <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
               <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">

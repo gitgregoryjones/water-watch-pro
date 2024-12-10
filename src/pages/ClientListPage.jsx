@@ -1,54 +1,84 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-import api from '../utility/api';
-import Card from '../components/Card';
-import { useSelector } from 'react-redux';
-import SettingsMenu from '../components/SettingsMenu';
+import api from "../utility/api";
+import Card from "../components/Card";
+import { useSelector } from "react-redux";
+import SettingsMenu from "../components/SettingsMenu";
 
 const ClientListPage = () => {
   const [clients, setClients] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState({
+    gold: false,
+    silver: false,
+    bronze: false,
+    trial: false,
+    unpaid: false,
+  });
 
+  const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
 
   const fetchClients = async (page) => {
     try {
-      const response = await api.get(`/api/clients/?client_id=${user.clients[0].id}&page=${page}&page_size=250`);
+      const response = await api.get(
+        `/api/clients/?client_id=${user.clients[0].id}&page=${page}&page_size=250`
+      );
       setClients(response.data);
-      // Update total pages if API provides pagination metadata
-      // setTotalPages(response.data.total_pages);
     } catch (error) {
-      console.error('Error fetching clients:', error.message);
+      console.error("Error fetching clients:", error.message);
     }
   };
 
   const filterClients = (e) => setSearchTerm(e.target.value);
 
-  const filtered = clients.filter(
-    (client) =>
-     ( client.account_name.toLowerCase().includes(searchTerm.toLowerCase()) 
-    ||  client.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    ||  client.phone?.toLowerCase().includes(searchTerm.toLowerCase()))) 
-  ;
+  const handleFilterChange = (filterName) => {
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: !prevFilters[filterName],
+    }));
+  };
 
+  const filtered = clients.filter((client) => {
+    const matchesSearch =
+      client.account_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.phone?.toLowerCase().includes(searchTerm.toLowerCase());
+  
+    // Create an array of selected tiers
+    const selectedTiers = [];
+    if (selectedFilters.gold) selectedTiers.push("gold");
+    if (selectedFilters.silver) selectedTiers.push("silver");
+    if (selectedFilters.bronze) selectedTiers.push("bronze");
+    if (selectedFilters.trial) selectedTiers.push(null); // null is considered "trial"
+  
+    // Check if the client's tier matches any of the selected tiers
+    const matchesTier = selectedTiers.length === 0 || selectedTiers.includes(client.tier);
+  
+    // Check if the payment type matches
+    const matchesPayment =
+      (!selectedFilters.unpaid || client.account_type === "unpaid") &&
+      (!selectedFilters.trial || client.account_type !== "paid");
+  
+    return matchesSearch && matchesTier && matchesPayment;
+  });
+  
   const handleDelete = async (clientId) => {
-    if (window.confirm('Are you sure you want to delete this client?')) {
+    if (window.confirm("Are you sure you want to delete this client?")) {
       try {
         await api.delete(`/api/clients/${clientId}`);
-        fetchClients(currentPage); // Refresh the list
+        fetchClients(currentPage);
       } catch (error) {
-        console.error('Error deleting client:', error.message);
+        console.error("Error deleting client:", error.message);
       }
     }
   };
 
   const handleEdit = (client) => {
-    navigate('/client-form', { state: { client } });
+    navigate("/client-form", { state: { client } });
   };
 
   useEffect(() => {
@@ -57,13 +87,12 @@ const ClientListPage = () => {
 
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans">
-      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings > Clients</h1>
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
+        Settings > Clients
+      </h1>
       <Card
-        className={'w-full'}
-        header={
-         
-          <SettingsMenu activeTab={"clients"}/>
-        }
+        className="w-full"
+        header={<SettingsMenu activeTab={"clients"} />}
       >
         <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
           <div
@@ -83,11 +112,58 @@ const ClientListPage = () => {
               />
             </div>
             <button
-              onClick={() => navigate('/client-form')}
+              onClick={() => navigate("/client-form")}
               className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
             >
               Add Client
             </button>
+          </div>
+          <div className="flex gap-4 items-center justify-start">
+            <div className="font-bold">
+              Gold{" "}
+              <input
+                type="checkbox"
+                name="gold"
+                checked={selectedFilters.gold}
+                onChange={() => handleFilterChange("gold")}
+              />
+            </div>
+            <div className="font-bold">
+              Silver{" "}
+              <input
+                type="checkbox"
+                name="silver"
+                checked={selectedFilters.silver}
+                onChange={() => handleFilterChange("silver")}
+              />
+            </div>
+            <div className="font-bold">
+              Bronze{" "}
+              <input
+                type="checkbox"
+                name="bronze"
+                checked={selectedFilters.bronze}
+                onChange={() => handleFilterChange("bronze")}
+              />
+            </div>
+            <div className="font-bold">
+              Trial{" "}
+              <input
+                type="checkbox"
+                name="trial"
+                checked={selectedFilters.trial}
+                onChange={() => handleFilterChange("trial")}
+              />
+            </div>
+            <div className="font-bold">
+              Unpaid{" "}
+              <input
+                type="checkbox"
+                name="unpaid"
+                checked={selectedFilters.unpaid}
+                onChange={() => handleFilterChange("unpaid")}
+              />
+            </div>
           </div>
 
           <table className="table-auto block md:w-full min-h-[300px] h-[300px] overflow-auto border border-gray-300">
@@ -112,7 +188,7 @@ const ClientListPage = () => {
                 {filtered.map((client) => (
                   <tr
                     className={`${
-                      window.innerWidth < 800 && 'cursor-pointer'
+                      window.innerWidth < 800 && "cursor-pointer"
                     }`}
                     key={client.id}
                     onClick={() =>
@@ -123,10 +199,10 @@ const ClientListPage = () => {
                       {client.account_name}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell">
-                      {client.status || 'N/A'}
+                      {client.account_type || "N/A"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell">
-                      {client.tier || 'N/A'}
+                      {client.tier || "N/A"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 items-center gap-4 md:table-cell">
                       <button

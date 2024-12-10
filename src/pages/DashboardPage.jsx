@@ -611,7 +611,10 @@ function showThreshold(color){
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
       <div id="graphs" className='h-[10px]'></div>
-      <Card className={`${user.tier == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i>Rainfall {location.name}</div>} >
+      <Card className={`${user.tier == 4 && 'hidden'}`} 
+        footer={window.innerWidth <= 600  && <div className='flex gap-2 justify-around text-sm py-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold} or <div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</div>}
+        header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
+      <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold} or <div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</div></div>} >
            <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${user.tier == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               

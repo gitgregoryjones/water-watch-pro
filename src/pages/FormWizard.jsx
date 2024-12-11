@@ -107,11 +107,11 @@ const FormWizard = () => {
 
   return (
     <div
-  className="w-full mt-8 md:mt-0 md:max-w-[50%] mx-auto bg-gradient-to-br from-white to-[green] shadow-md rounded-xl relative"
+  className="w-full mt-8 md:mt-0 md:max-w-[50%] mx-auto bg-gradient-to-br from-white to-[green] shadow-md md:rounded-xl relative"
   
 >
         
-    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>Register</div></h1>
+    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>Register</div></h1>
     
     <div className='text-xl text-[white] m-2 mx-6'>{errors}</div>
     <div className='text-xl text-[white] m-2'>{success}</div>

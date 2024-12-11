@@ -35,6 +35,7 @@ import UserAccountProvisioning from "./pages/UserAccountProvisioning";
 import ClientListPage from "./pages/ClientListPage";
 import ClientForm from "./components/ClientForm";
 import ClientPage from "./pages/ClientPage";
+import FormWizard from "./pages/FormWizard";
 
 
 
@@ -44,7 +45,7 @@ function App() {
   const location = useLocation();
 
   // Check if the current path is the login page
-  const isLoginPage = location.pathname === "/";
+  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard");
 
   
 
@@ -108,6 +109,7 @@ function App() {
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
        
         <Route path="/settings-admin" element={<ClientListPage />} />
+        <Route path="/wizard" element={<FormWizard />} />
        
 <Route path="/contact-form" element={<ContactPage />} />
 <Route path="/client-form" element={<ClientPage />} />

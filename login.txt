@@ -1,0 +1,19 @@
+Now let's implement handle submit for the registration.  It requires calls to the following backend steps using our api class we created earlier.
+
+1.  POST /auth/register with body like {
+  "email": "user@example.com",
+  "password": "string",
+  "is_active": true,
+  "is_superuser": false,
+  "is_verified": true,
+  "role": "client",
+  "first_name": "string",
+  "last_name": "string",
+  "phone": "string"
+}
+
+2. Read email from the last response and then Request a verification token via POST /auth/request-verify-token with body like {
+  "email": "testlogin@example.com"" 
+}
+
+

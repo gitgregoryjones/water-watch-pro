@@ -233,6 +233,7 @@ export default function LoginForm() {
                     ) : (
                         <Button>Register</Button>
                     )}
+                    
                 </ButtonContainer>
                 <label hidden={logView}>Email</label>
                 <input
@@ -252,6 +253,9 @@ export default function LoginForm() {
                     value={password}
                     className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
                 />
+                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Trial Account</Link>
+                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Paid Account</Link>
+              
             </FormContainer>
         </div>
     );

@@ -24,7 +24,7 @@ const FormWizard = () => {
     latitude: '',
     longitude: '',
     threshold: '0.5',
-    rapidRain: '',
+    rapidrain: '',
   });
 
   const [errors,setErrors] = useState("")
@@ -63,8 +63,31 @@ const FormWizard = () => {
   const validateStep = () => {
     switch (currentStep) {
       case 1: // User Details Validation
-        if (!formData.email || !formData.password || !formData.confirmPassword || !formData.phone) {
-          setErrors('Please fill all required fields.');
+        // Email validation
+        if (!formData.email) {
+          setErrors('Email is required.');
+          return false;
+        }
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(formData.email)) {
+          setErrors('Please enter a valid email address.');
+          return false;
+        }
+  
+        // Phone validation
+        if (!formData.phone) {
+          setErrors('Phone number is required.');
+          return false;
+        }
+        const phonePattern = /^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$/;
+        if (!phonePattern.test(formData.phone)) {
+          setErrors('Please enter a valid phone number.');
+          return false;
+        }
+  
+        // Passwords
+        if (!formData.password || !formData.confirmPassword) {
+          setErrors('Please fill in both password fields.');
           return false;
         }
         if (formData.password !== formData.confirmPassword) {
@@ -72,38 +95,12 @@ const FormWizard = () => {
           return false;
         }
         return true;
-      case 4: // Monitored Location Validation
-        if (!formData.locationName || !formData.latitude || !formData.longitude) {
-          setErrors('Please fill all required fields.');
-          return false;
-        }
-        if (formData.latitude < -90 || formData.latitude > 90) {
-          setErrors('Latitude must be between -90 and 90.');
-          return false;
-        }
-        if (formData.longitude < -180 || formData.longitude > -66) {
-          setErrors('Longitude must be between -180 and -66.');
-          return false;
-        }
-        return true;
+  
       default:
-        setErrors(false)
         return true;
     }
   };
-
-  const handleSubmit = () => {
-    setShowMsg(true)
-    if (validateStep()) {
-      
-      console.log('Form Submitted:', formData);
-      setTimeout(()=>{
-
-      setSuccess('Sign-up successful!'); window.location.href = "/"},500)
-    } else {
-        setShowMsg(false)
-    }
-  };
+  
 
   return (
     <div
@@ -127,7 +124,7 @@ const FormWizard = () => {
         <div className='border rounded-2xl p-4'>
           <h2 className="text-xl font-bold mb-4">User Details</h2>
           <div className="mb-4">
-            <label className="block text-gray-700">Email *</label>
+            <label className="block text-gray-700">Email <span className='text-[red]'>*</span></label>
             <input
               type="email"
               name="email"
@@ -139,7 +136,7 @@ const FormWizard = () => {
             </div>
           
           <div className="mb-4">
-            <label className="block text-gray-700">Password *</label>
+            <label className="block text-gray-700">Password <span className='text-[red]'>*</span></label>
             <input
               type="password"
               name="password"
@@ -150,7 +147,7 @@ const FormWizard = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Confirm Password *</label>
+            <label className="block text-gray-700">Confirm Password <span className='text-[red]'>*</span></label>
             <input
               type="password"
               name="confirmPassword"
@@ -164,7 +161,7 @@ const FormWizard = () => {
           <div className='mt-4 border rounded-2xl p-4'>
           <div className="mb-4">
           <h2 className="text-xl font-bold mb-4">Contact Information</h2>
-            <label className="block text-gray-700">Name *</label>
+            <label className="block text-gray-700">Name <span className='text-[red]'>*</span></label>
             <input
               type="text"
               name="name"
@@ -175,7 +172,7 @@ const FormWizard = () => {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Phone *</label>
+            <label className="block text-gray-700">Phone <span className='text-[red]'>*</span></label>
             <input
               type="tel"
               name="phone"
@@ -204,8 +201,9 @@ const FormWizard = () => {
       {currentStep === 2 && (
         <div className='border rounded-2xl p-4 mb-4'>
         <div>
-          <h2 className="text-xl font-bold mb-4">Account Information</h2>
+          <h2 className="text-xl font-bold mb-4">Group Information</h2>
           <div className="flex gap-2 mb-4 items-center text-lg justify-start">
+            
            
              <input
               type="radio"
@@ -232,7 +230,7 @@ const FormWizard = () => {
             
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">{formData.accountType === "self" ? "Individual" : formData.accountType} Name *</label>
+            <label className="block text-gray-700">{formData.accountType === "self" ? "Individual" : formData.accountType} Name <span className='text-[red]'>*</span></label>
            {formData.accountType != "self" ? <input
               type="text"
               name="companyName"
@@ -253,7 +251,7 @@ const FormWizard = () => {
           />}
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Phone *</label>
+            <label className="block text-gray-700">Phone <span className='text-[red]'>*</span></label>
             {formData.accountType != "self" ? <input
               type="tel"
               name="companyPhone"
@@ -265,6 +263,25 @@ const FormWizard = () => {
             type="tel"
             name="companyPhone"
             value={formData.accountType == "self" ? formData.phone : formData.companyPhone}
+            onChange={handleChange}
+            className="w-full border border-gray-300 bg-slate-200 rounded p-2"
+            required
+            readOnly
+          />}
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Email <span className='text-[red]'>*</span></label>
+            {formData.accountType != "self" ? <input
+              type="email"
+              name="companyPhone"
+              value={formData.accountType == "self" ? formData.email : formData.companyEmail}
+              onChange={handleChange}
+              className="w-full border border-gray-300  rounded p-2"
+              required
+            /> : <input
+            type="tel"
+            name="companyPhone"
+            value={formData.accountType == "self" ? formData.email : formData.companyEmail}
             onChange={handleChange}
             className="w-full border border-gray-300 bg-slate-200 rounded p-2"
             required
@@ -322,7 +339,7 @@ Questions? Contact us at support@waterwatchpro.com.
         <div className='border rounded-2xl p-4 mb-4'>
           <h2 className="text-xl font-bold mb-4">Monitored Location</h2>
           <div className="mb-4">
-            <label className="block text-gray-700">Location Name *</label>
+            <label className="block text-gray-700">Location Name <span className='text-[red]'>*</span></label>
             <input
               type="text"
               name="locationName"
@@ -333,7 +350,7 @@ Questions? Contact us at support@waterwatchpro.com.
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Latitude *</label>
+            <label className="block text-gray-700">Latitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="latitude"
@@ -344,7 +361,7 @@ Questions? Contact us at support@waterwatchpro.com.
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Longitude *</label>
+            <label className="block text-gray-700">Longitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="longitude"
@@ -355,49 +372,46 @@ Questions? Contact us at support@waterwatchpro.com.
             />
           </div>
           <div className="mb-4">
-          <label htmlFor="threshold" className="block text-gray-700 font-bold mb-2">
-            24-Hour Rain Threshold (inches)
-          </label>
-          <select
-            
-            
-            id="h24Threshold"
-            value={formData.threshold}
-            onChange={(e) => {handleChange}}
-            className="border border-gray-300 rounded p-2 w-full"
-            required
-          >
-                 <option value="">-- Select Threshhold --</option>
-           {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
-                return <option value={o} key={i}>{o}</option>
-            })
-            }
-            </select>
-        </div>
+  <label htmlFor="threshold" className="block text-gray-700 font-bold mb-2">
+    24-Hour Rain Threshold (inches)
+  </label>
+  <select
+    id="threshold"
+    name="threshold"
+    value={formData.threshold}
+    onChange={handleChange}
+    className="border border-gray-300 rounded p-2 w-full"
+    required
+  >
+    <option value="">-- Select Threshold --</option>
+    {[0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].map((o, i) => (
+      <option value={o} key={i}>{o}</option>
+    ))}
+  </select>
+</div>
 
-        {/* RapidRain Threshold */}
-        {formData.tier == "gold" && ( <div className="mb-4">
-          <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
-            RapidRain Threshold (inches)
-          </label>
-          <select
-            
-            
-            id="rapidRainThreshold"
-            value={formData.rapidRain}
-            onChange={(e) => handleChange}
-            className="border border-gray-300 rounded p-2 w-full"
-            required
-            
-            >
-              <option value="">-- Select Threshhold --</option>
-          
-            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
-                return <option value={o} key={i}>{o}</option>
-            })
-            }
-            </select>
-        </div>)}
+{/* RapidRain Threshold */}
+{formData.tier === "gold" && (
+  <div className="mb-4">
+    <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
+      RapidRain Threshold (inches)
+    </label>
+    <select
+      id="rapidrain"
+      name="rapidrain"
+      value={formData.rapidrain}
+      onChange={handleChange}
+      className="border border-gray-300 rounded p-2 w-full"
+      required
+    >
+      <option value="">-- Select Threshold --</option>
+      {[0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].map((o, i) => (
+        <option value={o} key={i}>{o}</option>
+      ))}
+    </select>
+  </div>
+)}
+
         </div>
       )}
 

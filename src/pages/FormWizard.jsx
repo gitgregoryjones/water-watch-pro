@@ -113,8 +113,8 @@ const FormWizard = () => {
         
     <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>Register</div></h1>
     
-    <div className='text-xl text-[white] m-2 mx-6'>{errors}</div>
-    <div className='text-xl text-[white] m-2'>{success}</div>
+    <div className='text-xl text-[red] m-2 mx-6'>{errors}</div>
+    <div className='text-xl text-[black] m-2'>{success}</div>
     <div className='p-6 bg-[white]'>
       <div className="flex w-full justify-between mb-4">
         Step {currentStep} of 4

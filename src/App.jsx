@@ -36,6 +36,7 @@ import ClientListPage from "./pages/ClientListPage";
 import ClientForm from "./components/ClientForm";
 import ClientPage from "./pages/ClientPage";
 import FormWizard from "./pages/FormWizard";
+import RegistrationComplete from "./pages/RegistrationComplete";
 
 
 
@@ -45,7 +46,7 @@ function App() {
   const location = useLocation();
 
   // Check if the current path is the login page
-  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard");
+  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete");
 
   
 
@@ -80,6 +81,7 @@ function App() {
     <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
     <Link to="/location-list" onClick={showSettings} className="menu-item bm-item">Settings</Link>
     <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
+    
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}
        
       {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>*/}
@@ -110,6 +112,8 @@ function App() {
        
         <Route path="/settings-admin" element={<ClientListPage />} />
         <Route path="/wizard" element={<FormWizard />} />
+        <Route path="/registration-complete" element={<RegistrationComplete />} />
+
        
 <Route path="/contact-form" element={<ContactPage />} />
 <Route path="/client-form" element={<ClientPage />} />

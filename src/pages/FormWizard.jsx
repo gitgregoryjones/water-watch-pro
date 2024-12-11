@@ -3,8 +3,10 @@ import Toggle from '../components/Toggle';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import WorkingDialog from '../components/WorkingDialog';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const FormWizard = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [showMsg,setShowMsg] = useState(false)
   const [formData, setFormData] = useState({
@@ -101,6 +103,19 @@ const FormWizard = () => {
     }
   };
   
+
+  const handleSubmit = () => {
+    setShowMsg(true)
+    if (validateStep()) {
+      
+      console.log('Form Submitted:', JSON.stringify(formData));
+      setTimeout(()=>{
+
+      setSuccess('Sign-up successful!');navigate('/registration-complete')},500)
+    } else {
+        setShowMsg(false)
+    }
+  };
 
   return (
     <div
@@ -273,14 +288,14 @@ const FormWizard = () => {
             <label className="block text-gray-700">Email <span className='text-[red]'>*</span></label>
             {formData.accountType != "self" ? <input
               type="email"
-              name="companyPhone"
+              name="companyEmail"
               value={formData.accountType == "self" ? formData.email : formData.companyEmail}
               onChange={handleChange}
               className="w-full border border-gray-300  rounded p-2"
               required
             /> : <input
-            type="tel"
-            name="companyPhone"
+            type="email"
+            name="companyEmail"
             value={formData.accountType == "self" ? formData.email : formData.companyEmail}
             onChange={handleChange}
             className="w-full border border-gray-300 bg-slate-200 rounded p-2"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 import api from "../utility/api";
@@ -7,17 +7,29 @@ import Card from "../components/Card";
 import { useSelector } from "react-redux";
 import SettingsMenu from "../components/SettingsMenu";
 
+
 const ClientListPage = () => {
   const [clients, setClients] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState({
-    gold: false,
+  const [selectedFilters, setSelectedFilters] = useState({});
+  const location = useLocation();
+  
+
+  useEffect(()=>{
+    console.log(`Location user ${JSON.stringify(location.state)}`)
+    if(location.state)
+        setSelectedFilters(location.state)
+  },[])
+  
+  
+  /*useState({
+    gold: true,
     silver: false,
     bronze: false,
     trial: false,
     unpaid: false,
-  });
+  });*/
 
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
@@ -53,18 +65,23 @@ const ClientListPage = () => {
     if (selectedFilters.gold) selectedTiers.push("gold");
     if (selectedFilters.silver) selectedTiers.push("silver");
     if (selectedFilters.bronze) selectedTiers.push("bronze");
-    if (selectedFilters.trial) selectedTiers.push(null); // null is considered "trial"
+    
   
     // Check if the client's tier matches any of the selected tiers
     const matchesTier = selectedTiers.length === 0 || selectedTiers.includes(client.tier);
+
+    let matchesTrial = true;
+
+    if (selectedFilters.trial) {
+        matchesTrial = client.account_type != "paid"
+    }
   
-    // Check if the payment type matches
-    const matchesPayment =
-      (!selectedFilters.unpaid || client.account_type === "unpaid") &&
-      (!selectedFilters.trial || client.account_type !== "paid");
   
-    return matchesSearch && matchesTier && matchesPayment;
+   
+  
+    return matchesSearch && matchesTier && matchesTrial;
   });
+  
   
   const handleDelete = async (clientId) => {
     if (window.confirm("Are you sure you want to delete this client?")) {
@@ -84,6 +101,8 @@ const ClientListPage = () => {
   useEffect(() => {
     fetchClients(currentPage);
   }, [currentPage]);
+
+  
 
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans">
@@ -146,7 +165,7 @@ const ClientListPage = () => {
                 onChange={() => handleFilterChange("bronze")}
               />
             </div>
-            <div className="hidden font-bold">
+            <div className=" font-bold">
               Trial{" "}
               <input
                 type="checkbox"

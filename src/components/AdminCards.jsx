@@ -8,7 +8,10 @@ import api from '../utility/api'
 import { useSelector } from 'react-redux'
 import WorkingDialog from './WorkingDialog'
 
+
 export default function AdminCards() {
+
+  
 
   const user = useSelector((state)=> state.userInfo.user)
 
@@ -136,19 +139,19 @@ export default function AdminCards() {
       <Card className={'flex gap-4 justify-center items-center md:border-[transparent] '} header={<PrettyHeader icon={<i className='fa  fa-solid fa-people-group text-[white]'></i>}>Client Status</PrettyHeader>} footer={<div className='flex justify-around items-center gap-2 text-sm'></div>} >
       <div className='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8' >
     
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[gold] fa fa-solid fa-circle-user'></i>Gold Tier </div>}>
+        <Stats onClick={(e)=> navigate("/settings-admin",{state:{gold:true,trial:false}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[gold] fa fa-solid fa-circle-user'></i>Gold Tier </div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.gold.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.gold.unpaid)}{summary.gold.unpaid} unpaid</div>
           </div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Silver Tier </div>}>
+        <Stats onClick={(e)=> navigate("/settings-admin",{state:{silver:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Silver Tier </div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.silver.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.silver.unpaid)}{summary.silver.unpaid} unpaid</div>
           </div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[tan] fa-solid fa-circle-user'></i>Bronze Tier</div>}>
+        <Stats onClick={(e)=> navigate("/settings-admin",{state:{bronze:true}})}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[tan] fa-solid fa-circle-user'></i>Bronze Tier</div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.bronze.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.bronze.unpaid)}{summary.bronze.unpaid} unpaid</div>
@@ -160,11 +163,11 @@ export default function AdminCards() {
         
           </div>
         </Stats>*/}
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Accounts</div>}>
+        <Stats onClick={(e)=> navigate("/settings-admin")}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Accounts</div>}>
           <div className='flex items-center justify-center text-3xl'>{summary.totalAccounts}</div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
-          <div className='flex items-center justify-center  text-3xl'>{summary.totalUnpaid}/{summary.totalAccounts}</div>
+        <Stats onClick={(e)=> navigate("/settings-admin",{state:{trial:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
+          <div className='flex items-center justify-center  text-3xl'>{summary.totalUnpaid}</div>
         </Stats>
       
       </div>

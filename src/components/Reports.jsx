@@ -141,7 +141,7 @@ const Reports = () => {
     setReportContent(''); // Clear previous content
   
     // Validation logic
-    if (selectedLocations.length === 0) {
+    if (selectedLocations.length === 0 &&  !user.is_superuser) {
       const errorMessage = `
         <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
           <p><strong>Error:</strong> Please select at least one location.</p>
@@ -284,10 +284,11 @@ const Reports = () => {
               <option value="emails">Emails Sent/Received</option>
               <option value="unpaid">Unpaid By Tier</option>
             </Upgrade>
-              <option value="daily">Custom</option>
-              <option value="weekly">Weekly</option>
+
+              {!user.is_superuser && <option value="daily">Custom</option>}
+              {!user.is_superuser && <option value="weekly">Weekly</option>}
             
-            <option value="monthly">Monthly</option>
+            {!user.is_superuser && <option value="monthly">Monthly</option>}
           </select>
         </div>
         {/* Dude */}
@@ -334,7 +335,7 @@ const Reports = () => {
 
         {/* Row 3 */}
         
-        {(reportType == "daily" || reportType == "monthly" || reportType == "custom") && <div className="w-full border">
+        {(reportType == "daily" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full border">
           <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
             id="locList"

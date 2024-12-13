@@ -37,6 +37,7 @@ import ClientForm from "./components/ClientForm";
 import ClientPage from "./pages/ClientPage";
 import FormWizard from "./pages/FormWizard";
 import RegistrationComplete from "./pages/RegistrationComplete";
+import VerifyEmail from "./pages/VerifyEmail";
 
 
 
@@ -79,8 +80,8 @@ function App() {
     Forecasts
   </Link>
     <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
-    <Link to="/location-list" onClick={showSettings} className="menu-item bm-item">Settings</Link>
-    <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>
+    <Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link>
+    {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
     
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}
        
@@ -113,6 +114,7 @@ function App() {
         <Route path="/settings-admin" element={<ClientListPage />} />
         <Route path="/wizard" element={<FormWizard />} />
         <Route path="/registration-complete" element={<RegistrationComplete />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
        
 <Route path="/contact-form" element={<ContactPage />} />

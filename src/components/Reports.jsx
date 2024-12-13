@@ -61,7 +61,7 @@ const Reports = () => {
 
       setReportContent(`
         <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
-          GThis feature is not available at your current service level
+          This feature is not available at your current service level
           <p>
           <a href=${VITE_PRICES_LINK}>Click Here to Upgrade</a>
         </div></center>
@@ -383,7 +383,7 @@ const Reports = () => {
 
       {/* Report Content */}
       <div id="reportArea"
-        className={`flex flex-col md:flex-[4] self-center sm:max-w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-y-scroll`}
+        className={`flex flex-col md:flex-[4] self-end sm:w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-auto`}
         dangerouslySetInnerHTML={{ __html: reportContent }}
       ></div>
     </div>

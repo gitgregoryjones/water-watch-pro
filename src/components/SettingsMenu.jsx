@@ -8,26 +8,26 @@ const SettingsMenu = ({ activeTab }) => {
   return (
     <div className="flex justify-start rounded space-x-6 mb-8 self-start bg-[transparent] w-full p-2">
       <Upgrade showMsg={false} tier={4}>
-        <Link
+      {window.innerWidth > 600 &&(<Link
           to="/settings-admin"
           className={`text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
             activeTab === 'clients' ? 'border-blue-500' : 'border-transparent'
           }`}
         >
           Client Management
-        </Link>
+        </Link>)}
       </Upgrade>
        
-      <Link
+      {window.innerWidth > 600 && (<Link
         to="/contact-list"
         className={`text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
           activeTab === 'contacts' ? 'border-blue-500' : 'border-transparent'
         }`}
       >
         Modify Contacts
-      </Link>
-      {user.tier !=4 && (
-      <Link
+      </Link>)}
+      {user.tier !=4 && window.innerWidth > 600 && (
+       <Link
         to="/location-list"
         className={`text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
           activeTab === 'locations' ? 'border-blue-500' : 'border-transparent'

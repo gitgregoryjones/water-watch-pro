@@ -149,7 +149,7 @@ export default function AdminCards() {
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.silver.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.silver.unpaid)}{summary.silver.unpaid} unpaid</div>
-          </div>
+          </div>  
         </Stats>
         <Stats onClick={(e)=> navigate("/settings-admin",{state:{bronze:true}})}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[tan] fa-solid fa-circle-user'></i>Bronze Tier</div>}>
         <div className='flex flex-col'>

@@ -108,6 +108,12 @@ export default function LoginForm() {
                 },
             });
 
+            let yourLocations = locationResponse.data;
+
+            if(!yourLocations || yourLocations.length == 0){
+                navigate("/wizard", {state:userData})
+            }
+
             let myLocations = locationResponse.data.map((l) => ({
                 ...l,
                 location: {

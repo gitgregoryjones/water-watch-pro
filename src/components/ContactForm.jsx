@@ -48,6 +48,7 @@ const ContactForm = ({ contactToEdit }) => {
     'Daily Report': { email: true, sms: true },
     Forecast: { email: true, sms: true },
     'NOAA Atlas 14': { email: true, sms: true },
+    '24 Hour Threshold': { email: true, sms: true },
   });
   
 

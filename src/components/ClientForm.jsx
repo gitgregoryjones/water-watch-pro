@@ -240,7 +240,7 @@ const ClientForm = ({ clientToEdit }) => {
 
         {/* Tier Radio Buttons */}
         <div className="border p-4 rounded">
-          <h2 className="text-xl font-bold mb-4">Account Tier</h2>
+          <h2 className="text-xl font-bold mb-4">Account Type</h2>
           <div className="flex items-center mb-2">
             <input
               type="radio"

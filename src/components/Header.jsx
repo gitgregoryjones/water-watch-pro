@@ -4,6 +4,10 @@ import logo from '../assets/logo.png';
 import { useLocation, Link } from 'react-router-dom';
 import Upgrade from './Upgrade';
 import { useSelector } from 'react-redux';
+import api from '../utility/api';
+import { useNavigate } from 'react-router-dom';
+
+
 
 
 
@@ -14,10 +18,13 @@ export default function Header() {
 
   const location = useLocation();
 
+  const navigate = useNavigate();
+
   // Check if the current path is the login page
   const isLoginPage = location.pathname === "/";
 
   const user = useSelector((state) => state.userInfo.user);
+  
 
   const trialEndDateStr = user.trial_end_date;
   const trialEndDate = new Date(trialEndDateStr);
@@ -30,6 +37,22 @@ export default function Header() {
   
 
   const daysLeft = (Math.max(Math.floor(differenceInMs / (1000 * 60 * 60 * 24)), 0));
+
+  async function logout(){
+
+    try {
+      
+      // Step 1: Log in to get the access token
+      const loginResponse = await api.post(`/auth/jwt/logout`)
+
+      navigate("/");
+
+    }catch(e){
+
+    }
+
+
+  }
 
   
   return (
@@ -73,7 +96,7 @@ export default function Header() {
   </Link>)}
   </div>
   
-  <Link to="/" className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
+  <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
     Logout
   </Link>
     <div className=' hidden flex fa-stack relative flex justify-center items-center'>

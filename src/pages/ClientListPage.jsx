@@ -192,10 +192,10 @@ const ClientListPage = () => {
                   Account Name
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
-                  Account Type
+                  Status
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
-                  Tier
+                Account Type
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell">
                   Actions

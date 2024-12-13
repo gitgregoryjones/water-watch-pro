@@ -101,114 +101,151 @@ const GeneralSettingsPage = () => {
             {/* Daily Report Section */}
             <div className="border p-6 rounded shadow-md">
               <h2 className="text-xl font-bold mb-4">Daily Report</h2>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center mb-4 gap-2">
                 <Toggle
                   checked={settings.daily_report_on}
                   onChange={() => handleToggle('daily_report_on')}
                 />
-                <span className="ml-4">Enabled</span>
+                <span className="">Enabled</span>
+                
               </div>
-              <div className="flex items-center">
+              <div className='ml-[56px]'>All contacts will receive the daily report, sent at 6 am
+              </div>
+              <div className="hidden flex items-center">
+                
                 <Toggle
                   checked={settings.daily_report_combine_locations}
                   onChange={() => handleToggle('daily_report_combine_locations')}
                 />
                 <span className="ml-4">Combine Locations</span>
               </div>
+              
             </div>
 
             {/* 24 Hour Threshold Section */}
-            <div className="border p-6 rounded shadow-md">
+            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">24 Hour Threshold Exceeded</h2>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center">
                 <Toggle
                   checked={settings.exceed24h_on}
                   onChange={() => handleToggle('exceed24h_on')}
                 />
-                <span className="ml-4">Enabled</span>
+                <span className="ml-2">Enabled</span>
+               
+              </div>
+              <div className='ml-[56px] mb-4'>All contacts receive notification when assigned locations exceed the 24-hour threshold
               </div>
               <div className="flex items-center">
                 <Toggle
                   checked={settings.exceed24h_combine_locations}
                   onChange={() => handleToggle('exceed24h_combine_locations')}
                 />
-                <span className="ml-4">Combine Locations</span>
+                <span className="ml-2">Combine Locations</span>
               </div>
+              <div className='ml-[56px] flex flex-col gap-2'><span>Notification for multiple locations combined into a single email or text. Recommended for accounts with many locations.</span>
+<span>If turned off, contacts receive individual text and email notifications for each location exceeding the threshold.</span>
+</div>
             </div>
 
             {/* Forecast Section */}
-            <div className="border p-6 rounded shadow-md">
+            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">Forecast</h2>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center ">
                 <Toggle
                   checked={settings.forecast_on}
                   onChange={() => handleToggle('forecast_on')}
                 />
-                <span className="ml-4">Enabled</span>
+                <span className="ml-2">Enabled</span>
+              </div>
+              <div className='ml-[56px] mb-4'>All contacts receive notification when assigned locations are forecast exceed the 24-hour threshold. 
+
               </div>
               <div className="flex items-center">
                 <Toggle
                   checked={settings.forecast_combine_locations}
                   onChange={() => handleToggle('forecast_combine_locations')}
                 />
-                <span className="ml-4">Combine Locations</span>
+                <span className="ml-2">Combine Locations</span>
               </div>
+              <div className='ml-[56px] flex flex-col gap-2'><span>Notification for multiple locations combined into a single email or text. Recommended for accounts with many locations.</span>
+<span>If turned off, contacts receive individual text and email notifications
+</span>
+</div>
             </div>
-
+            <Upgrade tier={2} showMsg={false}>
             {/* NOAA Atlas 14 Section */}
-            <div className="border p-6 rounded shadow-md">
+            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">NOAA Atlas 14</h2>
-              <div className="flex items-center mb-4">
+              <div className="hidden flex items-center ">
                 <Toggle
                   checked={settings.atlas14_on}
                   onChange={() => handleToggle('atlas14_on')}
                 />
                 <span className="ml-4">Enabled</span>
               </div>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center ">
                 <Toggle
                   checked={settings.atlas14_24h_on}
                   onChange={() => handleToggle('atlas14_24h_on')}
                 />
-                <span className="ml-4">24 Hour</span>
+                <span className="ml-2">24 Hour</span>
               </div>
-              <div className="flex items-center mb-4">
+              <div className='ml-[56px] mb-4'>Receive notification when 24 hour values exceed NOAA Atlas maximums
+              </div>
+              <div className="flex items-center">
                 <Toggle
                   checked={settings.atlas14_1h_on}
                   onChange={() => handleToggle('atlas14_1h_on')}
                 />
-                <span className="ml-4">1 Hour</span>
+                <span className="ml-2">1 Hour</span>
+              </div>
+              <div className='ml-[56px] mb-4'>Receive notification when 1 hour values exceed NOAA Atlas maximums
               </div>
               <div className="flex items-center">
                 <Toggle
                   checked={settings.atlas14_first_on}
                   onChange={() => handleToggle('atlas14_first_on')}
                 />
-                <span className="ml-4">First</span>
+                <span className="ml-2">First</span>
               </div>
+              <div className='ml-[56px] flex flex-col gap-2'><span>Receive notification the first time values are exceeded.</span>
+<span>If turned off, notifications are sent each time the exceedance occurs.
+</span>
+</div>
             </div>
 
             {/* RapidRain Alerts */}
-            <div className="border p-6 rounded shadow-md">
+            
+            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">RapidRain Alerts</h2>
-              <div className="flex items-center mb-4">
+              <div className="flex items-center ">
                 <Toggle
                   checked={settings.rapidrain_on}
                   onChange={() => handleToggle('rapidrain_on')}
                 />
-                <span className="ml-4">Enabled</span>
+                <span className="ml-2">Enabled</span>
+                
+
+              </div>
+              <div className='ml-[56px] mb-4'>Receive notification when hourly values exceed 15-minute RapidRain thresholds
               </div>
               <div className="flex items-center">
                 <Toggle
                   checked={settings.rapidrain_combine_locations}
                   onChange={() => handleToggle('rapidrain_combine_locations')}
                 />
-                <span className="ml-4">Combine Locations</span>
+                <span className="ml-2">Combine Locations</span>
+               
               </div>
+              <div className='ml-[56px] mb-4'>RNotifications for multiple locations exceeding the RapidRain thresholds are combined into one email or text.
+
+
+</div>
             </div>
+            </Upgrade>
 
             {/* Submit Button */}
-            <div className="flex justify-end">
+            <div className="flex justify-start">
               <button
                 type="button"
                 onClick={handleSubmit}

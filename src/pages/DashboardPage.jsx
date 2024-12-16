@@ -624,7 +624,7 @@ function showThreshold(color){
             <RainfallChart location={location} period={"hourly"} max={2} />
             </div>
             <div className='tab'>RapidRain
-           <Upgrade tier={3}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
+           <Upgrade tier={2}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
             </div>
             <div className='tab'>NOAA Atlas 14
             <Upgrade tier={2}><ResponsiveTable  location={location} /></Upgrade>

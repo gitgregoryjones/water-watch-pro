@@ -109,7 +109,7 @@ const GeneralSettingsPage = () => {
                 <span className="">Enabled</span>
                 
               </div>
-              <div className='ml-[56px]'>All contacts will receive the daily report, sent at 6 am
+              <div className='ml-[56px]'>All contacts will receive the daily report, sent at 6 am EDT
               </div>
               <div className="hidden flex items-center">
                 

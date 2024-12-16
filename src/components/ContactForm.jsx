@@ -90,9 +90,9 @@ const ContactForm = ({ contactToEdit }) => {
 
     try {
       if (contactToEdit) {
-        await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${user.clients[0]?.id}`, payload);
+        await api.patch(`/api/contacts/${contactToEdit.id}/?xclient_id=${user.clients[0]?.id}`, payload);
       } else {
-        await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
+        await api.post(`/api/contacts/?xclient_id=${user.clients[0]?.id}`, payload);
       }
 
       setTimeout(() => {

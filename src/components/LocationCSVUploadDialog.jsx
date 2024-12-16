@@ -9,7 +9,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [processing, setProcessing] = useState(false);
   const [successRows, setSuccessRows] = useState([]);
 
-  const requiredFields = ["name", "lat", "lng", "limit24"];
+  const requiredFields = ["name", "lat", "lng", "limit24","rapidrain"];
   const validThresholdValues = [0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4];
 
   const validateRow = (row) => {
@@ -24,14 +24,14 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
 
     // Validate latitude
     const latitude = parseFloat(row.lat);
-    if (isNaN(latitude) || latitude < -90 || latitude > 90) {
-      errorMessages.push(`Invalid latitude: ${row.lat}. Must be between -90 and 90.`);
+    if (isNaN(latitude) || latitude < 20 || latitude > 55) {
+      errorMessages.push(`Invalid latitude: ${row.lat}. Latitude must be between 20 and 55 degrees.`);
     }
 
     // Validate longitude
     const longitude = parseFloat(row.lng);
-    if (isNaN(longitude) || longitude < -180 || longitude > -66) {
-      errorMessages.push(`Invalid longitude: ${row.lng}. Must be between -180 and -66.`);
+    if (isNaN(longitude) || longitude < -125 || longitude > -70) {
+      errorMessages.push(`Invalid longitude: ${row.lng}. Longitude must be between -125 and -70 degrees`);
     }
 
     // Validate limit24
@@ -41,6 +41,8 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
         `Invalid limit24: ${row.limit24}. Must be one of ${validThresholdValues.join(", ")}.`
       );
     }
+
+    
 
    
 
@@ -53,6 +55,44 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
     setSuccess(false);
   };
 
+  function processCSV(inputString) {
+    const lines = inputString.split("\n");
+    const output = [];
+    let lastHashLineIndex = -1;
+  
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+  
+      // Skip lines starting with #
+      if (line.startsWith("#")) {
+        lastHashLineIndex = i; // Track the last line with #
+        continue;
+      }
+  
+      // Skip the first line after the last # line
+    //  if (i === lastHashLineIndex + 1) continue;
+  
+      // Process remaining lines
+      const parts = line.split(",");
+  
+      // If the line doesn't have exactly 5 parts, fix it
+      if (parts.length === 4) {
+        parts.push(parts[3]); // Default the 5th part with the value of the 4th
+      }
+  
+      // Join the updated parts and add them to the output
+      if (parts.length === 5) {
+        output.push(parts.join(","));
+      }
+    }
+  
+    // Return the processed CSV as a string
+    return output.join("\n");
+  }
+  
+
+
+
   const processFile = () => {
     if (!file) return;
 
@@ -64,6 +104,13 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       header: true,
       skipEmptyLines: true,
       comments: "#",
+      beforeFirstChunk:(chunk)=>{
+
+          let cleanChunk = processCSV(chunk)
+          console.log(`See Rapid Rain ${JSON.stringify(cleanChunk)}`)
+        
+        return cleanChunk;
+      },
       complete: async (results) => {
         const { data, errors: parseErrors } = results;
 

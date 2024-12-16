@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from 'styled-components';
 import Button from '../components/WaterWatchProButton';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { API_HOST } from '../utility/constants';
 import api from '../utility/api';
+import {loginUser} from '../utility/loginUser';
 
 export default function LoginForm() {
     const [logView, setLogView] = useState(true);
@@ -17,11 +18,23 @@ export default function LoginForm() {
     const [password, setPassword] = useState("");
     const [serverError, setServerError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
+    const emailRef = useRef(null);
+    const passwordRef = useRef(null);
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     let [loggingIn, setLoggingIn] = useState(false);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+    
+        if (name === 'email') {
+          setEmail(value);
+        } else if (name === 'password') {
+          setPassword(value);
+        }
+      };
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -30,88 +43,37 @@ export default function LoginForm() {
         try {
             setServerError(false);
 
-            // Step 1: Log in to get the access token
-            const loginResponse = await api.post(`/auth/jwt/login`, new URLSearchParams({
-                grant_type: "password",
-                username: email,
-                password: password,
-                client_id: "string",
-                client_secret: "string",
-                scope: "",
-            }), {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            });
+            let lresponse = await loginUser(email, password);
 
-            const { access_token: accessToken } = loginResponse.data;
+            let userData = {};
 
-            localStorage.setItem("accessToken", accessToken);
-            //localStorage.setItem("refreshToken", loginData.refresh_token);
+            if(lresponse.errors.length == 0){
 
+                userData = lresponse.userData;
 
-            if (!accessToken) {
-                setErrorMsg("Login failed. Please check your credentials.");
-                setServerError(true);
-                throw new Error("Login failed");
-            }
-
-            console.log(`Received bearer token: ${accessToken}`);
-
-            // Step 2: Use the Token To get The Full User Profile
-            const verifyResponse = await api.get(`/users/me`, {
-                headers: {
-                    "Authorization": `Bearer ${accessToken}`,
-                },
-            });
-
-            const userData = verifyResponse.data;
-
-            userData.firstName = userData.first_name;
-            userData.lastName = userData.last_name;
-            userData.accessToken = accessToken;
-
-            switch (userData.clients[0]?.tier?.toLowerCase()) {
-                case "bronze":
-                    userData.tier = 1;
-                    break;
-              
-                case "gold":
-                    userData.tier = 3;
-                    break;
-                case "silver":
-                    userData.tier = 2;
-                    break;
-                default:
-                    userData.tier = 0;
-                    break;
-            }
-
-            if(userData.is_superuser == true){
-                userData.tier = 4;
-            }
-
-            // Step 3: Get the locations for this client
-            const clients = userData.clients;
-            if (!clients) {
-                throw new Error(`Client Account information missing for this user ${userData.firstName} ${userData.lastName}`);
-            }
+            }  else {
+                setErrorMsg(lresponse.errors[0])
+                return;
+            }  
 
             const locationResponse = await api.get(`/api/locations`, {
                 params: {
-                    client_id: clients[0].id,
+                    client_id: lresponse.userData.clients[0].id,
                     page: 1,
                     page_size: 250,
                 },
                 headers: {
-                    "Authorization": `Bearer ${accessToken}`,
+                    "Authorization": `Bearer ${lresponse.userData.accessToken}`,
                 },
             });
 
             let yourLocations = locationResponse.data;
 
             if(!yourLocations || yourLocations.length == 0){
+                //await api.post('/auth/jwt/logout');
+                dispatch(updateUser(userData));
                 navigate("/wizard", {state:userData})
+                return;``
             }
 
             let myLocations = locationResponse.data.map((l) => ({
@@ -132,11 +94,11 @@ export default function LoginForm() {
 
             const location24History = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
-                    client_id: clients[0].id,
+                    client_id: userData.clients[0].id,
                     
                 },
                 headers: {
-                    "Authorization": `Bearer ${accessToken}`,
+                    "Authorization": `Bearer ${userData.accessToken}`,
                 },
             });
 
@@ -171,11 +133,11 @@ export default function LoginForm() {
 
             const locationHourlyHistory = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
-                    client_id: clients[0].id,
+                    client_id: userData.clients[0].id,
                     date: todayStr,
                 },
                 headers: {
-                    "Authorization": `Bearer ${accessToken}`,
+                    "Authorization": `Bearer ${userData.accessToken}`,
                 },
             });
 
@@ -243,22 +205,27 @@ export default function LoginForm() {
                 </ButtonContainer>
                 <label hidden={logView}>Email</label>
                 <input
-                    name="email"
-                    type="email"
-                    onInput={(e) => setEmail(e.target.value)}
-                    value={email}
-                    placeholder="Email Address"
-                    className='p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
-                />
-                <label hidden={logView}>Password</label>
-                <input
-                    name="password"
-                    type="password"
-                    onInput={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your Password"
-                    value={password}
-                    className='placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold'
-                />
+        ref={emailRef}
+        name="email"
+        type="email"
+        autoComplete="username"
+        onInput={handleChange}
+        value={email}
+        placeholder="Email Address"
+        className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+      />
+      <input
+        ref={passwordRef}
+        name="password"
+        type="password"
+        autoComplete="current-password"
+        onInput={handleChange}
+        value={password}
+        placeholder="Enter your Password"
+        className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+      />
+
+
                 <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Trial Account</Link>
                 <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Paid Account</Link>
               

@@ -6,9 +6,16 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import api from '../utility/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUser } from '../utility/UserSlice';
+import { loginUser, patchClient } from '../utility/loginUser';
+
+
 
 const FormWizard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.userInfo.user);
   
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -110,6 +117,8 @@ useEffect(()=>{
 
  }
 
+ 
+
  const addLocation = async ()=>{
 
     
@@ -127,7 +136,20 @@ useEffect(()=>{
             
         }))
 
-        console.log(`User registered successfully ${JSON.stringify(locationResponse.data)}`)
+        const userData = {...user};
+
+        let theLocation = {...locationResponse.data, lat:locationResponse.data.latitude, lng:locationResponse.data.longitude}
+
+        //Weird formatting on dashboard page.  need to fix this
+        theLocation.location = {...locationResponse.data, lat:locationResponse.data.latitude, lng:locationResponse.data.longitude}
+
+        
+
+        userData.locations = [theLocation]
+
+        dispatch(updateUser(userData));
+
+        console.log(`User registered successfully ${JSON.stringify(userData)}`)
 
         return true;
         
@@ -221,12 +243,12 @@ useEffect(()=>{
             return;
         }
 
-        if(location.state && location.state.tier != "gold"){
+       
+        if(formData.tier != "gold"){
             formData.rapidrain = formData.threshold;
-        }
-
+        } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(formData.rapidrain))){
-            setErrors(`24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4 `)
+            setErrors(`Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4 `)
             return;
         }
         return true;
@@ -239,31 +261,67 @@ useEffect(()=>{
   };
   
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(`Inside submit`)
     setShowMsg(true)
+    console.log(`After submit`)
     if (validateStep()) {
-      
-      if(location.state){
+      console.log(`Inside Validate Step`)
+      if(currentStep == 4){
         //The state is available after the user logs in.  Now continue setting up the account.  The registration process adds a User and Client record.
         //Now we only need to add a location for this client
         addLocation();
-        setShowMsg(false)
-        console.log(`Got the user from ${JSON.stringify(location.state.user)} and now save location to the DB ${JSON.stringify(formData)}`)
+        
+        console.log(`Got the user from ${JSON.stringify(user)} and now save location to the DB ${JSON.stringify(formData)}`)
         setTimeout(()=>{
-
+            setShowMsg(false)
             setSuccess('location added successfully');navigate('/dashboard')},
            3000);
    
-       } else {
-        addUser();
-        setShowMsg(false)
-        setCurrentStep(3)
-           setShowMsg(false)
-       }
-      } 
+       } else if(currentStep == 2){
+        await addUser();
+        //Now Login As User
 
-   
+        
+        const lresponse = await loginUser(formData.email, formData.password);
+
+        dispatch(updateUser(lresponse.userData));
+        
+
+        let savedClient = lresponse.userData?.clients[0]
+
+        let newClient =  {...savedClient, tier: formData.tier, account_type: formData.subscriptionLevel }
+
+        console.log(`Writing new client ${JSON.stringify(newClient)} to user ${JSON.stringify(lresponse.userData)}`)
+
+        //If not bronze, overwrite client
+        await patchClient(newClient)
+
+        let userCopy = {...lresponse.userData};
+
+        userCopy.clients = [newClient];
+
+        dispatch(updateUser(userCopy));
+
+        if(lresponse.errors.length == 0){
+            setCurrentStep(4)
+
+        } else  {
+            setErrors(lresponse.errors[0])
+        }
+            
+           // setCurrentStep(4)
+            setShowMsg(false)
+       
+       
+       }
+      }  else {
+        //alert('hi')
+        console.log(`Step was not valid`)
+        setShowMsg(false)
+      }
+
+   console.log(`Leaving Submit....`)
   };
 
   return (
@@ -272,7 +330,7 @@ useEffect(()=>{
   
 >
         
-    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>{!location.state ? 'Register':`Welcome ${location.state.first_name}`}</div></h1>
+    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>{currentStep != 4 ? 'Register':`Welcome ${user.first_name}`}</div></h1>
     
     <div className='text-xl text-[red] m-2 mx-6'>{errors}</div>
     <div className='text-xl text-[black] m-2'>{success}</div>
@@ -422,7 +480,7 @@ Questions? Contact us at support@waterwatchpro.com.
 
       {currentStep === 4 && (
         <div className='border rounded-2xl p-4 mb-4'>
-          <h2 className="text-xl font-bold mb-4">Monitored Location</h2>
+          <h2 className="text-xl font-bold mb-4">Monitored Location!</h2>
           
           <div className="mb-4">
             <label className="block text-gray-700">Location Name <span className='text-[red]'>*</span></label>
@@ -570,8 +628,9 @@ Questions? Contact us at support@waterwatchpro.com.
           </button>
         )}
       </div>)}
-      <WorkingDialog showDialog={showMsg}/>
+      
       </div>
+      <WorkingDialog showDialog={showMsg}/>
     </div>
   );
 };

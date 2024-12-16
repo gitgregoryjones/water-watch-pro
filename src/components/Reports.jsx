@@ -139,6 +139,19 @@ const Reports = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setReportContent(''); // Clear previous content
+
+    const notImplemented = ["sms","emails","unpaid"]
+
+    if(notImplemented.includes(reportType)){
+      const errorMessage = `
+        <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+          <p><strong>TODO:</strong> "${reportType}" Reports aren't implemented yet</p>
+        </div>
+      `;
+      setReportContent(errorMessage);
+
+      return;
+    }
   
     // Validation logic
     if (selectedLocations.length === 0 &&  !user.is_superuser) {
@@ -241,6 +254,7 @@ const Reports = () => {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> An error occurred while fetching the report.</p>
+            <p>${error.message.indexOf('404')> -1 ? 'Location not found' : error.message}</p>
             <p>Please try again later.</p>
           </div>
         `;
@@ -286,7 +300,7 @@ const Reports = () => {
             </Upgrade>
 
               {!user.is_superuser && <option value="daily">Custom</option>}
-              {!user.is_superuser && <option value="weekly">Weekly</option>}
+              {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
           </select>
@@ -383,7 +397,7 @@ const Reports = () => {
 
       {/* Report Content */}
       <div id="reportArea"
-        className={`flex flex-col md:flex-[4] self-end sm:w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-auto`}
+        className={`flex flex-col md:flex-[4]   self-end sm:w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-auto`}
         dangerouslySetInnerHTML={{ __html: reportContent }}
       ></div>
     </div>

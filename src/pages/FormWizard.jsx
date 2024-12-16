@@ -36,7 +36,7 @@ const FormWizard = () => {
     companyName: '',
     companyPhone: '',
     companyEmail: '',
-    subscriptionLevel: 'paid',
+    subscriptionLevel: 'trial',
     tier: 'gold',
     locationName: '',
     latitude: '',
@@ -44,6 +44,8 @@ const FormWizard = () => {
     threshold: '0.5',
     rapidrain: '',
   });
+
+  console.log(`State passed is ${JSON.stringify(location.state)}`)
 
   const [errors,setErrors] = useState("")
   const [success,setSuccess] = useState("")
@@ -76,11 +78,10 @@ const FormWizard = () => {
   };
 
 useEffect(()=>{
-    console.log(`User passed was ${JSON.stringify(location.state)}`)
+    console.log(`Location passed was ${JSON.stringify(location.state)}`)
     //The User Was Passed, so go to the Location page
-  if(location.state){
-    setCurrentStep(4);
-  }
+    setFormData({...formData, subscriptionLevel:location.state.account_type })
+  
 
 },[])
   
@@ -204,6 +205,11 @@ useEffect(()=>{
         if (formData.password !== formData.confirmPassword) {
           setErrors('Passwords do not match.');
           return false;
+        }
+
+        if(!formData.termsAccepted){
+            setErrors('Please accept the terms')
+            return false;
         }
         return true;
         break;
@@ -336,7 +342,7 @@ useEffect(()=>{
     <div className='text-xl text-[black] m-2'>{success}</div>
     <div className='p-6 bg-[white]'>
       {currentStep < 3 && (<div className="flex w-full justify-between mb-4">
-        Step {currentStep} of 4 {location?.state ? `for ${location.state.first_name} ${location.state.last_name}` : ""}
+        Step {currentStep} of 3 
         
        { currentStep < 3 && <Link to="/">I already have a login</Link>}
       </div>)}
@@ -427,7 +433,7 @@ useEffect(()=>{
                 checked={formData.termsAccepted}
                 onChange={handleChange}
               />
-              I agree to the terms and conditions
+              <a href="https://drive.google.com/file/d/15j0YmwgK4UsPKo3FfTj3jpTdCEF5X75J/view" target="_top">I agree to the terms and conditions</a>
             </label>
           </div>
         </div>

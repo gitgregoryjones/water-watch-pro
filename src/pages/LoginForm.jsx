@@ -226,9 +226,9 @@ export default function LoginForm() {
       />
 
 
-                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Trial Account</Link>
-                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to="/wizard">Create Paid Account</Link>
-              
+                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
+                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
+                
             </FormContainer>
         </div>
     );

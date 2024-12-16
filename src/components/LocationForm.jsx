@@ -70,7 +70,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       } else {
         // Create new location using POST
         response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData);
-        alert('Location created successfully!');
+       // alert('Location created successfully!');
       }
       setResponseData(response.data); // Store response data for display
       console.log('Response Data:', response.data); // Log the response data
@@ -93,7 +93,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     if (window.confirm('Are you sure you want to delete this location?')) {
       try {
         await api.delete(`/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`);
-        alert('Location deleted successfully!');
+        //alert('Location deleted successfully!');
         onSubmitSuccess(); // Refresh the parent list or close the form
       } catch (error) {
         console.error('Error deleting location:', error.message);

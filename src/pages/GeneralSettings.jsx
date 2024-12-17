@@ -237,7 +237,7 @@ const GeneralSettingsPage = () => {
                 <span className="ml-2">Combine Locations</span>
                
               </div>
-              <div className='ml-[56px] mb-4'>RNotifications for multiple locations exceeding the RapidRain thresholds are combined into one email or text.
+              <div className='ml-[56px] mb-4'>Notifications for multiple locations exceeding the RapidRain thresholds are combined into one email or text.
 
 
 </div>

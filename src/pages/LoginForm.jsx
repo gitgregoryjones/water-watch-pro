@@ -105,7 +105,8 @@ export default function LoginForm() {
             const loc24 = location24History.data;
 
             myLocations = myLocations.map((location) => {
-                location.atlas14_threshold = JSON.parse(location.atlas14_threshold);
+                //location.atlas14_threshold = JSON.parse(location.atlas14_threshold);
+                location.atlas14_threshold = (location.atlas14_threshold);
                 let loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
                     try {

@@ -294,9 +294,9 @@ const Reports = () => {
           >
             <Upgrade tier={4}>
             <option value="sms">Files Processed</option>
-              <option value="sms">SMS Sent/Received</option>
-              <option value="emails">Emails Sent/Received</option>
-              <option value="unpaid">Unpaid By Tier</option>
+              <option value="sms">SMS Sent/Rejected</option>
+              <option value="emails">Emails Sent/Rejected</option>
+              <option value="billing">Billing</option>
             </Upgrade>
 
               {!user.is_superuser && <option value="daily">Custom</option>}

@@ -128,7 +128,7 @@ export default function AdminCards() {
           <div className='flex gap-2 justify-center items-center'><i className='fa text-[orange] fa-solid fa-circle-exclamation'></i>As of 1300 EDT</div>
           </div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 2 </div>}>
+        <Stats className={`hidden`} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 2 </div>}>
           <div className='flex items-center justify-center md:text-3xl text-2xl text-[white]'>On Standby</div>
         </Stats>
       </div>

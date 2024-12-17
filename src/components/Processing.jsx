@@ -48,7 +48,7 @@ export default function Processing({showPlain = false}) {
   if(!showPlain) {  
   return (
   
-     <div className='flex justify-center items-center text-xs md:w-[17rem] md:text-lg md:flex bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} ET data </div>
+     <div className='flex flex-col md:flex-row justify-center items-center text-xs md:w-[17rem] md:text-lg bg-[#ffbc00] p-2 rounded border border-[black]'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} ET data </div>
   )
   } else {
    return <div className='w-full  flex justify-center items-center text-xs  md:text-2xl'>Data Up To {plainMsg} ET</div>

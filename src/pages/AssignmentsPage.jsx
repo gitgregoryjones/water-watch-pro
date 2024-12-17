@@ -40,7 +40,7 @@ const AssignmentsPage = () => {
 
   useEffect(() => {
     // Fetch all contacts for the user
-    api.get(`/api/contacts/?client_id=${user.clients[0]?.id}`)
+    api.get(`/api/contacts/?client_id=${user.clients[0]?.id}&page=1&page_size=250`)
       .then((response) => {
         const contactNames = response.data.map((contact) => ({
           id: contact.id,
@@ -58,7 +58,7 @@ const AssignmentsPage = () => {
     if (selectedLocation) {
       setWorking(true)
       api
-        .get(`/api/locations/${selectedLocation}/contacts?client_id=${user.clients[0]?.id}&page=1&page_size=50`)
+        .get(`/api/locations/${selectedLocation}/contacts?client_id=${user.clients[0]?.id}&page=1&page_size=250`)
         .then((response) => {
           const assigned = response.data.map((contact) => ({
             id: contact.id,

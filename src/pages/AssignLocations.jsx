@@ -17,7 +17,7 @@ const AssignLocations = () => {
 
   useEffect(() => {
     // Fetch all contacts for the user
-    api.get('/api/contacts')
+    api.get('/api/contacts?page=1&page_size=250')
       .then((response) => {
         const contactList = response.data.map((contact) => ({
           id: contact.id,
@@ -64,7 +64,7 @@ const AssignLocations = () => {
 
     selectedUnassignedLocations.forEach((location) => {
       api
-        .post(`/api/contacts/${selectedContact}/locations/${location.id}`)
+        .post(`/api/contacts/${selectedContact}/locations/${location.id}?page=1&page_size=250`)
         .then(() => {
           fetchAssignedLocations();
         })

@@ -113,8 +113,10 @@ export default function LoginForm() {
                        
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
-                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"
+                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
                         : "green";
+
+                    
 
                         //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
                     }catch (e){
@@ -147,9 +149,7 @@ export default function LoginForm() {
             myLocations = myLocations.map((location) => {
                 const locHourlyData = locHourly.locations[location.id];
                 if (locHourlyData) {
-                    if(location.name == "Brownsville Daily"){
-                        console.log(`Brownsville ${JSON.stringify(locHourlyData)}`)
-                    }
+                    
                     location.total_hourly_rainfall = locHourlyData.total_rainfall;
                     location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
                        ? "orange"

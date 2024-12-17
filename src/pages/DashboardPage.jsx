@@ -74,7 +74,7 @@ export default function DashboardPage() {
 
   var [isNewContact, setIsNewContact] = useState(false);
 
-  var [mapZoom, setMapZoom] = useState(7)
+  var [mapZoom, setMapZoom] = useState(12)
 
   var [assignedContact, setAssignedContact] = useState([{locations:[]}])
 

@@ -123,7 +123,7 @@ const AssignmentsPage = () => {
 
   const filterLocations = (e)=> setSearchTerm(e.target.value);
  
-  const  filtered = locations.filter(l => l.name.startsWith(searchTerm)  );
+  const  filtered = locations.filter(l => l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()  ));
 
   return (
     <div className="mt-16 md:p-6 w-full text-sm flex flex-col items-center ">

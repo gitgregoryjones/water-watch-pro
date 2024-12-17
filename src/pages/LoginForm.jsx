@@ -110,9 +110,7 @@ export default function LoginForm() {
                 let loc24Data = loc24.locations[location.id];
                 if (loc24Data) {
                     try {
-                        if(location.name == "Brownsville"){
-                            console.log(`Brownsville ${JSON.stringify(loc24Data)}`)
-                        }
+                       
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
                         ? location.total_rainfall > location.atlas14_threshold['24h'][0] ? "red" : "orange"

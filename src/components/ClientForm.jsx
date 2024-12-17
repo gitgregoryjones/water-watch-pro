@@ -173,20 +173,58 @@ const ClientForm = ({ clientToEdit }) => {
             />
             <span className="ml-2">Suspend Account</span>
           </div>
-          <div className="hidden flex items-center mb-2">
-            <Toggle
-              checked={additionalSettings.convertToDemo}
-              onChange={() => toggleAdditionalSetting('convertToDemo')}
-            />
-            <span className="ml-2">Convert To Demo Account</span>
-          </div>
-          <div className="flex items-center mb-2 gap-2">
-          <Toggle checked={account_type == "paid" ? true : false} onChange={() => setAccount_Type(account_type == "paid" ? "trial" : "paid")} />
-            <div className='flex flex-row gap-2'>
-            <span className="">Convert To Paid Account</span>
-           
-            </div>
-          </div>
+          <div className="border p-4 rounded">
+  <h2 className="text-xl font-bold mb-4">Account Type</h2>
+  <div className="flex items-center gap-4">
+    <label className="flex items-center">
+      <input
+        type="radio"
+        name="account_type"
+        value="paid"
+        checked={account_type === 'paid'}
+        onChange={(e) => setAccount_Type(e.target.value)}
+        className="mr-2"
+      />
+      Paid
+    </label>
+    <label className="flex items-center">
+      <input
+        type="radio"
+        name="account_type"
+        value="trial"
+        checked={account_type === 'trial'}
+        onChange={(e) => setAccount_Type(e.target.value)}
+        className="mr-2"
+      />
+      Trial
+    </label>
+
+    <label className="flex items-center">
+      <input
+        type="radio"
+        name="account_type"
+        value="demo"
+        checked={account_type === 'demo'}
+        onChange={(e) => setAccount_Type(e.target.value)}
+        className="mr-2"
+      />
+      Demo
+    </label>
+
+    <label className="flex items-center">
+      <input
+        type="radio"
+        name="account_type"
+        value="free"
+        checked={account_type === 'free'}
+        onChange={(e) => setAccount_Type(e.target.value)}
+        className="mr-2"
+      />
+      Free
+    </label>
+  </div>
+</div>
+
           <div>
           <label htmlFor="account_type" className="block text-gray-700 font-bold">
             Last Payment Status

@@ -76,6 +76,7 @@ const loginUser = async (email, password)=>{
         case "silver":
             userData.tier = 2;
             break;
+        
         default:
             userData.tier = 0;
             break;
@@ -85,6 +86,7 @@ const loginUser = async (email, password)=>{
         userData.tier = 4;
     }
 
+    
     // Step 3: Get the locations for this client
     const clients = userData.clients;
 

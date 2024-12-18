@@ -9,7 +9,7 @@ import api from '../utility/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
-
+import { VITE_PAYMENT_LINK_GOLD } from '../utility/constants';
 
 
 const FormWizard = () => {
@@ -18,7 +18,7 @@ const FormWizard = () => {
   const user = useSelector((state) => state.userInfo.user);
 
   const [searchParams] = useSearchParams();
-  const session = searchParams.get('wwp_client');
+  const session = searchParams.get('session');
 
   
   const location = useLocation();
@@ -94,10 +94,12 @@ useEffect(()=>{
       //get the stripe session_id for the account from the record and see if they have paid, if so, forward to step 4.  If not, forward to stripe to complete payment      
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
-
-      setCurrentStep(4)
-    } else {
-      setCurrentStep(1)
+      if(session){
+        //do Stripe Lookup and if complete go to step 4, otherwise go to stripe
+        setCurrentStep(4)
+        
+      }
+     
     }
 
   
@@ -368,7 +370,11 @@ useEffect(()=>{
         dispatch(updateUser(userCopy));
 
         if(lresponse.errors.length == 0){
-            setCurrentStep(4)
+          //Forward to Stripe for Payment
+
+          window.location.href = VITE_PAYMENT_LINK_GOLD;
+          
+          //  setCurrentStep(4)
 
         } else  {
             setErrors(lresponse.errors[0])

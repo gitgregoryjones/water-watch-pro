@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Toggle from '../components/Toggle';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import WorkingDialog from '../components/WorkingDialog';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import api from '../utility/api';
@@ -16,6 +16,10 @@ const FormWizard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
+
+  const [searchParams] = useSearchParams();
+  const session = searchParams.get('wwp_client');
+
   
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -84,10 +88,18 @@ useEffect(()=>{
     if(location.state?.accountType){
       setFormData({...formData, subscriptionLevel:location.state.account_type })
     }  
-    if(user.id && !user.locations ){
+    //wwp_session = user id
+    if(user.clients[0].status == "pending"){
+      console.log(`The user is ${JSON.stringify(user.clients)}`)
+      //get the stripe session_id for the account from the record and see if they have paid, if so, forward to step 4.  If not, forward to stripe to complete payment      
+      //Read Stripe Session Id from record
+      //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
 
       setCurrentStep(4)
+    } else {
+      setCurrentStep(1)
     }
+
   
 
 },[])
@@ -132,7 +144,7 @@ useEffect(()=>{
 
     try {
         
-        // Step 1: Log in to get the access token
+        // Step 1: Log Add The Location
         const locationResponse = await api.post(`/api/locations`,({
             name: formData.locationName,
             latitude: formData.latitude,
@@ -150,15 +162,28 @@ useEffect(()=>{
         //Weird formatting on dashboard page.  need to fix this
         theLocation.location = {...locationResponse.data, lat:locationResponse.data.latitude, lng:locationResponse.data.longitude}
 
-        
-
         userData.locations = [theLocation]
 
-        dispatch(updateUser(userData));
+        
 
         console.log(`User registered successfully ${JSON.stringify(userData)}`)
 
-        return true;
+         // Step 1: Log Add The Location
+         const clientResponse = await patchClient({
+          id:user.clients[0].id,
+          status:'active'
+          
+        })
+
+        userData.clients = [clientResponse.clientData];
+
+        console.log(`Client Status should be active now ${JSON.stringify(userData)}`)
+
+
+        dispatch(updateUser(userData));
+
+
+        return clientResponse.errors;
         
         
     }catch(e){
@@ -287,7 +312,17 @@ useEffect(()=>{
       if(currentStep == 4){
         //The state is available after the user logs in.  Now continue setting up the account.  The registration process adds a User and Client record.
         //Now we only need to add a location for this client
-        addLocation();
+        let locStep = await addLocation();
+
+        if(locStep.errors && locStep.errors.length > 0){
+
+          setErrors(locStep.errors[0])
+          return;
+        }
+
+        //Set Account to 'active'
+        //client.status = 'active'
+        //save client
         
         console.log(`Got the user from ${JSON.stringify(user)} and now save location to the DB ${JSON.stringify(formData)}`)
         setTimeout(()=>{
@@ -319,7 +354,7 @@ useEffect(()=>{
 
         let savedClient = lresponse.userData?.clients[0]
 
-        let newClient =  {...savedClient, tier: formData.tier, account_type: formData.subscriptionLevel }
+        let newClient =  {...savedClient, tier: formData.tier, is_trial_account: formData.subscriptionLevel == "trial",account_type: formData.subscriptionLevel, status:'pending' }
 
         console.log(`Writing new client ${JSON.stringify(newClient)} to user ${JSON.stringify(lresponse.userData)}`)
 

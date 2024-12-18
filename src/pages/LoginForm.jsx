@@ -70,10 +70,11 @@ export default function LoginForm() {
 
             let yourLocations = locationResponse.data;
 
-            if(!yourLocations || yourLocations.length == 0){
+           // if(!yourLocations || yourLocations.length == 0){
+           if(userData.clients[0].status == "pending"){
                 //await api.post('/auth/jwt/logout');
                 dispatch(updateUser(userData));
-                navigate("/wizard", {state:userData})
+                navigate("/wizard")
                 return;``
             }
 

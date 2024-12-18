@@ -25,6 +25,7 @@ export default function Header() {
 
   const user = useSelector((state) => state.userInfo.user);
   
+  console.log(`User in header is ${JSON.stringify(user)}`)
 
   const trialEndDateStr = user.clients[0].trial_end_date;
   const trialEndDate = new Date(trialEndDateStr);

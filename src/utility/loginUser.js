@@ -27,6 +27,7 @@ const loginUser = async (email, password)=>{
 
     let response = {userData,errors:[]}
 
+    
     try {
 
     const loginResponse = await api.post(`/auth/jwt/login`, new URLSearchParams({

@@ -10,12 +10,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
 import { VITE_PAYMENT_LINK_GOLD } from '../utility/constants';
+import Stripe from 'stripe';
 
 
 const FormWizard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
+  const stripe = new Stripe(VITE_PAYMENT_LINK_GOLD);
 
   const [searchParams] = useSearchParams();
   const session = searchParams.get('session');
@@ -372,7 +374,20 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          window.location.href = VITE_PAYMENT_LINK_GOLD;
+          const session = await stripe.checkout.sessions.create({
+            line_items: [
+              {
+                // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                price: 'price_1QXLf8RQsphsH8fYZyQiTCyO',
+                quantity: 1,
+              },
+            ],
+            mode: 'subscription',
+            success_url: `https://dev-water-watch-pro.netlify.app/wizard?session={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://dev-water-watch-pro.netlify.app`,
+          });
+
+          window.location.href = session.url;
           
           //  setCurrentStep(4)
 

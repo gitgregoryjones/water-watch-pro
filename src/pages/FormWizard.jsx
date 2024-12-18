@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
 import { VITE_PAYMENT_LINK_GOLD } from '../utility/constants';
+import validatePassword from '../utility/passwordFunc';
 import Stripe from 'stripe';
 
 
@@ -244,6 +245,13 @@ useEffect(()=>{
         }
         if (formData.password !== formData.confirmPassword) {
           setErrors('Passwords do not match.');
+          return false;
+        }
+
+        let msgs = validatePassword(formData.password, formData.confirmPassword)
+
+        if(msgs.length > 0){
+          setErrors(msgs[0])
           return false;
         }
 

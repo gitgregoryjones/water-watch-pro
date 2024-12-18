@@ -32,6 +32,7 @@ const FormWizard = () => {
     last_name:'',
     phone: '',
     termsAccepted: false,
+    smsAccepted:false,
     accountType: 'self',
     companyName: '',
     companyPhone: '',
@@ -45,7 +46,7 @@ const FormWizard = () => {
     rapidrain: '',
   });
 
-  console.log(`State passed is ${JSON.stringify(location.state)}`)
+  
 
   const [errors,setErrors] = useState("")
   const [success,setSuccess] = useState("")
@@ -80,7 +81,13 @@ const FormWizard = () => {
 useEffect(()=>{
     console.log(`Location passed was ${JSON.stringify(location.state)}`)
     //The User Was Passed, so go to the Location page
-    setFormData({...formData, subscriptionLevel:location.state.account_type })
+    if(location.state?.accountType){
+      setFormData({...formData, subscriptionLevel:location.state.account_type })
+    }  
+    if(user.id && !user.locations ){
+
+      setCurrentStep(4)
+    }
   
 
 },[])
@@ -88,32 +95,31 @@ useEffect(()=>{
   
  const addUser = async ()=>{
 
-    try {
-        
+    let loginResponse = {};
+
+    try {     
         // Step 1: Log in to get the access token
-        const loginResponse = await api.post(`/auth/register`,({
+        loginResponse = await api.post(`/auth/register`,({
             password: formData.password,
             email: formData.email,
             phone: formData.phone,
             is_verified:false,
             role:"client",
-
             first_name: formData.first_name,
             last_name: formData.last_name
             
         }))
-
-        
-
         console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
 
-        return true;
+        return loginResponse;
         
         
     }catch(e){
-        console.log(`Encountere errors ${e.message}`)
+        
         setErrors(e.message)
-        return;
+        console.log(JSON.stringify(e))
+        loginResponse.errors = [e.message]
+        return  loginResponse;
     }
 
  }
@@ -211,6 +217,10 @@ useEffect(()=>{
             setErrors('Please accept the terms')
             return false;
         }
+        if(!formData.smsAccepted){
+            setErrors('Please accept the sms terms')
+            return false;
+        }
         return true;
         break;
     case 2:
@@ -270,6 +280,7 @@ useEffect(()=>{
   const handleSubmit = async () => {
     console.log(`Inside submit`)
     setShowMsg(true)
+    setErrors(null);
     console.log(`After submit`)
     if (validateStep()) {
       console.log(`Inside Validate Step`)
@@ -285,7 +296,19 @@ useEffect(()=>{
            3000);
    
        } else if(currentStep == 2){
-        await addUser();
+        let aResponse = await addUser();
+
+        console.log(`A RESPONSE Errors length is ${JSON.stringify(aResponse)}`)
+
+        if(!aResponse.data){
+
+            setErrors(aResponse.errors[0])
+            setCurrentStep(1);
+            setShowMsg(false)
+            return;
+        }
+
+
         //Now Login As User
 
         
@@ -332,7 +355,7 @@ useEffect(()=>{
 
   return (
     <div
-  className="w-full mt-8 md:mt-0 md:max-w-[50%] mx-auto bg-gradient-to-br from-white to-[green] shadow-md md:rounded-xl relative"
+  className="w-full mt-8 md:mt-0 md:max-w-[60%]  mx-auto bg-gradient-to-br from-white to-[green] shadow-md md:rounded-xl relative"
   
 >
         
@@ -424,6 +447,7 @@ useEffect(()=>{
             />
           </div>
           </div>
+          <div className='flex gap-2 justify-between'>
           <div className="mt-4 mb-4">
             <label className="flex gap-2 items-start justify-start block text-gray-700">
               <input
@@ -435,6 +459,20 @@ useEffect(()=>{
               />
               <a href="https://drive.google.com/file/d/15j0YmwgK4UsPKo3FfTj3jpTdCEF5X75J/view" target="_top">I agree to the terms and conditions</a>
             </label>
+          </div>
+          <div className="mt-4 mb-4">
+            <label className="flex gap-2 items-start justify-start block text-gray-700">
+              <input
+                type="checkbox"
+                name="smsAccepted"
+                required
+                checked={formData.smsAccepted}
+                onChange={handleChange}
+              />
+              <a href="" target="_top">I agree to receive SMS texts and email notifications  
+              </a>
+            </label>
+          </div>
           </div>
         </div>
       )}
@@ -452,7 +490,7 @@ useEffect(()=>{
                 setFormData({ ...formData, subscriptionLevel: formData.subscriptionLevel === 'trial' ? 'paid' : 'trial' })
               }
             />
-            <span className="ml-2">{formData.subscriptionLevel}</span>
+            <span className="ml-2">{formData.subscriptionLevel.charAt(0).toUpperCase() + formData.subscriptionLevel.slice(1)}</span>
           </div>
           {formData.subscriptionLevel === 'paid' && (
             <div className="mb-4">
@@ -478,15 +516,52 @@ useEffect(()=>{
             Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the Gold service level (link back to the Prices section of the WWP website). Questions? Contact us at support@waterwatchpro.com 
             </div>}
             {formData.subscriptionLevel === "paid" && <div className="text-[green] font-normal mb-4 text-lg">
-                Thanks for your interest in starting a monthly subscription to WaterWatch PRO. Select a service level and enter as many locations as you wish. Billing is based on the number of your locations and the service level (link back to the Prices section of the WWP website).  
-Questions? Contact us at support@waterwatchpro.com. 
+                {/*Thanks for your interest in starting a monthly subscription to WaterWatch PRO. Select a service level and enter as many locations as you wish. Billing is based on the number of your locations and the service level (link back to the Prices section of the WWP website).  
+Questions? Contact us at support@waterwatchpro.com. */}
+<div class="w-full p-6 bg-gradient-to-br from-white to-gray-100 rounded-lg shadow-md md:rounded-xl">
+  <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800">Subscription Pricing</h2>
+  
+  <div class="grid gap-6 md:grid-cols-3">
+  
+    <div class="flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">
+      <h3 class="text-xl font-bold text-yellow-700 mb-2">Gold</h3>
+      <p class="text-4xl font-bold text-gray-800 mb-2">$24.00</p>
+      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
+    </div>
+
+  
+    <div class="flex flex-col items-center justify-center border border-gray-400 rounded-lg p-6 bg-gray-50 shadow-md">
+      <h3 class="text-xl font-bold text-gray-700 mb-2">Silver</h3>
+      <p class="text-4xl font-bold text-gray-800 mb-2">$18.00</p>
+      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
+    </div>
+
+  
+    <div class="flex flex-col items-center justify-center border border-orange-400 rounded-lg p-6 bg-orange-50 shadow-md">
+      <h3 class="text-xl font-bold text-orange-700 mb-2">Bronze</h3>
+      <p class="text-4xl font-bold text-gray-800 mb-2">$12.00</p>
+      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
+    </div>
+  </div>
+
+  
+  <div class="mt-8 text-gray-700 text-sm md:text-base leading-6">
+    <p class="mb-4">
+      Once you make your initial payment, you can add as many locations as you want to pay for. During the next billing cycle, your recurring subscription cost is based on the number of locations in your account and service level.
+    </p>
+    <p class="font-semibold text-gray-800 text-center">
+      Your card will automatically be charged on the renewal date.
+    </p>
+  </div>
+</div>
+
             </div>}
         </div>
       )}
 
       {currentStep === 4 && (
         <div className='border rounded-2xl p-4 mb-4'>
-          <h2 className="text-xl font-bold mb-4">Monitored Location!</h2>
+          <h2 className="text-xl font-bold mb-4">Monitored Location</h2>
           
           <div className="mb-4">
             <label className="block text-gray-700">Location Name <span className='text-[red]'>*</span></label>
@@ -523,8 +598,10 @@ Questions? Contact us at support@waterwatchpro.com.
           </div>
           <div className="mb-4">
   <label htmlFor="threshold" className="block text-gray-700 font-bold mb-2">
-    24-Hour Rain Threshold (inches)
+    24-Hour Threshold (inches)
   </label>
+  <div className='m-2 text-sm  italic'>When detected hourly rainfall exceeds this value, you and your contacts will receive text and email notifications.
+  </div>
   <select
     id="threshold"
     name="threshold"
@@ -546,6 +623,8 @@ Questions? Contact us at support@waterwatchpro.com.
     <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
       RapidRain Threshold (inches)
     </label>
+    <div className='m-2 text-sm  italic'>When detected 15-minute rainfall exceeds this value, you and your contacts will receive text and email notifications. Ideal for pulling samples in a timely fashion. Learn more <a href="https://www.waterwatchpro.com/rapidrain">here</a>
+    </div>
     <select
       id="rapidrain"
       name="rapidrain"
@@ -559,6 +638,7 @@ Questions? Contact us at support@waterwatchpro.com.
         <option value={o} key={i}>{o}</option>
       ))}
     </select>
+    
   </div>
 )}
 
@@ -622,7 +702,7 @@ Questions? Contact us at support@waterwatchpro.com.
                 }
             }}
           >
-            {currentStep < 2 ? 'Next' : 'Join'} <FaChevronRight />
+            {currentStep < 2 ? 'Next' : 'Next'} <FaChevronRight />
           </button>
         )}
         {currentStep === 4 && (

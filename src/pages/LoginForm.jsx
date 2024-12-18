@@ -53,6 +53,7 @@ export default function LoginForm() {
 
             }  else {
                 setErrorMsg(lresponse.errors[0])
+                console.log(`Encountered error ${JSON.stringify(lresponse)}`)
                 return;
             }  
 
@@ -183,7 +184,7 @@ export default function LoginForm() {
                 <img className="w-[24rem]" src={logo} alt="Logo" />
             </div>
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
-                {serverError && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
+                {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
                 <ButtonContainer>
                     <Button className="hidden" onClick={() => setLogView(true)}>Login</Button>
                     {logView ? (
@@ -202,7 +203,7 @@ export default function LoginForm() {
                     )}
                     
                 </ButtonContainer>
-                <label hidden={logView}>Email</label>
+                <div className='text-[white] font-bold'>Email</div>
                 <input
         ref={emailRef}
         name="email"
@@ -213,6 +214,7 @@ export default function LoginForm() {
         placeholder="Email Address"
         className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
       />
+      <div className='text-[white] font-bold' >Password</div>
       <input
         ref={passwordRef}
         name="password"
@@ -224,7 +226,7 @@ export default function LoginForm() {
         className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
       />
 
-
+                
                 <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
                 <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
                 

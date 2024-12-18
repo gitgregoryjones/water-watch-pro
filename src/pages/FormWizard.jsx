@@ -96,10 +96,15 @@ useEffect(()=>{
       //get the stripe session_id for the account from the record and see if they have paid, if so, forward to step 4.  If not, forward to stripe to complete payment      
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
+      //If we have a valid session, then we can complete the transaction, otherwise send them to the payment page
       if(session){
         //do Stripe Lookup and if complete go to step 4, otherwise go to stripe
         setCurrentStep(4)
         
+      } else {
+        const session = getSession();
+
+        window.location.href = session.url;
       }
      
     }
@@ -304,6 +309,28 @@ useEffect(()=>{
         return true;
     }
   };
+
+  const getSession = async ()=>{
+
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+          price: 'price_1QXLf8RQsphsH8fYZyQiTCyO',
+          quantity: 1,
+        },
+      ],
+      customer_email: user.email, // Pre-fill email field
+      metadata: {
+        customer_name: `${user.first_name} ${user.last_name}`, // Pass the name as metadata
+      },
+      mode: 'subscription',
+      success_url: `https://dev-water-watch-pro.netlify.app/wizard?session={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://dev-water-watch-pro.netlify.app`,
+    });
+
+    return session;
+  }
   
 
   const handleSubmit = async () => {
@@ -374,18 +401,7 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = await stripe.checkout.sessions.create({
-            line_items: [
-              {
-                // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                price: 'price_1QXLf8RQsphsH8fYZyQiTCyO',
-                quantity: 1,
-              },
-            ],
-            mode: 'subscription',
-            success_url: `https://dev-water-watch-pro.netlify.app/wizard?session={CHECKOUT_SESSION_ID}`,
-            cancel_url: `https://dev-water-watch-pro.netlify.app`,
-          });
+          const session = getSession();
 
           window.location.href = session.url;
           

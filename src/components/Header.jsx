@@ -45,6 +45,7 @@ export default function Header() {
       
       // Step 1: Log in to get the access token
       const loginResponse = await api.post(`/auth/jwt/logout`)
+      localStorage.deleteItem("accessToken");
 
       navigate("/");
 

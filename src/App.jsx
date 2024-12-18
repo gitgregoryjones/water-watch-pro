@@ -38,6 +38,8 @@ import ClientPage from "./pages/ClientPage";
 import FormWizard from "./pages/FormWizard";
 import RegistrationComplete from "./pages/RegistrationComplete";
 import VerifyEmail from "./pages/VerifyEmail";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 
 
@@ -47,7 +49,8 @@ function App() {
   const location = useLocation();
 
   // Check if the current path is the login page
-  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete");
+  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete" 
+    || location.pathname == "/reset-password" || location.pathname == "/forgot-password");
 
   
 
@@ -115,6 +118,8 @@ function App() {
         <Route path="/wizard" element={<FormWizard />} />
         <Route path="/registration-complete" element={<RegistrationComplete />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
        
 <Route path="/contact-form" element={<ContactPage />} />

@@ -184,7 +184,9 @@ export default function LoginForm() {
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
                 <img className="w-[24rem]" src={logo} alt="Logo" />
             </div>
+            
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
+            <div onClick={()=> window.location.href = "/forgot-password"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I forgot my password</div>
                 {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
                 <ButtonContainer>
                     <Button className="hidden" onClick={() => setLogView(true)}>Login</Button>

@@ -241,7 +241,7 @@ const ClientForm = ({ clientToEdit }) => {
         </div>
         <div>
         <label htmlFor="invoiceDate" className="block text-gray-700 font-bold">
-            Invoice Day
+            Renewal Day
           </label>
           <input
             id="invoiceDate"

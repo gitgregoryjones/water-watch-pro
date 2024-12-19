@@ -114,19 +114,18 @@ useEffect(()=>{
        if(sessionDetails.status == "complete"){
         setCurrentStep(4)
         return;
-
+ 
        } 
-        
         
       } 
 
       //fall through logic
 
-      const tryAgainSession = await createSession();
+      const tryAgainSession = await createSession(user);
 
       await patchClient({...user.clients[0], stripe_session_id:tryAgainSession.id})
 
-     // window.location.href = tryAgainSession.url;
+      window.location.href = tryAgainSession.url;
       
     }
      
@@ -530,7 +529,7 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = await createSession(lresponse.userData);
+          const session = await createSession(userCopy);
 
           //console.log(`Session came back as ${JSON.stringify(session)}`)
 

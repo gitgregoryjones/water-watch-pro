@@ -9,7 +9,7 @@ import api from '../utility/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
-import { VITE_PAYMENT_LINK_GOLD } from '../utility/constants';
+import { VITE_PAYMENT_LINK_GOLD, VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE,VITE_PRICE_ID_SILVER,VITE_PRICE_ID_TRIAL,VITE_STRIPE_SUCCESS_URL,VITE_STRIPE_CANCEL_URL } from '../utility/constants';
 import validatePassword from '../utility/passwordFunc';
 import Stripe from 'stripe';
 
@@ -126,7 +126,7 @@ useEffect(()=>{
 
       await patchClient({...user.clients[0], stripe_session_id:tryAgainSession.id})
 
-      window.location.href = tryAgainSession.url;
+      //window.location.href = tryAgainSession.url;
       
     }
      
@@ -352,17 +352,46 @@ useEffect(()=>{
     }
   }
 
+
+  const getPriceTier = ()=>{
+
+    let pTier = VITE_PRICE_ID_GOLD;
+
+    switch(user.clients[0].account_type){
+      case "gold":
+        pTier = VITE_PRICE_ID_GOLD;
+      break;
+    
+    case "silver":
+        pTier = VITE_PRICE_ID_SILVER;
+      break;
+    case "bronze":
+      pTier = VITE_PRICE_ID_BRONZE;
+      break;
+    case "bronze":
+      pTier = VITE_PRICE_ID_TRIAL;
+      break;      
+      default:
+      pTier = VITE_PRICE_ID_GOLD;
+      break;
+    }
+
+    console.log(`Returning price ${pTier} for account type ${user.clients[0].account_type}`)
+    return pTier;
+  }
+
   const createSession = async ()=>{
 
     //console.log(`Trying to get a session for the user T ${user.first_name}`)
 
     let sessionT = {};
     
+    if(getPriceTier() != VITE_PRICE_ID_TRIAL) {
      sessionT = await stripe.checkout.sessions.create({
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-          price: 'price_1QXLf8RQsphsH8fYZyQiTCyO',
+          price: getPriceTier(),
           quantity: 1,
         },
       ],
@@ -370,11 +399,39 @@ useEffect(()=>{
       metadata: {
         customer_name: `${user.first_name} ${user.last_name}`, // Pass the name as metadata
       },
-      mode: 'subscription',
-      success_url: `https://dev-water-watch-pro.netlify.app/wizard?session={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://dev-water-watch-pro.netlify.app`,
+      mode: 'payment' ,
+      
+      success_url: VITE_STRIPE_SUCCESS_URL,
+      cancel_url: VITE_STRIPE_CANCEL_URL,
     });
-
+  } else {
+    sessionT = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+          price: getPriceTier(),
+          quantity: 1,
+        },
+      ],
+      customer_email: user.email, // Pre-fill email field
+      metadata: {
+        customer_name: `${user.first_name} ${user.last_name}`, // Pass the name as metadata
+      },
+      mode: 'subscription' ,
+      
+      subscription_data:{
+        trial_settings:{
+          end_behavior:{
+            missing_payment_method:"cancel"
+          }
+        },
+        trial_period_days:30
+      },
+      payment_method_collection:"if_required",
+      success_url: VITE_STRIPE_SUCCESS_URL,
+      cancel_url: VITE_STRIPE_CANCEL_URL,
+    });
+  }
     //console.log(`Leaving session T`)
 //    //console.log(sessionT)
 
@@ -456,7 +513,7 @@ useEffect(()=>{
 
           patchClient({...newClient, stripe_session_id: session.id})
 
-          window.location.href = session.url;
+          //window.location.href = session.url;
           
           //  setCurrentStep(4)
 

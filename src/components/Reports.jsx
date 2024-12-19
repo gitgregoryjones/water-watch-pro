@@ -59,7 +59,7 @@ const Reports = () => {
         </div></center>
       `)
 
-    }else if(reportType == 'daily' && user.tier < 2){
+    }else if((reportType == 'daily' || reportType == 'rapidrain') && user.tier < 2){
 
       setReportContent(`
         <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
@@ -174,7 +174,7 @@ const Reports = () => {
       return;
     }
   
-    if (reportType === 'weekly' || reportType === 'daily') {
+    if (reportType === 'weekly' || reportType === 'daily' || reportType === 'rapidrain') {
       if (!fromDate || !toDate) {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
@@ -217,6 +217,9 @@ const Reports = () => {
       query = `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
     } else if (reportType === 'weekly' || reportType === 'daily') {
       query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
+    } else if (reportType === 'rapidrain'){
+      query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
+      
     }
   
     if (selectedLocations.length > 1 || displayFormat === 'csv') {
@@ -325,6 +328,7 @@ const Reports = () => {
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
+            {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
         {/* Dude */}
@@ -422,7 +426,7 @@ const Reports = () => {
       <div
   id="reportArea"
   ref={reportAreaRef}
-  className={`${ reportContent ? 'border-2  border-[black]':''} overflow-auto w-full`}
+  className={`${ reportContent ? 'border-[unset]  border-[black]':''} overflow-auto w-full`}
   dangerouslySetInnerHTML={{ __html: reportContent }}
 ></div>
 </div>

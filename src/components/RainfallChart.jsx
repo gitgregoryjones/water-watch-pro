@@ -314,7 +314,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
           const dateLabel = day.split("-").join("-"); // Convert YYYY-MM-DD to MM-DD format
           if(customPeriod != "daily")
-          ctx.fillText(dateLabel, barCenterX -240, textY);
+          ctx.fillText(dateLabel, barCenterX -100, textY);
         }
       });
   

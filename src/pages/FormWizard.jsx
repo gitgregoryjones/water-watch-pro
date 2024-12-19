@@ -378,9 +378,7 @@ useEffect(()=>{
     case "bronze":
       pTier = VITE_PRICE_ID_BRONZE;
       break;
-    case "bronze":
-      pTier = VITE_PRICE_ID_TRIAL;
-      break;      
+        
       default:
       pTier = VITE_PRICE_ID_GOLD;
       break;
@@ -388,7 +386,7 @@ useEffect(()=>{
 
     console.log(`Returning price ${pTier} for account type ${userP.clients[0].account_type}`)
 
-    if(user.clients[0].account_type == "trial"){
+    if(userP.clients[0].account_type == "trial"){
       console.log(`User wants a free 30 day trial because tier is ${userP.clients[0].tier}  and subscription type is ${userP.clients[0].account_type} and user is ${JSON.stringify(userP)}`)
       pTier = VITE_PRICE_ID_TRIAL;
     }
@@ -590,6 +588,7 @@ useEffect(()=>{
               onChange={handleChange}
               className="w-full border border-gray-300 rounded p-2"
               required
+              autocomplete="off"
             />
             </div>
           

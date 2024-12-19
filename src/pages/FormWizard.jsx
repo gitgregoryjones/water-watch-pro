@@ -160,7 +160,7 @@ useEffect(()=>{
 
         await api.post(`/auth/jwt/login`,{
           username:formData.email,
-          password
+          password:formData.password
         })
         //console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
 

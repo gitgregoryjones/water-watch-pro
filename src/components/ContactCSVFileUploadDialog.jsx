@@ -21,15 +21,20 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
     });
 
     // Validate email format
-    if (row.email && !/\S+@\S+\.\S+/.test(row.email)) {
-      errorMessages.push(`Invalid email format: ${row.email}`);
+    if(row.email != "none"){
+      if (row.email && !/\S+@\S+\.\S+/.test(row.email)) {
+        errorMessages.push(`Invalid email format: ${row.email}`);
+      }
     }
 
     row.phone = row.phone.replace(/\./g,"-")
-    // Validate phone number (simple check for digits and length)
-    if (row.phone && !/^\d{10}$|^\d{11}$/.test(row.phone.trim().replace(/[^0-9]/g, ""))) {
-      errorMessages.push(`Invalid phone number: ${row.phone}`);
-    } 
+
+    if(row.phone != "none"){
+      // Validate phone number (simple check for digits and length)
+      if (row.phone && !/^\d{10}$|^\d{11}$/.test(row.phone.trim().replace(/[^0-9]/g, ""))) {
+        errorMessages.push(`Invalid phone number: ${row.phone}`);
+      } 
+    }
 
     
 
@@ -42,6 +47,55 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
     setSuccess(false);
   };
 
+  function processCSV(inputString) {
+    const lines = inputString.split("\n");
+    const output = [];
+    let lastHashLineIndex = -1;
+  
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+  
+      // Skip lines starting with #
+      if (line.startsWith("#")) {
+        lastHashLineIndex = i; // Track the last line with #
+        continue;
+      }
+
+      if(!line)
+        continue;
+        
+      // Skip the first line after the last # line
+    //  if (i === lastHashLineIndex + 1) continue;
+      console.log(`Reading Line ${line}`)
+      // Process remaining lines
+      let [name,email,phone] = line.split(",");
+  
+      if(!email  && !phone){
+        //do nothing, let the parse find this error
+      } else{
+
+        if(!email){
+          email = "none";
+        }
+  
+        if(!phone){
+          phone = "none";
+        }
+    
+
+      }
+
+      
+      // Join the updated parts and add them to the output
+  
+        output.push([name,email,phone].join(","));
+      
+    }
+  
+    // Return the processed CSV as a string
+    return output.join("\n");
+  }
+
   const processFile = () => {
     if (!file) return;
 
@@ -53,6 +107,13 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
       header: true,
       skipEmptyLines: true,
       comments: "#",
+      beforeFirstChunk:(chunk)=>{
+
+        let cleanChunk = processCSV(chunk)
+        console.log(`See CSV Upload ${JSON.stringify(cleanChunk)}`)
+      
+      return cleanChunk;
+    },
       complete: async (results) => {
         const { data, errors: parseErrors } = results;
 
@@ -87,12 +148,23 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
         const postErrors = [];
         for (const row of validRows) {
           try {
-            await api.post("/api/contacts/", {
+
+            let eBody = {
               name: row.name,
-              email: row.email,
-              phone: row.phone,
+              email: row.email == "none" ? "" : row.email,
+              phone: row.phone  == "none" ? "" : row.phone,
               status: "active",
-            });
+            };
+
+            if(eBody.email.length == 0){
+              delete eBody.email;
+            }
+
+            if(eBody.phone.length == 0){
+              delete eBody.phone;
+            }
+
+            await api.post("/api/contacts/", eBody);
           } catch (error) {
             postErrors.push(`Failed to process row with email ${row.email}: ${error.message}`);
           }

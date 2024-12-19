@@ -1,3 +1,6 @@
+# This is an example Customer Upload File
+# An email OR phone number is required for each contact. 
+# Lines that begin with # are comments and are ignored by the upload tool
 name,email,phone
 Hector Price III,Carmine_Wuckert13@gmail.com,1-786-726-2622
 Abbigail Crist,Kennith_Stoltenberg@yahoo.com,783-922-3516
@@ -9,3 +12,4 @@ Karl Feil Jr.,Amanda_Pagac@yahoo.com,(646) 457-1888
 Kris Lynch,Eulalia90@yahoo.com,432-155-1024
 Ms. Kara Torphy,Grover.Reinger@gmail.com,120.410.7837
 Ashton Feeney,Hollie9@gmail.com,551.768.6436
+

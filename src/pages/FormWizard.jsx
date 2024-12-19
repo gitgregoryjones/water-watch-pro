@@ -23,7 +23,7 @@ const FormWizard = () => {
   const [searchParams] = useSearchParams();
   const sessionParam = searchParams.get('session');
 
-  console.log(`Session is ${VITE_PAYMENT_LINK_GOLD}`)
+  //console.log(`Session is ${VITE_PAYMENT_LINK_GOLD}`)
 
   
   const location = useLocation();
@@ -88,7 +88,7 @@ const FormWizard = () => {
   };
 
 useEffect(()=>{
-    console.log(`Location passed was ${JSON.stringify(location.state)}`)
+    //console.log(`Location passed was ${JSON.stringify(location.state)}`)
     //The User Was Passed, so go to the Location page
     if(location.state?.accountType){
       setFormData({...formData, subscriptionLevel:location.state.account_type })
@@ -96,20 +96,38 @@ useEffect(()=>{
     const b = async function(){
     //wwp_session = user id
     if(user.clients[0].status == "pending"){
-      console.log(`The user is ${JSON.stringify(user.clients)}`)
+      //console.log(`The user is ${JSON.stringify(user.clients)}`)
       //get the stripe session_id for the account from the record and see if they have paid, if so, forward to step 4.  If not, forward to stripe to complete payment      
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
       //If we have a valid session, then we can complete the transaction, otherwise send them to the payment page
       if(sessionParam){
         //do Stripe Lookup and if complete go to step 4, otherwise go to stripe
-        setCurrentStep(4)
-        
-      } else {
-        const session = await getSession();
 
-        window.location.href = session.url;
-      }
+        let sessionDetails = await retrieveSession(sessionParam)
+
+        let localClient = await patchClient({...user.clients[0], stripe_customer_id:sessionDetails.customer})
+
+        //console.log(`Who's session is ${JSON.stringify(sessionDetails)} and customer ${JSON.stringify(localClient)}`)
+
+       //Do Lookup to make sure session is complete, Otherwise Allow the logic to fall through to create a new session and try again
+       if(sessionDetails.status == "complete"){
+        setCurrentStep(4)
+        return;
+
+       } 
+        
+        
+      } 
+
+      //fall through logic
+
+      const tryAgainSession = await createSession();
+
+      await patchClient({...user.clients[0], stripe_session_id:tryAgainSession.id})
+
+      window.location.href = tryAgainSession.url;
+      
     }
      
     }
@@ -136,7 +154,7 @@ useEffect(()=>{
             last_name: formData.last_name
             
         }))
-        console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
+        //console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
 
         return loginResponse;
         
@@ -144,7 +162,7 @@ useEffect(()=>{
     }catch(e){
         
         setErrors(e.message)
-        console.log(JSON.stringify(e))
+        //console.log(JSON.stringify(e))
         loginResponse.errors = [e.message]
         return  loginResponse;
     }
@@ -181,7 +199,7 @@ useEffect(()=>{
 
         
 
-        console.log(`User registered successfully ${JSON.stringify(userData)}`)
+        //console.log(`User registered successfully ${JSON.stringify(userData)}`)
 
          // Step 1: Log Add The Location
          const clientResponse = await patchClient({
@@ -192,7 +210,7 @@ useEffect(()=>{
 
         userData.clients = [clientResponse.clientData];
 
-        console.log(`Client Status should be active now ${JSON.stringify(userData)}`)
+        //console.log(`Client Status should be active now ${JSON.stringify(userData)}`)
 
 
         dispatch(updateUser(userData));
@@ -202,7 +220,7 @@ useEffect(()=>{
         
         
     }catch(e){
-        console.log(`Encountere errors ${e.message}`)
+        //console.log(`Encountere errors ${e.message}`)
         setErrors(e.message)
         return;
     }
@@ -271,7 +289,7 @@ useEffect(()=>{
         return true;
         break;
     case 2:
-        console.log(`Found the second case...continuing`)
+        //console.log(`Found the second case...continuing`)
         return true;
         break;
    
@@ -323,9 +341,20 @@ useEffect(()=>{
     }
   };
 
-  const getSession = async ()=>{
+  const retrieveSession = async (sessionId)=> {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      //console.log('Session Details:', session);
+      return session;
+    } catch (error) {
+      console.error('Error retrieving session:', error);
+      throw error;
+    }
+  }
 
-    console.log(`Trying to get a session for the user T ${user.first_name}`)
+  const createSession = async ()=>{
+
+    //console.log(`Trying to get a session for the user T ${user.first_name}`)
 
     let sessionT = {};
     
@@ -346,20 +375,20 @@ useEffect(()=>{
       cancel_url: `https://dev-water-watch-pro.netlify.app`,
     });
 
-    console.log(`Leaving session T`)
-//    console.log(sessionT)
+    //console.log(`Leaving session T`)
+//    //console.log(sessionT)
 
     return sessionT;
   }
   
 
   const handleSubmit = async () => {
-    console.log(`Inside submit`)
+    //console.log(`Inside submit`)
     setShowMsg(true)
     setErrors(null);
-    console.log(`After submit`)
+    //console.log(`After submit`)
     if (validateStep()) {
-      console.log(`Inside Validate Step`)
+      //console.log(`Inside Validate Step`)
       if(currentStep == 4){
         //The state is available after the user logs in.  Now continue setting up the account.  The registration process adds a User and Client record.
         //Now we only need to add a location for this client
@@ -375,7 +404,7 @@ useEffect(()=>{
         //client.status = 'active'
         //save client
         
-        console.log(`Got the user from ${JSON.stringify(user)} and now save location to the DB ${JSON.stringify(formData)}`)
+        //console.log(`Got the user from ${JSON.stringify(user)} and now save location to the DB ${JSON.stringify(formData)}`)
         setTimeout(()=>{
             setShowMsg(false)
             setSuccess('location added successfully');navigate('/dashboard')},
@@ -384,7 +413,7 @@ useEffect(()=>{
        } else if(currentStep == 2){
         let aResponse = await addUser();
 
-        console.log(`A RESPONSE Errors length is ${JSON.stringify(aResponse)}`)
+        //console.log(`A RESPONSE Errors length is ${JSON.stringify(aResponse)}`)
 
         if(!aResponse.data){
 
@@ -407,7 +436,7 @@ useEffect(()=>{
 
         let newClient =  {...savedClient, tier: formData.tier, is_trial_account: formData.subscriptionLevel == "trial",account_type: formData.subscriptionLevel, status:'pending' }
 
-        console.log(`Writing new client ${JSON.stringify(newClient)} to user ${JSON.stringify(lresponse.userData)}`)
+        //console.log(`Writing new client ${JSON.stringify(newClient)} to user ${JSON.stringify(lresponse.userData)}`)
 
         //If not bronze, overwrite client
         await patchClient(newClient)
@@ -421,7 +450,11 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = await getSession();
+          const session = await createSession();
+
+          //console.log(`Session came back as ${JSON.stringify(session)}`)
+
+          patchClient({...newClient, stripe_session_id: session.id})
 
           window.location.href = session.url;
           
@@ -438,11 +471,11 @@ useEffect(()=>{
        }
       }  else {
         //alert('hi')
-        console.log(`Step was not valid`)
+        //console.log(`Step was not valid`)
         setShowMsg(false)
       }
 
-   console.log(`Leaving Submit....`)
+   //console.log(`Leaving Submit....`)
   };
 
   return (
@@ -789,7 +822,7 @@ Questions? Contact us at support@waterwatchpro.com. */}
                 if(currentStep < 2){
                     handleNext()
                 } else {
-                    console.log(`Trying to Submit`)
+                    //console.log(`Trying to Submit`)
                     handleSubmit();
                 }
             }}

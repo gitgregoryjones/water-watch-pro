@@ -11,7 +11,7 @@ const CheckboxGroup = ({ onClick, color, className }) => {
   };
 
   return (
-    <div className={`flex flex-col p-2 ${className}`}>
+    <div className={`flex sm:flex-row p-2 ${className}`}>
       {/* Normal */}
       <label className={`flex items-center space-x-2 text-sm `}>
         <input

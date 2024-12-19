@@ -447,15 +447,19 @@ function showThreshold(color){
       <Card  className={`${user.tier == 4 && 'hidden'}`}
       footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
       header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full justify-around items-center'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}<Processing showPlain={true}/></div> <Processing /></div>}  >
-      <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
+      <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 200}>
       <div className='tab'><span>Daily Total</span>
-      <Card className={"w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]"} >
+      <div className='flex-col flex w-full'>
         
+      <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2 sm:my-4 justify-end items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
+      <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={"w-full md:h-full max-h-[20rem]  justify-start items-start md:max-h-full flex md:flex-col border-[transparent]"} >
+        
+      
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
            <Map
             
-             className='max-h-[95%]   md:h-[45rem] flex-[3_3_0%] md:border md:border-slate-800'
+             className={`w-[calc(100vw)] h-[calc(100vh)]`}
              
              
              
@@ -501,11 +505,12 @@ function showThreshold(color){
              </Map>
          
          </APIProvider>
+         
      
       <div className='w-[30%] md:w-[20%]'>
-        <CheckboxGroup className={`border rounded mx-2 mb-2`} color={currentColor} onClick={setCurrentColor}/>
+        <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
        
-      <ItemControl className={`mapList px-2  justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}
@@ -524,16 +529,18 @@ function showThreshold(color){
           
          
           </Card>
+          
+          </div>
           </div>
           <div className='tab'>24 Hr Accum
-      <Card className={`${user.tier == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
+      <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={`${user.tier == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
     
         
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
            
       <Map
             
-            className='max-h-[95%]   md:h-[40rem] flex-[3_3_0%] md:border'
+            className='w-[calc(100vw)] h-[calc(100vh)]'
             
             
             
@@ -581,9 +588,9 @@ function showThreshold(color){
          
          </APIProvider>
        <div className='w-[30%] md:w-[20%]'>
-      <CheckboxGroup color={currentColor24} onClick={setCurrentColor24}/>
+       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor24}/>
       <hr className='hidden md:block m-2'/>
-      <ItemControl className={`mapList px-2 md:h-full max-h-[95%] md:shadow-[unset]`}
+      <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
             showAddButton={false}
             onItemClicked={(obj)=>setMapCenter(obj,true)}

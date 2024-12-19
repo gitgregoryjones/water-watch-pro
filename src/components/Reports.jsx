@@ -257,6 +257,7 @@ const Reports = () => {
       try {
         const response = await api.get(query);
         console.log('Report Data:', response.data);
+        /*
         if(window.innerWidth < 600){
         setReportContent(response.data.replace(
           /<h1(.*?)>/g,
@@ -264,7 +265,8 @@ const Reports = () => {
         ));
       } else {
         setReportContent(response.data);
-      }
+      }*/
+        setReportContent(response.data);
       } catch (error) {
         console.error('Error fetching report:', error.message);
         const errorMessage = `
@@ -294,7 +296,11 @@ const Reports = () => {
 
   return (
     <div className={`w-full max-w-[${window.innerWidth}] flex mt-28  flex-col md:flex-row md:items-start text-sm  gap-2 md:h-full md:min-h-full md:p-6`}>
-      
+      <style>
+        {`
+        
+        `}
+      </style>
         
       <form onSubmit={handleSubmit} className="flex flex-col  md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
        
@@ -412,11 +418,11 @@ const Reports = () => {
       </form>
 
       {/* Report Content */}
-      <div className='flex w-full justify-center items-center'>
+      <div className='flex w-full justify-center items-center overflow-auto'>
       <div
   id="reportArea"
   ref={reportAreaRef}
-  className="w-[90%] overflow-auto "
+  className={`${ reportContent ? 'border-2  border-[black]':''} overflow-auto w-full`}
   dangerouslySetInnerHTML={{ __html: reportContent }}
 ></div>
 </div>

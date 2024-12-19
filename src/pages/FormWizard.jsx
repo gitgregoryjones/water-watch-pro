@@ -144,6 +144,9 @@ useEffect(()=>{
 
     try {     
         // Step 1: Log in to get the access token
+
+       
+
         loginResponse = await api.post(`/auth/register`,({
             password: formData.password,
             email: formData.email,
@@ -154,6 +157,11 @@ useEffect(()=>{
             last_name: formData.last_name
             
         }))
+
+        await api.post(`/auth/jwt/login`,{
+          username:formData.email,
+          password
+        })
         //console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
 
         return loginResponse;

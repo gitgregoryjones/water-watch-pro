@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Button from '../components/WaterWatchProButton';
 import { useState } from 'react';
@@ -25,6 +25,10 @@ export default function LoginForm() {
     const dispatch = useDispatch();
 
     let [loggingIn, setLoggingIn] = useState(false);
+
+
+    //api.post(`/auth/jwt/logout`);
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;

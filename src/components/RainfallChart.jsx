@@ -266,13 +266,14 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
       // Ensure originalKeys is available and valid
       const originalKeys = chart.config.options.plugins.originalKeys;
+      const customPeriod = chart.config.options.plugins.customPeriod;
       if (!originalKeys || originalKeys.length === 0) return;
   
       ctx.save();
   
       let currentDay = null;
       let currentColorIndex = 0;
-      const colors = ["#C5D7EF", "#D6E3F7","#F1F6FA"].reverse(); // Pink and Orange
+      const colors = ["#C5D7EF", "#D6E3F7", "#F1F6FA"].reverse(); // Background colors
       let color = null;
   
       originalKeys.forEach((key, index) => {
@@ -281,7 +282,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
         if (isNewDay) {
           currentDay = day;
-          color = colors[currentColorIndex++] // Alternate colors
+          color = colors[currentColorIndex++ % colors.length]; // Alternate colors
         }
   
         const barStartX =
@@ -296,10 +297,24 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
         // Ensure valid bar positions
         if (!isNaN(barStartX) && !isNaN(barEndX)) {
-         ctx.fillStyle = color;
-         
+          ctx.fillStyle = color;
           ctx.fillRect(barStartX, top, barEndX - barStartX, bottom - top);
-          
+        }
+  
+        // Write the date on the last bar of the day
+        const nextDay = originalKeys[index + 1]?.split(" ")[0]; // Look ahead to the next day
+        if (nextDay !== currentDay || index === originalKeys.length - 1) {
+          const barCenterX = (barStartX + barEndX) / 2; // Center of the last bar for the day
+          const textY = top + 40; // Position the text slightly above the bottom of the chart
+  
+          ctx.fillStyle = "black"; // Text color
+          ctx.font = "24px Arial"; // Font style and size
+          ctx.textAlign = "center"; // Center align the text
+          ctx.textBaseline = "middle"; // Vertically center the text
+  
+          const dateLabel = day.split("-").join("-"); // Convert YYYY-MM-DD to MM-DD format
+          if(customPeriod != "daily")
+          ctx.fillText(dateLabel, barCenterX -240, textY);
         }
       });
   
@@ -307,10 +322,10 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     },
   };
   
-  
-  
   // Register the plugin
   ChartJS.register(dayChangeBackgroundPlugin);
+  
+  
 
   
 

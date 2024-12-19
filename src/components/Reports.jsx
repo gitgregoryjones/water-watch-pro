@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { API_HOST, VITE_PRICES_LINK } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
@@ -20,6 +20,8 @@ const Reports = () => {
   const user = useSelector((state) => state.userInfo.user);
   const [isSelectAll,setIsSelectAll] = useState(false);
   const locations = user.locations;
+  const reportAreaRef = useRef(null);
+
   const currentDate = new Date();
   const currentYearMonth = currentDate.toISOString().slice(0, 7); // Get current month in YYYY-MM
   const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
@@ -69,6 +71,13 @@ const Reports = () => {
 
     }
   }, [reportType, user.tier]);
+
+  useEffect(() => {
+    const h1Element = reportAreaRef.current?.querySelector("h1");
+    if (h1Element) {
+      h1Element.style.display = "none";
+    }
+  }, [reportType]);
 
   const handleReportTypeChange = (e) => {
     const selectedType = e.target.value;
@@ -248,7 +257,14 @@ const Reports = () => {
       try {
         const response = await api.get(query);
         console.log('Report Data:', response.data);
+        if(window.innerWidth < 600){
+        setReportContent(response.data.replace(
+          /<h1(.*?)>/g,
+          '<h1 style="display:none;"$1>'
+        ));
+      } else {
         setReportContent(response.data);
+      }
       } catch (error) {
         console.error('Error fetching report:', error.message);
         const errorMessage = `
@@ -396,10 +412,15 @@ const Reports = () => {
       </form>
 
       {/* Report Content */}
-      <div id="reportArea"
-        className={`flex flex-col md:flex-[4]   self-end sm:w-[${window.innerWidth-20}px] h-[600px]  rounded mt-6  md:mt-[0] p-0 overflow-auto`}
-        dangerouslySetInnerHTML={{ __html: reportContent }}
-      ></div>
+      <div className='flex w-full justify-center items-center'>
+      <div
+  id="reportArea"
+  ref={reportAreaRef}
+  className="w-[90%] overflow-auto "
+  dangerouslySetInnerHTML={{ __html: reportContent }}
+></div>
+</div>
+
     </div>
   );
 };

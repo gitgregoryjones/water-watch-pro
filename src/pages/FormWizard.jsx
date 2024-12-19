@@ -117,7 +117,15 @@ useEffect(()=>{
  
        } 
         
-      } 
+      } else {
+        let sessionDetails = await retrieveSession(user.clients[0].stripe_session_id)
+
+        if(sessionDetails.status == "complete"){
+          setCurrentStep(4)
+          return;
+   
+         }
+      }
 
       //fall through logic
 

@@ -12,11 +12,40 @@ const ContactForm = ({ contactToEdit }) => {
   const [phone, setPhone] = useState(contactToEdit?.phone || '');
   const [client_id, setClient_Id] = useState(contactToEdit?.client_id)
   const [accountName, setAccountName] = useState(contactToEdit?.account_name)
+  const [daily_report_on, set] = useState(contactToEdit?.account_name)
+
+  const [formData, setFormData] = useState({
+      daily_report_on: contactToEdit?.daily_report_on,
+      daily_report_on_sms: contactToEdit?.daily_report_on_sms,
+      forecast_on: contactToEdit?.forecast_on,
+      forecast_on_sms: contactToEdit?.forecast_on_sms,
+      atlas14_24h_on: contactToEdit?.atlas14_24h_on,
+      atlas14_24h_on_sms: contactToEdit?.atlas14_24h_on_sms,
+      //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
+      //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
+      //atlas14_first_on: contactToEdit?.atlas14_first_on,
+      //atlas14_first_on_sms: contactToEdit?.atlas14_1h_on_sms,
+      exceed24h_on: contactToEdit?.exceed24h_on,
+      exceed24h_on_sms: contactToEdit?.exceed24h_on_sms,
+      //exceed24h_combine_locations: contactToEdit?.exceed24h_combine_locations
+  });
+
+  
+
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(false);
   const user = useSelector((state) => state.userInfo.user);
   const [showDialog, setShowDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [clients, setClients] = useState([])
+
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e;
+    setFormData({
+      ...formData,
+      [name]: type === 'checkbox' ? checked : value,
+    });
+  };
 
   const fetchClients = async (page) => {
 
@@ -80,12 +109,25 @@ const ContactForm = ({ contactToEdit }) => {
 
     setShowDialog(true);
 
+    
+
     const payload = {
       name,
       email,
       phone,
       status: 'active',
-      alert_settings: alertSettings,
+      daily_report_on:formData.daily_report_on,
+      daily_report_on_sms: formData.daily_report_on_sms,
+      forecast_on: formData.forecast_on,
+      forecast_on_sms:formData.forecast_on_sms,
+      atlas14_24h_on: formData.atlas14_24h_on,
+      atlas14_24h_on_sms: formData.atlas14_24h_on_sms,
+      atlas14_1h_on: formData.atlas14_1h_on,
+      atlas14_1h_on_sms: formData.atlas14_1h_on_sms,
+      atlas14_first_on : formData.atlas14_first_on,
+      atlas14_first_on_sms: formData.atlas14_first_on_sms,
+      exceed24h_on : formData.exceed24h_on,
+      exceed24h_on_sms: formData.exceed24h_on_sms,
     };
 
     try {
@@ -114,6 +156,46 @@ const ContactForm = ({ contactToEdit }) => {
     }));
   };
 
+
+  const renderSettings = (settings) => {
+    // Group the keys into pairs (email + SMS)
+    const groupedKeys = Object.keys(settings).reduce((acc, key) => {
+      const baseKey = key.replace('_sms', '');
+      if (!acc[baseKey]) acc[baseKey] = {};
+      if (key.endsWith('_sms')) {
+        acc[baseKey].sms = key;
+      } else {
+        acc[baseKey].email = key;
+      }
+      return acc;
+    }, {});
+  
+    return Object.entries(groupedKeys).map(([header, { email, sms }]) => {
+      const label = header.replace(/_/g, ' '); // Create a readable header
+  
+      return (
+        <div className="flex flex-col mb-4" key={header}>
+          <span className="font-bold text-gray-700 capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
+  
+          <div className="flex items-center mt-2">
+            <span className="mr-2">Email</span>
+            <Toggle
+              checked={settings[email]}
+              onChange={() => handleChange({ name: email, value: !settings[email] })}
+            />
+          </div>
+  
+          <div className="flex items-center mt-2">
+            <span className="mr-2">SMS</span>
+            <Toggle
+              checked={settings[sms]}
+              onChange={() => handleChange({ name: sms, value: !settings[sms] })}
+            />
+          </div>
+        </div>
+      );
+    });
+  };
   return (
     <div className={`relative ${user.tier >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg`}>
       {/* Close Button */}
@@ -208,25 +290,8 @@ const ContactForm = ({ contactToEdit }) => {
 
           {isAlertSettingsExpanded && (
             <div className="mt-4 grid grid-cols-2 gap-4 border-t pt-4">
-              {Object.keys(alertSettings).map((alertType) => (
-                <div key={alertType} className="flex flex-col">
-                  <span className="font-bold text-gray-700">{alertType}</span>
-                  <div className="flex items-center mt-2">
-                    <span className="mr-2">Email</span>
-                    <Toggle
-                      checked={alertSettings[alertType].email}
-                      onChange={() => toggleAlertSetting(alertType, 'email')}
-                    />
-                  </div>
-                  <div className="flex items-center mt-2">
-                    <span className="mr-2">SMS</span>
-                    <Toggle
-                      checked={alertSettings[alertType].sms}
-                      onChange={() => toggleAlertSetting(alertType, 'sms')}
-                    />
-                  </div>
-                </div>
-              ))}
+             
+               {renderSettings(formData)}         
             </div>
           )}
         </div>

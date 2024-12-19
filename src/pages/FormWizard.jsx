@@ -126,7 +126,7 @@ useEffect(()=>{
 
       await patchClient({...user.clients[0], stripe_session_id:tryAgainSession.id})
 
-      //window.location.href = tryAgainSession.url;
+      window.location.href = tryAgainSession.url;
       
     }
      
@@ -357,7 +357,7 @@ useEffect(()=>{
 
     let pTier = VITE_PRICE_ID_GOLD;
 
-    switch(user.clients[0].account_type){
+    switch(user.clients[0].tier){
       case "gold":
         pTier = VITE_PRICE_ID_GOLD;
       break;
@@ -377,6 +377,12 @@ useEffect(()=>{
     }
 
     console.log(`Returning price ${pTier} for account type ${user.clients[0].account_type}`)
+
+    if(user.clients[0].account_type == "trial"){
+      console.log(`User wants a free 30 day trial because tier is ${user.clients[0].tier}  and subscription type is ${user.clients[0].account_type} `)
+      pTier = VITE_PRICE_ID_TRIAL;
+    }
+
     return pTier;
   }
 
@@ -513,7 +519,7 @@ useEffect(()=>{
 
           patchClient({...newClient, stripe_session_id: session.id})
 
-          //window.location.href = session.url;
+          window.location.href = session.url;
           
           //  setCurrentStep(4)
 

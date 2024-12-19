@@ -21,7 +21,9 @@ const FormWizard = () => {
   const stripe = new Stripe(VITE_PAYMENT_LINK_GOLD);
 
   const [searchParams] = useSearchParams();
-  const session = searchParams.get('session');
+  const sessionParam = searchParams.get('session');
+
+  console.log(`Session is ${VITE_PAYMENT_LINK_GOLD}`)
 
   
   const location = useLocation();
@@ -91,6 +93,7 @@ useEffect(()=>{
     if(location.state?.accountType){
       setFormData({...formData, subscriptionLevel:location.state.account_type })
     }  
+    const b = async function(){
     //wwp_session = user id
     if(user.clients[0].status == "pending"){
       console.log(`The user is ${JSON.stringify(user.clients)}`)
@@ -98,17 +101,19 @@ useEffect(()=>{
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
       //If we have a valid session, then we can complete the transaction, otherwise send them to the payment page
-      if(session){
+      if(sessionParam){
         //do Stripe Lookup and if complete go to step 4, otherwise go to stripe
         setCurrentStep(4)
         
       } else {
-        const session = getSession();
+        const session = await getSession();
 
         window.location.href = session.url;
       }
+    }
      
     }
+    b();
 
   
 
@@ -320,7 +325,11 @@ useEffect(()=>{
 
   const getSession = async ()=>{
 
-    const session = await stripe.checkout.sessions.create({
+    console.log(`Trying to get a session for the user T ${user.first_name}`)
+
+    let sessionT = {};
+    
+     sessionT = await stripe.checkout.sessions.create({
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
@@ -337,7 +346,10 @@ useEffect(()=>{
       cancel_url: `https://dev-water-watch-pro.netlify.app`,
     });
 
-    return session;
+    console.log(`Leaving session T`)
+//    console.log(sessionT)
+
+    return sessionT;
   }
   
 
@@ -409,7 +421,7 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = getSession();
+          const session = await getSession();
 
           window.location.href = session.url;
           

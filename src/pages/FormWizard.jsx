@@ -96,7 +96,7 @@ useEffect(()=>{
     const b = async function(){
     //wwp_session = user id
     if(user.clients[0].status == "pending"){
-      //console.log(`The user is ${JSON.stringify(user.clients)}`)
+      console.log(`The user is now ${JSON.stringify(user)}`)
       //get the stripe session_id for the account from the record and see if they have paid, if so, forward to step 4.  If not, forward to stripe to complete payment      
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
@@ -108,7 +108,7 @@ useEffect(()=>{
 
         let localClient = await patchClient({...user.clients[0], stripe_customer_id:sessionDetails.customer})
 
-        //console.log(`Who's session is ${JSON.stringify(sessionDetails)} and customer ${JSON.stringify(localClient)}`)
+        console.log(`Who's session is ${JSON.stringify(sessionDetails)} and customer ${JSON.stringify(localClient)}`)
 
        //Do Lookup to make sure session is complete, Otherwise Allow the logic to fall through to create a new session and try again
        if(sessionDetails.status == "complete"){
@@ -126,7 +126,7 @@ useEffect(()=>{
 
       await patchClient({...user.clients[0], stripe_session_id:tryAgainSession.id})
 
-      window.location.href = tryAgainSession.url;
+     // window.location.href = tryAgainSession.url;
       
     }
      
@@ -158,10 +158,10 @@ useEffect(()=>{
             
         }))
 
-        await api.post(`/auth/jwt/login`,{
-          username:formData.email,
-          password:formData.password
-        })
+       
+        
+
+        
         //console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
 
         return loginResponse;
@@ -361,11 +361,13 @@ useEffect(()=>{
   }
 
 
-  const getPriceTier = ()=>{
+  const getPriceTier = (userP)=>{
+
+    
 
     let pTier = VITE_PRICE_ID_GOLD;
 
-    switch(user.clients[0].tier){
+    switch(userP.clients[0].tier){
       case "gold":
         pTier = VITE_PRICE_ID_GOLD;
       break;
@@ -384,34 +386,40 @@ useEffect(()=>{
       break;
     }
 
-    console.log(`Returning price ${pTier} for account type ${user.clients[0].account_type}`)
+    console.log(`Returning price ${pTier} for account type ${userP.clients[0].account_type}`)
 
     if(user.clients[0].account_type == "trial"){
-      console.log(`User wants a free 30 day trial because tier is ${user.clients[0].tier}  and subscription type is ${user.clients[0].account_type} `)
+      console.log(`User wants a free 30 day trial because tier is ${userP.clients[0].tier}  and subscription type is ${userP.clients[0].account_type} and user is ${JSON.stringify(userP)}`)
       pTier = VITE_PRICE_ID_TRIAL;
     }
 
     return pTier;
   }
 
-  const createSession = async ()=>{
+  const createSession = async (userP)=>{
 
     //console.log(`Trying to get a session for the user T ${user.first_name}`)
 
+    if(!userP){
+      userP = user;
+    } else {
+      console.log(`Using this user!!! ${JSON.stringify(userP)}`)
+    }
+
     let sessionT = {};
     
-    if(getPriceTier() != VITE_PRICE_ID_TRIAL) {
+    if(getPriceTier(userP) != VITE_PRICE_ID_TRIAL) {
      sessionT = await stripe.checkout.sessions.create({
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-          price: getPriceTier(),
+          price: getPriceTier(userP),
           quantity: 1,
         },
       ],
-      customer_email: user.email, // Pre-fill email field
+      customer_email: userP.email, // Pre-fill email field
       metadata: {
-        customer_name: `${user.first_name} ${user.last_name}`, // Pass the name as metadata
+        customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'payment' ,
       
@@ -423,13 +431,13 @@ useEffect(()=>{
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-          price: getPriceTier(),
+          price: getPriceTier(userP),
           quantity: 1,
         },
       ],
-      customer_email: user.email, // Pre-fill email field
+      customer_email: userP.email, // Pre-fill email field
       metadata: {
-        customer_name: `${user.first_name} ${user.last_name}`, // Pass the name as metadata
+        customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'subscription' ,
       
@@ -483,6 +491,7 @@ useEffect(()=>{
    
        } else if(currentStep == 2){
         let aResponse = await addUser();
+    
 
         //console.log(`A RESPONSE Errors length is ${JSON.stringify(aResponse)}`)
 
@@ -499,6 +508,8 @@ useEffect(()=>{
 
         
         const lresponse = await loginUser(formData.email, formData.password);
+
+        console.log(`This session is now for ${lresponse.userData.email}`)
 
         dispatch(updateUser(lresponse.userData));
         
@@ -521,7 +532,7 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = await createSession();
+          const session = await createSession(lresponse.userData);
 
           //console.log(`Session came back as ${JSON.stringify(session)}`)
 

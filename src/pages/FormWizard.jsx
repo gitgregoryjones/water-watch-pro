@@ -727,8 +727,8 @@ useEffect(()=>{
               </div>
             </div>
           )}
-            {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[green]">
-            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the Gold service level (link back to the Prices section of the WWP website). Questions? Contact us at support@waterwatchpro.com 
+            {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[black]">
+            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level Questions? Contact us at support@waterwatchpro.com 
             </div>}
             {formData.subscriptionLevel === "paid" && <div className="text-[green] font-normal mb-4 text-lg">
                 {/*Thanks for your interest in starting a monthly subscription to WaterWatch PRO. Select a service level and enter as many locations as you wish. Billing is based on the number of your locations and the service level (link back to the Prices section of the WWP website).  

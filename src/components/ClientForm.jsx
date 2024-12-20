@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
 import Toggle from './Toggle';
 import WorkingDialog from './WorkingDialog';
+import Card from './Card';
+import SettingsMenu from './SettingsMenu';
 
-const ClientForm = ({ clientToEdit }) => {
+const ClientForm = ({ clientToEdit,myself = false }) => {
+
+  
+
   const [accountName, setAccountName] = useState(clientToEdit?.account_name || '');
   const [email, setEmail] = useState(clientToEdit?.invoice_email || '');
   const [phone, setPhone] = useState(clientToEdit?.phone || '');
@@ -15,6 +20,11 @@ const ClientForm = ({ clientToEdit }) => {
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
+
+
+  useEffect(()=>{
+
+  },[myself])
 
   const [additionalSettings, setAdditionalSettings] = useState({
     turnAccountOn: false,
@@ -90,14 +100,25 @@ const ClientForm = ({ clientToEdit }) => {
   };
 
   return (
-    <div className="relative mt-24 p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg">
+      <div className="h-full w-full flex flex-col mt-28">
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
+        Settings &gt; Client: {clientToEdit?.account_name}  
+      </h1>
+      <Card
+        header={
+          <SettingsMenu activeTab={myself ? `mysubscription` : `clients`}/>
+        }
+        className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}
+      >
+        <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
+    <div className="relative mt-0 p-6 w-full  mx-auto bg-white shadow-md rounded-lg">
       {/* Close Button */}
-      <button
+      {!myself && <button
         onClick={() => navigate('/settings-admin')}
         className="absolute top-4 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600"
       >
         <FaTimes />
-      </button>
+      </button>}
 
       <h1 className="text-2xl font-bold mb-4">
         {clientToEdit ? `Edit ${accountName}` : 'Add Client'}
@@ -171,17 +192,24 @@ const ClientForm = ({ clientToEdit }) => {
               checked={status != "active" ? true : false }
               onChange={() => setStatus(status == "active" ? "inactive" : "active")} 
             />
-            <span className="ml-2">Suspend Account</span>
+            <span className="ml-2">{myself ? `Pause Subscription` : `Suspend Account`}</span>
           </div>
           <div className="border p-4 rounded">
-  <h2 className="text-xl font-bold mb-4">Account Type</h2>
-  <div className="flex items-center gap-4">
+  <h2 className="text-xl font-bold mb-4">Status</h2>
+  {myself && 
+        <label className="flex items-center capitalize">
+        
+        {account_type}
+      </label>
+  }
+  {!myself && <div className="flex items-center gap-4">
     <label className="flex items-center">
       <input
         type="radio"
         name="account_type"
         value="paid"
         checked={account_type === 'paid'}
+        
         onChange={(e) => setAccount_Type(e.target.value)}
         className="mr-2"
       />
@@ -199,7 +227,7 @@ const ClientForm = ({ clientToEdit }) => {
       Trial
     </label>
 
-    <label className="flex items-center">
+    { <label className="flex items-center">
       <input
         type="radio"
         name="account_type"
@@ -207,11 +235,12 @@ const ClientForm = ({ clientToEdit }) => {
         checked={account_type === 'demo'}
         onChange={(e) => setAccount_Type(e.target.value)}
         className="mr-2"
+        
       />
       Demo
-    </label>
+    </label>}
 
-    <label className="flex items-center">
+    {<label className="flex items-center">
       <input
         type="radio"
         name="account_type"
@@ -221,8 +250,8 @@ const ClientForm = ({ clientToEdit }) => {
         className="mr-2"
       />
       Free
-    </label>
-  </div>
+    </label>}
+  </div>}
 </div>
 
           <div>
@@ -325,7 +354,7 @@ const ClientForm = ({ clientToEdit }) => {
           >
             {isEditMode ? 'Update Client' : 'Create Client'}
           </button>
-          {isEditMode && (
+          {isEditMode && !myself && (
             <button
               type="button"
               onClick={handleDelete}
@@ -337,6 +366,9 @@ const ClientForm = ({ clientToEdit }) => {
         </div>
       </form>
       <WorkingDialog showDialog={showDialog} />
+    </div>
+    </div> {/* div card div */}
+    </Card>
     </div>
   );
 };

@@ -44,6 +44,16 @@ const SettingsMenu = ({ activeTab }) => {
         >
         Notifications
       </Link>
+      <Link
+        to="/client-form"
+        className={`${user.is_superuser && 'hidden'} text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
+          activeTab === (!user.is_superuser ? 'mysubscription' : 'clients') ? 'border-blue-500' : 'border-transparent'
+        }`}
+
+        state={{client:user.clients[0], myself:true}}
+        >
+        Account
+      </Link>
       
     </div>
   );

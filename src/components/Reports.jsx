@@ -6,6 +6,7 @@ import Upgrade from './Upgrade';
 import api from '../utility/api';
 import EmailRowManager from './EmailRowManager';
 import { convertTier } from '../utility/loginUser';
+import WorkingDialog from './WorkingDialog';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
@@ -17,6 +18,7 @@ const Reports = () => {
   const [reportContent, setReportContent] = useState(''); // HTML content for the report
   const [contacts, setContacts] = useState([]);
   const [selectAll, setSelectAll] = useState(false); 
+  const [showDialog,setShowDialog] = useState(false);
 
   const user = useSelector((state) => state.userInfo.user);
   const [isSelectAll,setIsSelectAll] = useState(false);
@@ -150,7 +152,7 @@ const Reports = () => {
     e.preventDefault();
     setReportContent(''); // Clear previous content
 
-    const notImplemented = ["sms","emails","unpaid"]
+    const notImplemented = ["sms","unpaid","billing","files-processed"]
 
     if(notImplemented.includes(reportType)){
       const errorMessage = `
@@ -175,11 +177,11 @@ const Reports = () => {
       return;
     }
   
-    if (reportType === 'weekly' || reportType === 'daily' || reportType === 'rapidrain') {
+    if (reportType === 'weekly' || reportType === 'daily' || reportType === 'rapidrain' || reportType == 'emails') {
       if (!fromDate || !toDate) {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
-            <p><strong>Error:</strong> Please specify both a from date and a to date for weekly or custom date ranges.</p>
+            <p><strong>Error:</strong> Please specify both a from date and a to date for this report.</p>
           </div>
         `;
         setReportContent(errorMessage);
@@ -221,8 +223,11 @@ const Reports = () => {
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
+    } else if(reportType === 'emails'){
+      query = `${API_HOST}/api/reports/sockletlabs-email-report?start_date=${fromDate}&end_date=${toDate}&page_size=250&page_number=1&sort_field=queuedTime&sort_directin=asc`
     }
-  
+   
+    setShowDialog(true);
     if (selectedLocations.length > 1 || displayFormat === 'csv') {
       // POST Request for multiple locations
       requestData = {
@@ -233,6 +238,8 @@ const Reports = () => {
   
       try {
         const response = await api.post(query, requestData);
+
+        setShowDialog(false);
   
         // Display task_id in the report area
         const taskIdMessage = `
@@ -245,6 +252,7 @@ const Reports = () => {
         setReportContent(taskIdMessage);
         window.scrollTo({top: 0, behavior: 'smooth'});
       } catch (error) {
+        setShowDialog(false)
         console.error('Error submitting report:', error.message);
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
@@ -261,6 +269,7 @@ const Reports = () => {
       try {
         const response = await api.get(query);
         console.log('Report Data:', response.data);
+        setShowDialog(false);
         /*
         if(window.innerWidth < 600){
         setReportContent(response.data.replace(
@@ -272,6 +281,7 @@ const Reports = () => {
       }*/
         setReportContent(response.data);
       } catch (error) {
+        setShowDialog(false);
         console.error('Error fetching report:', error.message);
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
@@ -319,9 +329,9 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full text-sm"
           >
             <Upgrade tier={4}>
-            <option value="sms">Files Processed</option>
+            <option value="files-processed">Files Processed</option>
               <option value="sms">SMS Sent/Rejected</option>
-              <option value="emails">Emails Sent/Rejected</option>
+              <option value="emails">Rejected Emails</option>
               <option value="billing">Billing</option>
             </Upgrade>
 
@@ -430,6 +440,7 @@ const Reports = () => {
   className={`${ reportContent ? 'border-[unset]  border-[black]':''} overflow-auto w-full`}
   dangerouslySetInnerHTML={{ __html: reportContent }}
 ></div>
+<WorkingDialog showDialog={showDialog}/>
 </div>
 
     </div>

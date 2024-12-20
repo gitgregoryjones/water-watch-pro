@@ -56,7 +56,7 @@ api.interceptors.response.use(
     }
 
     // Specific handling for 400 errors with "details"
-    if (error.response?.status === 400 && error.response.data?.detail) {
+    if (error.response.data?.detail) {
       error.message = error.response.data.detail;
     }
 

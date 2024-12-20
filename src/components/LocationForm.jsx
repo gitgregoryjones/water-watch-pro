@@ -224,7 +224,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           >
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
-          {isEditMode && (
+          {isEditMode && user.tier >= 2 && (
             <button
               type="button"
               onClick={handleDelete}

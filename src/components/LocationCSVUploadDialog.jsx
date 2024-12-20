@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
 import api from "../utility/api"; // Replace with your actual API utility
+import { useSelector } from "react-redux";
 
 const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [file, setFile] = useState(null);
@@ -8,7 +9,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [successRows, setSuccessRows] = useState([]);
-
+  const user = useSelector((state) => state.userInfo.user);
   const requiredFields = ["name", "lat", "lng", "limit24","rapidrain"];
   const validThresholdValues = [0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4];
 
@@ -184,11 +185,16 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
 
   return (
     <div className={`flex flex-col relative items-start justify-start gap-2 ${className}`}>
+      
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
         onClick={() => {
-          document.getElementById("fileUpload").value = "";
-          document.getElementById("fileUpload").click();
+          if(user.tier >= 2){
+            document.getElementById("fileUpload").value = "";
+            document.getElementById("fileUpload").click(); 
+          } else {
+            alert('This feature is not available at your current service level')
+          }
         }}
       >
         Bulk Upload Locations CSV

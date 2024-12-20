@@ -12,6 +12,7 @@ import { loginUser, patchClient } from '../utility/loginUser';
 import { VITE_PAYMENT_LINK_GOLD, VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE,VITE_PRICE_ID_SILVER,VITE_PRICE_ID_TRIAL,VITE_STRIPE_SUCCESS_URL,VITE_STRIPE_CANCEL_URL } from '../utility/constants';
 import validatePassword from '../utility/passwordFunc';
 import Stripe from 'stripe';
+import Prices from './Prices';
 
 
 const FormWizard = () => {
@@ -733,42 +734,7 @@ useEffect(()=>{
             {formData.subscriptionLevel === "paid" && <div className="text-[green] font-normal mb-4 text-lg">
                 {/*Thanks for your interest in starting a monthly subscription to WaterWatch PRO. Select a service level and enter as many locations as you wish. Billing is based on the number of your locations and the service level (link back to the Prices section of the WWP website).  
 Questions? Contact us at support@waterwatchpro.com. */}
-<div class="w-full p-6 bg-gradient-to-br from-white to-gray-100 rounded-lg shadow-md md:rounded-xl">
-  <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800">Subscription Pricing</h2>
-  
-  <div class="grid gap-6 md:grid-cols-3">
-  
-    <div class="flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">
-      <h3 class="text-xl font-bold text-yellow-700 mb-2">Gold</h3>
-      <p class="text-4xl font-bold text-gray-800 mb-2">$24.00</p>
-      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-    </div>
-
-  
-    <div class="flex flex-col items-center justify-center border border-gray-400 rounded-lg p-6 bg-gray-50 shadow-md">
-      <h3 class="text-xl font-bold text-gray-700 mb-2">Silver</h3>
-      <p class="text-4xl font-bold text-gray-800 mb-2">$18.00</p>
-      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-    </div>
-
-  
-    <div class="flex flex-col items-center justify-center border border-orange-400 rounded-lg p-6 bg-orange-50 shadow-md">
-      <h3 class="text-xl font-bold text-orange-700 mb-2">Bronze</h3>
-      <p class="text-4xl font-bold text-gray-800 mb-2">$12.00</p>
-      <p class="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-    </div>
-  </div>
-
-  
-  <div class="mt-8 text-gray-700 text-sm md:text-base leading-6">
-    <p class="mb-4">
-      Once you make your initial payment, you can add as many locations as you want to pay for. During the next billing cycle, your recurring subscription cost is based on the number of locations in your account and service level.
-    </p>
-    <p class="font-semibold text-gray-800 text-center">
-      Your card will automatically be charged on the renewal date.
-    </p>
-  </div>
-</div>
+<Prices isSmall={true}/>
 
             </div>}
         </div>

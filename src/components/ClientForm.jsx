@@ -315,7 +315,7 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
               name="tier"
               value="bronze"
               checked={tier === 'bronze'}
-              onChange={() => setTier('bronze')}
+              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('bronze')}
               className="mr-2"
             />
             <label htmlFor="bronze">Bronze</label>
@@ -327,8 +327,9 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
               name="tier"
               value="silver"
               checked={tier === 'silver'}
-              onChange={() => setTier('silver')}
+              onChange={(e) => e.target.value != tier && myself ?  navigate("/upgrade")  : setTier('silver')}
               className="mr-2"
+              
             />
             <label htmlFor="silver">Silver</label>
           </div>
@@ -339,7 +340,7 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
               name="tier"
               value="gold"
               checked={tier === 'gold'}
-              onChange={() => setTier('gold')}
+              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('gold')}
               className="mr-2"
             />
             <label htmlFor="gold">Gold</label>

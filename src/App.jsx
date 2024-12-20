@@ -40,6 +40,7 @@ import RegistrationComplete from "./pages/RegistrationComplete";
 import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import Prices from "./pages/Prices";
 
 
 
@@ -50,7 +51,7 @@ function App() {
 
   // Check if the current path is the login page
   const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete" 
-    || location.pathname == "/reset-password" || location.pathname == "/forgot-password");
+    || location.pathname == "/reset-password" || location.pathname == "/forgot-password" || location.pathname == "/upgrade") ;
 
   
 
@@ -120,6 +121,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/upgrade" element={<Prices />} />
 
        
 <Route path="/contact-form" element={<ContactPage />} />

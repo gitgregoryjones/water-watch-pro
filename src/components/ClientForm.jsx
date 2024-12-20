@@ -6,6 +6,9 @@ import Toggle from './Toggle';
 import WorkingDialog from './WorkingDialog';
 import Card from './Card';
 import SettingsMenu from './SettingsMenu';
+import { useSelector } from 'react-redux';
+import { updateUser } from '../utility/UserSlice';
+import { useDispatch } from 'react-redux';
 
 const ClientForm = ({ clientToEdit,myself = false }) => {
 
@@ -20,7 +23,8 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
-
+  const user = useSelector((state) => state.userInfo.user);
+  const dispatch = useDispatch();
 
   useEffect(()=>{
 
@@ -78,14 +82,19 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
 
     try {
       if (clientToEdit) {
-        await api.patch(`/api/clients/${clientToEdit.id}`, payload);
+        let c = await api.patch(`/api/clients/${clientToEdit.id}`, payload);
+        if(myself){
+            let copy = {...user};
+            copy.clients = [c.data];
+            dispatch(updateUser(copy))
+        }
       } else {
         await api.post('/api/clients/', payload);
       }
 
       setTimeout(() => {
         setShowDialog(false);
-        navigate('/settings-admin');
+        myself ? navigate("/client-form", { state:{client:user.clients[0],myself:true}}) : navigate('/settings-admin');
       }, 2000);
     } catch (error) {
       console.error('Error saving client:', error.message);
@@ -307,7 +316,7 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
 
         {/* Tier Radio Buttons */}
         <div className="border p-4 rounded">
-          <h2 className="text-xl font-bold mb-4">Account Type</h2>
+          <h2 className="text-xl flex flex-col gap-2 font-bold mb-4"><span>Account Type</span><Link to="/upgrade" className='text-sm'>I want to upgrade</Link></h2>
           <div className="flex items-center mb-2">
             <input
               type="radio"

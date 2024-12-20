@@ -438,7 +438,7 @@ function showThreshold(color){
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
-      Tier is {user.clients[0].tier} 
+      
       {convertTier(user) >= 4 && (<AdminCards/>)}
       
       

@@ -119,7 +119,7 @@ export default function LoginForm() {
                        
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
-                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
+                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && convertTier(user) != 1 ? "red" : "orange"
                         : "green";
 
                     

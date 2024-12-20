@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import api from "../utility/api"; // Replace with your actual API utility
 import { useSelector } from "react-redux";
+import { convertTier } from "../utility/loginUser";
 
 const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const [file, setFile] = useState(null);
@@ -12,6 +13,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
   const user = useSelector((state) => state.userInfo.user);
   const requiredFields = ["name", "lat", "lng", "limit24","rapidrain"];
   const validThresholdValues = [0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4];
+  
 
   const validateRow = (row) => {
     const errorMessages = [];
@@ -189,7 +191,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       <button
         className="bg-blue-600 text-white px-4 py-2 rounded shadow-md"
         onClick={() => {
-          if(user.tier >= 2){
+          if(convertTier(user) >= 2){
             document.getElementById("fileUpload").value = "";
             document.getElementById("fileUpload").click(); 
           } else {

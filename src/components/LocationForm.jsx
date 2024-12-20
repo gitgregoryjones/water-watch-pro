@@ -5,6 +5,7 @@ import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
 import { VITE_PRICES_LINK } from '../utility/constants';
+import { convertTier } from '../utility/loginUser';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -28,7 +29,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setLongitude(locationToEdit.longitude || '');
       setH24Threshold(locationToEdit.h24_threshold || .5);
       
-      if(user.tier < 2){
+      if(convertTier(user) < 2){
         if(locationToEdit.h24Threshold){
           setRapidRainThreshold(locationToEdit.h24Threshold)
         }else {
@@ -178,7 +179,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             step="0.01"
             id="h24Threshold"
             value={h24Threshold}
-            onChange={(e) => {setH24Threshold(e.target.value); if(user.tier < 2){setRapidRainThreshold(e.target.value)}}}
+            onChange={(e) => {setH24Threshold(e.target.value); if(convertTier(user) < 2){setRapidRainThreshold(e.target.value)}}}
             className="border border-gray-300 rounded p-2 w-full"
             required
           >
@@ -195,7 +196,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="rapidRainThreshold" className="block text-gray-700 font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
-          {user.tier > 2 ? (<select
+          {convertTier(user) > 2 ? (<select
             
             
             id="rapidRainThreshold"
@@ -224,7 +225,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           >
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
-          {isEditMode && user.tier >= 2 && (
+          {isEditMode && convertTier(user) >= 2 && (
             <button
               type="button"
               onClick={handleDelete}

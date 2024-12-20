@@ -5,6 +5,7 @@ import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
 import EmailRowManager from './EmailRowManager';
+import { convertTier } from '../utility/loginUser';
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
@@ -44,12 +45,12 @@ const Reports = () => {
   useEffect(() => {
     // Initialize the `toDate` for monthly based on user tier
     if (reportType === 'monthly') {
-      if (user.tier < 2) {
+      if (convertTier(user) < 2) {
         setToDate(lastMonth); // Default to last month if tier < 2
       } else {
         setToDate(currentYearMonth); // Default to current month if tier >= 2
       }
-    } else if(reportType == 'weekly' && user.tier < 2){
+    } else if(reportType == 'weekly' && convertTier(user) < 2){
 
       setReportContent(`
         <center><div class="flex flex-col gap-4  items-center justify-center bg-[white] text-center border-[gold]  border-4 text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
@@ -59,7 +60,7 @@ const Reports = () => {
         </div></center>
       `)
 
-    }else if((reportType == 'daily' || reportType == 'rapidrain') && user.tier < 2){
+    }else if((reportType == 'daily' || reportType == 'rapidrain') && convertTier(user) < 2){
 
       setReportContent(`
         <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
@@ -70,7 +71,7 @@ const Reports = () => {
       `)
 
     }
-  }, [reportType, user.tier]);
+  }, [reportType, convertTier(user)]);
 
   useEffect(() => {
     const h1Element = reportAreaRef.current?.querySelector("h1");
@@ -84,7 +85,7 @@ const Reports = () => {
     setReportType(selectedType);
 
     if (selectedType === 'monthly') {
-      if (user.tier < 2) {
+      if (convertTier(user) < 2) {
         setToDate(lastMonth); // Default to last month
       } else {
         setToDate(currentYearMonth); // Default to current month
@@ -354,8 +355,8 @@ const Reports = () => {
             value={toDate}
             onChange={handleToDateChange}
             className="border border-gray-300 rounded p-2 w-full"
-            min={reportType === 'monthly' && user.tier < 2 ? lastMonth : undefined} // Disable months before last month for tier < 2
-            max={reportType === 'monthly' && user.tier < 2 ? lastMonth : undefined} // Disable current month for tier < 2
+            min={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable months before last month for tier < 2
+            max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable current month for tier < 2
           />
         </div>
         </div>

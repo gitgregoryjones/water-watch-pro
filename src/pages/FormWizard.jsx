@@ -430,6 +430,7 @@ useEffect(()=>{
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'payment' ,
+      payment_method_collection:'always',
       
       success_url: VITE_STRIPE_SUCCESS_URL,
       cancel_url: VITE_STRIPE_CANCEL_URL,
@@ -448,6 +449,7 @@ useEffect(()=>{
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'subscription' ,
+      payment_method_collection:'always',
       
       subscription_data:{
         trial_settings:{
@@ -457,7 +459,7 @@ useEffect(()=>{
         },
         trial_period_days:30
       },
-      payment_method_collection:"if_required",
+      
       success_url: VITE_STRIPE_SUCCESS_URL,
       cancel_url: VITE_STRIPE_CANCEL_URL,
     });

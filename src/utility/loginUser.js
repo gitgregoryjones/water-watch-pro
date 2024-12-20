@@ -1,5 +1,34 @@
 import api from "./api";
 
+const convertTier = (person) =>{
+
+    let tier = 1;
+
+    switch (person.clients[0].tier.toLowerCase()) {
+        case "bronze":
+            tier = 1;
+            break;
+      
+        case "gold":
+            tier = 3;
+            break;
+        case "silver":
+            tier = 2;
+            break;
+        
+        default:
+            tier = 0;
+            break;
+    }
+
+    if(person.is_superuser){
+        tier = 4;
+    }
+
+    return tier;
+
+}
+
 const patchClient = async(clientData) =>{
 
     let response = {clientData,errors:[]}
@@ -66,26 +95,7 @@ const loginUser = async (email, password)=>{
     userData.lastName = userData.last_name;
     userData.accessToken = accessToken;
 
-    switch (userData.clients[0]?.tier?.toLowerCase()) {
-        case "bronze":
-            userData.tier = 1;
-            break;
-      
-        case "gold":
-            userData.tier = 3;
-            break;
-        case "silver":
-            userData.tier = 2;
-            break;
-        
-        default:
-            userData.tier = 0;
-            break;
-    }
-
-    if(userData.is_superuser == true){
-        userData.tier = 4;
-    }
+    userData.tier = convertTier (userData);
 
     
     // Step 3: Get the locations for this client
@@ -109,4 +119,4 @@ const loginUser = async (email, password)=>{
 }
 }
 
-export  {loginUser, patchClient};
+export  {loginUser, patchClient, convertTier};

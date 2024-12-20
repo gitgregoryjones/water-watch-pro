@@ -10,6 +10,7 @@ export const VITE_PRICE_ID_SILVER = import.meta.env.VITE_PRICE_ID_SILVER;
 export const VITE_PRICE_ID_BRONZE = import.meta.env.VITE_PRICE_ID_BRONZE;
 export const VITE_PRICE_ID_TRIAL = import.meta.env.VITE_PRICE_ID_TRIAL;
 export const VITE_STRIPE_SUCCESS_URL = import.meta.env.VITE_STRIPE_SUCCESS_URL;
+export const VITE_STRIPE_UPGRADE_SUCCESS_URL = import.meta.env.VITE_STRIPE_UPGRADE_SUCCESS_URL;
 export const VITE_STRIPE_CANCEL_URL = import.meta.env.VITE_STRIPE_CANCEL_URL;
 
 

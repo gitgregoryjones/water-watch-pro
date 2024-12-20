@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Upgrade from './Upgrade';
 import { useSelector } from 'react-redux';
+import { convertTier } from '../utility/loginUser';
 
 const SettingsMenu = ({ activeTab }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -26,7 +27,7 @@ const SettingsMenu = ({ activeTab }) => {
       >
         Modify Contacts
       </Link>)}
-      {user.tier !=4 && window.innerWidth > 600 && (
+      {convertTier(user) !=4 && window.innerWidth > 600 && (
        <Link
         to="/location-list"
         className={`text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
@@ -50,7 +51,7 @@ const SettingsMenu = ({ activeTab }) => {
           activeTab === (!user.is_superuser ? 'mysubscription' : 'clients') ? 'border-blue-500' : 'border-transparent'
         }`}
 
-        state={{client:user.clients[0], myself:true}}
+        state={{client:user.clients[0], myself:!user.is_superuser}}
         >
         Account
       </Link>

@@ -44,7 +44,7 @@ const ContactListPage = () => {
  
     if (window.confirm('Are you sure you want to delete this contact?')) {
     try {
-      await api.delete(`/api/contacts/${contactId}`);
+      await api.delete(user.is_superuser ? `/api/contacts/${contactId}?client_id=${user.clients[0].id}` : `/api/contacts/${contactId}`);
       fetchContacts(currentPage); // Refresh the list
     } catch (error) {
       console.error('Error deleting contact:', error.message);
@@ -71,7 +71,7 @@ const ContactListPage = () => {
           Modify Contacts
         </span>
         <div>
-          {user.tier !=4 && (
+          {convertTier(user) !=4 && (
          
         <Link
           to="/location-list"
@@ -80,7 +80,7 @@ const ContactListPage = () => {
           Modify Locations
         </Link>
             )}
-        {user.tier == 4 && <Link
+        {convertTier(user) == 4 && <Link
           to="/settings-admin"
           className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >

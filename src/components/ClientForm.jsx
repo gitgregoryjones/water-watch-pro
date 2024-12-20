@@ -9,8 +9,9 @@ import SettingsMenu from './SettingsMenu';
 import { useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { useDispatch } from 'react-redux';
+import { convertTier } from '../utility/loginUser';
 
-const ClientForm = ({ clientToEdit,myself = false }) => {
+const ClientForm = ({ clientToEdit,myself }) => {
 
   
 
@@ -111,7 +112,7 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
   return (
       <div className="h-full w-full flex flex-col mt-28">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
-        Settings &gt; Client: {clientToEdit?.account_name}  
+        Settings &gt; Client: {clientToEdit?.account_name} 
       </h1>
       <Card
         header={
@@ -316,7 +317,8 @@ const ClientForm = ({ clientToEdit,myself = false }) => {
 
         {/* Tier Radio Buttons */}
         <div className="border p-4 rounded">
-          <h2 className="text-xl flex flex-col gap-2 font-bold mb-4"><span>Account Type</span><Link to="/upgrade" className='text-sm'>I want to upgrade</Link></h2>
+           <h2 className="text-xl flex flex-col gap-2 font-bold mb-4"><span>Account Type</span>
+         {myself && <Link to="/upgrade" className='text-sm'>I want to change my subscription</Link>}</h2>
           <div className="flex items-center mb-2">
             <input
               type="radio"

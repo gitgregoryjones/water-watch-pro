@@ -6,6 +6,7 @@ import CardContent from '../components/CardContent'
 import Pill from '../components/Pill'
 import PillControls from '../components/PillControls'
 import PillContent from '../components/PillContent'
+import { convertTier } from '../utility/loginUser'
 
 
 import Forecast from '../components/Forecast'
@@ -437,14 +438,14 @@ function showThreshold(color){
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
-
-      {user.tier >= 4 && (<AdminCards/>)}
+      Tier is {user.clients[0].tier} 
+      {convertTier(user) >= 4 && (<AdminCards/>)}
       
       
           
         {user.processedThrough}
       
-      <Card  className={`${user.tier == 4 && 'hidden'}`}
+      <Card  className={`${convertTier(user) == 4 && 'hidden'}`}
       footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></div>} 
       header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full justify-around items-center'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}<Processing showPlain={true}/></div> <Processing /></div>}  >
       <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} mini={window.outerWidth < 600}>
@@ -534,7 +535,7 @@ function showThreshold(color){
           </div>
           <div className='tab'>24 Hr Accum
           <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2 sm:my-4 justify-around items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor24}/>
-      <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={`${user.tier == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
+      <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={`${convertTier(user) == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
     
         
       <APIProvider apiKey={VITE_GOOGLE_API_KEY}>
@@ -619,11 +620,11 @@ function showThreshold(color){
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
       <div id="graphs" className='h-[10px]'></div>
-      <Card className={`${user.tier == 4 && 'hidden'}`} 
+      <Card className={`${convertTier(user) == 4 && 'hidden'}`} 
         footer={window.innerWidth <= 600  && <div className='flex gap-2 justify-around text-sm py-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <div className='bg-[red] h-2 w-4'></div>{ `Exceeds 24h NOAA Atlas 14`}</div>}
         header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
       <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade></div></div>} >
-           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${user.tier == 4 && 'hidden'}`}>
+           <PillTabs mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               
             <RainfallChart location={location} period={"daily"} max={3} />
@@ -644,9 +645,9 @@ function showThreshold(color){
       
   
       <span id="forecast" className=''></span>
-      <Card className={`${user.tier == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
+      <Card className={`${convertTier(user) == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
            <PillTabs mini={window.outerWidth < 600} 
-           header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${user.tier == 4 && 'hidden'}`}>
+           header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>National
               
               <Forecast className={"items-end"}/>

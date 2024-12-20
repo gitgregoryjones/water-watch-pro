@@ -7,6 +7,7 @@ import { VITE_MAILCHIMP_LOGIN, VITE_TWILIO_LOGIN } from '../utility/constants'
 import api from '../utility/api'
 import { useSelector } from 'react-redux'
 import WorkingDialog from './WorkingDialog'
+import Processing from './Processing'
 
 
 export default function AdminCards() {
@@ -121,13 +122,7 @@ export default function AdminCards() {
           <div className='flex gap-2 justify-center items-center'><i className='fa text-[orange] fa-solid fa-circle-exclamation'></i>15 errors</div>
           </div>
         </Stats>
-        <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 1 </div>}>
-          <div className='flex flex-col'>
-          <div className='flex items-center justify-center text-3xl md:text-3xl'>Processed
-          </div>
-          <div className='flex gap-2 justify-center items-center'><i className='fa text-[orange] fa-solid fa-circle-exclamation'></i>As of 1300 EDT</div>
-          </div>
-        </Stats>
+        <Processing/>
         <Stats className={`hidden`} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 2 </div>}>
           <div className='flex items-center justify-center md:text-3xl text-2xl text-[white]'>On Standby</div>
         </Stats>

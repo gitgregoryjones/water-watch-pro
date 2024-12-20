@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import api from '../utility/api';
 import { useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
+import { convertTier } from '../utility/loginUser';
 
 
 
@@ -76,7 +77,7 @@ export default function Header() {
       <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Data
   </Link>
-  {user.tier != 4 && (
+  {convertTier(user) != 4 && (
     <div className='flex gap-4'>
   <Link to="/dashboard#graphs" className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs
@@ -96,7 +97,7 @@ export default function Header() {
   </Link>)}
   <div>
 
-    {user.tier == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+    {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
   </Link>): (<Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings

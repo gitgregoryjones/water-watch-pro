@@ -5,6 +5,7 @@ import api from '../utility/api';
 import Toggle from './Toggle'; // Import the Toggle component
 import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
+import { convertTier } from '../utility/loginUser';
 
 const ContactForm = ({ contactToEdit }) => {
   const [name, setName] = useState(contactToEdit?.name || '');
@@ -197,7 +198,7 @@ const ContactForm = ({ contactToEdit }) => {
     });
   };
   return (
-    <div className={`relative ${user.tier >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg`}>
+    <div className={`relative ${convertTier(user) >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg`}>
       {/* Close Button */}
       <button
         onClick={() => navigate('/contact-list')}

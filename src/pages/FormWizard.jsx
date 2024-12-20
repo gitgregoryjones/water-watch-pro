@@ -430,7 +430,7 @@ useEffect(()=>{
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'payment' ,
-      payment_method_collection:'always',
+      customer_creation:"always",
       
       success_url: VITE_STRIPE_SUCCESS_URL,
       cancel_url: VITE_STRIPE_CANCEL_URL,
@@ -444,6 +444,7 @@ useEffect(()=>{
           quantity: 1,
         },
       ],
+      customer_creation:"always",
       customer_email: userP.email, // Pre-fill email field
       metadata: {
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata

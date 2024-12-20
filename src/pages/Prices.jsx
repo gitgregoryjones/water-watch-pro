@@ -147,12 +147,12 @@ const handleUpgrade = async (tier) => {
           <p className="text-4xl font-bold text-gray-800 mb-2">$24.00</p>
           <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
           <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('gold')}</ul>
-          <button
+          {!isSmall && <button
             onClick={() => handleUpgrade('gold')}
             className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
           >
             Upgrade
-          </button>
+          </button>}
         </div>
 
         {/* Silver Plan */}
@@ -161,12 +161,12 @@ const handleUpgrade = async (tier) => {
           <p className="text-4xl font-bold text-gray-800 mb-2">$18.00</p>
           <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
           <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('silver')}</ul>
-          <button
+          {!isSmall &&<button
             onClick={() => handleUpgrade('silver')}
             className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
           >
             Upgrade
-          </button>
+          </button>}
         </div>
 
         {/* Bronze Plan */}
@@ -175,12 +175,12 @@ const handleUpgrade = async (tier) => {
           <p className="text-4xl font-bold text-gray-800 mb-2">$12.00</p>
           <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
           <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('bronze')}</ul>
-          <button
+          {!isSmall && <button
             onClick={() => handleUpgrade('bronze')}
             className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
           >
             Upgrade
-          </button>
+          </button>}
         </div>
       </div>
 

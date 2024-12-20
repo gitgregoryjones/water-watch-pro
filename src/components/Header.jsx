@@ -6,6 +6,7 @@ import Upgrade from './Upgrade';
 import { useSelector } from 'react-redux';
 import api from '../utility/api';
 import { useNavigate } from 'react-router-dom';
+import WorkingDialog from './WorkingDialog';
 
 
 
@@ -19,6 +20,8 @@ export default function Header() {
   const location = useLocation();
 
   const navigate = useNavigate();
+
+  const [showDialog,setShowDialog] = useState(false)
 
   // Check if the current path is the login page
   const isLoginPage = location.pathname === "/";
@@ -40,17 +43,19 @@ export default function Header() {
   const daysLeft = (Math.max(Math.floor(differenceInMs / (1000 * 60 * 60 * 24)), 0));
 
   async function logout(){
-
+    setShowDialog(true)
     try {
       
       // Step 1: Log in to get the access token
       const loginResponse = await api.post(`/auth/jwt/logout`)
-      localStorage.deleteItem("accessToken");
+      setTimeout(
+      ()=> navigate("/"),2000)
 
-      navigate("/");
+      
 
     }catch(e){
-
+      setShowDialog(false)
+      console.log(e)
     }
 
 
@@ -113,8 +118,8 @@ export default function Header() {
 
     
       
-      
-      
+      <WorkingDialog showDialog={showDialog}/>
+       
     </div>
   )
 }

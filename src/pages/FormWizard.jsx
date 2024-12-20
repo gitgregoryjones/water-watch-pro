@@ -91,7 +91,7 @@ const FormWizard = () => {
 useEffect(()=>{
     //console.log(`Location passed was ${JSON.stringify(location.state)}`)
     //The User Was Passed, so go to the Location page
-    if(location.state?.accountType){
+    if(location.state?.account_type){
       setFormData({...formData, subscriptionLevel:location.state.account_type })
     }  
     const b = async function(){
@@ -627,7 +627,7 @@ useEffect(()=>{
           </div>
           <div className='mt-4 border rounded-2xl p-4'>
           <div className="mb-4">
-          <h2 className="text-xl font-bold mb-4">Contact Information</h2>
+          <h2 className="text-xl font-bold mb-4">Contact Information </h2>
             <label className="block text-gray-700">Name <span className='text-[red]'>*</span></label>
             <div className='flex gap-4 justify-center items-center'>
             <input
@@ -698,7 +698,7 @@ useEffect(()=>{
       {currentStep === 2 && (
 
         <div className='border rounded-2xl p-4 mb-4'>
-          <h2 className="text-xl font-bold mb-4">Subscription Level</h2>
+          <h2 className="text-xl font-bold mb-4">Subscription Level </h2>
           <div className="mb-4">
             <Toggle
               checked={formData.subscriptionLevel === 'paid'}

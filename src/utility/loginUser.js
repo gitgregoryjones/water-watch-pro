@@ -2,7 +2,14 @@ import api from "./api";
 
 const convertTier = (person) =>{
 
+    
+
     let tier = 1;
+
+    if(person.role == "contact"){
+        tier = 0;
+        return tier;
+    }
 
     switch (person.clients[0].tier.toLowerCase()) {
         case "bronze":

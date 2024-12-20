@@ -438,8 +438,7 @@ function showThreshold(color){
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
-      
-      {convertTier(user) >= 4 && (<AdminCards/>)}
+   
       
       
           

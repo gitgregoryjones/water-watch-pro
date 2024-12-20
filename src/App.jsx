@@ -41,6 +41,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import Prices from "./pages/Prices";
+import AdminCards from "./components/AdminCards";
 
 
 
@@ -122,6 +123,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/upgrade" element={<Prices />} />
+        <Route path="/admin" element={<AdminCards />} />
 
        
 <Route path="/contact-form" element={<ContactPage />} />

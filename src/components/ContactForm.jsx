@@ -14,6 +14,7 @@ const ContactForm = ({ contactToEdit }) => {
   const [client_id, setClient_Id] = useState(contactToEdit?.client_id)
   const [accountName, setAccountName] = useState(contactToEdit?.account_name)
   const [daily_report_on, set] = useState(contactToEdit?.account_name)
+  const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
       daily_report_on: contactToEdit?.daily_report_on,
@@ -39,6 +40,17 @@ const ContactForm = ({ contactToEdit }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [clients, setClients] = useState([])
 
+  const generatePassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    let password = "";
+    password += chars[Math.floor(Math.random() * 26)]; // Add an uppercase letter
+    password += chars[Math.floor(Math.random() * 10) + 26]; // Add a number
+    password += chars[Math.floor(Math.random() * 10) + 52]; // Add a special character
+    for (let i = 0; i < 5; i++) {
+      password += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return password;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e;
@@ -86,6 +98,7 @@ const ContactForm = ({ contactToEdit }) => {
   const navigate = useNavigate();
 
   const handleDelete = async () => {
+    setMsg(null)
     if (!contactToEdit) {
       alert('You can only delete an existing contact.');
       return;
@@ -98,9 +111,10 @@ const ContactForm = ({ contactToEdit }) => {
           setShowDialog(false);
           navigate('/contact-list');
         }, 2000);
+        
       } catch (error) {
         console.error('Error deleting contact:', error.message);
-        alert('An error occurred while deleting the contact.');
+        setMsg(<span className="text-[red]">{error.message}</span>)
       }
     }
   };
@@ -110,7 +124,7 @@ const ContactForm = ({ contactToEdit }) => {
 
     setShowDialog(true);
 
-    
+    setMsg(null)
 
     const payload = {
       name,
@@ -140,7 +154,7 @@ const ContactForm = ({ contactToEdit }) => {
 
       setTimeout(() => {
         setShowDialog(false);
-        navigate('/contact-list');
+        setMsg(<span className="text-[green]">Contact updated Successfully</span>)
       }, 2000);
     } catch (error) {
       console.error('Error saving contact:', error.message);
@@ -208,7 +222,7 @@ const ContactForm = ({ contactToEdit }) => {
       </button>
 
       <h1 className="text-2xl font-bold mb-4">{contactToEdit ? `Edit ${name}` : 'Add Contact'}</h1>
-      <h2 style={{visibility:"hidden"}}>{user.clients[0]?.id}</h2>
+      <h2 className='mb-2'>{msg}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Basic Info */}
         <div>
@@ -257,6 +271,7 @@ const ContactForm = ({ contactToEdit }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
+        
        { user.role == "admin" && (<div>
           <label htmlFor="accountName" className="block text-gray-700 font-bold">
             Account Name

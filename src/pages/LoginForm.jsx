@@ -61,9 +61,16 @@ export default function LoginForm() {
                 return;
             }  
 
-            const locationResponse = await api.get(`/api/locations`, {
+            if(userData.role == "admin"){
+                userData.locations = [];
+                dispatch(updateUser(userData));
+                navigate("/dashboard");
+                return;
+            }
+
+            const locationResponse =  await api.get(`/api/locations`, {
                 params: {
-                    client_id: lresponse.userData.clients[0].id,
+                    
                     page: 1,
                     page_size: 250,
                 },
@@ -75,7 +82,7 @@ export default function LoginForm() {
             let yourLocations = locationResponse.data;
 
            // if(!yourLocations || yourLocations.length == 0){
-           if(userData.clients[0].status == "pending"){
+           if(userData.clients[0]?.status == "pending"){
                 //await api.post('/auth/jwt/logout');
                 dispatch(updateUser(userData));
                 navigate("/wizard")
@@ -100,7 +107,7 @@ export default function LoginForm() {
 
             const location24History = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
-                    client_id: userData.clients[0].id,
+                    
                     
                 },
                 headers: {
@@ -119,7 +126,7 @@ export default function LoginForm() {
                        
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
-                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && convertTier(user) != 1 ? "red" : "orange"
+                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
                         : "green";
 
                     
@@ -140,7 +147,7 @@ export default function LoginForm() {
 
             const locationHourlyHistory = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
-                    client_id: userData.clients[0].id,
+                   
                     date: todayStr,
                 },
                 headers: {

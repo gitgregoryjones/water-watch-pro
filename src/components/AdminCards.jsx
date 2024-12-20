@@ -8,6 +8,7 @@ import api from '../utility/api'
 import { useSelector } from 'react-redux'
 import WorkingDialog from './WorkingDialog'
 import Processing from './Processing'
+import ProfilePic from './ProfilePic'
 
 
 export default function AdminCards() {
@@ -106,7 +107,9 @@ export default function AdminCards() {
 
   const navigate = useNavigate();
   return (
-    <div className='flex flex-col gap-4'>
+    
+    <div className='flex flex-col md:mt-28 gap-4'>
+           <ProfilePic/>
         <Card className={'flex gap-4 justify-center items-center md:border-[transparent] '} header={<PrettyHeader icon={<i className='fa fa-solid fa-triangle-exclamation'></i>}><span className=''>Overall System Health</span></PrettyHeader>} footer={<div className='flex justify-around items-center gap-2 text-sm'></div>} >
       <div className='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8' >
     

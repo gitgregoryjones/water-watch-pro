@@ -84,7 +84,7 @@ const handleUpgrade = async (tier) => {
             dispatch(
                 updateUser({
                     ...user,
-                    tier: convertTier(patchResponse.clientData.tier),
+                    tier: convertTier({clients:[patchResponse.clientData]}),
                     clients: [patchResponse.clientData],
                 })
             );

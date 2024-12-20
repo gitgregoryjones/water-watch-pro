@@ -31,7 +31,7 @@ export default function Header() {
   
   console.log(`User in header is ${JSON.stringify(user)}`)
 
-  const trialEndDateStr = user.clients[0].trial_end_date;
+  const trialEndDateStr = user.clients[0]?.trial_end_date;
   const trialEndDate = new Date(trialEndDateStr);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -68,13 +68,13 @@ export default function Header() {
     <div className=' flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center   zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex  md:flex-row flex-col xlg:flex-row items-center md:gap-4 justify-center items-center'>
         <img src={logo} className='w-[14rem] md:w-[20rem]' />
-       { user.clients[0].is_trial_account && <span className="text-[#ecbf1d] text-xl md:text-2xl decoration-solid"><a className="text-[#ecbf1d] decoration-solid" href="http://www.stormwatermonitor.net/swim_app/db_acm.php?ac=ZRUZGU&action=view_account">Trial Ends in {daysLeft} Days</a></span>}
+       { user.clients[0]?.is_trial_account && <span className="text-[#ecbf1d] text-xl md:text-2xl decoration-solid"><a className="text-[#ecbf1d] decoration-solid" href="http://www.stormwatermonitor.net/swim_app/db_acm.php?ac=ZRUZGU&action=view_account">Trial Ends in {daysLeft} Days</a></span>}
       </div>
       <div className='hidden flex '><input type="text" placeholder='Search Locations' className='relative flex text-sm p-2 pl-8 placeholder:text-slate-400 rounded-2xl min-w-[20rem]'/>
         <i className='fas fa-search absolute pl-4 pb-4 top-10 text-slate-400 text-sm'></i>
       </div>
       <div className='hidden md:flex justify-around items-center gap-4 items-end'> 
-      <Link to="/dashboard" className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+     <Link to={user.role == "admin" ? `/admin`:`/dashboard`} className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Data
   </Link>
   {convertTier(user) != 4 && (
@@ -87,21 +87,22 @@ export default function Header() {
   </Link>
   </div>
 )}
-  <Upgrade showMsg={false} tier={0}>
+
+  <Upgrade showMsg={false} tier={1}>
     <Link to="/reports" className={location.pathname === "/reports" ? "text-slate-800" : "text-[--main-2]"}>
       Reports
     </Link>
   </Upgrade>
-  {user.role != "admin" && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+  {user.role != "admin" || user.role != "contact" && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>)}
   <div>
 
     {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>): (<Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+  </Link>): (<Upgrade  tier={1} showMsg={false}><Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>)}
+  </Link></Upgrade>)}
   </div>
   
   <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>

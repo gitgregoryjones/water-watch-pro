@@ -42,6 +42,7 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import Prices from "./pages/Prices";
 import AdminCards from "./components/AdminCards";
+import { useSelector } from "react-redux";
 
 
 
@@ -70,6 +71,7 @@ function App() {
     setOpen(state.isOpen);
   }
   
+  const user = useSelector((state) => state.userInfo.user);
 
   return (
     <LandscapeOrientation>
@@ -77,17 +79,18 @@ function App() {
     <div className={"md:hidden"}>
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
-    <Link to="/dashboard" onClick={showSettings} className="menu-item bm-item">Data</Link>
-    <Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+    <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
+    {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs
-  </Link>
-  <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+  </Link>}
+  {user.role != "admin" && <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Forecasts
-  </Link>
-    <Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
+  </Link>}
+    <Upgrade showMsg={false} tier={1}><div   className="flex flex-col"><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
     <Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link>
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
-    
+    </div>
+    </Upgrade>
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}
        
       {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>*/}

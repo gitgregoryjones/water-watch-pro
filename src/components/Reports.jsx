@@ -219,7 +219,7 @@ const Reports = () => {
     } else if (reportType === 'weekly' || reportType === 'daily') {
       query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
     } else if (reportType === 'rapidrain'){
-      query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
+      query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
     }
   
@@ -376,7 +376,7 @@ const Reports = () => {
 
         {/* Row 3 */}
         
-        {(reportType == "daily" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full border">
+        {(reportType == "daily" || reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
           <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
             id="locList"

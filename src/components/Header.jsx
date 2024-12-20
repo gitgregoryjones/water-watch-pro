@@ -93,7 +93,7 @@ export default function Header() {
       Reports
     </Link>
   </Upgrade>
-  {user.role != "admin" || user.role != "contact" && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+  {(user.role != "admin" && user.role != "contact") && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>)}
   <div>

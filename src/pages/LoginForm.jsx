@@ -64,7 +64,7 @@ export default function LoginForm() {
             if(userData.role == "admin"){
                 userData.locations = [];
                 dispatch(updateUser(userData));
-                navigate("/dashboard");
+                navigate("/admin");
                 return;
             }
 
@@ -78,6 +78,12 @@ export default function LoginForm() {
                     "Authorization": `Bearer ${lresponse.userData.accessToken}`,
                 },
             });
+
+            if(userData.role == "contact" && locationResponse.data.length == 0){
+                setErrorMsg(`Ask the account owner to assign you to a location `)
+                return;
+
+            }
 
             let yourLocations = locationResponse.data;
 

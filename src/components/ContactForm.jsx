@@ -158,6 +158,9 @@ const ContactForm = ({ contactToEdit }) => {
       }, 2000);
     } catch (error) {
       console.error('Error saving contact:', error.message);
+      setShowDialog(false)
+      setMsg(<span className="text-[red]">{error.message}</span>)
+
     }
   };
 

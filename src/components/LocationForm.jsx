@@ -17,7 +17,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [responseData, setResponseData] = useState(null); // Store response data
   const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
-  
+  const [msg,setMsg] = useState("")
 
   const navigate = useNavigate();
 
@@ -77,17 +77,21 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       console.log('Response Data:', response.data); // Log the response data
       
       setTimeout(()=>{
-        setIsWorking(false); onSubmitSuccess && onSubmitSuccess();},2000)
+        setIsWorking(false); 
+        setMsg(<span className="text-[green]">Successfully Updated</span>)
+        },2000)
     } catch (error) {
       console.error('Error submitting location:', error.message);
-      alert(`An error occurred while saving the location. ${error.message}`);
+      setMsg(<span className="text-[red]">{error.message}</span>)
       setIsWorking(false)
     }
   };
 
   const handleDelete = async () => {
+    setIsWorking(true)
     if (!isEditMode) {
-      alert('You can only delete an existing location.');
+      setMsg(<span className="text-[red]">{error.message}</span>)
+      setIsWorking(false)
       return;
     }
 
@@ -95,10 +99,12 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       try {
         await api.delete(`/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`);
         //alert('Location deleted successfully!');
+        setIsWorking(false)
         onSubmitSuccess(); // Refresh the parent list or close the form
       } catch (error) {
         console.error('Error deleting location:', error.message);
-        alert('An error occurred while deleting the location.');
+        setIsWorking(false)
+        setMsg(<span className="text-[red]">{error.message}</span>)
       }
     }
   };
@@ -115,8 +121,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         {isEditMode ? `Update :  ${name}` : 'Create New Location'}
       </h2>
-     
+      <div className='mb-4'>{msg}</div>
       <form onSubmit={handleSubmit}>
+        
         {/* Name */}
         <div className="mb-4">
           <div className='flex justify-between'>

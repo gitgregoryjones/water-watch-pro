@@ -24,6 +24,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
+  const [msg,setMsg] = useState("")
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
 
@@ -81,9 +82,11 @@ const ClientForm = ({ clientToEdit,myself }) => {
       
     };
 
+    let c = {}
+
     try {
       if (clientToEdit) {
-        let c = await api.patch(`/api/clients/${clientToEdit.id}`, payload);
+        c = await api.patch(`/api/clients/${clientToEdit.id}`, payload);
         if(myself){
             let copy = {...user};
             copy.clients = [c.data];
@@ -95,10 +98,12 @@ const ClientForm = ({ clientToEdit,myself }) => {
 
       setTimeout(() => {
         setShowDialog(false);
-        myself ? navigate("/client-form", { state:{client:user.clients[0],myself:true}}) : navigate('/settings-admin');
+        myself ? navigate("/client-form", { state:{client:user.clients[0],myself:true}}) : navigate('/client-form', { state:{client:c}});
+        setMsg(<span className="text-[green]">Successfully Updated</span>)
       }, 2000);
     } catch (error) {
-      console.error('Error saving client:', error.message);
+      setShowDialog(false)
+      setMsg(<span className="text-[red]">{error.message}</span>)
     }
   };
 
@@ -114,6 +119,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
         Settings &gt; Client: {clientToEdit?.account_name} 
       </h1>
+      
       <Card
         header={
           <SettingsMenu activeTab={myself ? `mysubscription` : `clients`}/>
@@ -134,6 +140,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         {clientToEdit ? `Edit ${accountName}` : 'Add Client'}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>{msg}</div>
         
         {/* Account Name */}
        

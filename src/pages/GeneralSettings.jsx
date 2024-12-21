@@ -16,6 +16,7 @@ const GeneralSettingsPage = () => {
   const [settings, setSettings] = useState({});
   const [client, setClient] = useState(user.clients[0] ? user.clients[0] : {})
   const [working, setWorking] = useState(false);
+  const [msg,setMsg] = useState("")
 
   
 
@@ -70,17 +71,20 @@ const GeneralSettingsPage = () => {
 
   const handleSubmit = async () => {
     setWorking(true)
+    setMsg("")
     try {
       await api.patch(`/api/clients/${client.id}`, settings);
       //alert('Settings updated successfully!');
       setTimeout(() => {
         setWorking(false);
-        navigate('/location-list');
+        setMsg(<span className="text-[green]">Settings updated Successfully</span>)
+        navigate('/settings-general');
       }, 2000);
       
     } catch (error) {
       console.error('Error updating settings:', error.message);
-      alert('An error occurred while updating settings.');
+      setWorking(false)
+      setMsg('An error occurred while updating settings.');
     }
   };
 
@@ -97,6 +101,7 @@ const GeneralSettingsPage = () => {
       >
         <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+            <div>{msg}</div>
             <h2 className='py-4 px-2 border rounded bg-[#128CA6] text-[white]'>Note: The options below set notifications system wide. Modify contact settings to override settings for individual users</h2>
             {/* Daily Report Section */}
             <div className="border p-6 rounded shadow-md">

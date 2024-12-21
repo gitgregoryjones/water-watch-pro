@@ -52,6 +52,7 @@ export default function AdminCards() {
       totalPaid: 0,
       totalUnpaid: 0,
       totalAccounts: accounts?.length,
+      totalEmailFailures:0
     };
   
     accounts.forEach((account) => {
@@ -73,7 +74,48 @@ export default function AdminCards() {
   }
   
   
-  
+ 
+async function countFailureTds() {
+  try {
+    // Make a GET request to the specified endpoint
+    const response = await api.get('/api/reports/sockletlabs-email-report');
+
+    // Check if response data is valid
+    if (!response.data) {
+      console.error("No data received from API.");
+      return 0;
+    }
+
+    // Parse the HTML response using DOMParser (for browsers) or JSDOM (for Node.js)
+    const htmlContent = response.data;
+
+    // For browser environments
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+
+    // For Node.js environments, use JSDOM:
+    // const dom = new JSDOM(htmlContent);
+    // const doc = dom.window.document;
+
+    // Select all <td> elements
+    const tdElements = doc.querySelectorAll('td');
+
+    // Count <td> elements with the text 'Failure'
+    const failureCount = Array.from(tdElements).filter(
+      (td) => td.textContent.trim() === 'Failed'
+    ).length;
+
+    console.log(`Total number of 'Failure' <td> tags: ${failureCount}`);
+    return failureCount;
+  } catch (error) {
+    console.error("Error fetching or processing the report:", error);
+    return 0;
+  }
+}
+
+// Call the function
+
+
 
 
   async function fetchClients() {
@@ -83,6 +125,8 @@ export default function AdminCards() {
     try {
       const response = await api.get(`/api/clients/?client_id=${user.clients[0].id}&page=${currentPage}&page_size=250`);
 
+      const emailFailures = await countFailureTds();
+
       //setTimeout(()=> setWorking(false),500)
 
       setClients(response.data);
@@ -91,7 +135,7 @@ export default function AdminCards() {
      
       //Get Gold
      
-      setSummary(generateSummary(response.data))
+      setSummary({...generateSummary(response.data), totalEmailFailures:emailFailures})
 
       
 
@@ -110,13 +154,13 @@ export default function AdminCards() {
     
     <div className='flex flex-col md:mt-28 gap-4'>
            <ProfilePic/>
-        <Card className={'flex gap-4 justify-center items-center md:border-[transparent] '} header={<PrettyHeader icon={<i className='fa fa-solid fa-triangle-exclamation'></i>}><span className=''>Overall System Health</span></PrettyHeader>} footer={<div className='flex justify-around items-center gap-2 text-sm'></div>} >
+        <Card className={'flex gap-4 justify-center items-center md:border-[transparent] '} header={<PrettyHeader icon={<i className='fa fa-solid fa-triangle-exclamation'></i>}><span className=''>Overall System Health {new Date().toLocaleDateString("EN-US")} </span></PrettyHeader>} footer={<div className='flex justify-around items-center gap-2 text-sm'></div>} >
       <div className='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8' >
     
         <Stats onClick={()=> window.location.href = VITE_MAILCHIMP_LOGIN} header={<div className='flex  gap-2 justify-center  items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='fa fa-solid fa-envelope'></i>Emails </div>}>
           <div  className='flex flex-col'>
-            <div className='flex gap-2 items-center justify-center text-3xl'>200/290</div>
-          <div className='flex gap-2 justify-center items-center'><i className='fa text-[orange] fa-solid fa-circle-exclamation'></i>8 errors</div>
+            <div className='flex gap-2 items-center justify-center text-3xl'>Processed</div>
+          <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.totalEmailFailures)}{summary.totalEmailFailures} errors</div>
           </div>
         </Stats>
         <Stats onClick={()=> window.location.href = VITE_TWILIO_LOGIN} header={<div className='flex gap-2 justify-center items-center px-4 text-white h-full border-b-[white] text-3xl md:text-3xl'><i className='text-3xl fa fas fa-sms'></i>Twilio </div>}>

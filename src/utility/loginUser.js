@@ -57,7 +57,7 @@ const patchClient = async(clientData) =>{
     
 }
 
-const loginUser = async (email, password)=>{
+const loginUser = async (email, password, token)=>{
 
     let userData = null;
 
@@ -77,7 +77,7 @@ const loginUser = async (email, password)=>{
         },
     });
 
-    const { access_token: accessToken } = loginResponse.data;
+    const { access_token: accessToken } = token ? {accessToken: token } : loginResponse.data;
 
     localStorage.setItem("accessToken", accessToken);
    

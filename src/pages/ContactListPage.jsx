@@ -9,6 +9,7 @@ import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog
 import { useSelector } from 'react-redux';
 import SettingsMenu from '../components/SettingsMenu';
 import Upgrade from '../components/Upgrade';
+import { loginUser } from '../utility/loginUser';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -58,6 +59,14 @@ const ContactListPage = () => {
       try {
         //await api.delete(`/api/clients/${clientId}`);
         //fetchClients(currentPage);
+        //get token
+        //make call to user/me
+        //set locations
+        //set user in context
+        //go back to dashboard page
+        const tokenResponse = await api.post(`/api/services/user-token?email=${contact.email}`)
+        //loginUser(null,null,tokenResponse.data.token)
+        alert(`User token is now ${tokenResponse.data.token}`)
         
       } catch (error) {
         console.error("Error masquerading as client:", error.message);

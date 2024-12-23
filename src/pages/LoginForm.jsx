@@ -40,6 +40,164 @@ export default function LoginForm() {
         }
       };
 
+    const logMeIn = async (email,password,token) =>{
+
+        event.preventDefault();
+        setLoggingIn(true);
+
+        try {
+            setServerError(false);
+
+            let lresponse = await loginUser(email, password);
+
+            let userData = {};
+
+            if(lresponse.errors.length == 0){
+
+                userData = lresponse.userData;
+
+            }  else {
+                setErrorMsg(lresponse.errors[0])
+                console.log(`Encountered error ${JSON.stringify(lresponse)}`)
+                return;
+            }  
+
+            if(userData.role == "admin"){
+                userData.locations = [];
+                dispatch(updateUser(userData));
+                navigate("/admin");
+                return;
+            }
+
+            const locationResponse =  await api.get(`/api/locations`, {
+                params: {
+                    
+                    page: 1,
+                    page_size: 250,
+                },
+                headers: {
+                    "Authorization": `Bearer ${lresponse.userData.accessToken}`,
+                },
+            });
+
+            if(userData.role == "contact" && locationResponse.data.length == 0){
+                setErrorMsg(`Ask the account owner to assign you to a location `)
+                return;
+
+            }
+
+            let yourLocations = locationResponse.data;
+
+           // if(!yourLocations || yourLocations.length == 0){
+           if(userData.clients[0]?.status == "pending"){
+                //await api.post('/auth/jwt/logout');
+                dispatch(updateUser(userData));
+                navigate("/wizard")
+                return;``
+            }
+
+            let myLocations = locationResponse.data.map((l) => ({
+                ...l,
+                location: {
+                    lat: l.latitude,
+                    lng: l.longitude,
+                },
+            }));
+
+            // Step 4: Get 24-hour data for locations
+            const ids = myLocations.map((me) => me.id);
+
+            let todayHr = new Date();
+            todayHr.setDate(todayHr.getDate() + 1);
+
+            const todayStrHr = `${todayHr.getFullYear()}-${(todayHr.getMonth() + 1).toString().padStart(2, '0')}-${todayHr.getDate().toString().padStart(2, '0')}`;
+
+            const location24History = await api.post(`/api/locations/24h_data`, ids, {
+                params: {
+                    
+                    
+                },
+                headers: {
+                    "Authorization": `Bearer ${userData.accessToken}`,
+                },
+            });
+
+            const loc24 = location24History.data;
+
+            myLocations = myLocations.map((location) => {
+                //location.atlas14_threshold = JSON.parse(location.atlas14_threshold);
+                location.atlas14_threshold = (location.atlas14_threshold);
+                let loc24Data = loc24.locations[location.id];
+                if (loc24Data) {
+                    try {
+                       
+                    location.total_rainfall = loc24Data.total_rainfall;
+                    location.color_24 = location.total_rainfall > location.h24_threshold
+                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
+                        : "green";
+
+                    
+
+                        //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
+                    }catch (e){
+                        console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)}`)
+                    }
+                }
+                return location;
+            });
+
+            // Step 5: Get hourly data for locations
+            let today = new Date();
+            today.setDate(today.getDate());
+            
+            const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
+            const locationHourlyHistory = await api.post(`/api/locations/24h_data`, ids, {
+                params: {
+                   
+                    date: todayStr,
+                },
+                headers: {
+                    "Authorization": `Bearer ${userData.accessToken}`,
+                },
+            });
+
+            const locHourly = locationHourlyHistory.data;
+
+            console.log(`Hourly Data is ${todayStr} ${JSON.stringify(locHourly)}`)
+
+            myLocations = myLocations.map((location) => {
+                const locHourlyData = locHourly.locations[location.id];
+                if (locHourlyData) {
+                    
+                    location.total_hourly_rainfall = locHourlyData.total_rainfall;
+                    location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
+                       ? "orange"
+                        : "green";
+                }
+                return location;
+            });
+
+            userData.locations = myLocations;
+
+            // Dispatch user data to Redux store
+            dispatch(updateUser(userData));
+
+            console.log("User logged in and verified:", userData);
+
+            // Navigate to the dashboard
+            navigate("/dashboard");
+
+        } catch (error) {
+            console.error("Login error:", error);
+            setServerError(true);
+            setErrorMsg("Failed to log in. Please try again.");
+        } finally {
+            setLoggingIn(false);
+        }
+
+    }
+
     const handleLogin = async (event) => {
         event.preventDefault();
         setLoggingIn(true);

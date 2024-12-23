@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Upgrade from './Upgrade';
 
 const CheckboxGroup = ({ onClick, color, className }) => {
   const [selectedValue, setSelectedValue] = useState(color);
@@ -37,7 +38,8 @@ const CheckboxGroup = ({ onClick, color, className }) => {
       </label>
 
       {/* Above NOAA 14 */}
-      <label className="flex items-center space-x-2 text-sm">
+      <Upgrade showMsg={false} tier={2}>
+        <label className="flex items-center space-x-2 text-sm">
         <input
           type="checkbox"
           value="red"
@@ -47,6 +49,7 @@ const CheckboxGroup = ({ onClick, color, className }) => {
         />
         <span>Above NOAA 14</span>
       </label>
+      </Upgrade>
     </div>
   );
 };

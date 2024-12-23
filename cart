@@ -1,0 +1,137 @@
+#!/bin/bash
+
+# Token file location
+token_file="token.txt"
+
+# Read the token from token.txt if it exists
+if [[ -f "$token_file" ]]; then
+  AUTH_TOKEN=$(<"$token_file")
+else
+  echo "Authentication token file not found! Please create a token.txt file with your token."
+  exit 1
+fi
+
+# Function to process a search term and add the product to the list
+process_search_term() {
+  local search_term="$1"
+
+  # URL encode the search term
+  local encoded_term=$(echo "$search_term" | jq -sRr @uri)
+
+  # Search endpoint
+  local search_url="https://www.samsclub.com/api/node/vivaldi/v2/search-suggestions?num=8&pnum=3&term=$encoded_term&clubId=4739"
+
+  # Make the search API request with browser-like headers
+  local search_response=$(curl -s --compressed -H "Authorization: $AUTH_TOKEN" \
+      -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" \
+      -H "Accept: application/json, text/plain, */*" \
+      -H "Accept-Language: en-US,en;q=0.9" \
+      -H "Referer: https://www.samsclub.com/" \
+      "$search_url")
+
+  # Check if the response contains products
+  if [[ $(echo "$search_response" | jq '.response.products | length') -eq 0 ]]; then
+    echo "No products found for the search term: $search_term"
+    return
+  fi
+
+  # Extract the first product's ID
+  local product_id=$(echo "$search_response" | jq -r '.response.products[0].pid')
+
+  # Product Details endpoint
+  local product_details_url="https://www.samsclub.com/api/node/vivaldi/browse/v2/products"
+
+  # Prepare the payload for the product details request
+  local product_details_payload=$(cat <<EOF
+{
+    "productIds": [
+        "$product_id"
+    ],
+    "type": "LARGE",
+    "clubId": 4739
+}
+EOF
+)
+
+  # Make the Product Details API call
+  local product_details_response=$(curl -s --compressed -X POST -H "Authorization: $AUTH_TOKEN" \
+      -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" \
+      -H "Accept: application/json, text/plain, */*" \
+      -H "Accept-Language: en-US,en;q=0.9" \
+      -H "Referer: https://www.samsclub.com/" \
+      -H "Content-Type: application/json" \
+      -d "$product_details_payload" \
+      "$product_details_url")
+
+  # Extract fields from the product details response
+  local product_id=$(echo "$product_details_response" | jq -r '.payload.products[0].productId')
+  local sku_id=$(echo "$product_details_response" | jq -r '.payload.products[0].skus[0].skuId')
+  local item_number=$(echo "$product_details_response" | jq -r '.payload.products[0].skus[0].onlineOffer.itemNumber')
+  local title=$(echo "$product_details_response" | jq -r '.payload.products[0].descriptors.name')
+
+  # Add Product endpoint
+  local add_product_url="https://www.samsclub.com/api/node/vivaldi/list/v3/lists/4ad5f11c-b72f-42a2-bb56-a67108999126/items?clubId=4739"
+
+  # Prepare the payload for the Add to List request
+  local add_product_payload=$(cat <<EOF
+{
+    "items": [
+        {
+            "productId": "$product_id",
+            "skuId": "$sku_id",
+            "itemId": "$item_number"
+        }
+    ]
+}
+EOF
+)
+
+  # Make the POST request to add the product
+  local add_product_response=$(curl -s --compressed -X POST -H "Authorization: $AUTH_TOKEN" \
+      -H "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36" \
+      -H "Accept: application/json, text/plain, */*" \
+      -H "Accept-Language: en-US,en;q=0.9" \
+      -H "Referer: https://www.samsclub.com/" \
+      -H "Content-Type: application/json" \
+      -d "$add_product_payload" \
+      "$add_product_url")
+
+  # Print the result
+  echo "Product added to list:"
+  echo "Title: $title"
+  echo "Response: $add_product_response"
+}
+
+# Main logic
+echo "Choose an option:"
+echo "1. Enter search terms manually"
+echo "2. Read search terms from a file"
+read -p "Enter your choice (1 or 2): " choice
+
+if [[ "$choice" == "2" ]]; then
+  read -p "Enter the path to the file with search terms: " file_path
+  if [[ ! -f "$file_path" ]]; then
+    echo "File not found: $file_path"
+    exit 1
+  fi
+
+  while IFS= read -r search_term; do
+    if [[ -n "$search_term" ]]; then
+      process_search_term "$search_term"
+      sleep $((RANDOM % 4 + 2)) # Random delay between 2 and 5 seconds
+    fi
+  done < "$file_path"
+else
+  while true; do
+    echo -n "Enter a food search term (or type 'exit' to quit): "
+    read search_term
+
+    if [[ "$search_term" == "exit" ]]; then
+      echo "Exiting..."
+      break
+    fi
+
+    process_search_term "$search_term"
+  done
+fi
+

@@ -329,7 +329,7 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full text-sm"
           >
             <Upgrade tier={4}>
-            <option value="files-processed">Files Processed</option>
+            {/*<option value="files-processed">Files Processed</option>*/}
               <option value="sms">SMS Sent/Rejected</option>
               <option value="emails">Rejected Emails</option>
               <option value="billing">Billing</option>

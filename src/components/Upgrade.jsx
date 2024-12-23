@@ -2,7 +2,7 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { convertTier } from '../utility/loginUser'
 
-export default function Upgrade({children, link = "https://waterwatchpro.com/prices", tier = 2, showMsg = true}) {
+export default function Upgrade({children, link = "/upgrade", tier = 2, showMsg = true}) {
 
     let user = useSelector(state => state.userInfo.user)
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaCheck, FaUser } from 'react-icons/fa';
 
 import api from '../utility/api';
 import SubHeader from '../components/Subheader';
@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog';
 import { useSelector } from 'react-redux';
 import SettingsMenu from '../components/SettingsMenu';
+import Upgrade from '../components/Upgrade';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -50,6 +51,18 @@ const ContactListPage = () => {
       console.error('Error deleting contact:', error.message);
     }
   }
+  };
+
+  const swapUser = async (contact) => {
+    if (window.confirm(`Are you sure you want to masquerade as ${contact.name} ${contact.email}`)) {
+      try {
+        //await api.delete(`/api/clients/${clientId}`);
+        //fetchClients(currentPage);
+        
+      } catch (error) {
+        console.error("Error masquerading as client:", error.message);
+      }
+    }
   };
 
   const handleEdit = (contact) => {
@@ -143,13 +156,22 @@ const ContactListPage = () => {
                 )}
               </td>
               <td className="text-sm border border-gray-300 p-2  items-center gap-4 hidden md:table-cell ">
+              <Upgrade showMsg={false} tier={4}><button
+                    onClick={() => swapUser(contact)}
+                    className="text-blue-500 hover:text-blue-700 px-2"
+                    title={`Masquerade as ${contact.name} `}
+                  >
+                    <FaUser />
+                  </button>
+                  </Upgrade>
                   <button
                     onClick={() => handleEdit(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
-                    title="Edit Location"
+                    title={`Edit Location`}
                   >
                     <FaEdit />
                   </button>
+                
                   <button
                     onClick={() => handleDelete(contact.id)}
                     className="text-red-500 hover:text-red-700"

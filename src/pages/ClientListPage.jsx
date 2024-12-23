@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaUser } from "react-icons/fa";
 
 import api from "../utility/api";
 import Card from "../components/Card";
@@ -93,6 +93,10 @@ const ClientListPage = () => {
       }
     }
   };
+
+
+  
+
 
   const handleEdit = (client) => {
     navigate("/client-form", { state: { client } });
@@ -224,6 +228,13 @@ const ClientListPage = () => {
                       {client.tier || "N/A"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 items-center gap-4 md:table-cell">
+                    {/*<button
+                        onClick={() => swapUser(client)}
+                        className="text-blue-500 hover:text-blue-700 px-2"
+                        title="Masquerade User"
+                      >
+                        <FaUser />
+                      </button>*/}
                       <button
                         onClick={() => handleEdit(client)}
                         className="text-blue-500 hover:text-blue-700 px-2"

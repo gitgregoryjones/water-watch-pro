@@ -320,6 +320,11 @@ useEffect(()=>{
         if(!formData.longitude){
             setErrors('Longitude is required')
             return;
+        }else {
+          if(formData.longitude > 0 ){
+            formData.longitude = -(formData.longitude);
+            
+          }
         }
 
         if(!formData.latitude ){

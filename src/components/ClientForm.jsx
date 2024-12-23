@@ -204,13 +204,14 @@ const ClientForm = ({ clientToEdit,myself }) => {
             />
             <span className="ml-2">Turn Account On</span>
           </div>
-          <div className="flex items-center mb-2">
+          {!myself &&  <div className="flex items-center mb-2">
             <Toggle
               checked={status != "active" ? true : false }
               onChange={() => setStatus(status == "active" ? "inactive" : "active")} 
             />
             <span className="ml-2">{myself ? `Pause Subscription` : `Suspend Account`}</span>
-          </div>
+          </div>}
+          <div  className='my-4'>Contact support@waterwatch.com if you would like to suspend or cancel your account</div>
           <div className="border p-4 rounded">
   <h2 className="text-xl font-bold mb-4">Status</h2>
   {myself && 

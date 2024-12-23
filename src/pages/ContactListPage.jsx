@@ -147,8 +147,8 @@ const ContactListPage = () => {
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
               {user.role == "admin" && <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>}
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || ''}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || ''}</td>
               <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">
                 {contact.sms_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />

@@ -17,8 +17,10 @@ const ContactForm = ({ contactToEdit }) => {
   const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
-      daily_report_on: contactToEdit?.daily_report_on,
-      daily_report_on_sms: contactToEdit?.daily_report_on_sms,
+    daily_report_on: contactToEdit?.daily_report_on,
+    daily_report_on_sms: contactToEdit?.daily_report_on_sms,
+    exceed24h_on: contactToEdit?.exceed24h_on,
+    exceed24h_on_sms: contactToEdit?.exceed24h_on_sms,
       forecast_on: contactToEdit?.forecast_on,
       forecast_on_sms: contactToEdit?.forecast_on_sms,
       atlas14_24h_on: contactToEdit?.atlas14_24h_on,
@@ -27,9 +29,9 @@ const ContactForm = ({ contactToEdit }) => {
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
       //atlas14_first_on_sms: contactToEdit?.atlas14_1h_on_sms,
-      exceed24h_on: contactToEdit?.exceed24h_on,
-      exceed24h_on_sms: contactToEdit?.exceed24h_on_sms,
+     
       //exceed24h_combine_locations: contactToEdit?.exceed24h_combine_locations
+     
   });
 
   
@@ -146,15 +148,17 @@ const ContactForm = ({ contactToEdit }) => {
     };
 
     try {
+      let rec = {};
       if (contactToEdit) {
-        await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${user.clients[0]?.id}`, payload);
+       rec = await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${user.clients[0]?.id}`, payload);
       } else {
-        await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
+         rec = await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
       }
 
       setTimeout(() => {
         setShowDialog(false);
         setMsg(<span className="text-[green]">Contact updated Successfully</span>)
+        
       }, 2000);
     } catch (error) {
       console.error('Error saving contact:', error.message);

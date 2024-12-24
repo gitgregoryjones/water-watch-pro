@@ -123,10 +123,12 @@ useEffect(()=>{
           let sessionDetails = await retrieveSession(user.clients[0].stripe_session_id)
 
           if(sessionDetails.status == "complete"){
+            
             setCurrentStep(4)
             return;
     
           }
+          //alert(`Session complete from database is ${JSON.stringify(sessionDetails)}`)
         }
       }
 
@@ -348,8 +350,9 @@ useEffect(()=>{
         }
 
        
-        if(formData.tier != "gold"){
+        if(user.clients[0]?.tier == "bronze"){
             formData.rapidrain = formData.threshold;
+            
         } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(formData.rapidrain))){
             setErrors(`Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4 `)
@@ -423,6 +426,7 @@ useEffect(()=>{
     
     if(getPriceTier(userP) != VITE_PRICE_ID_TRIAL) {
      sessionT = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
@@ -436,12 +440,15 @@ useEffect(()=>{
       },
       mode: 'payment' ,
       customer_creation:"always",
-      
+      payment_intent_data :{
+        setup_future_usage : 'off_session'
+      },
       success_url: VITE_STRIPE_SUCCESS_URL,
       cancel_url: VITE_STRIPE_CANCEL_URL,
     });
   } else {
     sessionT = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
@@ -450,6 +457,9 @@ useEffect(()=>{
         },
       ],
       customer_creation:"always",
+      payment_intent_data :{
+        setup_future_usage : 'off_session'
+      },
       customer_email: userP.email, // Pre-fill email field
       metadata: {
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
@@ -807,7 +817,7 @@ Questions? Contact us at support@waterwatchpro.com. */}
 </div>
 
 {/* RapidRain Threshold */}
-{formData.tier === "gold" && (
+{(user.clients[0].tier === "gold" || user.clients[0].tier === "silver") && (
   <div className="mb-4">
     <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
       RapidRain Threshold (inches)

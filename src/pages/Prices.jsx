@@ -34,6 +34,9 @@ const handleUpgrade = async (tier) => {
             customer_creation:"always",
             
             customer_email: user.email,
+            payment_intent_data :{
+              setup_future_usage :'off_session'
+            },
             metadata: {
                 customer_name: `${user.first_name} ${user.last_name}`,
                 tier,
@@ -135,9 +138,9 @@ const handleUpgrade = async (tier) => {
     });
 
   return (
-    <div className="w-full p-6 pt-6 bg-gradient-to-br from-white to-gray-100 rounded-lg max-w-6xl shadow-md md:rounded-xl">
+    <div className="w-full p-6 pt-6 bg-gradient-to-br  from-white to-gray-100 rounded-lg max-w-6xl shadow-md md:rounded-xl">
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800 pricing-header">
-        Subscription Pricing
+        Monthly Subscription Pricing
       </h2>
       {!isSmall && <Link to="/client-form" state={{client:user.clients[0], myself:!user.is_superuser}} className="flex justify-end items-center px-4 mb-4">Not Now</Link>}
       <div className="grid gap-6 md:grid-cols-3">
@@ -145,8 +148,8 @@ const handleUpgrade = async (tier) => {
         <div className="plan gold flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">
           <h3 className="text-xl font-bold text-yellow-700 mb-2">Gold</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$24.00</p>
-          <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('gold')}</ul>
+          <p className="text-gray-600 text-sm text-center">per 5 locations</p>
+          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('gold')}</ul>
           {!isSmall && <button
             onClick={() => handleUpgrade('gold')}
             className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
@@ -156,11 +159,11 @@ const handleUpgrade = async (tier) => {
         </div>
 
         {/* Silver Plan */}
-        <div className="plan silver flex flex-col items-center justify-center border border-gray-400 rounded-lg p-6 bg-gray-50 shadow-md">
+        <div className="plan silver flex flex-col items-center justify-start border border-gray-400 rounded-lg p-6 bg-gray-50 shadow-md">
           <h3 className="text-xl font-bold text-gray-700 mb-2">Silver</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$18.00</p>
-          <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('silver')}</ul>
+          <p className="text-gray-600 text-sm text-center">per 5 locations</p>
+          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('silver')}</ul>
           {!isSmall &&<button
             onClick={() => handleUpgrade('silver')}
             className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
@@ -170,11 +173,11 @@ const handleUpgrade = async (tier) => {
         </div>
 
         {/* Bronze Plan */}
-        <div className="plan bronze flex flex-col items-center justify-center border border-orange-400 rounded-lg p-6 bg-orange-50 shadow-md">
+        <div className="plan bronze flex flex-col items-center justify-start border border-orange-400 rounded-lg p-6 bg-orange-50 shadow-md">
           <h3 className="text-xl font-bold text-orange-700 mb-2">Bronze</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$12.00</p>
-          <p className="text-gray-600 text-sm text-center">Base charge to initialize service</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{!isSmall && renderFeatures('bronze')}</ul>
+          <p className="text-gray-600 text-sm text-center">per 5 locations</p>
+          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('bronze')}</ul>
           {!isSmall && <button
             onClick={() => handleUpgrade('bronze')}
             className="mt-4 px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition"

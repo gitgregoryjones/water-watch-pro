@@ -433,11 +433,11 @@ const Reports = () => {
       </form>
 
       {/* Report Content */}
-      <div className='flex w-full justify-center items-center overflow-auto'>
+      <div className='flex w-full justify-center items-start overflow-auto'>
       <div
   id="reportArea"
   ref={reportAreaRef}
-  className={`${ reportContent ? 'border-[unset]  border-[black]':''} overflow-auto w-full`}
+  className={`${ reportContent ? 'border-[unset]  border-[black]':''} overflow-auto w-full  h-[700px]`}
   dangerouslySetInnerHTML={{ __html: reportContent }}
 ></div>
 <WorkingDialog showDialog={showDialog}/>

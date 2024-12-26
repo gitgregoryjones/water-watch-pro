@@ -17,14 +17,14 @@ const ContactForm = ({ contactToEdit }) => {
   const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
-    daily_report_on: contactToEdit?.daily_report_on,
-    daily_report_on_sms: contactToEdit?.daily_report_on_sms,
-    exceed24h_on: contactToEdit?.exceed24h_on,
-    exceed24h_on_sms: contactToEdit?.exceed24h_on_sms,
-      forecast_on: contactToEdit?.forecast_on,
-      forecast_on_sms: contactToEdit?.forecast_on_sms,
-      atlas14_24h_on: contactToEdit?.atlas14_24h_on,
-      atlas14_24h_on_sms: contactToEdit?.atlas14_24h_on_sms,
+    daily_report_on: contactToEdit ? contactToEdit?.daily_report_on : true,
+    daily_report_on_sms: contactToEdit ? contactToEdit?.daily_report_on_sms  : true,
+    exceed24h_on: contactToEdit ? contactToEdit?.exceed24h_on : true,
+    exceed24h_on_sms: contactToEdit ? contactToEdit?.exceed24h_on_sms  : true,
+      forecast_on: contactToEdit? contactToEdit?.forecast_on   : true,
+      forecast_on_sms: contactToEdit? contactToEdit?.forecast_on_sms  : true,
+      atlas14_24h_on: contactToEdit? contactToEdit?.atlas14_24h_on  : true,
+      atlas14_24h_on_sms: contactToEdit? contactToEdit?.atlas14_24h_on_sms  : true,
       //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
@@ -36,7 +36,7 @@ const ContactForm = ({ contactToEdit }) => {
 
   
 
-  const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(false);
+  const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(true);
   const user = useSelector((state) => state.userInfo.user);
   const [showDialog, setShowDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);

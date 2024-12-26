@@ -334,13 +334,13 @@ useEffect(()=>{
             return;
         }
 
-        if(formData.latitude < 20 || formData.latitude > 55 ){
-            setErrors('Latitude must be between 20 and 55 degrees')
+        if(formData.latitude < 24 || formData.latitude > 49 ){
+            setErrors('Latitude must be between 24 and 49 degrees')
             return;
         }
 
-        if(formData.longitude < -125 || formData.longitude > -70 ){
-            setErrors('Longitude must be between -125 and -70 degrees')
+        if(formData.longitude < -124 || formData.longitude > -66 ){
+            setErrors('Longitude must be between -124 and -66 degrees')
             return;
         }
        

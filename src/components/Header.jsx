@@ -88,11 +88,11 @@ export default function Header() {
   </div>
 )}
 
-  <Upgrade showMsg={false} tier={1}>
+ 
     <Link to="/reports" className={location.pathname === "/reports" ? "text-slate-800" : "text-[--main-2]"}>
       Reports
     </Link>
-  </Upgrade>
+  
   {(user.role != "admin" && user.role != "contact") && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>)}

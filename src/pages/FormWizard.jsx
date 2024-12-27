@@ -166,7 +166,9 @@ useEffect(()=>{
             is_verified:false,
             role:"client",
             first_name: formData.first_name,
-            last_name: formData.last_name
+            last_name: formData.last_name,
+            agree_to_terms: formData.termsAccepted,
+            agree_to_privacy_policy : formData.smsAccepted
             
         }))
 
@@ -439,6 +441,17 @@ useEffect(()=>{
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'payment' ,
+      custom_fields: [
+        {
+            key: 'alternate_billing_email',
+            label: {
+                type: 'custom',
+                custom: `Billing Email Address (${userP.email}) `,
+            },
+            type: "text",
+            optional: true,
+        },
+    ],
       customer_creation:"always",
       payment_intent_data :{
         setup_future_usage : 'off_session'
@@ -457,14 +470,26 @@ useEffect(()=>{
         },
       ],
       customer_creation:"always",
+      /*
       payment_intent_data :{
         setup_future_usage : 'off_session'
-      },
+      },*/
       customer_email: userP.email, // Pre-fill email field
       metadata: {
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
       mode: 'subscription' ,
+      custom_fields: [
+        {
+            key: 'alternate_billing_email',
+            label: {
+                type: 'custom',
+                custom: `Billing Email Address (${userP.email}) `,
+            },
+            type: "text",
+            optional: true,
+        },
+    ],
       payment_method_collection:'always',
       
       subscription_data:{

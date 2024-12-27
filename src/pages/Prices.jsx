@@ -24,29 +24,38 @@ const stripe = new Stripe(VITE_PAYMENT_LINK_GOLD);
 
 const handleUpgrade = async (tier) => {
     try {
-        const session = await stripe.checkout.sessions.create({
-            line_items: [
-                {
-                    price: STRIPE_PRICE_IDS[tier],
-                    quantity: 1,
+      const session = await stripe.checkout.sessions.create({
+        line_items: [
+            {
+                price: STRIPE_PRICE_IDS[tier],
+                quantity: 1,
+            },
+        ],
+        customer_creation: "always",
+        customer_email: user.email,
+        payment_intent_data: {
+            setup_future_usage: 'off_session',
+        },
+        metadata: {
+            customer_name: `${user.first_name} ${user.last_name}`,
+            tier,
+        },
+        mode: 'payment',
+        custom_fields: [
+            {
+                key: 'alternate_billing_email',
+                label: {
+                    type: 'custom',
+                    custom: `Alternate Billing Email Address (${user.email}) `,
                 },
-            ],
-            customer_creation:"always",
-            
-            customer_email: user.email,
-            payment_intent_data :{
-              setup_future_usage :'off_session'
+                type: "text",
+                optional: true,
             },
-            metadata: {
-                customer_name: `${user.first_name} ${user.last_name}`,
-                tier,
-            },
-            mode:'payment',
-            
-            
-            success_url: VITE_STRIPE_UPGRADE_SUCCESS_URL,
-            cancel_url: VITE_STRIPE_CANCEL_URL,
-        });
+        ],
+        success_url: VITE_STRIPE_UPGRADE_SUCCESS_URL,
+        cancel_url: VITE_STRIPE_CANCEL_URL,
+    });
+    
 
         window.location.href = session.url;
     } catch (error) {

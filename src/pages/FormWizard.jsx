@@ -460,6 +460,18 @@ useEffect(()=>{
       cancel_url: VITE_STRIPE_CANCEL_URL,
     });
   } else {
+
+    const customer = await stripe.customers.create({
+      email: userP.email,
+      name: `${userP.first_name} ${userP.last_name}`,
+      metadata: {
+        tier: getPriceTier(userP)
+      }
+    });
+  
+
+
+
     sessionT = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -469,12 +481,13 @@ useEffect(()=>{
           quantity: 1,
         },
       ],
-      customer_creation:"always",
+      
       /*
       payment_intent_data :{
         setup_future_usage : 'off_session'
       },*/
-      customer_email: userP.email, // Pre-fill email field
+     
+      customer:customer.id,
       metadata: {
         customer_name: `${userP.first_name} ${userP.last_name}`, // Pass the name as metadata
       },
@@ -484,7 +497,7 @@ useEffect(()=>{
             key: 'alternate_billing_email',
             label: {
                 type: 'custom',
-                custom: `Billing Email Address (${userP.email}) `,
+                custom: `Billing Email Address (${customer.email}) `,
             },
             type: "text",
             optional: true,
@@ -495,7 +508,7 @@ useEffect(()=>{
       subscription_data:{
         trial_settings:{
           end_behavior:{
-            missing_payment_method:"cancel"
+            missing_payment_method: "create_invoice"
           }
         },
         trial_period_days:30

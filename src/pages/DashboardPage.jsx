@@ -146,8 +146,11 @@ export default function DashboardPage() {
 
   useEffect(()=>{
     //console.log(`Location List size is now ${locationList.length}`)
+    if(currentColor == "green" || currentColor == "zero" || currentColor24 == "green" || currentColor24 == "zero"){
+      setMapZoom(4)
+    }
     
-  },[locationList])
+  },[currentColor, currentColor24])
 
   
   useEffect(() => {

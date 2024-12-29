@@ -290,14 +290,15 @@ export default function LoginForm() {
                        
                     location.total_rainfall = loc24Data.total_rainfall;
                     location.color_24 = location.total_rainfall > location.h24_threshold
-                        ? location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
+                        ? location.atlas14_threshold && location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
                         : "green";
 
                     
 
                         //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
                     }catch (e){
-                        console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)}`)
+                       // console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)}`)
+                       console.log(e.message)
                     }
                 }
                 return location;

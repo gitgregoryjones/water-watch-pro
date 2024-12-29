@@ -50,6 +50,16 @@ const CheckboxGroup = ({ onClick, color, className }) => {
         <span>Above NOAA 14</span>
       </label>
       </Upgrade>
+      <label className="hidden flex items-center space-x-2 text-sm">
+        <input
+          type="checkbox"
+          value="zero"
+          checked={selectedValue === 'zero'}
+          onChange={() => handleClick('zero')}
+          className="cursor-pointer accent-orange-600 text-[white] "
+        />
+        <span>Hide Zeroes</span>
+      </label>
     </div>
   );
 };

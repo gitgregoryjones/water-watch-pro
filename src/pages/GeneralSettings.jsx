@@ -40,6 +40,9 @@ const GeneralSettingsPage = () => {
           invoice_email: response.data.invoice_email || '',
           daily_report_on: response.data.daily_report_on || false,
           daily_report_combine_locations: response.data.daily_report_combine_locations || false,
+          daily_report_suppress_zero: response.data.daily_report_suppress_zero || true,
+          sort_by_rainfall: response.data.sort_by_rainfall || false,
+          only_show_locations_with_non_zero: response.data.only_show_locations_with_non_zero || false,
           forecast_on: response.data.forecast_on || false,
           forecast_combine_locations: response.data.forecast_combine_locations || false,
           atlas14_on: response.data.atlas14_on || false,
@@ -104,6 +107,11 @@ const GeneralSettingsPage = () => {
             <div>{msg}</div>
             <h2 className='py-4 px-2 border rounded bg-[#128CA6] text-[white]'>Note: The options below set notifications system wide. Modify contact settings to override settings for individual users</h2>
             {/* Daily Report Section */}
+            {/* 
+             daily_report_suppress_zero: response.data.daily_report_suppress_zero || true,
+          sort_by_rainfall: response.data.sort_by_rainfall || false,
+          only_show_locations_with_non_zero: response.data.only_show_locations_with_non_zero || false,
+            */}
             <div className="border p-6 rounded shadow-md">
               <h2 className="text-xl font-bold mb-4">Daily Report</h2>
               <div className="flex items-center mb-4 gap-2">
@@ -114,8 +122,33 @@ const GeneralSettingsPage = () => {
                 <span className="">Enabled</span>
                 
               </div>
-              <div className='ml-[56px]'>All contacts will receive the daily report, sent at 6 am EDT
+              <div className='ml-[56px] mb-4'>All contacts will receive the daily report, sent at 6 am EDT
               </div>
+              <div className="hidden flex items-center mb-4 gap-2">
+                <Toggle
+                  checked={settings.daily_report_suppress_zero}
+                  onChange={() => handleToggle('daily_report_suppress_zero')}
+                />
+                <span className="">Supress Locations with 0 rainfall from the report</span>
+                
+              </div>
+              <div className="flex items-center mb-4 gap-2">
+                <Toggle
+                  checked={settings.sort_by_rainfall}
+                  onChange={() => handleToggle('sort_by_rainfall')}
+                />
+                <span className="">Sort Locations DESC by rainfall</span>
+                
+              </div>
+              <div className="flex items-center mb-4 gap-2">
+                <Toggle
+                  checked={settings.only_show_locations_with_non_zero}
+                  onChange={() => handleToggle('only_show_locations_with_non_zero')}
+                />
+                <span className="">Only Show Locations With Non-Zero Values</span>
+                
+              </div>
+             
               <div className="hidden flex items-center">
                 
                 <Toggle

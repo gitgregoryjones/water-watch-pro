@@ -399,6 +399,8 @@ function onRenderedRowHourly(raw,row,index){
   if(currentColor == "zero"){
     display = raw.total_hourly_rainfall <= 0 ?  "none" : "flex"
 
+  } else {
+    display = (currentColor != "green" && currentColor != raw.color_hourly && currentColor != "zero") ? "none" : "flex";
   }
    //display = (currentColor != "green" && currentColor != raw.color_hourly && currentColor != "zero") ? "none" : "flex";
   
@@ -430,6 +432,8 @@ function onRenderedRow24HourAccum(raw,row,index){
   if(currentColor24 == "zero"){
     display = raw.total_rainfall <= 0 ?  "none" : "flex"
 
+  } else {
+    display = (currentColor24 != "green" && currentColor24 != raw.color_24) ? "none" : "flex";
   }
 
   //console.log(`Setting ${raw.name} to display ${display} because [${raw.color_24}] and current color is ${currentColor24} `)

@@ -137,7 +137,7 @@ const GeneralSettingsPage = () => {
                   checked={settings.sort_by_rainfall}
                   onChange={() => handleToggle('sort_by_rainfall')}
                 />
-                <span className="">Sort Locations DESC by rainfall</span>
+                <span className="">Sort highest to lowest in the daily report</span>
                 
               </div>
               <div className="flex items-center mb-4 gap-2">
@@ -145,7 +145,7 @@ const GeneralSettingsPage = () => {
                   checked={settings.only_show_locations_with_non_zero}
                   onChange={() => handleToggle('only_show_locations_with_non_zero')}
                 />
-                <span className="">Only Show Locations With Non-Zero Values</span>
+                <span className="">Show only non-zero values</span>
                 
               </div>
              

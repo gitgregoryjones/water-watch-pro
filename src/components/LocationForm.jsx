@@ -45,10 +45,53 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     setIsWorking(true)
     e.preventDefault();
 
-    if (!name || !latitude || !longitude || !h24Threshold || !rapidRainThreshold) {
-      alert('Please fill out all fields.');
-      return;
-    }
+        if(!name){
+          setMsg(<span className="text-[red]">Location name is required</span>)
+          setIsWorking(false); 
+            return;
+        }
+
+       
+
+        if(!latitude || latitude < 24 || latitude > 49 ){
+            
+            setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
+            setIsWorking(false); 
+            return;
+        }
+
+        if(!longitude || longitude < -124 || longitude > -66 ){
+            
+            setMsg(<span className="text-[red]">Longitude must be between -124 and -66 degrees</span>)
+            setIsWorking(false); 
+
+            return;
+        }else {
+          if(longitude > 0 ){
+            setLongitude(-longitude);
+            
+          }
+        }
+       
+        if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
+            
+            setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            setIsWorking(false); 
+            return;
+        }
+
+       
+        if(user.clients[0]?.tier == "bronze"){
+            setRapidRainThreshold(h24Threshold)
+            
+        } else 
+        if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
+            
+            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            setIsWorking(false); 
+            return;
+        }
+     
 
     const locationData = {
       name,
@@ -75,10 +118,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       }
       setResponseData(response.data); // Store response data for display
       console.log('Response Data:', response.data); // Log the response data
-      
+      setMsg(<span className="text-[green]">Successfully Updated</span>)
       setTimeout(()=>{
         setIsWorking(false); 
-        setMsg(<span className="text-[green]">Successfully Updated</span>)
+       
+        navigate("/location-list")
         },2000)
     } catch (error) {
       console.error('Error submitting location:', error.message);
@@ -138,7 +182,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
           />
         </div>
 
@@ -154,7 +198,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={latitude}
             onChange={(e) => setLatitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
             disabled={isEditMode}
           />
         </div>
@@ -171,7 +215,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={longitude}
             onChange={(e) => setLongitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
             disabled={isEditMode}
           />
         </div>
@@ -188,7 +232,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={h24Threshold}
             onChange={(e) => {setH24Threshold(e.target.value); if(convertTier(user) < 2){setRapidRainThreshold(e.target.value)}}}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
           >
                  <option value="">-- Select Threshhold --</option>
            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
@@ -210,7 +254,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={rapidRainThreshold}
             onChange={(e) => setRapidRainThreshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
             
             >
               <option value="">-- Select Threshhold --</option>

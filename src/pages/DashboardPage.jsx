@@ -392,11 +392,11 @@ function onRenderedRowHourly(raw,row,index){
 
   let display = "flex";
 
+  
   if(currentColor == "zero"){
-    display = raw.total_hourly_rainfall <= 0 ? "none" : "flex"
+    display = raw.total_hourly_rainfall <= 0 ?  "none" : "flex"
 
   }
-
    //display = (currentColor != "green" && currentColor != raw.color_hourly && currentColor != "zero") ? "none" : "flex";
   
 
@@ -421,14 +421,20 @@ function onRenderedRow24HourAccum(raw,row,index){
   //let raincolor = raw.total_hourly_rainfall  > raw.h24_threshold ? raw.total_hourly_rainfall  > raw.atlas14_threshold['24h'][0] ? "red" : "orange" : "black";
   let raincolor = raw.color_24;
 
-  let display = (currentColor24 != "green" && currentColor24 != raw.color_24) ? "none" : "flex";
+  //let display = (currentColor24 != "green" && currentColor24 != raw.color_24) ? "none" : "flex";
+  let display = "flex";
+  
+  if(currentColor24 == "zero"){
+    display = raw.total_rainfall <= 0 ?  "none" : "flex"
+
+  }
 
   //console.log(`Setting ${raw.name} to display ${display} because [${raw.color_24}] and current color is ${currentColor24} `)
 
   let clone = React.cloneElement(row,{
     
       style:{color: raincolor, fontWeight:"bold", display:display},
-      filter: raincolor
+      filter: raw.total_rainfall + " " + currentColor
   }
       
   );
@@ -494,7 +500,7 @@ function showThreshold(color){
         )}
               
               {locationList.map((obj, i) => (
-          (currentColor == "green" || currentColor == obj.color_hourly) && <AdvancedMarker
+          (currentColor == "green" || currentColor == obj.color_hourly || (currentColor == "zero" && obj.total_hourly_rainfall?.toFixed(2) > 0))  && <AdvancedMarker
             onClick={() => setMapCenter(obj)}
             clickable={true}
             key={i}
@@ -577,7 +583,7 @@ function showThreshold(color){
        )}
              
              {locationList.map((obj, i) => (
-       (currentColor24 == "green" || currentColor24 == obj.color_24) &&  <AdvancedMarker
+       (currentColor24 == "green" || currentColor24 == obj.color_24 || (currentColor24 == "zero" && obj.total_rainfall?.toFixed(2) > 0)) &&  <AdvancedMarker
            onClick={() => setMapCenter(obj)}
            clickable={true}
            key={i}
@@ -598,7 +604,7 @@ function showThreshold(color){
          
          </APIProvider>
        <div className='w-[30%] md:w-[20%]'>
-       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor24}/>
+       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor24} onClick={setCurrentColor24}/>
       <hr className='hidden md:block m-2'/>
       <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}

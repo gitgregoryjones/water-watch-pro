@@ -5,9 +5,9 @@ const CheckboxGroup = ({ onClick, color, className }) => {
   const [selectedValue, setSelectedValue] = useState(color);
 
   const handleClick = (value) => {
-    setSelectedValue(value);
+    setSelectedValue(value == selectedValue ? "green" : value);
     if (onClick) {
-      onClick(value); // Call the optional onClick prop with the selected value
+      onClick(value == selectedValue ? "green" : value); // Call the optional onClick prop with the selected value
     }
   };
 
@@ -23,6 +23,16 @@ const CheckboxGroup = ({ onClick, color, className }) => {
           className="cursor-pointer accent-[green] text-[white] "
         />
         <span>All</span>
+      </label>
+      <label className=" flex items-center space-x-2 text-sm">
+        <input
+          type="checkbox"
+          value="zero"
+          checked={selectedValue === 'zero'}
+          onChange={() => handleClick('zero')}
+          className="cursor-pointer accent-orange-600 text-[white] "
+        />
+        <span>Hide Zeroes</span>
       </label>
 
       {/* Above Threshold */}
@@ -50,16 +60,7 @@ const CheckboxGroup = ({ onClick, color, className }) => {
         <span>Above NOAA 14</span>
       </label>
       </Upgrade>
-      <label className="hidden flex items-center space-x-2 text-sm">
-        <input
-          type="checkbox"
-          value="zero"
-          checked={selectedValue === 'zero'}
-          onChange={() => handleClick('zero')}
-          className="cursor-pointer accent-orange-600 text-[white] "
-        />
-        <span>Hide Zeroes</span>
-      </label>
+      
     </div>
   );
 };

@@ -42,6 +42,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   }, [locationToEdit, isEditMode]);
 
   const handleSubmit = async (e) => {
+    setMsg("");
     setIsWorking(true)
     e.preventDefault();
 
@@ -60,17 +61,17 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             return;
         }
 
+        if(longitude > 0 ){
+          setLongitude(-longitude);
+          
+        }
+
         if(!longitude || longitude < -124 || longitude > -66 ){
             
             setMsg(<span className="text-[red]">Longitude must be between -124 and -66 degrees</span>)
             setIsWorking(false); 
 
             return;
-        }else {
-          if(longitude > 0 ){
-            setLongitude(-longitude);
-            
-          }
         }
        
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){

@@ -81,14 +81,14 @@ const LocationListPage = () => {
         <div className='flex md:flex-row flex-col md:justify-end  flex-1'>
         <input type="text" className='p-2 border border-green-800 rounded text-md w-full' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
         </div>
-        <Upgrade showMsg={false} tier={3}>
-        <button
+       
+        {!user.clients[0]?.is_trial_account && <button
           onClick={handleAddLocation}
           className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
         >
           Add Location
-        </button>
-        </Upgrade>
+        </button>}
+        
       </div>
     
         <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">

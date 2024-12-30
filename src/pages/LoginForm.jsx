@@ -4,7 +4,7 @@ import Button from '../components/WaterWatchProButton';
 import { useState } from 'react';
 import FormContainer from '../components/FormContainer';
 import ButtonContainer from '../components/ButtonContainer';
-import { Link, useNavigate } from 'react-router-dom';
+import { json, Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
@@ -89,12 +89,14 @@ export default function LoginForm() {
             let yourLocations = locationResponse.data;
 
            // if(!yourLocations || yourLocations.length == 0){
-           if(userData.clients[0]?.status == "pending"){
+           if(userData.clients[0]?.status == "pending" || yourLocations == 0){
                 //await api.post('/auth/jwt/logout');
                 dispatch(updateUser(userData));
                 navigate("/wizard")
                 return;``
             }
+
+            console.log(`THESE ARE LOCATIONS ${JSON.stringify(yourLocations)}`)
 
             let myLocations = locationResponse.data.map((l) => ({
                 ...l,

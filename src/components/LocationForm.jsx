@@ -248,7 +248,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="rapidRainThreshold" className="block text-gray-700 font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
-          {convertTier(user) > 2 ? (<select
+          {convertTier(user) >= 2 ? (<select
             
             
             id="rapidRainThreshold"
@@ -265,7 +265,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             })
             }
             </select>) : (<div className='flex w-full flex-col'><input type="text" readonly value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
-                          <div className='flex text-sm gap-2'>Upgrade to access this feature <a href={VITE_PRICES_LINK}>Upgrade Now</a></div>
+                          <div className='flex text-sm gap-2'>Upgrade to access this feature <Link to={"/upgrade"}>Upgrade Now</Link></div>
             </div>)}
         </div>
 

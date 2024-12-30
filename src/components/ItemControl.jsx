@@ -144,6 +144,12 @@ const ItemControl = ({
     setCList(updatedList);
     onItemClicked && onItemClicked(clickedItem);
   };
+
+  useEffect(()=>{
+
+    setCList(collectionList)
+
+  },[collectionList])
   
   
   //setCList(copy);

@@ -178,7 +178,7 @@ export default function LoginForm() {
                 return location;
             });
 
-            userData.locations = myLocations;
+            //userData.locations = myLocations;
 
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));
@@ -336,7 +336,7 @@ export default function LoginForm() {
                 return location;
             });
 
-            userData.locations = myLocations;
+            //userData.locations = myLocations;
 
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));

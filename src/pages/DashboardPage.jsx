@@ -44,7 +44,8 @@ import { color } from 'chart.js/helpers'
 import PrettyHeader from '../components/PrettyHeader'
 import Stats from '../components/Stats'
 import AdminCards from '../components/AdminCards'
-
+import { colorLoggedInUserLocations } from '../utility/loginUser'
+import WorkingDialog from '../components/WorkingDialog'
 
 export default function DashboardPage() {
 
@@ -89,7 +90,8 @@ export default function DashboardPage() {
   
   const [showIndividualMarkers, setShowIndividualMarkers] = useState(false);
 
-  const groupedLocations = groupLocations(locationList);
+  const groupedLocations = locationList;
+  //groupLocations(locationList);
 
   const [currentLocation, setCurrentLocation] = useState(null);
 
@@ -102,6 +104,8 @@ export default function DashboardPage() {
   const [currentColor, setCurrentColor] = useState("green")
 
   const [currentColor24, setCurrentColor24] = useState("green")
+
+  const [isWorking, setWorking] = useState(false);
 
 
   
@@ -117,6 +121,30 @@ export default function DashboardPage() {
  var citiesToDisplay = [];
 
  
+ useEffect(() => {
+  // Fetch locations asynchronously
+  const fetchLocations = async () => {
+    setWorking(true)
+    let response = {}
+    try {
+       response = await colorLoggedInUserLocations(user);
+    
+      setLocationList(response.locations || [])
+      if (response.locations?.length > 0) {
+        setLocation(response.locations[0]); // Set the first location as default
+        setMapCoords({ lat: response.locations[0].latitude, lng: response.locations[0].longitude });
+      }
+      setWorking(false)
+    } catch (error) {
+      console.error('Failed to fetch locations:', error);
+      
+      setLocationList(response.locations || [])
+      setWorking(false)
+    }
+  };
+
+  fetchLocations();
+}, []);
 
   useEffect(()=>{
 
@@ -132,10 +160,10 @@ export default function DashboardPage() {
 
       //console.log(`Location DB Records is ${JSON.stringify(locations)}`)
       
-      setMapCoords({lat:locations[0]?.latitude, lng:locations[0]?.longitude})
-      setLocation(locations[0]);
-      setMapZoom(10)
-      setLocationList(locations);
+      //setMapCoords({lat:locations[0]?.latitude, lng:locations[0]?.longitude})
+      //setLocation(locations[0]);
+     // setMapZoom(10)
+      //setLocationList(locations);
       
      
     }
@@ -506,7 +534,7 @@ function showThreshold(color){
           </AdvancedMarker>
         )}
               
-              {locationList.map((obj, i) => (
+              {locationList && locationList.map((obj, i) => (
           (currentColor == "green" || currentColor == obj.color_hourly || (currentColor == "zero" && obj.total_hourly_rainfall?.toFixed(2) > 0))  && <AdvancedMarker
             onClick={() => setMapCenter(obj)}
             clickable={true}
@@ -589,7 +617,7 @@ function showThreshold(color){
          </AdvancedMarker>
        )}
              
-             {locationList.map((obj, i) => (
+             {locationList && locationList.map((obj, i) => (
        (currentColor24 == "green" || currentColor24 == obj.color_24 || (currentColor24 == "zero" && obj.total_rainfall?.toFixed(2) > 0)) &&  <AdvancedMarker
            onClick={() => setMapCenter(obj)}
            clickable={true}
@@ -691,7 +719,7 @@ function showThreshold(color){
         
      {/*</span>*/}
      <a name="alerts"></a>
-      
+      <WorkingDialog showDialog={isWorking}/>
     </Dashboard>
    
   )

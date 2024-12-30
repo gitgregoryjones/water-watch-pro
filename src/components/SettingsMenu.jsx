@@ -37,14 +37,14 @@ const SettingsMenu = ({ activeTab }) => {
         Modify Locations
       </Link>
       )}
-      <Link
+      {!user.is_superuser && <Link
         to="/settings-general"
         className={`text-blue-500 hover:text-blue-700 font-bold border-b-2 ${
           activeTab === 'notifications' ? 'border-blue-500' : 'border-transparent'
         }`}
         >
         Notifications
-      </Link>
+      </Link>}
       <Link
         to="/client-form"
         className={`${user.is_superuser && 'hidden'} text-blue-500 hover:text-blue-700 font-bold border-b-2 ${

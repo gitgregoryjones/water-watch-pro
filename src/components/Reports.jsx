@@ -7,6 +7,8 @@ import api from '../utility/api';
 import EmailRowManager from './EmailRowManager';
 import { convertTier } from '../utility/loginUser';
 import WorkingDialog from './WorkingDialog';
+import { colorLoggedInUserLocations } from '../utility/loginUser';
+
 
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
@@ -19,11 +21,13 @@ const Reports = () => {
   const [contacts, setContacts] = useState([]);
   const [selectAll, setSelectAll] = useState(false); 
   const [showDialog,setShowDialog] = useState(false);
+  
 
   const user = useSelector((state) => state.userInfo.user);
-  const [isSelectAll,setIsSelectAll] = useState(false);
-  const locations = user.locations;
+  
+  const [locations, setLocations] = useState(null)
   const reportAreaRef = useRef(null);
+
 
   const currentDate = new Date();
   const currentYearMonth = currentDate.toISOString().slice(0, 7); // Get current month in YYYY-MM
@@ -32,6 +36,34 @@ const Reports = () => {
     .slice(0, 7); // Get last month in YYYY-MM
   
   
+    useEffect(() => {
+      // Fetch locations asynchronously
+      const fetchLocations = async () => {
+        setShowDialog(true)
+        let response = {}
+        try {
+           response =  await api.get(`/api/locations`, {
+            params: {
+                
+                page: 1,
+                page_size: 250,
+            }
+        });
+    
+       
+          setLocations(response.data)
+         
+          setShowDialog(false)
+        } catch (error) {
+          console.error('Failed to fetch locations:', error);
+          
+         
+          setShowDialog(false)
+        }
+      };
+    
+      fetchLocations();
+    }, []);
 
     const handleSelectAllChange = () => {
         if (selectAll) {
@@ -401,7 +433,7 @@ const Reports = () => {
             }}
             className="border border-gray-300 w-full rounded p-2 "
           >
-            {locations.map((l) => (
+            {locations && locations.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
               </option>

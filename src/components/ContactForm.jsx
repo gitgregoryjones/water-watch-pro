@@ -158,6 +158,7 @@ const ContactForm = ({ contactToEdit }) => {
       setTimeout(() => {
         setShowDialog(false);
         setMsg(<span className="text-[green]">Contact updated Successfully</span>)
+        navigate('/contact-list');
         
       }, 2000);
     } catch (error) {

@@ -46,7 +46,7 @@ const handleUpgrade = async (tier) => {
                 key: 'alternate_billing_email',
                 label: {
                     type: 'custom',
-                    custom: `Alternate Billing Email Address (${user.email}) `,
+                    custom: `Billing Email (${user.email}) `,
                 },
                 type: "text",
                 optional: true,

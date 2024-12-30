@@ -1,5 +1,130 @@
 import api from "./api";
 
+
+
+const colorLoggedInUserLocations = async(userData)=>{
+
+    let response = {errors:"", locations:[],redirect:""}
+
+    const locationResponse =  await api.get(`/api/locations`, {
+        params: {
+            
+            page: 1,
+            page_size: 250,
+        }
+    });
+
+    if(userData.role == "contact" && locationResponse.data.length == 0){
+        response.errors = `Ask the account owner to assign you to a location `;
+        response.redirect = `/login`;
+        return response;
+
+    }
+
+    let yourLocations = locationResponse.data;
+
+   // if(!yourLocations || yourLocations.length == 0){
+   if(userData.clients[0]?.status == "pending"){
+        //await api.post('/auth/jwt/logout');
+       // dispatch(updateUser(userData));
+        //navigate("/wizard");
+        response.redirect = "/wizard";
+        response.errors `User payment processed.  Assign Locations`
+
+        return response;
+    }
+
+    let myLocations = locationResponse.data.map((l) => ({
+        ...l,
+        location: {
+            lat: l.latitude,
+            lng: l.longitude,
+        },
+    }));
+
+    // Step 4: Get 24-hour data for locations
+    const ids = myLocations.map((me) => me.id);
+
+    let todayHr = new Date();
+    todayHr.setDate(todayHr.getDate() + 1);
+
+    const todayStrHr = `${todayHr.getFullYear()}-${(todayHr.getMonth() + 1).toString().padStart(2, '0')}-${todayHr.getDate().toString().padStart(2, '0')}`;
+
+    const location24History = await api.post(`/api/locations/24h_data`, ids, {
+        params: {
+            
+            
+        }
+    });
+
+    const loc24 = location24History.data;
+
+    myLocations = myLocations.map((location) => {
+        //location.atlas14_threshold = JSON.parse(location.atlas14_threshold);
+        location.atlas14_threshold = (location.atlas14_threshold);
+        let loc24Data = loc24.locations[location.id];
+        if (loc24Data) {
+            try {
+               
+            location.total_rainfall = loc24Data.total_rainfall;
+            location.color_24 = location.total_rainfall > location.h24_threshold
+                ? location.atlas14_threshold && location.total_rainfall > location.atlas14_threshold['24h'][0] && user.tier != 1 ? "red" : "orange"
+                : "green";
+
+            
+
+                //console.error(`Location DOES  have atlas 24 ${location.id} ${JSON.stringify(location.atlas14_threshold)}`)
+            }catch (e){
+               // console.error(`Location  does not have atlas 24 ${location.id} ${JSON.parse(location.atlas14_threshold)}`)
+               console.log(e.message)
+            }
+        }
+        return location;
+    });
+
+    // Step 5: Get hourly data for locations
+    let today = new Date();
+    today.setDate(today.getDate());
+    
+    const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
+    const locationHourlyHistory = await api.post(`/api/locations/24h_data`, ids, {
+        params: {
+           
+            date: todayStr,
+        }
+    });
+
+    const locHourly = locationHourlyHistory.data;
+
+    console.log(`Hourly Data is ${todayStr} ${JSON.stringify(locHourly)}`)
+
+    myLocations = myLocations.map((location) => {
+        const locHourlyData = locHourly.locations[location.id];
+        if (locHourlyData) {
+            
+            location.total_hourly_rainfall = locHourlyData.total_rainfall;
+            location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
+               ? "orange"
+                : "green";
+        }
+        return location;
+    });
+
+    //userData.locations = myLocations;
+
+    
+    response.locations = myLocations;
+    // Dispatch user data to Redux store
+    //dispatch(updateUser(userData));
+
+    console.log("User logged in and verified:", userData);
+    console.log(`Location after login ${JSON.stringify(response)}`)
+
+    return response;
+
+}
+
 const convertTier = (person) =>{
 
     
@@ -123,4 +248,4 @@ const loginUser = async (email, password, token)=>{
 }
 }
 
-export  {loginUser, patchClient, convertTier};
+export  {loginUser, patchClient, convertTier, colorLoggedInUserLocations};

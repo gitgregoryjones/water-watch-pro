@@ -86,10 +86,12 @@ function App() {
   {user.role != "admin" && <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Forecasts
   </Link>}
-    <div   className="flex flex-col"><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link>
-    {user.role != "contact" && <Upgrade showMsg={false} tier={1}> <Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link>
+    <div   className="flex flex-col">
+      <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
+   <Upgrade showMsg={false} tier={1}>
+    {user.role != "contact" && <div><Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link></div>}
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
-    </Upgrade>}
+    </Upgrade>
     </div>
    
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}

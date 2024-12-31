@@ -304,10 +304,11 @@ useEffect(()=>{
             setErrors('Please accept the terms')
             return false;
         }
+        /*
         if(!formData.smsAccepted){
             setErrors('Please accept the sms terms')
             return false;
-        }
+        }*/
         return true;
         break;
     case 2:
@@ -741,7 +742,7 @@ useEffect(()=>{
                 checked={formData.smsAccepted}
                 onChange={handleChange}
               />
-              <a href="" target="_top">I agree to receive SMS texts and email notifications  
+              <a href="" target="_top">I agree to receive SMS texts and email notifications (optional) 
               </a>
             </label>
           </div>

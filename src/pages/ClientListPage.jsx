@@ -6,6 +6,10 @@ import api from "../utility/api";
 import Card from "../components/Card";
 import { useSelector } from "react-redux";
 import SettingsMenu from "../components/SettingsMenu";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../utility/UserSlice";
+import Upgrade from "../components/Upgrade";
+import { swapUser } from "../utility/loginUser";
 
 
 const ClientListPage = () => {
@@ -14,6 +18,10 @@ const ClientListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({});
   const location = useLocation();
+
+  
+  const dispatch = useDispatch();
+  
   
 
   useEffect(()=>{
@@ -44,6 +52,21 @@ const ClientListPage = () => {
       console.error("Error fetching clients:", error.message);
     }
   };
+
+  const masquerade = async (client) =>{
+
+    let swapped = await swapUser(user,client);
+
+    if(!swapped.errors){
+      
+       dispatch(updateUser(swapped.user))
+        navigate("/dashboard")
+   
+    } else {
+      console.error(swapped.errors)
+    }
+
+  }
 
   const filterClients = (e) => setSearchTerm(e.target.value);
 
@@ -228,13 +251,14 @@ const ClientListPage = () => {
                       {client.tier || "N/A"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 items-center gap-4 md:table-cell">
-                    {/*<button
-                        onClick={() => swapUser(client)}
-                        className="text-blue-500 hover:text-blue-700 px-2"
-                        title="Masquerade User"
-                      >
-                        <FaUser />
-                      </button>*/}
+                    <Upgrade showMsg={false} tier={4}><button
+                    onClick={() => masquerade(client)}
+                    className="text-blue-500 hover:text-blue-700 px-2"
+                    title={`Masquerade as ${client.name} `}
+                  >
+                    <FaUser />
+                  </button>
+                  </Upgrade>
                       <button
                         onClick={() => handleEdit(client)}
                         className="text-blue-500 hover:text-blue-700 px-2"

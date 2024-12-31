@@ -1,6 +1,39 @@
 import api from "./api";
 
+const swapUser = async (currentUser, newUser) => {
 
+    let swapped = {errors:null,user:currentUser};
+
+    if (window.confirm(`Are you sure you want to masquerade as ${newUser.name? newUser.name : newUser.account_name} ${newUser.email? newUser.email : newUser.invoice_email}`)) {
+      try {
+       
+        //fetchClients(currentPage);
+        //get token
+        //make call to user/me
+        //set locations
+        //set user in context
+        //go back to dashboard page
+        const tokenResponse = await api.post(`/api/services/user-token?email=${newUser.email? newUser.email : newUser.invoice_email}`)
+        localStorage.setItem("accessToken",tokenResponse.data.token)
+        //loginUser(null,null,tokenResponse.data.token)
+        console.log(`User token is now ${tokenResponse.data.token}`)
+        const me = await  api.get(`/users/me`)
+        const locations = await api.get(`/api/locations`)
+        console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
+        swapped.user = {...me.data, locations:locations.data}
+        
+ 
+      } catch (error) {
+        console.error("Error masquerading as client:", error.message);
+        swapped.errors = error.message;
+      }
+    } else {
+        swapped.errors = "Admin cancelled swap request. Returning Admin to List page"
+    }
+
+
+    return swapped;
+  };
 
 const colorLoggedInUserLocations = async(userData)=>{
 
@@ -248,4 +281,4 @@ const loginUser = async (email, password, token)=>{
 }
 }
 
-export  {loginUser, patchClient, convertTier, colorLoggedInUserLocations};
+export  {loginUser, patchClient, convertTier, colorLoggedInUserLocations, swapUser};

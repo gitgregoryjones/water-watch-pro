@@ -9,7 +9,9 @@ import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog
 import { useSelector } from 'react-redux';
 import SettingsMenu from '../components/SettingsMenu';
 import Upgrade from '../components/Upgrade';
-import { loginUser } from '../utility/loginUser';
+import { loginUser, swapUser } from '../utility/loginUser';
+import { useDispatch } from 'react-redux';
+import { updateUser } from '../utility/UserSlice';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -17,6 +19,7 @@ const ContactListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
 
   const fetchContacts = async (page) => {
@@ -54,25 +57,20 @@ const ContactListPage = () => {
   }
   };
 
-  const swapUser = async (contact) => {
-    if (window.confirm(`Are you sure you want to masquerade as ${contact.name} ${contact.email}`)) {
-      try {
-        //await api.delete(`/api/clients/${clientId}`);
-        //fetchClients(currentPage);
-        //get token
-        //make call to user/me
-        //set locations
-        //set user in context
-        //go back to dashboard page
-        const tokenResponse = await api.post(`/api/services/user-token?email=${contact.email}`)
-        //loginUser(null,null,tokenResponse.data.token)
-        alert(`User token is now ${tokenResponse.data.token}`)
-        
-      } catch (error) {
-        console.error("Error masquerading as client:", error.message);
-      }
+  const masquerade = async (contact) =>{
+
+    let swapped = await swapUser(user,contact);
+
+    if(!swapped.errors){
+       dispatch(updateUser(swapped.user))
+  
+        navigate("/dashboard")
+    } else {
+      console.error(swapped.errors)
     }
-  };
+
+  }
+ 
 
   const handleEdit = (contact) => {
     navigate('/contact-form', { state: { contact } });
@@ -147,8 +145,8 @@ const ContactListPage = () => {
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
               {user.role == "admin" && <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>}
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || ''}</td>
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || ''}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
               <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">
                 {contact.sms_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />
@@ -166,7 +164,7 @@ const ContactListPage = () => {
               </td>
               <td className="text-sm border border-gray-300 p-2  items-center gap-4 hidden md:table-cell ">
               <Upgrade showMsg={false} tier={4}><button
-                    onClick={() => swapUser(contact)}
+                    onClick={() => masquerade(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
                     title={`Masquerade as ${contact.name} `}
                   >

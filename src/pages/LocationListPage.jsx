@@ -8,6 +8,7 @@ import Card from '../components/Card';
 import LocationCSVFileUploadDialog from '../components/LocationCSVUploadDialog';
 import SettingsMenu from '../components/SettingsMenu';
 import Upgrade from '../components/Upgrade';
+import { convertTier } from '../utility/loginUser';
 
 const LocationListPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -95,10 +96,10 @@ const LocationListPage = () => {
         <thead>
             <tr className="bg-gray-100 sticky top-0 ">
               <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 min-w-[70px] md:min-w-[250px] w-full">Name</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Latitude</th>
-              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  md:table-cell">Longitude</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden md:table-cell top-0">24 Hour Threshold</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap  hidden md:table-cell sticky top-0">RapidRain Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  hidden md:table-cell">Latitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  hidden md:table-cell">Longitude</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky  md:table-cell top-0">24 Hour Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap   hidden md:flex justify-center items-center sticky flex-col top-0">RapidRain Threshold {convertTier(user) == 1 ? <div><Link to="/upgrade">Upgrade</Link></div> : ''}</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>
           </thead>
@@ -111,7 +112,7 @@ const LocationListPage = () => {
                 <td className="text-sm border border-gray-300 p-2 hidden md:table-cell">{location.latitude}</td>
                 <td className="text-sm border border-gray-300 p-2 hidden md:table-cell">{location.longitude}</td>
                 <td className="text-sm border border-gray-300 p-2 ">{location.h24_threshold}</td>
-                <td className="text-sm border border-gray-300 p-2  ">{location.rapidrain_threshold}</td>
+                <td className={`text-sm border border-gray-300 p-2 hidden md:table-cell ${convertTier(user) == 1 ? 'bg-slate-200' : ''} `}>{location.rapidrain_threshold}</td>
                 <td className="text-smm border border-gray-300 p-2 flex items-center gap-4">
                   <button
                     onClick={() => handleEditLocation(location)}

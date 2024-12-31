@@ -28,16 +28,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setLatitude(locationToEdit.latitude || '');
       setLongitude(locationToEdit.longitude || '');
       setH24Threshold(locationToEdit.h24_threshold || .5);
+      setRapidRainThreshold(locationToEdit.rapidrain_threshold || locationToEdit.h24_threshold);
       
-      if(convertTier(user) < 2){
-        if(locationToEdit.h24Threshold){
-          setRapidRainThreshold(locationToEdit.h24Threshold)
-        }else {
-          setRapidRainThreshold(0.5)
-        }
-      } else {
-        setRapidRainThreshold(locationToEdit.rapidRainThreshold || 0.5)
-      }
+      
+
     }
   }, [locationToEdit, isEditMode]);
 
@@ -82,7 +76,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         }
 
        
-        if(user.clients[0]?.tier == "bronze"){
+        if(!rapidRainThreshold){
             setRapidRainThreshold(h24Threshold)
             
         } else 
@@ -100,7 +94,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       longitude: parseFloat(longitude),
       status: 'active',
       h24_threshold: parseFloat(h24Threshold),
-      rapidrain_threshold: parseFloat(rapidRainThreshold),
+      rapidrain_threshold: parseFloat(rapidRainThreshold ? rapidRainThreshold : h24Threshold),
     };
 
     try {
@@ -264,8 +258,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                 return <option value={o} key={i}>{o}</option>
             })
             }
-            </select>) : (<div className='flex w-full flex-col'><input type="text" readonly value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
-                          <div className='flex text-sm gap-2'>Upgrade to access this feature <Link to={"/upgrade"}>Upgrade Now</Link></div>
+            </select>) : (<div className='flex w-full flex-col'><input type="text" disabled value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
+                          <div className='flex text-sm gap-2'>Upgrade to set unique RapidRain thresholds <Link to={"/upgrade"}>Upgrade Now</Link></div>
             </div>)}
         </div>
 

@@ -6,7 +6,8 @@ import Card from '../components/Card';
 
 const AssignLocations = () => {
   const user = useSelector((state) => state.userInfo.user);
-  const locations = user.locations;
+ 
+  const [locations,setLocations] = useState([])
   const [contacts, setContacts] = useState([]);
   const [unassignedLocations, setUnassignedLocations] = useState([]);
   const [assignedLocations, setAssignedLocations] = useState([]);
@@ -14,6 +15,26 @@ const AssignLocations = () => {
   const [selectedUnassignedLocations, setSelectedUnassignedLocations] = useState([]);
   const [selectedAssignedLocations, setSelectedAssignedLocations] = useState([]);
   const [working,setWorking] = useState(false)
+  let currentPage = 1;
+  let pageSize = 25;
+
+
+  useEffect(() => {
+    fetchLocations(currentPage);
+  }, [currentPage]);
+
+  const fetchLocations = async (page) => {
+    try {
+      const response = await api.get(
+        `/api/locations/?client_id=${user.clients[0]?.id}&page=${page}&page_size=${pageSize}`
+      );
+      setLocations(response.data || []); // Ensure `results` is always an array
+      //setTotalPages(Math.ceil(response.data.total / pageSize));
+    } catch (error) {
+      console.error('Error fetching locations:', error.message);
+      setLocations([]); // Fallback to an empty array in case of an error
+    }
+  };
 
   useEffect(() => {
     // Fetch all contacts for the user

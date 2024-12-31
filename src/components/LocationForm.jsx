@@ -259,7 +259,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             })
             }
             </select>) : (<div className='flex w-full flex-col'><input type="text" disabled value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
-                          <div className='flex text-sm gap-2'>Upgrade to set unique RapidRain thresholds <Link to={"/upgrade"}>Upgrade Now</Link></div>
+                          <div className='flex text-sm gap-2'>Upgrade to set distinct RapidRain thresholds <Link to={"/upgrade"}>Upgrade Now</Link></div>
             </div>)}
         </div>
 

@@ -100,7 +100,7 @@ export default function Header() {
 
     {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>): (<Upgrade  tier={1} showMsg={false}><Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+  </Link>): user.role != "contact" && (<Upgrade  tier={1} showMsg={false}><Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
   </Link></Upgrade>)}
   </div>

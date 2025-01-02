@@ -129,6 +129,9 @@ useEffect(()=>{
     
           }
           //alert(`Session complete from database is ${JSON.stringify(sessionDetails)}`)
+        } else if(user.clients[0].is_trial_account){
+          setCurrentStep(4)
+          return;
         }
       }
 

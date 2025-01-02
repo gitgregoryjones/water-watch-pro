@@ -597,14 +597,17 @@ useEffect(()=>{
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
-          const session = await createSession(userCopy);
+          if(!newClient.is_trial_account){
+            const session = await createSession(userCopy);
 
-          //console.log(`Session came back as ${JSON.stringify(session)}`)
+            //console.log(`Session came back as ${JSON.stringify(session)}`)
 
-          patchClient({...newClient, stripe_session_id: session.id})
+            patchClient({...newClient, stripe_session_id: session.id})
 
-          window.location.href = session.url;
-          
+            window.location.href = session.url;
+          } else {
+            setCurrentStep(4);
+          }
           //  setCurrentStep(4)
 
         } else  {

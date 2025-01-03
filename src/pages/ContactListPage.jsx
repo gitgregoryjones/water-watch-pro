@@ -12,18 +12,22 @@ import Upgrade from '../components/Upgrade';
 import { loginUser, swapUser } from '../utility/loginUser';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
+import WorkingDialog from '../components/WorkingDialog';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDialog,setShowDialog] = useState(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
 
   const fetchContacts = async (page) => {
     try {
+
+      setShowDialog(true)
 
       let url = `/api/contacts/?client_id=${user.clients[0].id}`
       
@@ -33,9 +37,11 @@ const ContactListPage = () => {
 
       const response = await api.get(`${url}&page=${page}&page_size=250`);
       setContacts(response.data);
+      setShowDialog(false)
       //setTotalPages(response.data.total_pages);
     } catch (error) {
       console.error('Error fetching contacts:', user);
+      setShowDialog(false)
     }
   };
 
@@ -139,7 +145,7 @@ const ContactListPage = () => {
               <th className="hidden text-sm border border-gray-300 p-2 text-left sticky top-0 md:table-cell">Actions</th>
             </tr>
           </thead>
-       {filtered.length > 0 ?
+       {
         <tbody>
           {filtered.map((contact) => (
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
@@ -174,7 +180,7 @@ const ContactListPage = () => {
                   <button
                     onClick={() => handleEdit(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
-                    title={`Edit Location`}
+                    title={`Edit Contact`}
                   >
                     <FaEdit />
                   </button>
@@ -182,7 +188,7 @@ const ContactListPage = () => {
                   <button
                     onClick={() => handleDelete(contact.id)}
                     className="text-red-500 hover:text-red-700"
-                    title="Delete Location"
+                    title="Delete Contact"
                   >
                     <FaTrashAlt />
                   </button>
@@ -190,7 +196,7 @@ const ContactListPage = () => {
             </tr>
           ))}
         </tbody>
-        : <tbody className='relative'><i className='absolute text-[green] fa fa-spinner top-[5rem] text-4xl left-1/2 animate-spin'></i></tbody>}
+       }
       </table>
 
       <div className="hidden flex justify-between items-center mt-4">
@@ -216,6 +222,7 @@ const ContactListPage = () => {
      <ContactCSVFileUploadDialog className={'mt-2'} onClose={()=> location.reload()}/>
     </div>
     </Card>
+    <WorkingDialog showDialog={showDialog}/>
     </div>
   );
 };

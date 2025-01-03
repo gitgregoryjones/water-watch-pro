@@ -128,7 +128,7 @@ const handleUpgrade = async (tier) => {
     { name: 'Daily and Monthly Reports', gold: true, silver: true, bronze: true },
     { name: 'Contact Notifications', gold: true, silver: true, bronze: true },
     { name: 'Excessive Rainfall', gold: true, silver: true, bronze: false },
-    { name: 'RAPID-RAIN', gold: true, silver: true, bronze: false },
+    { name: 'RapidRain', gold: true, silver: true, bronze: false },
     { name: 'Site-Specific Forecasts', gold: true, silver: false, bronze: false },
     { name: 'On-Demand Lookup', gold: true, silver: false, bronze: false },
   ];

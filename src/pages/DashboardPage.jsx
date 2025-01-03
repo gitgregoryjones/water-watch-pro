@@ -650,7 +650,7 @@ function showThreshold(color){
             showFavoriteControls={false}
             onRowRendered={onRenderedRow24HourAccum}
             
-            searchPlaceholder='Search Your Locations...'
+            searchPlaceholder='Search...'
             addButtonLabel={<span><i className="fa-solid fa-angles-left"></i> Move Locations &nbsp;</span>}
 
 

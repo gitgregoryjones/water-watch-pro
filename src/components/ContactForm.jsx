@@ -128,10 +128,16 @@ const ContactForm = ({ contactToEdit }) => {
 
     setMsg(null)
 
+    if(!email && !phone){
+      setMsg(<span className='text-[red]'>Phone or Email is required to add this contact</span>)
+      setShowDialog(false);
+      return;
+    }
+
     const payload = {
       name,
-      email,
       phone,
+      email: email ? email : null,
       status: 'active',
       daily_report_on:formData.daily_report_on,
       daily_report_on_sms: formData.daily_report_on_sms,
@@ -209,7 +215,7 @@ const ContactForm = ({ contactToEdit }) => {
           </div>
   
           <div className="flex items-center mt-2">
-            <span className="mr-2">SMS</span>
+            <span className="mr-2">Text</span>
             <Toggle
               checked={settings[sms]}
               onChange={() => handleChange({ name: sms, value: !settings[sms] })}
@@ -261,7 +267,7 @@ const ContactForm = ({ contactToEdit }) => {
             id="email"
             type="email"
             value={email}
-            required
+            
             onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
           />
@@ -273,7 +279,7 @@ const ContactForm = ({ contactToEdit }) => {
           <input
             id="phone"
             type="tel"
-            required
+            
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"

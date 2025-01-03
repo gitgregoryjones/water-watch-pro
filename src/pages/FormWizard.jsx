@@ -18,6 +18,9 @@ import Prices from './Prices';
 const FormWizard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  
   const user = useSelector((state) => state.userInfo.user);
   const stripe = new Stripe(VITE_PAYMENT_LINK_GOLD);
 
@@ -60,6 +63,10 @@ const FormWizard = () => {
 
   const [errors,setErrors] = useState("")
   const [success,setSuccess] = useState("")
+
+  const toggleVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -355,11 +362,16 @@ useEffect(()=>{
             return;
         }
 
-       
+       /*
         if(user.clients[0]?.tier == "bronze"){
             formData.rapidrain = formData.threshold;
             
-        } else 
+        } else */
+        if(!formData.rapidrain){
+          formData.rapidrain = formData.threshold;
+          
+          
+      } else
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(formData.rapidrain))){
             setErrors(`Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4 `)
             return;
@@ -663,30 +675,67 @@ useEffect(()=>{
               required
               autocomplete="off"
             />
+            
             </div>
           
           <div className="mb-4">
             <label className="block text-gray-700">Password <span className='text-[red]'>*</span></label>
+            <div className='flex  items-center justify-center flex-col' >
             <input
-              type="password"
+               type={passwordVisible ? 'text' : 'password'}
               name="password"
               value={formData.password}
+              placeholder='Password (at least 8 characters)'
               onChange={handleChange}
               className="w-full border border-gray-300 rounded p-2"
               required
             />
+             <span
+                onClick={toggleVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '3rem',
+                 
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  color: passwordVisible ? '#333' : '#888',
+                }}
+              >
+              {passwordVisible ? <i class="fa-solid fa-eye-slash"></i> : <i class="fa-solid fa-eye"></i>}
+             </span>
+            </div>
+            <div className='mt-2'>Password must contain at least one capital letter, digit, special character</div>
           </div>
           <div className="mb-4">
             <label className="block text-gray-700">Confirm Password <span className='text-[red]'>*</span></label>
+            <div className='flex  items-center justify-center flex-col' >
             <input
-              type="password"
+               type={passwordVisible ? 'text' : 'password'}
               name="confirmPassword"
               value={formData.confirmPassword}
+              placeholder='Password (at least 8 characters)'
               onChange={handleChange}
               className="w-full border border-gray-300 rounded p-2"
               required
             />
+             <span
+                onClick={toggleVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '3rem',
+                  
+                  
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  color: passwordVisible ? '#333' : '#888',
+                }}
+              >
+              {passwordVisible ? <i class="fa-solid fa-eye-slash"></i> : <i class="fa-solid fa-eye"></i>}
+             </span>
+            </div>
+            <div className='mt-2'>Password must contain at least one capital letter, digit, special character</div>
           </div>
+          
           </div>
           <div className='mt-4 border rounded-2xl p-4'>
           <div className="mb-4">
@@ -702,6 +751,7 @@ useEffect(()=>{
               placeholder='Enter First Name'
               required
             />
+            
             <input
               type="text"
               name="last_name"
@@ -748,7 +798,7 @@ useEffect(()=>{
                 checked={formData.smsAccepted}
                 onChange={handleChange}
               />
-              <a href="" target="_top">I agree to receive SMS texts and email notifications (optional) 
+              <a href="" target="_top">I agree to receive texts and email notifications (optional) 
               </a>
             </label>
           </div>
@@ -761,16 +811,24 @@ useEffect(()=>{
       {currentStep === 2 && (
 
         <div className='border rounded-2xl p-4 mb-4'>
-          <h2 className="text-xl font-bold mb-4">Subscription Level </h2>
-          <div className="mb-4">
+          <h2 className="hidden text-xl font-bold mb-4">Subscription Level </h2>
+          {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[black]">
+            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level Questions? Contact us at support@waterwatchpro.com 
+            <p className='mt-2'>When the trial ends, you can upgrade for continued use.
+You can also choose to upgrade now by sliding the toggle below to “Upgrade Now.</p>
+</div>}
+          <div className="mb-4 flex items-start ">
+            
             <Toggle
               checked={formData.subscriptionLevel === 'paid'}
               onChange={() =>
                 setFormData({ ...formData, subscriptionLevel: formData.subscriptionLevel === 'trial' ? 'paid' : 'trial' })
               }
             />
-            <span className="ml-2">{formData.subscriptionLevel.charAt(0).toUpperCase() + formData.subscriptionLevel.slice(1)}</span>
+            
+            <span className="ml-2 font-bold ">{formData.subscriptionLevel === 'trial' ? <span className='text-lg font-bold'>Upgrade Now</span> : <div className='flex flex-col w-full gap-2 items-start justify-end'><span className='pt-2'>Paid</span><span>Slide to the left to switch to a 30-day trial account</span></div>}</span>
           </div>
+          {formData.subscriptionLevel === "trial"  && <div>Otherwise, click “Next” to continue with the trial registration.</div>}
           {formData.subscriptionLevel === 'paid' && (
             <div className="mb-4">
               <label className="block text-gray-700">Tier</label>
@@ -791,13 +849,10 @@ useEffect(()=>{
               </div>
             </div>
           )}
-            {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[black]">
-            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level Questions? Contact us at support@waterwatchpro.com 
-            </div>}
+   
             {formData.subscriptionLevel === "paid" && <div className="text-[green] font-normal mb-4 text-lg">
-                {/*Thanks for your interest in starting a monthly subscription to WaterWatch PRO. Select a service level and enter as many locations as you wish. Billing is based on the number of your locations and the service level (link back to the Prices section of the WWP website).  
-Questions? Contact us at support@waterwatchpro.com. */}
-<Prices isSmall={true}/>
+               
+                <Prices isSmall={true}/>
 
             </div>}
         </div>

@@ -39,6 +39,9 @@ const SearchBar = styled.input`
   font-family: inherit;
   margin-bottom: 10px;
   font-size:small;
+  &::placeholder {
+    color: black
+  }
 `;
 
 const FilterIcon = styled.span`

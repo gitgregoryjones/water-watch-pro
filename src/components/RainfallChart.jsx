@@ -120,10 +120,11 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     // Extract specific parts of the date
     const month = date.toLocaleString("en-US", { month: "short" });
     const day = date.toLocaleString("en-US", { day: "numeric" });
-    const hour = date.toLocaleString("en-US", { hour: "2-digit", hour12: false });
+    const hour = date.toLocaleString("en-US", { hour: "numeric", hour12: true });
   
     // Construct the desired format
-    return `${month} ${day}, ${hour}h`;
+    return `${month} ${day}, ${hour.replace(" ","").substring(0,hour.length-2)}`;
+    //return `${month} ${day}, ${hour}`;
   };
   
 

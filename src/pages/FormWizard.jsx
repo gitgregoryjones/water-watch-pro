@@ -571,9 +571,6 @@ useEffect(()=>{
    
        } else if(currentStep == 2){
         let aResponse = await addUser();
-    
-
-        //console.log(`A RESPONSE Errors length is ${JSON.stringify(aResponse)}`)
 
         if(!aResponse.data){
 
@@ -598,8 +595,27 @@ useEffect(()=>{
 
         let newClient =  {...savedClient, tier: formData.tier, is_trial_account: formData.subscriptionLevel == "trial",account_type: formData.subscriptionLevel, status:'pending' }
 
-        //console.log(`Writing new client ${JSON.stringify(newClient)} to user ${JSON.stringify(lresponse.userData)}`)
+        //Gene Business Rules
+        newClient.daily_report_on = true;
+        newClient.exceed24h_on = true;
+        newClient.exceed24h_combine_locations = true;
 
+        //Only Gold
+       
+        if(newClient.tier == "gold"){        
+          newClient.forecast_on = true;
+          newClient.forecast_combine_locations = true;
+        }
+
+        if(newClient.tier == "gold" || newClient.tier == "silver"){
+          newClient.atlas14_on = true;
+          newClient.atlas14_24h_on = true;
+          newClient.atlas14_1h_on = true;
+          newClient.atlas14_first_on = true;
+          newClient.rapidrain_on = true;
+          newClient.rapidrain_combine_locations = true;
+        }
+       
         //If not bronze, overwrite client
         await patchClient(newClient)
 

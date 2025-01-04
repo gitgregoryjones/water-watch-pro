@@ -183,7 +183,8 @@ const AssignmentsPage = () => {
               </option>
             ))}
           </select>
-          <input type="text" className='p-2 mt-2 border border-green-800 rounded text-md' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
+          <input type="text" className='p-2 mt-2 border border-green-800 rounded text-md placeholder-[black]' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
+          
         </div>
 
         {/* Unassigned Contacts Select */}

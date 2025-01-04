@@ -22,11 +22,12 @@ const Reports = () => {
   const [contacts, setContacts] = useState([]);
   const [selectAll, setSelectAll] = useState(false); 
   const [showDialog,setShowDialog] = useState(false);
+  const [searchTerm,setSearchTerm] = useState("")
   
 
   const user = useSelector((state) => state.userInfo.user);
   
-  const [locations, setLocations] = useState(null)
+  const [locations, setLocations] = useState([])
   const reportAreaRef = useRef(null);
 
 
@@ -329,7 +330,9 @@ const Reports = () => {
 
   
   
-  
+  const filterLocations = (e)=> setSearchTerm(e.target.value);
+ 
+  const  filtered = locations.filter(l => l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()  ));
   
   
   
@@ -427,12 +430,15 @@ const Reports = () => {
             }}
             className="border border-gray-300 w-full rounded p-2 "
           >
-            {locations && locations.map((l) => (
+            {filtered && filtered.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
               </option>
             ))}
           </select>
+          
+          <input type="text" className='p-2 mt-2 w-full border border-green-800 rounded text-md placeholder-[black]' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
+         
         </div>}
 
         {/* Row 2 */}

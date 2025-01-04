@@ -13,6 +13,7 @@ import { loginUser, swapUser } from '../utility/loginUser';
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import WorkingDialog from '../components/WorkingDialog';
+import fetchByPage from '../utility/fetchByPage';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -20,6 +21,7 @@ const ContactListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [showDialog,setShowDialog] = useState(false)
+  const [pageSize, setPageSize] = useState(250)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
@@ -34,9 +36,11 @@ const ContactListPage = () => {
       if(user.role == "admin"){
         url = `/api/contacts/all/?a=true`;
       }
+     
+      let rows = await fetchByPage(url)
 
-      const response = await api.get(`${url}&page=${page}&page_size=250`);
-      setContacts(response.data);
+      setContacts(rows);
+
       setShowDialog(false)
       //setTotalPages(response.data.total_pages);
     } catch (error) {

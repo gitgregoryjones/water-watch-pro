@@ -34,7 +34,8 @@ api.interceptors.request.use(
 // Response interceptor for handling 401 errors and refreshing the token
 api.interceptors.response.use(
   (response) => {
-    console.log(`Response Status: ${response.status}`);
+     // Access custom headers
+    
     return response; // Pass through successful responses
   },
   async (error) => {

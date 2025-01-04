@@ -1,4 +1,5 @@
 import api from "./api";
+import fetchByPage from "./fetchByPage";
 
 const swapUser = async (currentUser, newUser) => {
 
@@ -39,22 +40,24 @@ const colorLoggedInUserLocations = async(userData)=>{
 
     let response = {errors:"", locations:[],redirect:""}
 
-    const locationResponse =  await api.get(`/api/locations`, {
-        params: {
-            
-            page: 1,
-            page_size: 250,
-        }
-    });
 
-    if(userData.role == "contact" && locationResponse.data.length == 0){
+    let yourLocations = [];
+    let page = 1;
+    let pageSize = 250;
+
+
+   
+    yourLocations =  await fetchByPage(`/api/locations`);
+
+
+    if(userData.role == "contact" && yourLocations.length == 0){
         response.errors = `Ask the account owner to assign you to a location `;
         response.redirect = `/login`;
         return response;
 
     }
 
-    let yourLocations = locationResponse.data;
+    
 
    // if(!yourLocations || yourLocations.length == 0){
    if(userData.clients[0]?.status == "pending"){
@@ -67,7 +70,7 @@ const colorLoggedInUserLocations = async(userData)=>{
         return response;
     }
 
-    let myLocations = locationResponse.data.map((l) => ({
+    let myLocations = yourLocations.map((l) => ({
         ...l,
         location: {
             lat: l.latitude,

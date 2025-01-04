@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import fetchJsonApi from '../utility/fetchJsonApi';
+import fetchJsonApi from '../utility/fetchByPage';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import api from '../utility/api';

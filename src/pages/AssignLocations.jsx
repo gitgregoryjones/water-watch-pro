@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import api from '../utility/api';
 import Card from '../components/Card';
+import fetchByPage from '../utility/fetchByPage';
 
 const AssignLocations = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -16,7 +17,7 @@ const AssignLocations = () => {
   const [selectedAssignedLocations, setSelectedAssignedLocations] = useState([]);
   const [working,setWorking] = useState(false)
   let currentPage = 1;
-  let pageSize = 25;
+  let pageSize = 250;
 
 
   useEffect(() => {
@@ -25,10 +26,9 @@ const AssignLocations = () => {
 
   const fetchLocations = async (page) => {
     try {
-      const response = await api.get(
-        `/api/locations/?client_id=${user.clients[0]?.id}&page=${page}&page_size=${pageSize}`
-      );
-      setLocations(response.data || []); // Ensure `results` is always an array
+      let rows = await fetchByPage(`/api/locations/?client_id=${user.clients[0]?.id}`)
+
+      setLocations(rows); // Ensure `results` is always an array
       //setTotalPages(Math.ceil(response.data.total / pageSize));
     } catch (error) {
       console.error('Error fetching locations:', error.message);
@@ -38,22 +38,27 @@ const AssignLocations = () => {
 
   useEffect(() => {
     // Fetch all contacts for the user
-    api.get('/api/contacts?page=1&page_size=250')
-      .then((response) => {
-        const contactList = response.data.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-        }));
-        setContacts(contactList);
-      })
-      .catch((error) => {
-        console.error('Error fetching contacts:', error.message);
-      });
+ 
+   
+    let b = async()=>{
+    try {
+
+    let rows = await fetchByPage(`/api/contacts`)
+    setContacts(rows)
+
+   } catch(e){
+        console.error('Error fetching contacts:', e.message);
+   }
+  }
+
+  b();
+      
   }, []);
 
   const fetchAssignedLocations = () => {
     setWorking(true)
     if (selectedContact) {
+      
       api
         .get(`/api/contacts/${selectedContact}/locations?page=1&page_size=250`)
         .then((response) => {

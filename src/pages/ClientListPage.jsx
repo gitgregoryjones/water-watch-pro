@@ -17,6 +17,7 @@ const ClientListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({});
+  const [pageSize, setPageSize] = useState(250);
   const location = useLocation();
 
   
@@ -44,14 +45,30 @@ const ClientListPage = () => {
 
   const fetchClients = async (page) => {
     try {
-      const response = await api.get(
-        `/api/clients/?client_id=${user.clients[0].id}&page=${page}&page_size=250`
-      );
-      setClients(response.data);
+      let rows = []; // To store results from both pages
+  
+      for (let i = page; i > 0 ; i++) { // Loop from page to page + 1
+        console.log(`Getting results for page ${i}`); // Use the loop counter `i`
+        const response = await api.get(
+          `/api/clients/?client_id=${user.clients[0].id}&page=${i}&page_size=${pageSize}`
+        );
+      
+        
+        if (response.data.length > 0) {
+          rows = rows.concat(response.data); // Append results to rows
+        } 
+
+        if(response.data.length < pageSize) {
+          break;
+        } 
+      }
+  
+      setClients(rows); // Update state with the combined results
     } catch (error) {
       console.error("Error fetching clients:", error.message);
     }
   };
+  
 
   const masquerade = async (client) =>{
 

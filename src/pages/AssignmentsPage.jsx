@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import api from '../utility/api';
 import Card from '../components/Card';
+import fetchContacts from '../utility/fetchContacts';
 
 const AssignmentsPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -27,10 +28,21 @@ const AssignmentsPage = () => {
 
   const fetchLocations = async (page) => {
     try {
-      const response = await api.get(
-        `/api/locations/?client_id=${user.clients[0]?.id}&page=${page}&page_size=${pageSize}`
-      );
-      setLocations(response.data || []); // Ensure `results` is always an array
+      let rows = [];
+      while(page > 0){
+        const response = await api.get(
+          `/api/locations/?client_id=${user.clients[0]?.id}&page=${page++}&page_size=${pageSize}`
+        );
+        if(response.data.length > 0 ){
+            rows = rows.concat(response.data)
+        }
+
+        if(response.data.length < pageSize){
+          break;
+        }
+      }
+      
+      setLocations(rows); // Ensure `results` is always an array
       //setTotalPages(Math.ceil(response.data.total / pageSize));
     } catch (error) {
       console.error('Error fetching locations:', error.message);
@@ -40,18 +52,16 @@ const AssignmentsPage = () => {
 
   useEffect(() => {
     // Fetch all contacts for the user
-    api.get(`/api/contacts/?client_id=${user.clients[0]?.id}&page=1&page_size=250`)
-      .then((response) => {
-        const contactNames = response.data.map((contact) => ({
-          id: contact.id,
-          name: contact.name,
-        }));
-        setContacts(contactNames);
-        setUnassignedContacts(contactNames); // Initially, all contacts are unassigned
-      })
-      .catch((error) => {
-        console.error('Error fetching contacts:', error.message);
-      });
+    let a = async ()=>{
+    try {
+      let contactNames = await fetchContacts();
+      setContacts(contactNames);
+      setUnassignedContacts(contactNames);
+    } catch(e){
+          console.error('Error fetching contacts:', error.message);
+    };
+    }
+    a();
   }, []);
 
   const fetchAssignedContacts = () => {

@@ -9,6 +9,7 @@ import LocationCSVFileUploadDialog from '../components/LocationCSVUploadDialog';
 import SettingsMenu from '../components/SettingsMenu';
 import Upgrade from '../components/Upgrade';
 import { convertTier } from '../utility/loginUser';
+import fetchByPage from '../utility/fetchByPage';
 
 const LocationListPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -27,10 +28,11 @@ const LocationListPage = () => {
 
   const fetchLocations = async (page) => {
     try {
-      const response = await api.get(
-        `/api/locations/?client_id=${user.clients[0].id}&page=${page}&page_size=${pageSize}`
-      );
-      setLocations(response.data || []); // Ensure `results` is always an array
+
+      
+      let rows = await fetchByPage(`/api/locations/?client_id=${user.clients[0].id}`)
+
+      setLocations(rows); // Ensure `results` is always an array
       //setTotalPages(Math.ceil(response.data.total / pageSize));
     } catch (error) {
       console.error('Error fetching locations:', error.message);

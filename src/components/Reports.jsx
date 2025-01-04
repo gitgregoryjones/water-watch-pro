@@ -8,6 +8,7 @@ import EmailRowManager from './EmailRowManager';
 import { convertTier } from '../utility/loginUser';
 import WorkingDialog from './WorkingDialog';
 import { colorLoggedInUserLocations } from '../utility/loginUser';
+import fetchByPage from '../utility/fetchByPage';
 
 
 const Reports = () => {
@@ -40,18 +41,11 @@ const Reports = () => {
       // Fetch locations asynchronously
       const fetchLocations = async () => {
         setShowDialog(true)
-        let response = {}
+   
         try {
-           response =  await api.get(`/api/locations`, {
-            params: {
-                
-                page: 1,
-                page_size: 250,
-            }
-        });
-    
-       
-          setLocations(response.data)
+          
+          let rows = await fetchByPage(`/api/locations`)
+          setLocations(rows)
          
           setShowDialog(false)
         } catch (error) {

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 
 const EmailRowManager = ({ contacts, onModify}) => {
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [emailRows, setEmailRows] = useState([]);
+  const user = useSelector((state) => state.userInfo.user);
 
   const addRow = () => {
     const newRowId = Date.now(); // Unique ID for each row
@@ -63,11 +65,13 @@ const EmailRowManager = ({ contacts, onModify}) => {
         }}
         className="border border-gray-300 rounded p-2 w-full h-20"
       >
+        <option key={user.email} value={user.email}>{user.first_name} {user.last_name}</option>
         {contacts.map((contact) => (
           <option key={contact.email} value={contact.email}>
             {contact.name}
           </option>
         ))}
+      
       </select>
       <div className="flex justify-between items-center">
         <div className="">Add more recipients</div>

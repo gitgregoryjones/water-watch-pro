@@ -559,6 +559,28 @@ useEffect(()=>{
           return;
         }
 
+        /*  No longer needed. But leaving here until we can explain to Gene why this is not necessary
+        try {
+
+        let contactReponse = await api.get(`api/contacts`);
+
+        let myContact = contactReponse.data.find((c)=> c.email == user.email)
+
+        console.log(`Found a contact named ${JSON.stringify(myContact)}`)
+
+        //User Will have the locations array after addLocation succeeds. So use the in memory location id
+        let assignResponse = await api.get(`/api/contacts/${myContact.id}/locations/${user.locations[0].id}`);
+        
+        console.log(`Added contact to the location ${assignResponse.data}`)
+
+        }catch(e){
+          setErrors(e.message);
+          setShowMsg(false);
+          return;
+        }
+*/
+        //Add This user as a contact
+
         //Set Account to 'active'
         //client.status = 'active'
         //save client
@@ -625,6 +647,35 @@ useEffect(()=>{
 
         dispatch(updateUser(userCopy));
 
+        //Add Customer
+/*  Not needed since creating a contact automatically creates a User which causes a collision because we created a user before this step.  
+Gene really just wants reports to have the logged in user as an option instead of having to add the user as a contact which no longer works 
+because of the db constraint on emal
+        try {
+        //Add A new Contact.  At the end of Step 4, we will look up the contact and assign it to the newly created location
+        let contactReponse = await api.get(`api/contacts`,{
+          name:`${formData.first_name} ${formData.last_name}`,
+          email:formData.email,
+          phone:formData.phone,
+          status:'active',
+          daily_report_on: newClient.daily_report_on,
+          exceed24h_on: newClient.exceed24h_on,
+          forecast_on : newClient.forecast_on,
+          atlas14_on : newClient.atlas14_on
+
+
+        })
+
+       
+
+      }catch (e){
+        setErrors(e.message);
+        setShowMsg(false)
+        return;
+      }*/
+
+        
+
         if(lresponse.errors.length == 0){
           //Forward to Stripe for Payment
 
@@ -633,7 +684,7 @@ useEffect(()=>{
 
             //console.log(`Session came back as ${JSON.stringify(session)}`)
 
-            patchClient({...newClient, stripe_session_id: session.id})
+            await patchClient({...newClient, stripe_session_id: session.id})
 
             window.location.href = session.url;
           } else {

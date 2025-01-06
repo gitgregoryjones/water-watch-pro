@@ -134,6 +134,20 @@ const ContactForm = ({ contactToEdit }) => {
       return;
     }
 
+    if(phone){
+      const phoneRegex = /^(\+?\d{1,4}[\s-]?)?(\(?\d{3}\)?[\s-]?)?\d{3}[\s-]?\d{4}$/;
+
+      // Example usage
+      const validatePhoneNumber = (phoneNumber) => phoneRegex.test(phoneNumber);
+
+      
+      if(!validatePhoneNumber(phone)){
+        setMsg(<span className='text-[red]'>Please enter a valid phone number</span>)
+        setShowDialog(false);
+        return;
+      }
+    }
+
     const payload = {
       name,
       phone,

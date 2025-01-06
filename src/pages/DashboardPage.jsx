@@ -559,7 +559,7 @@ function showThreshold(color){
          
      
       <div className='w-[30%] md:w-[20%]'>
-        <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4  justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
+        <CheckboxGroup className={`border hidden md:ml-2 md:flex md:flex-col md:gap-2 gap-4  justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
        
       <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
@@ -640,7 +640,7 @@ function showThreshold(color){
          
          </APIProvider>
        <div className='w-[30%] md:w-[20%]'>
-       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 justify-start md:items-start rounded  mb-2`} color={currentColor24} onClick={setCurrentColor24}/>
+       <CheckboxGroup className={`border hidden md:flex md:flex-col md:ml-2 md:gap-2 gap-4 justify-start md:items-start rounded  mb-2`} color={currentColor24} onClick={setCurrentColor24}/>
       <hr className='hidden md:block m-2'/>
       <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}

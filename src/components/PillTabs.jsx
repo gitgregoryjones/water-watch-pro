@@ -5,11 +5,11 @@ import React, {
   } from "react";
   import LittleMenu from "./LittleMenu";
   
-  export default function PillTabs({ children, className, mini, header }) {
-    const [active, setActive] = useState(0);
+  export default function PillTabs({ children, className, mini, header, defaultActive = 0 }) {
+    const [active, setActive] = useState(defaultActive);
     const [menuActions, setMenuActions] = useState([]);
     const [littleText, setLittleText] = useState("");
-  
+   
     const randomId = `lm${Math.random().toFixed(2) * 100}`;
   
     useEffect(() => {
@@ -25,6 +25,8 @@ import React, {
         name: child.props.children[0] || `Tab ${index + 1}`,
         onClick: () => setActive(index),
       }));
+
+      //console.log(`Default active is ${active}`)
       setMenuActions(actions);
     }, [children]);
   

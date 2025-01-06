@@ -30,7 +30,7 @@ const SearchBarContainer = styled.div`
 `;
 
 const SearchBar = styled.input`
-  width: 85%;
+  width: 100%;
   padding: 10px;
   background-color: white;
   color: black;
@@ -42,6 +42,11 @@ const SearchBar = styled.input`
   &::placeholder {
     color: black
   }
+ 
+  @media (max-width:550px) {
+    width:85%
+  }
+  
 `;
 
 const FilterIcon = styled.span`

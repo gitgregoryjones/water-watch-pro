@@ -12,7 +12,11 @@ const CheckboxGroup = ({ onClick, color, className }) => {
   };
 
   return (
-    <div className={`flex sm:flex-row p-2 ${className}`}>
+    
+    <div>
+      <div  className='md:hidden flex justify-center items-center my-2 '>Sort Location By:</div>
+    <div className={`flex items-center justify-center sm:flex-row p-2 ${className}`}>
+      <label className='hidden md:flex w-full  items-center justify-center rounded text-[white] bg-[green] text-sm p-1'>Sort Location By:</label>
       {/* Normal */}
       <label className={`flex items-center space-x-2 text-sm `}>
         <input
@@ -62,6 +66,8 @@ const CheckboxGroup = ({ onClick, color, className }) => {
       </Upgrade>
       
     </div>
+    </div>
+   
   );
 };
 

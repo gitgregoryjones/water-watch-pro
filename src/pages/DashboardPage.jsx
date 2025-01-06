@@ -500,8 +500,9 @@ function showThreshold(color){
       <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} defaultActive={1} mini={window.outerWidth < 600}>
       <div className='tab'><span>Daily Total</span>
       <div className='flex-col flex w-full'>
-        
-      <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2 sm:my-4 justify-around items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
+      
+      <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2 justify-around items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
+      
       <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={"w-full md:h-full max-h-[20rem]  justify-start items-start md:max-h-full flex md:flex-col border-[transparent]"} >
         
       
@@ -558,7 +559,7 @@ function showThreshold(color){
          
      
       <div className='w-[30%] md:w-[20%]'>
-        <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
+        <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4  justify-start md:items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor}/>
        
       <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}
@@ -583,7 +584,7 @@ function showThreshold(color){
           </div>
           </div>
           <div className='tab'>24 Hr Accum
-          <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2 sm:my-4 justify-around items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor24}/>
+          <CheckboxGroup className={`md:hidden flex border md:flex-col md:gap-2 gap-2  justify-around items-start rounded  mb-2`} color={currentColor} onClick={setCurrentColor24}/>
       <Card bodyClassName={`sm:justify-start sm:items-start md:justify-between md:items-start overflow-auto`} className={`${convertTier(user) == 4 && 'hidden'} w-full md:h-full max-h-[20rem]  md:max-h-full md:flex-row border-[transparent]`} >
     
         
@@ -639,7 +640,7 @@ function showThreshold(color){
          
          </APIProvider>
        <div className='w-[30%] md:w-[20%]'>
-       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 sm:my-4 justify-start md:items-start rounded  mb-2`} color={currentColor24} onClick={setCurrentColor24}/>
+       <CheckboxGroup className={`border hidden md:flex md:flex-col md:gap-2 gap-4 justify-start md:items-start rounded  mb-2`} color={currentColor24} onClick={setCurrentColor24}/>
       <hr className='hidden md:block m-2'/>
       <ItemControl className={`mapList px-2 md:mt-0 mt-20 justify-start md:h-[80%] max-h-[95%] md:shadow-[unset]`}
             collectionList={locationList}

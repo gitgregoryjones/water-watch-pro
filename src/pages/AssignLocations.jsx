@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../utility/api';
 import Card from '../components/Card';
 import fetchByPage from '../utility/fetchByPage';
+import WorkingDialog from '../components/WorkingDialog';
 
 const AssignLocations = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -81,13 +82,30 @@ const AssignLocations = () => {
 
   useEffect(fetchAssignedLocations, [selectedContact, locations]);
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     if (!selectedContact) {
       alert('Please select a contact first.');
       return;
     }
-  
 
+    setWorking(true)
+
+    try {
+  
+      console.log(`Select UnassignedLocations ${JSON.stringify(selectedUnassignedLocations.map((m)=>m.id))}`)
+
+      let locIds = selectedUnassignedLocations.map((m)=>m.id);
+
+      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/locations`,locIds)
+
+    }catch(e){
+      setWorking(false);
+      console.log(e.message);
+    }
+
+    setWorking(false)
+
+    /*
     selectedUnassignedLocations.forEach((location) => {
       api
         .post(`/api/contacts/${selectedContact}/locations/${location.id}?page=1&page_size=250`)
@@ -98,29 +116,42 @@ const AssignLocations = () => {
           console.error(`Error assigning location ${location.name}:`, error.message);
         })
     });
-
+    */
+    fetchAssignedLocations();
     setSelectedUnassignedLocations([]);
   };
 
-  const handleUnassign = () => {
+  const handleUnassign = async () => {
     if (!selectedContact) {
       alert('Please select a contact first.');
       return;
     }
 
+    setWorking(true)
 
+    try {
+      // Create an array of promises for delete calls
+      const deletePromises = selectedAssignedLocations.map((location) =>
+        api
+          .delete(
+            `/api/contacts/${selectedContact}/locations/${location.id}?client_id=${user.clients[0].id}`
+          )
+          .catch((error) => {
+            console.error(`Error unassigning location ${location.name}:`, error.message);
+          })
+      );
+  
+      // Wait for all delete calls to complete
+      await Promise.all(deletePromises);
 
-    selectedAssignedLocations.forEach((location) => {
- 
-      api
-        .delete(`/api/contacts/${selectedContact}/locations/${location.id}?client_id=${user.clients[0].id}`)
-        .then(() => {
-          fetchAssignedLocations();
-        })
-        .catch((error) => {
-          console.error(`Error unassigning location ${location.name}:`, error.message);
-        })
-    });
+      setWorking(false)
+  
+      // Call fetchAssignedLocations after all delete calls have completed
+      fetchAssignedLocations();
+    } catch (error) {
+      console.error("Error unassigning locations:", error.message);
+      setWorking(false)
+    }
 
     setSelectedAssignedLocations([]);
   };
@@ -237,6 +268,7 @@ const AssignLocations = () => {
           </div>
         </div>
       </Card>
+      <WorkingDialog showDialog={working}/>
     </div>
   );
 };

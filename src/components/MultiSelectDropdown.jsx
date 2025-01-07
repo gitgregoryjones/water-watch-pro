@@ -91,7 +91,7 @@ const MultiSelectDropdown = ({ className, locations, onSelectedOption }) => {
 
       {/* Dropdown Options */}
       {isDropdownOpen && (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md mt-2 max-h-64 overflow-y-auto">
+        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md mt-2">
           {/* Close Icon */}
           <div className="flex justify-end p-2">
             <button
@@ -123,22 +123,24 @@ const MultiSelectDropdown = ({ className, locations, onSelectedOption }) => {
               className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          {/* Filtered Options */}
-          {filteredLocations.map((location) => (
-            <label
-              key={location.id}
-              className="flex items-center px-4 py-2 hover:bg-gray-100"
-            >
-              <input
-                type="checkbox"
-                value={location.name}
-                checked={selectedOptions.includes(location.name)}
-                onChange={() => handleOptionChange(location.id, location.name)}
-                className="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
-              />
-              {location.name}
-            </label>
-          ))}
+          {/* Scrollable List of Options */}
+          <div className="max-h-64 overflow-y-auto">
+            {filteredLocations.map((location) => (
+              <label
+                key={location.id}
+                className="flex items-center px-4 py-2 hover:bg-gray-100"
+              >
+                <input
+                  type="checkbox"
+                  value={location.name}
+                  checked={selectedOptions.includes(location.name)}
+                  onChange={() => handleOptionChange(location.id, location.name)}
+                  className="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                />
+                {location.name}
+              </label>
+            ))}
+          </div>
         </div>
       )}
 

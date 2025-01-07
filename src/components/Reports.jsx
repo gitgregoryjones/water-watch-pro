@@ -458,7 +458,7 @@ const Reports = () => {
         placeholder="Search Locations..."
         value={searchTerm}
       />
-      <div className={`${window.innerWidth > 600 && 'hidden'} flex w-full flex-col`}>
+      <div className={`md:hidden flex w-full flex-col`}>
         <div>Locations</div>
         <MultiSelectDropdown className={``} locations={filtered} onSelectedOption={(list)=> { console.log(`I see list ${JSON.stringify(list)}`); setSelectedLocations(list)} }/>
       </div>

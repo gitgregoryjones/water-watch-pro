@@ -9,6 +9,7 @@ import { convertTier } from '../utility/loginUser';
 import WorkingDialog from './WorkingDialog';
 import { colorLoggedInUserLocations } from '../utility/loginUser';
 import fetchByPage from '../utility/fetchByPage';
+import MultiSelectDropdown from './MultiSelectDropdown';
 
 
 const Reports = () => {
@@ -457,6 +458,8 @@ const Reports = () => {
         placeholder="Search Locations..."
         value={searchTerm}
       />
+
+      <MultiSelectDropdown locations={filtered}/>
         </div>}
 
         {/* Row 2 */}

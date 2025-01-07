@@ -406,6 +406,8 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
 
   return (
+    <div className="flex flex-col items-center justify-center w-full">
+      
     <div className="flex flex-row w-full ">
       <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
@@ -427,7 +429,11 @@ const RainfallChart = ({ location, period, max = 72 }) => {
         ) : (
           <div>Loading...</div>
         )}
+        
       </div>
+      
+    </div>
+        <div className={`mt-4 text-xl ${period != "hourly" && 'hidden' }`}>Scroll to see other days</div>
     </div>
   );
 };

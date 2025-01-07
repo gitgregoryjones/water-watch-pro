@@ -75,6 +75,7 @@ export default function Forecast({ location, className }) {
   }, [location, user.clients]);
 
   return !location ? (
+    <div className='flex flex-col'>
     <div className={`px-6 min-h-[10rem] mb-4 flex justify-start gap-2 overflow-scroll ${className}`}>
       {forecast.map((m, i) => (
         <div key={i} className="min-w-[fit-content] h-full relative overflow-hidden">
@@ -92,6 +93,8 @@ export default function Forecast({ location, className }) {
           </div>
         </div>
       ))}
+    </div>
+    <div className='flex justify-center items-center my-2 text-xl'>Scroll to see other days</div>
     </div>
   ) : (
     <div className="flex md:flex-row flex-row h-full min-h-[10rem] w-full flex-1 gap md:p-2 border justify-center items-center text-[--text-color]">

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 
-const MultiSelectDropdown = ({ className, locations, onSelectedOption }) => {
+const MultiSelectDropdown = ({ className, locations, onSelectedOption, idField = "id" }) => {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -134,7 +134,7 @@ const MultiSelectDropdown = ({ className, locations, onSelectedOption }) => {
                   type="checkbox"
                   value={location.name}
                   checked={selectedOptions.includes(location.name)}
-                  onChange={() => handleOptionChange(location.id, location.name)}
+                  onChange={() => handleOptionChange(location[idField], location.name)}
                   className="mr-2 h-4 w-4 text-blue-500 border-gray-300 rounded focus:ring-blue-500"
                 />
                 {location.name}

@@ -465,13 +465,19 @@ const Reports = () => {
         </div>}
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="">
+        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
             <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
           
           </div>
          
           <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
+        </div>}
+
+        {(displayFormat == "csv" ||  selectedLocations.length > 1) && 
+          <div className={`md:hidden flex w-full flex-col`}>
+          <div>EmailTo</div>
+          <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
         

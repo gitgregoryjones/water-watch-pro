@@ -441,7 +441,7 @@ const Reports = () => {
             .map((option) => parseInt(option.value, 10));
           setSelectedLocations(selected);
         }}
-        className="border border-gray-300 w-full rounded p-2"
+        className="border border-gray-300 w-full rounded p-2 appearance-none h-[200px]"
       >
         {filtered.map((l) => (
           <option key={l.id} value={l.id}>

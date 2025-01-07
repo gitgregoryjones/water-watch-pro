@@ -330,9 +330,22 @@ const Reports = () => {
 
   
   
-  const filterLocations = (e)=> setSearchTerm(e.target.value);
- 
-  const  filtered = locations.filter(l => l.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()  ));
+  const filterLocations = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    // Automatically select matching options
+    const matchingLocations = locations
+      .filter((l) => l.name.toLowerCase().includes(term.toLowerCase()))
+      .map((l) => l.id);
+
+    setSelectedLocations(matchingLocations);
+  };
+
+  const filtered = locations.filter((l) =>
+    l.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  
   
   
   
@@ -418,27 +431,32 @@ const Reports = () => {
         {(reportType == "daily" || reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
           <label htmlFor="locList" className="flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
-            id="locList"
-            multiple
-            value={selectedLocations}
-            
-            onChange={(e) => {
-              const options = Array.from(e.target.options);
-              const selected = options.filter((option) => option.selected).map((option) => option.value);
-              setSelectedLocations(selected);
-              //if (selected.length > 1) setDisplayFormat('csv'); // Force CSV if more than one location
-            }}
-            className="border border-gray-300 w-full rounded p-2 "
-          >
-            {filtered && filtered.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-          
-          <input type="text" className='p-2 mt-2 w-full border border-green-800 rounded text-md placeholder-[black]' onChange={filterLocations} placeholder='Search Locations...' value={searchTerm}/>
-         
+        id="locList"
+        multiple
+        value={selectedLocations}
+        onChange={(e) => {
+          const options = Array.from(e.target.options);
+          const selected = options
+            .filter((option) => option.selected)
+            .map((option) => parseInt(option.value, 10));
+          setSelectedLocations(selected);
+        }}
+        className="border border-gray-300 w-full rounded p-2"
+      >
+        {filtered.map((l) => (
+          <option key={l.id} value={l.id}>
+            {l.name}
+          </option>
+        ))}
+      </select>
+
+      <input
+        type="text"
+        className="p-2 mt-2 w-full border border-green-800 rounded text-md placeholder-[black]"
+        onChange={filterLocations}
+        placeholder="Search Locations..."
+        value={searchTerm}
+      />
         </div>}
 
         {/* Row 2 */}

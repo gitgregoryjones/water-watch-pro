@@ -16,9 +16,9 @@ api.interceptors.request.use(
  
   (config) => {
     const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-    console.log(`Reading token from localStorage ${token}`)
-    console.log(`Original config is`)
-    console.log(config)
+    //console.log(`Reading token from localStorage ${token}`)
+    //console.log(`Original config is`)
+    //console.log(config)
 
    
     if (token) {

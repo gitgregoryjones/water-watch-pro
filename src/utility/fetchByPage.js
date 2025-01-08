@@ -24,7 +24,7 @@ export default async function fetchByPage(url, page=1,pageSize=250){
                 break;
             }
         }
-        console.log(`Returning rows ${JSON.stringify(rows)}`)
+        //console.log(`Returning rows ${JSON.stringify(rows)}`)
         return rows; // Assuming contacts are in the `data` field
     } catch (error) {
         console.error("Error fetching contacts:", error);

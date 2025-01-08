@@ -114,12 +114,25 @@ const AssignmentsPage = () => {
 
   useEffect(fetchAssignedContacts, [selectedLocation, contacts]);
 
-  const handleAssign = () => {
+  const handleAssign = async () => {
     if (!selectedLocation) {
       alert('Please select a location first.');
       return;
     }
 
+    try {
+  
+      let theContacts = selectedUnassignedContacts.map((m)=>m.id);
+
+      let assignedResponse = await api.post(`/api/locations/${selectedLocation}/contacts`,theContacts)
+
+      setWorking(false);
+
+    }catch(e){
+      setWorking(false);
+      console.log(e.message);
+    }
+    /*
     selectedUnassignedContacts.forEach((contact) => {
       api
         .post(`/api/contacts/${contact.id}/locations/${selectedLocation}/?client_id=${user.clients[0]?.id}&`)
@@ -131,7 +144,8 @@ const AssignmentsPage = () => {
           console.error(`Error assigning contact ${contact.name}:`, error.message);
         });
     });
-
+    */
+    await fetchAssignedContacts();
     setSelectedUnassignedContacts([]); // Clear selection
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { API_HOST, VITE_PRICES_LINK } from '../utility/constants';
+import { API_HOST, VITE_PRICES_LINK, VITE_FEATURE_EXCEL_REPORT } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
@@ -426,7 +426,7 @@ const Reports = () => {
           >
             <option value="html">Formatted</option>
             <option value="csv">CSV</option>
-            <option value="excel">Excel</option>
+            {VITE_FEATURE_EXCEL_REPORT  === "true" && <option value="excel">Excel</option>}
           </select>
         </div>
 

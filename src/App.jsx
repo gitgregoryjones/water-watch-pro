@@ -15,7 +15,7 @@ import DashboardContent from "./components/DashboardContent";
 import SwitchUser from "./pages/SwitchUser";
 import {slide as Menu} from 'react-burger-menu';
 import Upgrade from "./components/Upgrade";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LandscapeOrientation from "./components/LandscapeOrientation";
 import SettingsPage from "./pages/SettingsPage";
 import ReportsPage from "./pages/ReportsPage";
@@ -65,6 +65,15 @@ function App() {
    setOpen(false)
    
   }
+
+  useEffect(() => {
+    // Check if the hostname is 'water-watch-pro.netlify.app'
+    if (window.location.hostname.indexOf("water-watch-pro.netlify.app") > -1) {
+      // Redirect to the desired domain, preserving path and query
+      const newURL = `https://www.waterwatchpro25.com`;
+      window.location.href = newURL;
+    }
+  }, [location]);
 
   let isMenuOpen = (state)=>{
 

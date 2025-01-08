@@ -87,7 +87,7 @@ const Reports = () => {
         <center><div class="flex flex-col gap-4  items-center justify-center bg-[white] text-center border-[gold]  border-4 text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
           This feature is not available at your current service level
           <p>
-          <a href=${VITE_PRICES_LINK}>Click Here to Upgrade</a>
+          <a href="${VITE_PRICES_LINK}?ref=/reports">Click Here to Upgrade</a>
         </div></center>
       `)
 
@@ -97,7 +97,7 @@ const Reports = () => {
         <center><div class="items-center flex-col gap-4 justify-center bg-[white] border-[gold] border-4 flex justify-center items-center text-center text-slate-900 p-4 rounded shadow-md  h-[20rem] md:w-[40rem]">
           This feature is not available at your current service level
           <p>
-          <a href=${VITE_PRICES_LINK}>Click Here to Upgrade</a>
+          <a href="${VITE_PRICES_LINK}?ref=/reports">Click Here to Upgrade</a>
         </div></center>
       `)
 
@@ -413,7 +413,11 @@ const Reports = () => {
             max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable current month for tier < 2
           />
         </div>
-        {convertTier(user) == 1 && <div>Want to see additional months? Click to <Link to={"/upgrade"}>Upgrade</Link></div>}
+        {convertTier(user) == 1 && 
+          <div className='p-1 items-center justify-center rounded border-[gold] border-2  text-center'>Want to run reports for all months including {new Date().toLocaleDateString('en-US', {
+              month: 'short',              
+            }) }?  Upgrade <Link to={"/upgrade"}  state={{url: "/reports"}}>here</Link>
+          </div>}
         </div>
         <div className="">
           <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display:</label>

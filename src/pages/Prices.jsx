@@ -12,6 +12,7 @@ export default function Prices({ isSmall = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
   // Stripe Price IDs from your environment variables
   const STRIPE_PRICE_IDS = {
@@ -125,10 +126,12 @@ const handleUpgrade = async (tier) => {
     { name: '24/7 Monitoring', gold: true, silver: true, bronze: true },
     { name: 'Threshold Notification', gold: true, silver: true, bronze: true },
     { name: 'National Precipitation Forecast', gold: true, silver: true, bronze: true },
-    { name: 'Daily and Monthly Reports', gold: true, silver: true, bronze: true },
+    { name: 'Daily and Monthly Reports', gold: true, silver: true, bronze: false },
+    { name: 'Previous Month Report Only', gold: false, silver: false, bronze: true },
     { name: 'Contact Notifications', gold: true, silver: true, bronze: true },
     { name: 'Excessive Rainfall', gold: true, silver: true, bronze: false },
     { name: 'RapidRain', gold: true, silver: true, bronze: false },
+    { name: 'Configurable RapidRain Thresholds', gold: true, silver: true, bronze: false },
     { name: 'Site-Specific Forecasts', gold: true, silver: false, bronze: false },
     { name: 'On-Demand Lookup', gold: true, silver: false, bronze: false },
   ];
@@ -151,7 +154,7 @@ const handleUpgrade = async (tier) => {
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-800 pricing-header">
         Monthly Subscription Pricing
       </h2>
-      {!isSmall && <Link to="/client-form" state={{client:user.clients[0], myself:!user.is_superuser}} className="flex justify-end items-center px-4 mb-4">Not Now</Link>}
+      {!isSmall && <Link to={location.state?.url ? location.state.url : params.get('ref') ? params.get('ref') : "/client-form"} state={{client:user.clients[0], myself:!user.is_superuser}} className="flex justify-end items-center px-4 mb-4">Not Now</Link>}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Gold Plan */}
         <div className="plan gold flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">

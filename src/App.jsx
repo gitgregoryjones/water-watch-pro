@@ -68,7 +68,7 @@ function App() {
 
   useEffect(() => {
     // Check if the hostname is 'water-watch-pro.netlify.app'
-    if (window.location.hostname.indexOf("water-watch-pro.netlify.app") > -1) {
+    if (window.location.hostname == "water-watch-pro.netlify.app") {
       // Redirect to the desired domain, preserving path and query
       const newURL = `https://www.waterwatchpro25.com`;
       window.location.href = newURL;

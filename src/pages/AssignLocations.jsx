@@ -57,8 +57,9 @@ const AssignLocations = () => {
   }, []);
 
   const fetchAssignedLocations = () => {
-    setWorking(true)
+    
     if (selectedContact) {
+      setWorking(true)
       
       api
         .get(`/api/contacts/${selectedContact}/locations?page=1&page_size=250`)
@@ -73,6 +74,8 @@ const AssignLocations = () => {
           setUnassignedLocations(
             locations.filter((location) => !assigned.some((a) => a.id === location.id))
           );
+
+          setWorking(false)
         })
         .catch((error) => {
           console.error('Error fetching assigned locations:', error.message);

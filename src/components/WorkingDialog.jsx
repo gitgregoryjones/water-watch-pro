@@ -20,7 +20,7 @@ const WorkingDialog = ({ showDialog,  }) => {
       timeoutId = setTimeout(() => {
         setIsVisible(false);
       
-      }, 2000);
+      }, 800);
     }
 
     return () => clearTimeout(timeoutId); // Cleanup timeout on unmount or prop change

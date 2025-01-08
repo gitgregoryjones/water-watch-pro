@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import api from '../utility/api';
 import Card from '../components/Card';
 import fetchContacts from '../utility/fetchContacts';
+import fetchByPage from '../utility/fetchByPage';
+import WorkingDialog from '../components/WorkingDialog';
 
 const AssignmentsPage = () => {
   const user = useSelector((state) => state.userInfo.user);
@@ -67,6 +69,28 @@ const AssignmentsPage = () => {
   const fetchAssignedContacts = () => {
     if (selectedLocation) {
       setWorking(true)
+
+      let b = async()=>{
+
+        try {
+
+          let rows = await fetchByPage(`/api/locations/${selectedLocation}/contacts?client_id=${user.clients[0]?.id}&page=1&page_size=250`);
+
+          setAssignedContacts(rows);
+
+          setUnassignedContacts(
+            contacts.filter((contact) => !rows.some((a) => a.id === contact.id))
+          );
+        
+
+          setWorking(false)
+        }catch(e){
+          console.log(e.message)
+          setWorking(false)
+        }
+      }
+      b();
+      /*
       api
         .get(`/api/locations/${selectedLocation}/contacts?client_id=${user.clients[0]?.id}&page=1&page_size=250`)
         .then((response) => {
@@ -84,6 +108,7 @@ const AssignmentsPage = () => {
         .catch((error) => {
           console.error('Error fetching assigned contacts:', error.message);
         }).finally(()=> setWorking(false));
+        */
     }
   };
 
@@ -110,12 +135,16 @@ const AssignmentsPage = () => {
     setSelectedUnassignedContacts([]); // Clear selection
   };
 
-  const handleUnassign = () => {
+  const handleUnassign = async () => {
     if (!selectedLocation) {
       alert('Please select a location first.');
       return;
     }
 
+    let cIds = selectedAssignedContacts.map((contact)=> contact.id)
+
+    let deletedResponse = await api.post(`/api/locations/${selectedLocation}/remove_contacts`,cIds)
+    /*
     selectedAssignedContacts.forEach((contact) => {
       api
         .delete(`/api/contacts/${contact.id}/locations/${selectedLocation}?client_id=${user.clients[0].id}`)
@@ -127,7 +156,9 @@ const AssignmentsPage = () => {
           console.error(`Error unassigning contact ${contact.name}:`, error.message);
         });
     });
+    */
 
+    await fetchAssignedContacts();
     setSelectedAssignedContacts([]); // Clear selection
   };
 
@@ -255,7 +286,7 @@ const AssignmentsPage = () => {
         </div>
       </div>
       </Card>
-
+<WorkingDialog  showDialog={working}/>
     </div>
     
   );

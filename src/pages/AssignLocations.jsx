@@ -56,30 +56,25 @@ const AssignLocations = () => {
       
   }, []);
 
-  const fetchAssignedLocations = () => {
+  const fetchAssignedLocations =  () => {
     
     if (selectedContact) {
       setWorking(true)
       
-      api
-        .get(`/api/contacts/${selectedContact}/locations?page=1&page_size=250`)
-        .then((response) => {
-          const assigned = response.data.map((location) => ({
-            id: location.id,
-            name: location.name,
-          }));
-          setAssignedLocations(assigned);
+    let b = async () =>{
+      let rows = await fetchByPage(`/api/contacts/${selectedContact}/locations?`)
 
-          // Remove assigned locations from the unassigned list
-          setUnassignedLocations(
-            locations.filter((location) => !assigned.some((a) => a.id === location.id))
-          );
+      setAssignedLocations(rows);
 
-          setWorking(false)
-        })
-        .catch((error) => {
-          console.error('Error fetching assigned locations:', error.message);
-        }).finally(()=>setWorking(false));
+      setUnassignedLocations(
+        locations.filter((location) => !rows.some((a) => a.id === location.id))
+      );
+
+      setWorking(false)
+
+    
+      }
+      b();
     }
   };
 
@@ -108,18 +103,7 @@ const AssignLocations = () => {
 
     setWorking(false)
 
-    /*
-    selectedUnassignedLocations.forEach((location) => {
-      api
-        .post(`/api/contacts/${selectedContact}/locations/${location.id}?page=1&page_size=250`)
-        .then(() => {
-          fetchAssignedLocations();
-        })
-        .catch((error) => {
-          console.error(`Error assigning location ${location.name}:`, error.message);
-        })
-    });
-    */
+  
     fetchAssignedLocations();
     setSelectedUnassignedLocations([]);
   };
@@ -134,18 +118,11 @@ const AssignLocations = () => {
 
     try {
       // Create an array of promises for delete calls
-      const deletePromises = selectedAssignedLocations.map((location) =>
-        api
-          .delete(
-            `/api/contacts/${selectedContact}/locations/${location.id}?client_id=${user.clients[0].id}`
-          )
-          .catch((error) => {
-            console.error(`Error unassigning location ${location.name}:`, error.message);
-          })
-      );
+
+      let locIds = selectedAssignedLocations.map((location)=> location.id)
   
-      // Wait for all delete calls to complete
-      await Promise.all(deletePromises);
+      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/remove_locations`,locIds)
+      
 
       setWorking(false)
   

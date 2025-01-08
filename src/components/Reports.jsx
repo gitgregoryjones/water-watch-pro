@@ -10,6 +10,7 @@ import WorkingDialog from './WorkingDialog';
 import { colorLoggedInUserLocations } from '../utility/loginUser';
 import fetchByPage from '../utility/fetchByPage';
 import MultiSelectDropdown from './MultiSelectDropdown';
+import { Link } from 'react-router-dom';
 
 
 const Reports = () => {
@@ -256,7 +257,7 @@ const Reports = () => {
     }
    
     setShowDialog(true);
-    if (selectedLocations.length > 1 || displayFormat === 'csv') {
+    if (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') {
       // POST Request for multiple locations
       requestData = {
         email_format: displayFormat,
@@ -412,6 +413,7 @@ const Reports = () => {
             max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable current month for tier < 2
           />
         </div>
+        {convertTier(user) == 1 && <div>Want to see additional months? Click to <Link to={"/upgrade"}>Upgrade</Link></div>}
         </div>
         <div className="">
           <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display:</label>
@@ -424,6 +426,7 @@ const Reports = () => {
           >
             <option value="html">Formatted</option>
             <option value="csv">CSV</option>
+            <option value="excel">Excel</option>
           </select>
         </div>
 
@@ -465,7 +468,7 @@ const Reports = () => {
         </div>}
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
+        {(displayFormat == "csv" ||  displayFormat == "excel" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
             <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
           
@@ -474,7 +477,7 @@ const Reports = () => {
           <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
-        {(displayFormat == "csv" ||  selectedLocations.length > 1) && 
+        {(displayFormat == "csv" || displayFormat == "excel" || selectedLocations.length > 1) && 
           <div className={`md:hidden flex w-full flex-col`}>
           <div>EmailTo</div>
           <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
@@ -488,7 +491,7 @@ const Reports = () => {
             type="submit"
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
-            {selectedLocations.length > 1 || displayFormat == "csv" ? "Email Report" : "View Report"}
+            {selectedLocations.length > 1 || displayFormat == "csv"  || displayFormat == "excel" ? "Email Report" : "View Report"}
           </button>
         </div>
       </form>

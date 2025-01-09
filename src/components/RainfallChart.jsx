@@ -171,7 +171,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
             }) 
           );
           values.push(value.total);
-          backgroundColors.push(value.total > location.h24_threshold ? (value.total > location.atlas14_threshold["1h"][0] ? "red" : "orange") : "green");
+          backgroundColors.push(value.total > location.h24_threshold ? location.atlas14_threshold && value.total > location.atlas14_threshold["1h"][0] ? "red" : "orange" : "green");
         });
       } else {
         data.total_rainfall.forEach((day) => {
@@ -412,7 +412,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
       <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (
-          <div>Error loading data. Please try again later.</div>
+          <div>Error loading data. Please try again later. {error}</div>
         ) : chartData ? (
           <div style={{
             width: `${

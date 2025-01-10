@@ -716,7 +716,7 @@ because of the db constraint on emal
   
 >
         
-    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="http://localhost:5173/src/assets/logo.png"/><div>{currentStep != 4 ? 'Register':`Welcome ${user.first_name}`}</div></h1>
+    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="/src/assets/logo.png"/><div>{currentStep != 4 ? 'Register':`Welcome ${user.first_name}`}</div></h1>
     
     <div className='text-xl text-[red] m-2 mx-6'>{errors}</div>
     <div className='text-xl text-[black] m-2'>{success}</div>
@@ -880,9 +880,10 @@ because of the db constraint on emal
         <div className='border rounded-2xl p-4 mb-4'>
           <h2 className="hidden text-xl font-bold mb-4">Subscription Level </h2>
           {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[black]">
-            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level Questions? Contact us at support@waterwatchpro.com 
+            Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level.
+            <p className='mt-2'>Questions? Contact us at support@waterwatchpro.com</p>
             <p className='mt-2'>When the trial ends, you can upgrade for continued use.
-You can also choose to upgrade now by sliding the toggle below to “Upgrade Now.</p>
+You can also choose to upgrade now by sliding the toggle below to “Upgrade Now".</p>
 </div>}
           <div className="mb-4 flex items-start ">
             

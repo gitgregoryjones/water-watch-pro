@@ -98,9 +98,12 @@ const ClientForm = ({ clientToEdit,myself }) => {
 
       setTimeout(() => {
         setShowDialog(false);
-        myself ? navigate("/client-form", { state:{client:user.clients[0],myself:true}}) : navigate('/client-form', { state:{client:c}});
+        //navigate("/settings-admin")
+        //myself ? navigate("/settings-admin", { state:{client:{...user.clients[0]},myself:true}}) : navigate('/client-form', { state:{client:c}});
         setMsg(<span className="text-[green]">Successfully Updated</span>)
-      }, 2000);
+        window.scrollTo({top:0,behavior: 'smooth',})
+
+      }, 800);
     } catch (error) {
       setShowDialog(false)
       setMsg(<span className="text-[red]">{error.message}</span>)
@@ -140,7 +143,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         {clientToEdit ? `Edit ${accountName}` : 'Add Client'}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>{msg}</div>
+        <div id="msg">{msg}</div>
         
         {/* Account Name */}
        

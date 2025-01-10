@@ -93,14 +93,14 @@ export default function Header() {
       Reports
     </Link>
   
-  {(user.role != "admin" && user.role != "contact") && (<Link to="/assignments" className={location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+  {(user.role != "admin" && user.role != "contact") && (<Link to="/assign-locations" className={location.pathname === "/assign-locations" || location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>)}
   <div>
 
     {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>): user.role != "contact" && (<Upgrade  tier={1} showMsg={false}><Link to="/location-list" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+  </Link>): user.role != "contact" && (<Upgrade  tier={1} showMsg={false}><Link to="/contact-list" className={["/location-list", "/contact-list", "/settings-general","/client-form"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
   </Link></Upgrade>)}
   </div>

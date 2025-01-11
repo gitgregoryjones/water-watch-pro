@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
 import { VITE_PAYMENT_LINK_GOLD, VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE,VITE_PRICE_ID_SILVER,VITE_PRICE_ID_TRIAL,VITE_STRIPE_SUCCESS_URL,VITE_STRIPE_CANCEL_URL } from '../utility/constants';
-import validatePassword from '../utility/passwordFunc';
+import { validatePassword, validateEmail } from '../utility/passwordFunc';
 import Stripe from 'stripe';
 import Prices from './Prices';
 
@@ -277,7 +277,7 @@ useEffect(()=>{
           return false;
         }
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(formData.email)) {
+        if (!validateEmail(formData.email)) {
           setErrors('Please enter a valid email address.');
           return false;
         }

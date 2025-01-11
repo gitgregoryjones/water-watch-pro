@@ -94,7 +94,7 @@ const ContactListPage = () => {
 
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
-      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings >  Contacts</h1>
+      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt;  Contacts</h1>
       <Card className={'w-full'} header={  <div className=" flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
         {/*
         <span className="text-gray-800 font-bold border-b-2 border-blue-500">
@@ -129,18 +129,18 @@ const ContactListPage = () => {
         <div className='flex md:flex-row flex-col md:justify-between  flex-1'>
         <input type="text" className='p-2 border border-green-800 rounded text-md flex flex-1' onChange={filterContacts} placeholder='Search Contacts...' value={searchTerm}/>
         </div>
-        <button
+        {!user.is_superuser && <button
           onClick={()=>navigate("/contact-form")}
           className="bg-green-500 text-white px-6 py-2 rounded hover:bg-blue-600"
         >
           Add Contact
-        </button>
+        </button>}
       </div>
 
       <table className="table-auto  block md:w-full  min-h-[300px] h-[300px] overflow-auto  border border-gray-300">
       <thead>
             <tr className="bg-gray-100 sticky top-0 ">
-              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0  md:min-w-[300px]">Name</th>
+              <th className="text-sm border border-gray-300 p-2 text-center sticky top-0  md:min-w-[300px]">Contact</th>
               {user.role == "admin" && <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Account Name</th>}
               <th className="text-sm  text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full">Email</th>
               <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0  md:table-cell md:w-full md:min-w-[300px]">Phone</th>
@@ -155,8 +155,8 @@ const ContactListPage = () => {
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
               {user.role == "admin" && <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>}
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || 'N/A'}</td>
-              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.phone || 'N/A'}</td>
+              <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || ''}</td>
+              <td className="text-sm  text-center border border-gray-300 p-2  md:table-cell">{contact.phone || ''}</td>
               <td className="hidden text-sm border border-gray-300 flex text-center p-2  hidden">
                 {contact.sms_notification ? (
                   <FaCheck className="text-green-500 text-center flex justify-center w-full" />

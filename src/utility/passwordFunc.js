@@ -2,7 +2,7 @@ import { retry } from "@reduxjs/toolkit/query";
 
 import { VITE_STRICT_VALIDATION } from "./constants";
 
-export default function validatePassword(password,retypePassword){
+const  validatePassword = (password,retypePassword)=>{
 
     const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
 
@@ -28,3 +28,15 @@ export default function validatePassword(password,retypePassword){
     return errors;
 
 }
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validateEmail = (email) =>{
+
+  let errors = [];  
+  return emailRegex.test(email);
+  
+  
+}
+
+export {validatePassword, validateEmail}

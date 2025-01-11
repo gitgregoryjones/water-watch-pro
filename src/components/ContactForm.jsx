@@ -6,6 +6,7 @@ import Toggle from './Toggle'; // Import the Toggle component
 import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
+import {validateEmail} from '../utility/passwordFunc'
 
 const ContactForm = ({ contactToEdit }) => {
   const [name, setName] = useState(contactToEdit?.name || '');
@@ -128,11 +129,20 @@ const ContactForm = ({ contactToEdit }) => {
 
     setMsg(null)
 
-    if(!email && !phone){
-      setMsg(<span className='text-[red]'>Phone or Email is required to add this contact</span>)
+    if(!name){
+      setMsg(<span className='text-[red]'>A name is required for this contact</span>)
       setShowDialog(false);
       return;
     }
+
+    if(!validateEmail(email)){
+      setMsg(<span className='text-[red]'>Email is required in order to create a login for this contact</span>)
+      setShowDialog(false);
+      return;
+    }
+
+    
+
 
     if(phone){
       const phoneRegex = /^(\+?\d{1,4}[\s-]?)?(\(?\d{3}\)?[\s-]?)?\d{3}[\s-]?\d{4}$/;
@@ -270,7 +280,7 @@ const ContactForm = ({ contactToEdit }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            required
+            
           />
         </div>
         <div>

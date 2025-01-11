@@ -21,9 +21,9 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
     });
 
     // Validate email format
-    if(row.email != "none"){
+    if(row.email){
       if (row.email && !/\S+@\S+\.\S+/.test(row.email)) {
-        errorMessages.push(`Invalid email format: ${row.email}`);
+        errorMessages.push(`A valid address is required in order to create a contact login: ${row.email}`);
       }
     }
 
@@ -222,7 +222,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
               ) : success ? (
                 <p className="text-green-500">All contacts uploaded successfully!</p>
               ) : (
-                <p className="text-gray-500">No errors reported.</p>
+                <p className="text-gray-500">Reading for processing...</p>
               )}
             </div>
 

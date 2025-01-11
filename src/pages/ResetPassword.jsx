@@ -11,7 +11,7 @@ import { updateUser } from '../utility/UserSlice';
 import { API_HOST } from '../utility/constants';
 import api from '../utility/api';
 import {loginUser} from '../utility/loginUser';
-import validatePassword from '../utility/passwordFunc';
+import {validatePassword} from '../utility/passwordFunc';
 
 export default function ResetPassword() {
     const [loggingIn,setLoggingIn] = useState(false);

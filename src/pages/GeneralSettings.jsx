@@ -184,7 +184,7 @@ const GeneralSettingsPage = () => {
 <span>If turned off, contacts receive individual text and email notifications for each location exceeding the threshold.</span>
 </div>
             </div>
-
+            <Upgrade tier={2} showMsg={false}>
             {/* Forecast Section */}
             <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">Forecast</h2>
@@ -210,7 +210,7 @@ const GeneralSettingsPage = () => {
 </span>
 </div>
             </div>
-            <Upgrade tier={2} showMsg={false}>
+            
             {/* NOAA Atlas 14 Section */}
             <div className="border p-6 rounded shadow-md flex flex-col gap-2">
               <h2 className="text-xl font-bold mb-4">NOAA Atlas 14</h2>

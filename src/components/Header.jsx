@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import logo from '../assets/logo.png';
+
 
 import { useLocation, Link } from 'react-router-dom';
 import Upgrade from './Upgrade';
@@ -67,7 +67,7 @@ export default function Header() {
     
     <div className=' flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center   zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex  md:flex-row flex-col xlg:flex-row items-center md:gap-4 justify-center items-center'>
-        <img src={logo} className='w-[14rem] md:w-[20rem]' />
+        <img src="/logo.png" className='w-[14rem] md:w-[20rem]' />
        { user.clients[0]?.is_trial_account && <span className="text-[#ecbf1d] text-xl md:text-2xl decoration-solid"><Link className="text-[#ecbf1d]" to="/upgrade">Trial Ends in {daysLeft} Days</Link></span>}
       </div>
       <div className='hidden flex '><input type="text" placeholder='Search Locations' className='relative flex text-sm p-2 pl-8 placeholder:text-slate-400 rounded-2xl min-w-[20rem]'/>

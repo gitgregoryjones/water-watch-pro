@@ -72,7 +72,7 @@ function App() {
     // Check if the hostname is 'water-watch-pro.netlify.app'
     if (window.location.hostname == "water-watch-pro.netlify.app") {
       // Redirect to the desired domain, preserving path and query
-      const newURL = `https://www.waterwatchpro25.com${location.search}`;
+      const newURL = `https://www.waterwatchpro25.com${location.pathname}${location.search}`;
       window.location.href = newURL;
     }
   }, [location]);

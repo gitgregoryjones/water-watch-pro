@@ -15,6 +15,7 @@ import Stripe from 'stripe';
 import Prices from './Prices';
 
 
+
 const FormWizard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -160,27 +161,29 @@ useEffect(()=>{
 },[])
   
   
- const addUser = async ()=>{
+ /*const addUser = async ()=>{
 
     let loginResponse = {};
+
+    let newUser = {
+      password: formData.password,
+      email: formData.email,
+      phone: formData.phone,
+      is_verified:false,
+      role:"client",
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      agree_to_terms: formData.termsAccepted,
+      agree_to_privacy_policy : formData.smsAccepted
+      
+  }
 
     try {     
         // Step 1: Log in to get the access token
 
        
 
-        loginResponse = await api.post(`/auth/register`,({
-            password: formData.password,
-            email: formData.email,
-            phone: formData.phone,
-            is_verified:false,
-            role:"client",
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            agree_to_terms: formData.termsAccepted,
-            agree_to_privacy_policy : formData.smsAccepted
-            
-        }))
+        loginResponse = await api.post(`/auth/register`,(newUser))
 
        
         
@@ -199,7 +202,52 @@ useEffect(()=>{
         return  loginResponse;
     }
 
- }
+ }*/
+
+
+ const addUser = async ()=>{
+
+  let loginResponse = {};
+
+  let newUser = {
+    password: formData.password,
+    email: formData.email,
+    phone: formData.phone,
+    is_verified:false,
+    role:"client",
+    first_name: formData.first_name,
+    last_name: formData.last_name,
+    agree_to_terms: formData.termsAccepted,
+    agree_to_privacy_policy : formData.smsAccepted
+    
+}
+
+  try {     
+      // Step 1: Log in to get the access token
+
+     
+
+      loginResponse = await api.post(`/auth/register`,(newUser))
+
+     
+      
+
+      
+      //console.log(`User registered successfully ${JSON.stringify(loginResponse.data)}`)
+
+      return loginResponse;
+      //return newUser;
+      
+      
+  }catch(e){
+      
+      setErrors(e.message)
+      //console.log(JSON.stringify(e))
+      loginResponse.errors = [e.message]
+      return  loginResponse;
+  }
+
+}
 
  
 
@@ -716,7 +764,7 @@ because of the db constraint on emal
   
 >
         
-    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="/src/assets/logo.png"/><div>{currentStep != 4 ? 'Register':`Welcome ${user.first_name}`}</div></h1>
+    <h1 className="p-4  h-[6rem] flex flex-col items-end text-4xl font-bold  md:rounded-t-xl text-[black]  justify-around "><img className="w-[65%] self-start" src="/logo.png"/><div>{currentStep != 4 ? 'Register':`Welcome ${user.first_name}`}</div></h1>
     
     <div className='text-xl text-[red] m-2 mx-6'>{errors}</div>
     <div className='text-xl text-[black] m-2'>{success}</div>

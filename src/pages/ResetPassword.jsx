@@ -5,7 +5,7 @@ import { useState } from 'react';
 import FormContainer from '../components/FormContainer';
 import ButtonContainer from '../components/ButtonContainer';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import logo from '../assets/logo.png';
+
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { API_HOST } from '../utility/constants';
@@ -80,7 +80,7 @@ export default function ResetPassword() {
   return (
     <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%] md:max-w-[30%]'>
     <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
-        <img className="w-[24rem]" src={logo} alt="Logo" />
+        <img className="w-[24rem]" src="/logo.png" alt="Logo" />
     </div>
     <FormContainer onSubmit={handleReset} className='min-w-full'>
         <div onClick={()=> window.location.href = "/"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I remember my password</div>

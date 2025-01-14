@@ -5,7 +5,7 @@ import { useState } from 'react';
 import FormContainer from '../components/FormContainer';
 import ButtonContainer from '../components/ButtonContainer';
 import { json, Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.png';
+
 import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { API_HOST } from '../utility/constants';
@@ -360,7 +360,7 @@ export default function LoginForm() {
     return (
         <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%]'>
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
-                <img className="w-[24rem]" src={logo} alt="Logo" />
+                <img className="w-[24rem]" src="/logo.png" alt="Logo" />
             </div>
             
             <FormContainer onSubmit={handleLogin} className='min-w-full'>

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import FormContainer from '../components/FormContainer';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
-import logo from '../assets/logo.png';
+
 
 
 import api from '../utility/api';
@@ -67,7 +67,7 @@ export default function ForgotPassword() {
   return (
     <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%] md:max-w-[30%] flex flex-col items-center justify-center '>
     <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
-        <img className="w-[24rem]" src={logo} alt="Logo" />
+        <img className="w-[24rem]" src="/logo.png" alt="Logo" />
     </div>
    { ( <FormContainer onSubmit={handleReset} className='min-w-full min-h-[20rem]'>
         <div onClick={()=> window.location.href = "/"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I remember my password</div>

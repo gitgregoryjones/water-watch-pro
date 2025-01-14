@@ -126,7 +126,7 @@ const ClientListPage = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm("Are you sure you want to delete this client?")) {
       try {
-        await api.delete(`/api/clients/${clientId}`);
+        await api.delete(`/api/clients/${clientId}?client_id=${user.clients[0].id}`);
         fetchClients(currentPage);
       } catch (error) {
         console.error("Error deleting client:", error.message);

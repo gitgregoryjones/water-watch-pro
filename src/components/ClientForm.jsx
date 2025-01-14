@@ -54,7 +54,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
         setShowDialog(true);
-        await api.delete(`/api/clients/${clientToEdit.id}`);
+        await api.delete(`/api/clients/${clientToEdit.id}?client_id=${user.clients[0].id}`);
         setTimeout(() => {
           setShowDialog(false);
           navigate('/settings-admin');

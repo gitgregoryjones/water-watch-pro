@@ -8,6 +8,7 @@ import Upgrade from '../components/Upgrade';
 import { useSelector } from 'react-redux';
 import WorkingDialog from '../components/WorkingDialog';
 import SettingsMenu from '../components/SettingsMenu';
+import {VITE_FEATURE_RAPIDRAIN_FIRST} from "../utility/constants"
 
 const GeneralSettingsPage = () => {
   const { state } = useLocation();
@@ -53,6 +54,7 @@ const GeneralSettingsPage = () => {
           exceed24h_combine_locations: response.data.exceed24h_combine_locations || false,
           rapidrain_on: response.data.rapidrain_on || false,
           rapidrain_combine_locations: response.data.rapidrain_combine_locations || false,
+          rapidrain_first_on: response.data.rapidrain_first_on || false
         });
       } catch (error) {
         console.error('Error fetching client data:', error.message);
@@ -279,6 +281,22 @@ const GeneralSettingsPage = () => {
 
 
 </div>
+{VITE_FEATURE_RAPIDRAIN_FIRST === "true" && <div>
+    <div className="flex items-center">
+        <Toggle
+          checked={settings.rapidrain_first_on}
+          onChange={() => handleToggle('rapidrain_first_on')}
+        />
+        <span className="ml-2">First</span>
+      
+      </div>
+                  <div className='ml-[56px] mb-4'><span>Receive notification the first time values are exceeded.</span>
+    <span>If turned off, notifications are sent each time the exceedance occurs.
+    </span>
+
+
+    </div>
+</div>}
             </div>
             </Upgrade>
 

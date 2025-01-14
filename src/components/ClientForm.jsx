@@ -214,7 +214,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
             />
             <span className="ml-2">{myself ? `Pause Subscription` : `Suspend Account`}</span>
           </div>}
-          {!user.is_superuser && <div  className='my-4'>Contact support@waterwatch.com if you would like to suspend or cancel your account</div>}
+          {!user.is_superuser && <div  className='my-4'>Contact support@waterwatchpro.com if you would like to suspend or cancel your account</div>}
           <div className="border p-4 rounded">
   <h2 className="text-xl font-bold mb-4">Status</h2>
   {myself && 

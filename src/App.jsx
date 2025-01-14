@@ -51,6 +51,8 @@ function App() {
 
   const location = useLocation();
 
+  
+
   // Check if the current path is the login page
   const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete" 
     || location.pathname == "/reset-password" || location.pathname == "/forgot-password" || location.pathname == "/upgrade") ;
@@ -70,7 +72,7 @@ function App() {
     // Check if the hostname is 'water-watch-pro.netlify.app'
     if (window.location.hostname == "water-watch-pro.netlify.app") {
       // Redirect to the desired domain, preserving path and query
-      const newURL = `https://www.waterwatchpro25.com`;
+      const newURL = `https://www.waterwatchpro25.com${location.search}`;
       window.location.href = newURL;
     }
   }, [location]);

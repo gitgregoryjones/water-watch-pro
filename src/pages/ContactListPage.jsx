@@ -55,11 +55,11 @@ const ContactListPage = () => {
   || l.email?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase())
   || l.phone?.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))  );
 
-  const handleDelete = async (contactId) => {
+  const handleDelete = async (theContact) => {
  
     if (window.confirm('Are you sure you want to delete this contact?')) {
     try {
-      await api.delete(user.is_superuser ? `/api/contacts/${contactId}?client_id=${user.clients[0].id}` : `/api/contacts/${contactId}`);
+      await api.delete(user.is_superuser ? `/api/contacts/${theContact.id}?client_id=${theContact.client_id}` : `/api/contacts/${theContact.id}`);
       fetchContacts(currentPage); // Refresh the list
     } catch (error) {
       console.error('Error deleting contact:', error.message);
@@ -190,7 +190,7 @@ const ContactListPage = () => {
                   </button>
                 
                   <button
-                    onClick={() => handleDelete(contact.id)}
+                    onClick={() => handleDelete(contact)}
                     className="text-red-500 hover:text-red-700"
                     title="Delete Contact"
                   >

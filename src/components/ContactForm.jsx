@@ -109,7 +109,7 @@ const ContactForm = ({ contactToEdit }) => {
 
     if (window.confirm('Are you sure you want to delete this contact?')) {
       try {
-        await api.delete(`/api/contacts/${contactToEdit.id}`);
+        await api.delete(`/api/contacts/${contactToEdit.id}?client_id=${contactToEdit.client_id}`);
         setTimeout(() => {
           setShowDialog(false);
           navigate('/contact-list');
@@ -180,7 +180,7 @@ const ContactForm = ({ contactToEdit }) => {
     try {
       let rec = {};
       if (contactToEdit) {
-       rec = await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${user.clients[0]?.id}`, payload);
+       rec = await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${contactToEdit.client_id}`, payload);
       } else {
          rec = await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
       }

@@ -1,7 +1,10 @@
 import api from "./api";
 import fetchByPage from "./fetchByPage";
+import { updateUser } from "./UserSlice";
 
 const swapUser = async (currentUser, newUser) => {
+
+    
 
     let swapped = {errors:null,user:currentUser};
 
@@ -169,7 +172,7 @@ const convertTier = (person) =>{
 
     
 
-    switch (person.clients[0].tier.toLowerCase()) {
+    switch (person.clients[0]?.tier.toLowerCase()) {
         case "bronze":
             tier = 1;
             break;
@@ -192,6 +195,27 @@ const convertTier = (person) =>{
 
     return tier;
 
+}
+
+const postClient = async(clientData) =>{
+
+    let response = {clientData,errors:[]}
+
+    try {
+
+    const clientResponse =  await api.post(`/api/clients/`, clientData);
+
+    response.data = clientResponse.data;
+
+    }catch(e){
+
+        response.errors.push(e.message)
+
+    }finally {
+        return response;
+    }
+
+    
 }
 
 const patchClient = async(clientData) =>{
@@ -263,6 +287,8 @@ const loginUser = async (email, password, token)=>{
     userData.tier = convertTier (userData);
 
     
+ 
+    
     // Step 3: Get the locations for this client
     const clients = userData.clients;
 
@@ -284,4 +310,4 @@ const loginUser = async (email, password, token)=>{
 }
 }
 
-export  {loginUser, patchClient, convertTier, colorLoggedInUserLocations, swapUser};
+export  {loginUser, patchClient, postClient, convertTier, colorLoggedInUserLocations, swapUser};

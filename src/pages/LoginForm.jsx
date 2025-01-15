@@ -88,6 +88,8 @@ export default function LoginForm() {
 
             let yourLocations = locationResponse.data;
 
+          
+
            // if(!yourLocations || yourLocations.length == 0){
            if(userData.clients[0]?.status == "pending" || yourLocations == 0){
                 //await api.post('/auth/jwt/logout');
@@ -246,6 +248,11 @@ export default function LoginForm() {
             }
 
             let yourLocations = locationResponse.data;
+
+            if(yourLocations.length == 0 ){
+                navigate("/dashboard")
+                return
+            }
 
            // if(!yourLocations || yourLocations.length == 0){
            if(userData.clients[0]?.status == "pending"){

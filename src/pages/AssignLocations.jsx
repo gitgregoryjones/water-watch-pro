@@ -178,7 +178,7 @@ const AssignLocations = () => {
           {/* Unassigned Locations Select */}
           <div className="bg-[white] p-4 rounded shadow min-w-[400px]">
             <div className="p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center">
-              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">2</span> Choose Locations
+              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">2</span> Choose Locations ({unassignedLocations.length})
             </div>
             <select
               id="unassignedLocations"
@@ -215,7 +215,7 @@ const AssignLocations = () => {
           {/* Assigned Locations Select */}
           <div className="bg-[white] p-4 rounded shadow min-w-[400px]">
             <div className="p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center">
-              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">4</span> View Assigned
+              <span className="text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]">4</span> View Assigned  ({assignedLocations.length})
             </div>
             <select
               id="assignedLocations"

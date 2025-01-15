@@ -43,6 +43,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Prices from "./pages/Prices";
 import AdminCards from "./components/AdminCards";
 import { useSelector } from "react-redux";
+import FormWizardDelayed from "./pages/FormWizardDelayed";
 
 
 
@@ -134,7 +135,7 @@ function App() {
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
        
         <Route path="/settings-admin" element={<ClientListPage />} />
-        <Route path="/wizard" element={<FormWizard />} />
+        <Route path="/wizard" element={<FormWizardDelayed />} />
         <Route path="/registration-complete" element={<RegistrationComplete />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/reset-password" element={<ResetPassword />} />

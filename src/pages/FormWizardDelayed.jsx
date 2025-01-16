@@ -148,7 +148,7 @@ useEffect(()=>{
             console.log(`I think there are errors`)
             setErrors(r.errors)
             setShowMsg(false)
-            hasMounted.current = true;
+          
             return;
           
         } else {

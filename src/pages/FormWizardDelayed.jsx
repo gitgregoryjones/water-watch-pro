@@ -142,21 +142,23 @@ useEffect(()=>{
 
         let r = provisionAccount(customerMetadata,customer.email)
 
-        console.log(`Has Mounted is now true ${hasMounted.current} `)
+        console.log(`Has Mounted is now true ${hasMounted.current}  and r is ${JSON.stringify(r)}`)
 
         if(r.errors != ""){
+            console.log(`I think there are errors`)
             setErrors(r.errors)
             setShowMsg(false)
             hasMounted.current = true;
             return;
           
         } else {
+            console.log(`I think there are NOT errors`)
             setErrors('Successfully Registered')
             navigate("/dashboard")
            
         }
 
-       
+       console.log('Done doing work')
 
         hasMounted.current = true;
         return;
@@ -165,6 +167,7 @@ useEffect(()=>{
         
       } else {
         setShowMsg(false)
+        console.log(`I FELL THROUGH`)
         setCurrentStep(1)
     }
       

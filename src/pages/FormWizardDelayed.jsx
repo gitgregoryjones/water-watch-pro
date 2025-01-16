@@ -146,17 +146,15 @@ useEffect(()=>{
 
         if(r.errors != ""){
             setErrors(r.errors)
+            hasMounted.current = true;
             return;
+          
         } else {
-            setErrors('GO TO DASHBOARD NEXT')
-            return;
+            hasMounted.current = true;
+            navigate("/dashboard")
         }
 
        
-
-        console.log(`Done and now forward to Dashboard`)
-
-        navigate("/dashboard")
 
 
         return;

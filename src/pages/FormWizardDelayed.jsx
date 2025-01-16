@@ -979,7 +979,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
         
         <h1 className="text-3xl font-bold text-green-800 mb-4">Almost Done</h1>
         <p className="text-lg text-gray-700 mb-6">
-          Configuring your account.  Please wait...
+          Configuring your account.  You will be redirected to the login page in a moment. Please wait...
         </p>
        
         

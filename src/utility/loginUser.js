@@ -261,20 +261,20 @@ const loginUser = async (email, password, token)=>{
 
     const { access_token: accessToken } = token ? {accessToken: token } : loginResponse.data;
 
-    localStorage.setItem("accessToken", access_token);
+    localStorage.setItem("accessToken", accessToken);
    
-    if (!access_token) {
+    if (!accessToken) {
         setErrorMsg("Login failed. Please check your credentials.");
         setServerError(true);
         throw new Error("Login failed");
     }
 
-    console.log(`Received bearer token: ${access_token}`);
+    console.log(`Received bearer token: ${accessToken}`);
 
     // Step 2: Use the Token To get The Full User Profile
     const verifyResponse = await api.get(`/users/me`, {
         headers: {
-            "Authorization": `Bearer ${access_token}`,
+            "Authorization": `Bearer ${accessToken}`,
         },
     });
 

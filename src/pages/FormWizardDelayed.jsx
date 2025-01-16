@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Toggle from '../components/Toggle';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import WorkingDialog from '../components/WorkingDialog';
@@ -20,6 +20,7 @@ const FormWizardDelayed = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const hasMounted = useRef(false);
 
   
   const user = useSelector((state) => state.userInfo.user);
@@ -108,7 +109,7 @@ useEffect(()=>{
       //Read Stripe Session Id from record
       //Contact Stripe.  If complete, go to step 4.  If not, forward to Stripe with the same session id
       //If we have a valid session, then we can complete the transaction, otherwise send them to the payment page
-      if(sessionParam){
+      if(sessionParam && !hasMounted.current){
         //do Stripe Lookup and if complete go to step 4, otherwise go to stripe
         setShowMsg(true)
         setCurrentStep(4)
@@ -141,7 +142,9 @@ useEffect(()=>{
 
         let r = provisionAccount(customerMetadata,customer.email)
 
-        if(r.errors){
+        hasMounted.current = true;
+
+        if(r.errors != ""){
             setErrors(r.errors)
             return;
         } else {
@@ -149,7 +152,7 @@ useEffect(()=>{
             return;
         }
 
-        
+       
 
         console.log(`Done and now forward to Dashboard`)
 
@@ -172,7 +175,7 @@ useEffect(()=>{
 
   
 
-},[user.id])
+},[])
   
   
  const provisionAccount = async(customerMetadata,customer_email)=>{
@@ -217,7 +220,7 @@ useEffect(()=>{
 
         console.log(`This session is now for ${JSON.stringify(lresponse.userData)}`)
 
-        dispatch(updateUser(lresponse.userData));
+        //dispatch(updateUser(lresponse.userData));
 
         let newClient =  {...lresponse.userData.clients[0],tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel === "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
 

@@ -144,7 +144,7 @@ useEffect(()=>{
 
         console.log(`Has Mounted is now true ${hasMounted.current}  and r is ${JSON.stringify(r)}`)
 
-        if(r.errors != ""){
+        if(r.errors){
             console.log(`I think there are errors`)
             setErrors(r.errors)
             setShowMsg(false)

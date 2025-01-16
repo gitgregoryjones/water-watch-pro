@@ -154,7 +154,8 @@ useEffect(()=>{
         } else {
             console.log(`I think there are NOT errors`)
             setErrors('Successfully Registered')
-            navigate("/")
+            setTimeout(()=> navigate("/"),1500)
+            //navigate("/")
            
         }
 

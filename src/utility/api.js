@@ -13,23 +13,16 @@ const api = axios.create({
 
 // Request interceptor for adding the Authorization header
 api.interceptors.request.use(
- 
   (config) => {
-    const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-    //console.log(`Reading token from localStorage ${token}`)
-    //console.log(`Original config is`)
-    //console.log(config)
-
-   
+    const token = localStorage.getItem("accessToken"); // Retrieve the latest token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
 
 // Response interceptor for handling 401 errors and refreshing the token
 api.interceptors.response.use(

@@ -142,8 +142,6 @@ useEffect(()=>{
 
         let r = provisionAccount(customerMetadata,customer.email)
 
-        hasMounted.current = true;
-
         console.log(`Has Mounted is now true ${hasMounted.current} `)
 
         if(r.errors != ""){

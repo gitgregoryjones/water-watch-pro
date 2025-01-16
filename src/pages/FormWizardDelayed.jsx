@@ -183,7 +183,7 @@ useEffect(()=>{
   
  const provisionAccount = async(customerMetadata,customer_email)=>{
 
-    let txn = {errors:""}
+    let txn = {}
 
     try {
 

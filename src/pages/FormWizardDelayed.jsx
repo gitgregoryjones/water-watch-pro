@@ -181,104 +181,100 @@ useEffect(()=>{
 },[])
   
   
- const provisionAccount = async(customerMetadata,customer_email)=>{
+ /* const provisionAccount = async (customerMetadata, customer_email) => {
+  let txn = {};
 
-    let txn = {}
+  try {
+    console.log("Trying to add User");
 
-    try {
+    // Step 1: Add User
+    const aResponse = await addUser({ ...customerMetadata, email: customer_email });
 
-        console.log(`Trying to add User`)
-
-    let aResponse = await addUser({...customerMetadata, email:customer_email})
-
-       console.log('added user')
-
-        if(!aResponse?.data){
-            console.log('added user  BADD response')
-
-            txn.errors = (aResponse.errors[0])
-            //setCurrentStep(1);
-            setErrors(txn.errors)
-            setShowMsg(false)
-            return;
-        }
-
-        console.log('added user  goood response')
-
-        //Now Login As User
-
-        
-        const lresponse = await loginUser(customer_email, customerMetadata.password);
-
-        console.log('LOGGED IN USER')
-
-
-        console.log(lresponse)
-
-        if(lresponse.errors.length > 0){
-            txn.errors = lresponse.errors;
-            setErrors(txn.errors)
-            return txn;
-        }
-
-        console.log(`This session is now for ${JSON.stringify(lresponse.userData)}`)
-
-        //dispatch(updateUser(lresponse.userData));
-
-        let newClient =  {...lresponse.userData.clients[0],tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel === "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
-
-        //Gene Business Rules
-        newClient.daily_report_on = true;
-        newClient.exceed24h_on = true;
-        newClient.exceed24h_combine_locations = true;
-
-        //Only Gold
-       
-        if(newClient.tier == "gold"){        
-          newClient.forecast_on = true;
-          newClient.forecast_combine_locations = true;
-        }
-
-        if(newClient.tier == "gold" || newClient.tier == "silver"){
-          newClient.atlas14_on = true;
-          newClient.atlas14_24h_on = true;
-          newClient.atlas14_1h_on = true;
-          newClient.atlas14_first_on = true;
-          newClient.rapidrain_on = true;
-          newClient.rapidrain_combine_locations = true;
-        }
-       
-        //If not bronze, overwrite client
-        let cResponse = await patchClient(newClient)
-
-        if(cResponse.errors.length > 0){
-            txn.errors = cResponse.errors;
-            return txn;
-        }
-
-
-        let theLocation = await addLocation(customerMetadata);
-
-        console.log(`The location data is ${JSON.stringify(theLocation)}`)
-
-        let userCopy = {...lresponse.userData, locations:[theLocation.data], clients: [cResponse.clientData]};
-
-        console.log(`User Copied is NOW ${JSON.stringify(userCopy)} and location length is ${userCopy.locations.length}`)
-
-
-        dispatch(updateUser(userCopy));
-
-    }catch(e){
-        txn.errors = e.message;
-        console.log(`Failed to provision account ${e.message}`)
+    if (!aResponse?.data) {
+      txn.errors = aResponse.errors[0];
+      setErrors(txn.errors);
+      setShowMsg(false);
+      return txn;
     }
 
-     return txn;   
+    // Step 2: Log in as the new user
+    const lresponse = await loginUser(customer_email, customerMetadata.password);
 
-       
- }
+    if (lresponse.errors.length > 0) {
+      txn.errors = lresponse.errors;
+      setErrors(txn.errors);
+      return txn;
+    }
 
- const addUser = async (obj)=>{
+    const accessToken = lresponse.userData.accessToken;
+    localStorage.setItem("accessToken", accessToken); // Save the new token
+    api.defaults.headers.Authorization = `Bearer ${accessToken}`; // Update Axios default headers
+
+    // Step 3: Add the location
+    const theLocation = await addLocation(customerMetadata);
+
+    console.log(`The location data is ${JSON.stringify(theLocation)}`);
+
+    const userCopy = { ...lresponse.userData, locations: [theLocation.data] };
+
+    dispatch(updateUser(userCopy));
+  } catch (e) {
+    txn.errors = e.message;
+    console.log(`Failed to provision account ${e.message}`);
+  }
+
+  return txn;
+}; */
+
+
+const provisionAccount = async (customerMetadata, customer_email) => {
+    let txn = {};
+  
+    try {
+      console.log("Trying to add User");
+  
+      // Step 1: Add User
+      const aResponse = await addUser({ ...customerMetadata, email: customer_email });
+  
+      if (!aResponse?.data) {
+        txn.errors = aResponse.errors[0];
+        setErrors(txn.errors);
+        setShowMsg(false);
+        return txn;
+      }
+  
+      // Step 2: Log in as the new user
+      const lresponse = await loginUser(customer_email, customerMetadata.password);
+  
+      if (lresponse.errors.length > 0) {
+        txn.errors = lresponse.errors;
+        setErrors(txn.errors);
+        return txn;
+      }
+  
+      const accessToken = lresponse.userData.accessToken;
+      localStorage.setItem("accessToken", accessToken); // Save the new token
+      api.defaults.headers.Authorization = `Bearer ${accessToken}`; // Update Axios default headers
+  
+      // Step 3: Add the location
+      const theLocation = await addLocation(customerMetadata);
+  
+      console.log(`The location data is ${JSON.stringify(theLocation)}`);
+  
+      const userCopy = { ...lresponse.userData, locations: [theLocation.data] };
+  
+      dispatch(updateUser(userCopy));
+    } catch (e) {
+      txn.errors = e.message;
+      console.log(`Failed to provision account ${e.message}`);
+    }
+  
+    return txn;
+  };
+  
+
+
+ /* const addUser = async (obj)=>{
 
   let loginResponse = {};
 
@@ -315,49 +311,63 @@ useEffect(()=>{
       return  loginResponse;
   }
 
-}
+} */
+
+  const addUser = async (obj) => {
+    let loginResponse = {};
+  
+    const newUser = {
+      password: obj.password,
+      email: obj.email,
+      phone: obj.phone,
+      is_verified: false,
+      role: "client",
+      first_name: obj.first_name || "NotFoundFirst",
+      last_name: obj.last_name || "NotFoundLast",
+      agree_to_terms: obj.termsAccepted,
+      agree_to_privacy_policy: obj.smsAccepted,
+    };
+  
+    try {
+      // Step 1: Register the user
+      loginResponse = await api.post(`/auth/register`, newUser);
+  
+      // Step 2: Save the access token from the response to localStorage
+      const { access_token: accessToken } = loginResponse.data;
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        api.defaults.headers.Authorization = `Bearer ${accessToken}`; // Update Axios default headers
+      }
+  
+      return loginResponse;
+    } catch (e) {
+        setShowMsg(false)
+      loginResponse.errors = [e.message];
+      return loginResponse;
+    }
+  };
+   
 
  
 
- const addLocation = async (obj)=>{
-
-    
-
+  const addLocation = async (obj) => {
     try {
-        
-        // Step 1: Log Add The Location
-        const locationResponse = await api.post(`/api/locations`,({
-            name: obj.locationName,
-            latitude: obj.latitude,
-            longitude: obj.longitude,
-            status: "active",
-            h24_threshold:obj.threshold,
-            rapidrain_threshold: obj.rapidrain
-            
-        }))
-
-        const userData = {...user};
-
-        let theLocation = {...locationResponse.data, lat:locationResponse.data.latitude, lng:locationResponse.data.longitude}
-
-        //Weird formatting on dashboard page.  need to fix this
-        theLocation.location = {...locationResponse.data, lat:locationResponse.data.latitude, lng:locationResponse.data.longitude}
-
-       
-
-        console.log(`The parsed location is NOW ${JSON.stringify(locationResponse)} and length is ${locationResponse.data.length}`)
-
-
-        return locationResponse;
-        
-        
-    }catch(e){
-        //console.log(`Encountere errors ${e.message}`)
-        setErrors(e.message)
-        return;
+      const locationResponse = await api.post(`/api/locations`, {
+        name: obj.locationName,
+        latitude: obj.latitude,
+        longitude: obj.longitude,
+        status: "active",
+        h24_threshold: obj.threshold,
+        rapidrain_threshold: obj.rapidrain,
+      });
+  
+      return locationResponse;
+    } catch (e) {
+      setErrors(e.message);
+      return null;
     }
-
- }
+  };
+  
 
   const validateStep = () => {
     setErrors("")

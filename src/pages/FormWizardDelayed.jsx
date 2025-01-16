@@ -146,12 +146,14 @@ useEffect(()=>{
 
         if(r.errors != ""){
             setErrors(r.errors)
+            setShowMsg(false)
             hasMounted.current = true;
             return;
           
         } else {
-            hasMounted.current = true;
+            setErrors('Successfully Registered')
             navigate("/dashboard")
+            hasMounted.current = true;
         }
 
        

@@ -144,6 +144,8 @@ useEffect(()=>{
 
         hasMounted.current = true;
 
+        console.log(`Has Mounted is now true ${hasMounted.current} `)
+
         if(r.errors != ""){
             setErrors(r.errors)
             setShowMsg(false)
@@ -153,12 +155,12 @@ useEffect(()=>{
         } else {
             setErrors('Successfully Registered')
             navigate("/dashboard")
-            hasMounted.current = true;
+           
         }
 
        
 
-
+        hasMounted.current = true;
         return;
  
        } 

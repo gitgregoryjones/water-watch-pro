@@ -154,7 +154,7 @@ useEffect(()=>{
         } else {
             console.log(`I think there are NOT errors`)
             setErrors('Successfully Registered')
-            navigate("/dashboard")
+            navigate("/")
            
         }
 

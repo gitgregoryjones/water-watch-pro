@@ -235,7 +235,7 @@ const AssignmentsPage = () => {
         {/* Unassigned Contacts Select */}
         <div className='bg-[white] p-4 rounded shadow min-w-[400px]'>
         <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><span className='text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]'>2</span> 
-            Choose 1 or more contacts
+            Choose Contacts  ({unassignedContacts.length})
           </div>
           <select
             id="unassignedContacts"
@@ -268,7 +268,7 @@ const AssignmentsPage = () => {
         {/* Assigned Contacts Select */}
         <div className='bg-[white] p-4 rounded shadow min-w-[400px]'>
         <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><span className='text-sm text-[white] font-bold px-3 py-1 rounded-2xl bg-[black]'>4</span> 
-            View Assigned Contacts
+            View Assigned Contacts ({assignedContacts.length})
           </div>
           <select
             id="assignedContacts"

@@ -439,7 +439,7 @@ const Reports = () => {
         {/* Row 3 */}
         
         {(reportType == "daily" || reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
-          <label htmlFor="locList" className="hidden md:flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations:</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
+          <label htmlFor="locList" className="hidden md:flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations: ({selectedLocations.length})</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
         id="locList"
         multiple

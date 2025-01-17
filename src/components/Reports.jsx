@@ -285,7 +285,7 @@ const Reports = () => {
         console.error('Error submitting report:', error.message);
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
-            <p><strong>Error:</strong> An error occurred while submitting the report!!!</p>
+            <p><strong>Error:</strong> An error occurred while submitting the report</p>
             <p>${error.message}</p>
             
           </div>

@@ -339,7 +339,7 @@ const ContactForm = ({ contactToEdit }) => {
             onClick={() => setIsAlertSettingsExpanded((prev) => !prev)}
             className="bg-[#128CA6] text-white px-4 py-2 rounded hover:bg-green-500 w-full text-left"
           >
-            {isAlertSettingsExpanded ? 'Hide Alert Settings' : 'Show Alert Settings'}
+            {isAlertSettingsExpanded ? 'Hide Notification Settings' : 'Show Notification Settings'}
           </button>
 
           {isAlertSettingsExpanded && (

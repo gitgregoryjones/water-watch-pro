@@ -11,11 +11,11 @@ const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
 function getItems(obj, plain){
 
     let details = plain == true ? "Customer Details\n" :  "<ul>>Customer Details";
-    Object.keys(meta).forEach((key) => {
+    Object.keys(obj).forEach((key) => {
         if(plain == true){
-            details += `${key} = ${meta[key]}\n`;
+            details += `${key} = ${obj[key]}\n`;
         }else {
-            details += `<li>${key} = ${meta[key]}</li>`; 
+            details += `<li>${key} = ${obj[key]}</li>`; 
         }
     });
     details += plain == true ? "" : "</ul>"

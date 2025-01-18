@@ -44,6 +44,7 @@ import Prices from "./pages/Prices";
 import AdminCards from "./components/AdminCards";
 import { useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
+import CancelSignUp from "./pages/CancelSignUp";
 
 
 
@@ -142,6 +143,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
+        <Route path="/cancel-signup" element={<CancelSignUp />} />
 
        
 <Route path="/contact-form" element={<ContactPage />} />

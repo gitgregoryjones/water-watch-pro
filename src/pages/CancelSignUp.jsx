@@ -10,7 +10,7 @@ const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
 
 function getItems(obj, plain){
 
-    let details = plain == true ? "Customer Details\n" :  "<ul>>Customer Details";
+    let details = plain == true ? "Additional Details\n" :  "<ul>Additional Details";
     Object.keys(obj).forEach((key) => {
         if(plain == true){
             details += `${key} = ${obj[key]}\n`;
@@ -54,7 +54,7 @@ const CancelSignUp = () => {
               subject: "Abandoned Signup Notification",
               textBody: `A user has abandoned the signup process:
 Customer Email: ${customer.email}
-Customer Phone: ${customer.phone || "Not provided"}
+
 Metadata: ${getItems(customer.metadata,true)}
 Session ID: ${session_id}`,
               htmlBody: `<html>
@@ -63,7 +63,7 @@ Session ID: ${session_id}`,
                   <p>A user has abandoned the signup process:</p>
                   <ul>
                     <li><strong>Customer Email:</strong> ${customer.email}</li>
-                    <li><strong>Customer Phone:</strong> ${customer.phone || "Not provided"}</li>
+                   
                     <li><strong>Metadata:</strong> ${getItems(customer.metadata) || ""}</li>
                     <li><strong>Session ID:</strong> ${session_id}</li>
                   </ul>

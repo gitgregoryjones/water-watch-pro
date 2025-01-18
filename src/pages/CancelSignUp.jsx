@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../utility/api"; // Axios instance
 import Stripe from "stripe"; // Ensure you have the Stripe Node.js library installed
 import {
-  VITE_SOCKETLABS_API_KEY,
-  VITE_SOCKETLABS_FROM_EMAIL,
-  VITE_SOCKETLABS_SERVER_ID,
+  VITE_EMAIL_PROXY,
 } from "../utility/constants";
 
 const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
@@ -13,6 +11,7 @@ const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
 const CancelSignUp = () => {
   const [searchParams] = useSearchParams();
   const session_id = searchParams.get("session_id");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleCancelSignup = async () => {
@@ -59,7 +58,8 @@ Session ID: ${session_id}`,
             }
 
       
-        const emailResponse = await api.post("/.netlify/functions/sendEmail",
+        const emailResponse = await api.post(
+            VITE_EMAIL_PROXY,
           emailContent,
           {
             headers: {
@@ -68,8 +68,12 @@ Session ID: ${session_id}`,
           }
         );
 
+        setTimeout(()=> navigate("/"),1500)
+
+
         console.log("Email sent successfully:", emailResponse.data);
       } catch (error) {
+        navigate("/")
         console.error("Error handling cancel signup:", error.message);
       }
     };
@@ -80,7 +84,7 @@ Session ID: ${session_id}`,
   return (
     <div>
       <h1>Cancel Signup</h1>
-      <p>If the session was abandoned, an email has been sent to support.</p>
+      <p>Experienced an issue with sign-up?  Someone from our support@waterwatchpro.com team will be in touch to assist you</p>
     </div>
   );
 };

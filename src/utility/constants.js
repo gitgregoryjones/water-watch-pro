@@ -17,6 +17,7 @@ export const VITE_FEATURE_RAPIDRAIN_FIRST = import.meta.env.VITE_FEATURE_RAPIDRA
 export const VITE_SOCKETLABS_API_KEY=import.meta.env.VITE_SOCKETLABS_API_KEY;
 export const VITE_SOCKETLABS_FROM_EMAIL=import.meta.env.VITE_SOCKETLABS_FROM_EMAIL
 export const VITE_SOCKETLABS_SERVER_ID=import.meta.env.VITE_SOCKETLABS_SERVER_ID
+export const VITE_EMAIL_PROXY=import.meta.env.VITE_EMAIL_PROXY
 
 
 

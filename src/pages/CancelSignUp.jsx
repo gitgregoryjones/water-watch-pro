@@ -98,7 +98,7 @@ Session ID: ${session_id}`,
   return (
     <div>
       <h1>Cancel Signup</h1>
-      <p>Experienced an issue with sign-up?  Someone from our support@waterwatchpro.com team will be in touch to assist you</p>
+      <p>It appears you experienced an issue with sign-up.  Someone from our support@waterwatchpro.com team will be in touch soon to assist you.</p>
     </div>
   );
 };

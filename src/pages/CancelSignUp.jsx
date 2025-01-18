@@ -68,7 +68,7 @@ Session ID: ${session_id}`,
           }
         );
 
-        setTimeout(()=> navigate("/"),1500)
+        setTimeout(()=> navigate("/"),5000)
 
 
         console.log("Email sent successfully:", emailResponse.data);

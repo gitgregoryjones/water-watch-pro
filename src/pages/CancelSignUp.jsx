@@ -51,7 +51,7 @@ const CancelSignUp = () => {
          
               toEmail: VITE_WATER_WATCH_SUPPORT,
               
-              subject: "Abandoned Signup Notification",
+              subject: `Abandoned Signup : ${customer.email}`,
               textBody: `A user has abandoned the signup process:
 Customer Email: ${customer.email}
 

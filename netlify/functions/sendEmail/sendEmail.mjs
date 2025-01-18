@@ -44,6 +44,7 @@ exports.handler = async (event) => {
     const response = await axios.post("https://inject.socketlabs.com/api/v1/email", payload, {
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${SOCKETLABS_API_KEY}`
       },
     });
 

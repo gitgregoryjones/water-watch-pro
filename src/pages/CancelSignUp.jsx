@@ -18,7 +18,7 @@ function getItems(obj, plain){
             details += `<li>${key} = ${meta[key]}</li>`; 
         }
     });
-    details + = plain == true ? "" : "</ul>"
+    details += plain == true ? "" : "</ul>"
 return details;
 }
 

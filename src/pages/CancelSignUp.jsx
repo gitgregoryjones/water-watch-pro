@@ -35,22 +35,16 @@ const CancelSignUp = () => {
 
         // Step 3: Prepare email content
         const emailContent = {
-          ServerId: VITE_SOCKETLABS_SERVER_ID,
-          ApiKey: VITE_SOCKETLABS_API_KEY,
-          Messages: [
-            {
-              To: [{ emailAddress: "gregory.jones05@gmail.com" }],
-              From: {
-                emailAddress: VITE_SOCKETLABS_FROM_EMAIL,
-                friendlyName: "Waterwatch Pro",
-              },
-              Subject: "Abandoned Signup Notification",
-              TextBody: `A user has abandoned the signup process:
+         
+              toEmail: "gregory.jones05@gmail.com",
+              
+              subject: "Abandoned Signup Notification",
+              textBody: `A user has abandoned the signup process:
 Customer Email: ${customer.email}
 Customer Phone: ${customer.phone || "Not provided"}
 Metadata: ${JSON.stringify(customer.metadata || {})}
 Session ID: ${session_id}`,
-              HtmlBody: `<html>
+              htmlBody: `<html>
                 <body>
                   <h1>Abandoned Signup Notification</h1>
                   <p>A user has abandoned the signup process:</p>
@@ -62,23 +56,15 @@ Session ID: ${session_id}`,
                   </ul>
                 </body>
               </html>`,
-            },
-          ],
-        };
+            }
 
-        // Step 4: Send email using the Netlify function with Authorization header
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-          console.error("No token found in localStorage.");
-          return;
-        }
-
+      
         const emailResponse = await api.post(
           "https://dev-water-watch-pro.netlify.app/.netlify/functions/sendEmail",
           emailContent,
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+                "Content-Type": "application/json"
             },
           }
         );

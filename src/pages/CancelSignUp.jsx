@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import api from "../utility/api"; // Axios instance
 import Stripe from "stripe"; // Ensure you have the Stripe Node.js library installed
 import {
@@ -11,16 +11,14 @@ import {
 const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
 
 const CancelSignUp = () => {
-const [searchParams] = useSearchParams();
-
-const session_id = searchParams.get("session_id")
+  const [searchParams] = useSearchParams();
+  const session_id = searchParams.get("session_id");
 
   useEffect(() => {
     const handleCancelSignup = async () => {
       try {
         if (!session_id) {
           console.error("Session ID is missing from the request params.");
-         
           return;
         }
 
@@ -68,8 +66,23 @@ Session ID: ${session_id}`,
           ],
         };
 
-        // Step 4: Send email using SocketLabs API
-        const emailResponse = await api.post("https://inject.socketlabs.com/api/v1/email", emailContent);
+        // Step 4: Send email using the Netlify function with Authorization header
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+          console.error("No token found in localStorage.");
+          return;
+        }
+
+        const emailResponse = await api.post(
+          "https://dev-water-watch-pro.netlify.app/.netlify/functions/sendEmail",
+          emailContent,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+            },
+          }
+        );
+
         console.log("Email sent successfully:", emailResponse.data);
       } catch (error) {
         console.error("Error handling cancel signup:", error.message);

@@ -59,8 +59,7 @@ Session ID: ${session_id}`,
             }
 
       
-        const emailResponse = await api.post(
-          "https://dev-water-watch-pro.netlify.app/.netlify/functions/sendEmail",
+        const emailResponse = await api.post("/.netlify/functions/sendEmail",
           emailContent,
           {
             headers: {

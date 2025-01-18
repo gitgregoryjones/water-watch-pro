@@ -3,10 +3,20 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../utility/api"; // Axios instance
 import Stripe from "stripe"; // Ensure you have the Stripe Node.js library installed
 import {
-  VITE_EMAIL_PROXY,
+  VITE_EMAIL_PROXY,VITE_WATER_WATCH_SUPPORT,
 } from "../utility/constants";
 
 const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
+
+function getItems(obj){
+
+    let details = "<ul>>Customer Details";
+    Object.keys(meta).forEach((key) => {
+    details += `<li>${key} = ${meta[key]}</li>`;
+    });
+    details + = "</ul>"
+return details;
+}
 
 const CancelSignUp = () => {
   const [searchParams] = useSearchParams();
@@ -35,7 +45,7 @@ const CancelSignUp = () => {
         // Step 3: Prepare email content
         const emailContent = {
          
-              toEmail: "gregory.jones05@gmail.com",
+              toEmail: VITE_WATER_WATCH_SUPPORT,
               
               subject: "Abandoned Signup Notification",
               textBody: `A user has abandoned the signup process:
@@ -50,7 +60,7 @@ Session ID: ${session_id}`,
                   <ul>
                     <li><strong>Customer Email:</strong> ${customer.email}</li>
                     <li><strong>Customer Phone:</strong> ${customer.phone || "Not provided"}</li>
-                    <li><strong>Metadata:</strong> ${JSON.stringify(customer.metadata || {})}</li>
+                    <li><strong>Metadata:</strong> ${getItems(customer.metadata) || ""}</li>
                     <li><strong>Session ID:</strong> ${session_id}</li>
                   </ul>
                 </body>

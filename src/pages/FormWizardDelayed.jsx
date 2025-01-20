@@ -13,6 +13,7 @@ import { VITE_PAYMENT_LINK_GOLD, VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE,VITE_P
 import { validatePassword, validateEmail } from '../utility/passwordFunc';
 import Stripe from 'stripe';
 import Prices from './Prices';
+import { abandon } from '../utility/abandon';
 
 
 
@@ -103,9 +104,11 @@ const FormWizardDelayed = () => {
     // Handle the beforeunload event
     const handleBeforeUnload = async (event) => {
       if (!isNavigating.current) {
-        event.preventDefault();        
+        event.preventDefault();  
+        
         console.log(`preserving ${JSON.stringify(formData)}`)
-        console.log(JSON.stringify(await api.post(`https://echo.free.beeceptor.com`,{...formData})))
+        formData.metadata = {...formData};
+        
         event.returnValue = ""; // Required for modern browsers to display the default prompt
       }
     };
@@ -114,8 +117,8 @@ const FormWizardDelayed = () => {
     const handleUnload =  () => {
       if (!isNavigating.current) {        
         console.log("User chose to leave or reload the page.");
-        console.log(`I know this about you ${JSON.stringify(formData)}`)
-      //  console.log(JSON.stringify(await api.post(`https://echo.free.beeceptor.com`,{...formData})))
+        console.log(`I know this about you ${JSON.stringify(formData)}`)        
+        abandon(formData, null)
         
       }
     };
@@ -133,6 +136,10 @@ const FormWizardDelayed = () => {
 
 
 useEffect(()=>{
+    console.log(`The location is ${location.state.account_type}`)
+    if(location.state?.account_type){
+      setFormData({...formData, subscriptionLevel:location.state.account_type })
+    } 
 
     const b = async function(){
     //wwp_session = user id
@@ -871,7 +878,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             <p className='mt-2'>Questions? Contact us at support@waterwatchpro.com</p>
             <p className='mt-2'>When the trial ends, you can upgrade for continued use.
 You can also choose to upgrade now by sliding the toggle below to “Upgrade Now".</p>
-</div>}
+</div> }
           <div className="mb-4 flex items-start ">
             
             <Toggle

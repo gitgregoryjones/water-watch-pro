@@ -5,22 +5,11 @@ import Stripe from "stripe"; // Ensure you have the Stripe Node.js library insta
 import {
   VITE_EMAIL_PROXY,VITE_WATER_WATCH_SUPPORT,
 } from "../utility/constants";
+import { abandon } from "../utility/abandon";
 
 const stripe = new Stripe(import.meta.env.VITE_PAYMENT_LINK_GOLD);
 
-function getItems(obj, plain){
 
-    let details = plain == true ? "Additional Details\n" :  "<ul>Additional Details";
-    Object.keys(obj).forEach((key) => {
-        if(plain == true){
-            details += `${key} = ${obj[key]}\n`;
-        }else {
-            details += `<li>${key} = ${obj[key]}</li>`; 
-        }
-    });
-    details += plain == true ? "" : "</ul>"
-return details;
-}
 
 const CancelSignUp = () => {
   const [searchParams] = useSearchParams();
@@ -46,6 +35,10 @@ const CancelSignUp = () => {
         // Step 2: Retrieve customer details from Stripe
         const customer = await stripe.customers.retrieve(session.customer);
 
+
+        const emailResponse  =  abandon(customer,session_id)
+
+        /*
         // Step 3: Prepare email content
         const emailContent = {
          
@@ -81,6 +74,7 @@ Session ID: ${session_id}`,
             },
           }
         );
+        */
 
         setTimeout(()=> navigate("/"),5000)
 

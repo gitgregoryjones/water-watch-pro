@@ -497,7 +497,7 @@ function showThreshold(color){
       <Card  className={`${convertTier(user) == 4 && 'hidden'}`}
       footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span><Upgrade showMsg={false} tier={2}> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></Upgrade></div>} 
       header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full md:flex-row flex-col justify-around items-center'><div className='flex flex-row'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div><Processing showPlain={true}/></div> <Processing /></div>}  >
-      <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} defaultActive={1} mini={window.outerWidth < 600}>
+      <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} defaultActive={1} mini={false}>
       <div className='tab'><span>Daily Total</span>
       <div className='flex-col flex w-full'>
       
@@ -674,7 +674,7 @@ function showThreshold(color){
         footer={(window.innerWidth <= 600  && <div className='flex gap-2 justify-around text-sm py-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <div className='bg-[red] h-2 w-4'></div>{ `Exceeds 24h NOAA Atlas 14`}</div>)}
         header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
       <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade></div></div>} >
-           <PillTabs defaultActive={0} mini={window.outerWidth < 600} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
+           <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               
             <RainfallChart location={location} period={"daily"} max={3} />
@@ -685,7 +685,7 @@ function showThreshold(color){
             <div className='tab'>RapidRain
            <Upgrade tier={2}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
             </div>
-            <div className='tab'>NOAA Atlas 14
+            <div className='tab text-xs'>NOAA Atlas 14
             <Upgrade tier={2}><ResponsiveTable  location={location} /></Upgrade>
             </div>
             </PillTabs>
@@ -696,8 +696,8 @@ function showThreshold(color){
   
       <span id="forecast" className=''></span>
       <Card className={`${convertTier(user) == 4 && 'hidden'}`} header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} >
-           <PillTabs mini={window.outerWidth < 600} 
-           header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
+           <PillTabs mini={false} 
+           header={window.outerWidth < 600 && <div className='flex gap-2 items-center justify-center '><i className="text-lg text-[--main-1] fa-solid fa-circle-info"></i>3 Day Forecast</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>National
               
               <Forecast className={"items-end"}/>

@@ -38,44 +38,7 @@ const CancelSignUp = () => {
 
         const emailResponse  =  abandon(customer,session_id)
 
-        /*
-        // Step 3: Prepare email content
-        const emailContent = {
-         
-              toEmail: VITE_WATER_WATCH_SUPPORT,
-              
-              subject: `Abandoned Signup : ${customer.email}`,
-              textBody: `A user has abandoned the signup process:
-Customer Email: ${customer.email}
-
-Metadata: ${getItems(customer.metadata,true)}
-Session ID: ${session_id}`,
-              htmlBody: `<html>
-                <body>
-                  <h1>Abandoned Signup Notification</h1>
-                  <p>A user has abandoned the signup process:</p>
-                  <ul>
-                    <li><strong>Customer Email:</strong> ${customer.email}</li>
-                   
-                    <li><strong>Metadata:</strong> ${getItems(customer.metadata) || ""}</li>
-                    <li><strong>Session ID:</strong> ${session_id}</li>
-                  </ul>
-                </body>
-              </html>`,
-            }
-
-      
-        const emailResponse = await api.post(
-            VITE_EMAIL_PROXY,
-          emailContent,
-          {
-            headers: {
-                "Content-Type": "application/json"
-            },
-          }
-        );
-        */
-
+       
         setTimeout(()=> navigate("/"),5000)
 
 

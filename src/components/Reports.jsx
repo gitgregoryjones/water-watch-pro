@@ -16,7 +16,7 @@ import { Link } from 'react-router-dom';
 const Reports = () => {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
-  const [reportType, setReportType] = useState('monthly');
+  
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [displayFormat, setDisplayFormat] = useState('html'); // 'html' or 'csv'
@@ -25,9 +25,11 @@ const Reports = () => {
   const [selectAll, setSelectAll] = useState(false); 
   const [showDialog,setShowDialog] = useState(false);
   const [searchTerm,setSearchTerm] = useState("")
+  const [smsStatus, setSmsStatus] = useState("all")
   
 
   const user = useSelector((state) => state.userInfo.user);
+  const [reportType, setReportType] = useState(user.is_superuser ? 'sms' :'monthly');
   
   const [locations, setLocations] = useState([])
   const reportAreaRef = useRef(null);
@@ -122,7 +124,7 @@ const Reports = () => {
         setToDate(currentYearMonth); // Default to current month
       }
       setFromDate(''); // Clear From date
-    } else if (selectedType === 'weekly') {
+    } else if (selectedType === 'weekly' || selectedType === "sms") {
       
       const currentDate = new Date(toDate);
       const pastDate = new Date(currentDate);
@@ -181,7 +183,7 @@ const Reports = () => {
     e.preventDefault();
     setReportContent(''); // Clear previous content
 
-    const notImplemented = ["sms","unpaid","billing","files-processed"]
+    const notImplemented = ["unpaid","billing","files-processed"]
 
     if(notImplemented.includes(reportType)){
       const errorMessage = `
@@ -254,6 +256,10 @@ const Reports = () => {
       
     } else if(reportType === 'emails'){
       query = `${API_HOST}/api/reports/sockletlabs-email-report?start_date=${fromDate}&end_date=${toDate}&page_size=250&page_number=1&sort_field=queuedTime&sort_directin=asc`
+    }  else if(reportType === 'sms'){
+
+       query = `${API_HOST}/api/reports/sms?status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
+
     }
    
     setShowDialog(true);
@@ -295,7 +301,13 @@ const Reports = () => {
       }
     } else {
       // GET Request for a single location
-      query = `${query}/${selectedLocations[0]}`;
+      if(reportType !=="sms"){
+
+        query = `${query}/${selectedLocations[0]}`;
+      } else {
+
+        //don't append anything to query
+      }
   
       try {
         const response = await api.get(query);
@@ -388,6 +400,21 @@ const Reports = () => {
             {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
+        {reportType === "sms" && <div className="col-span-1">
+        <label htmlFor="smsStatus" className="font-bold block text-gray-700">Text Status:</label>
+        <select
+            id="smsStatus"
+            value={smsStatus}
+            onChange={(e)=> setSmsStatus(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full text-sm"
+          >
+           <option value="all">All</option>
+           <option value="failed">Failed</option>
+           <option value="delivered">Delivered</option>
+           <option value="received">Received</option>
+           <option value="undelivered">Undelivered</option>
+        </select>
+        </div>}
         {/* Dude */}
         <div className='flex flex-col justify-start gap-4'>
         <div className={`${reportType == "monthly" ? "hidden" : ""} `}>

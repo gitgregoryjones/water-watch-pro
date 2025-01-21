@@ -496,7 +496,7 @@ function showThreshold(color){
       
       <Card  className={`${convertTier(user) == 4 && 'hidden'}`}
       footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span><Upgrade showMsg={false} tier={2}> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></Upgrade></div>} 
-      header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full justify-around items-center'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}<Processing showPlain={true}/></div> <Processing /></div>}  >
+      header={<div className='flex md:flex-row flex-row justify-between w-full gap-2 items-center '><div className='flex w-full md:flex-row flex-col justify-around items-center'><div className='flex flex-row'><i  onClick={resetMap} className="cursor-pointer text-lg text-[--main-1] fa-solid fa-location-dot px-2"></i>Map {location.name ? location.name + " (" + location.location.lat + "," +   location.location.lng + ")" : ""}</div><Processing showPlain={true}/></div> <Processing /></div>}  >
       <PillTabs className={"pb-2 md:border-0 md:shadow-[unset]"} defaultActive={1} mini={window.outerWidth < 600}>
       <div className='tab'><span>Daily Total</span>
       <div className='flex-col flex w-full'>

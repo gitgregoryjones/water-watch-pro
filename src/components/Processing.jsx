@@ -49,7 +49,7 @@ export default function Processing({showPlain = false}) {
   if(!showPlain) {  
   return (
   
-     !user.is_superuser ? <div className='flex gap-2 min-w-[8rem] flex-col md:flex-row justify-center items-center text-xs md:w-[17rem] md:text-lg bg-[#ffbc00] p-2 rounded border border-[black]'><span>{status[0]?.toUpperCase()}{status?.substring(1)} </span><span>{displayTime} ET data</span> </div>
+     !user.is_superuser ? <div className='flex gap-2 min-w-[8rem] flex-col md:flex-row justify-center items-center text-md md:w-[17rem] md:text-lg bg-[#ffbc00] p-2 rounded border border-[black]'><span>{status[0]?.toUpperCase()}{status?.substring(1)} </span><span>{displayTime} ET data</span> </div>
      :  <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 1 </div>}>
      <div className='flex flex-col'>
      <div className='flex items-center justify-center text-3xl md:text-3xl'>Processed
@@ -59,6 +59,6 @@ export default function Processing({showPlain = false}) {
    </Stats>
   )
   } else {
-   return <div className='w-full  flex justify-center items-center text-xs  md:text-2xl'>Data Up To {plainMsg} ET</div>
+   return <div className=' w-full justify-start mt-4 flex md:justify-center md:items-center text-green-800 md:my-0 text-xl  md:text-2xl'>Data Up To {plainMsg} ET</div>
   }
 }

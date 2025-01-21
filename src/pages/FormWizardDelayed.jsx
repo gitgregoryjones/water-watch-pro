@@ -103,11 +103,15 @@ const FormWizardDelayed = () => {
   useEffect(() => {
     // Handle the beforeunload event
     const handleBeforeUnload = async (event) => {
+
+      
+      formData.metadata = {...formData};
+      console.log(`This is a form preservation marshaling ${formData}`)
       if (!isNavigating.current) {
+        console.log(`Form Data Marshaling: ${JSON.stringify({...formData})}`)
         event.preventDefault();  
         
-        console.log(`preserving ${JSON.stringify(formData)}`)
-        formData.metadata = {...formData};
+       
         
         event.returnValue = ""; // Required for modern browsers to display the default prompt
       }
@@ -116,9 +120,9 @@ const FormWizardDelayed = () => {
     // Handle the unload event
     const handleUnload =  () => {
       if (!isNavigating.current) {        
-        console.log("User chose to leave or reload the page.");
+        console.log("Current Chose again to leave or reload the page.");
         console.log(`I know this about you ${JSON.stringify(formData)}`)        
-        abandon(formData, null)
+        abandon({...formData}, null)
         
       }
     };

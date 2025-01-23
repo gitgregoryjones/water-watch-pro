@@ -46,6 +46,7 @@ import Stats from '../components/Stats'
 import AdminCards from '../components/AdminCards'
 import { colorLoggedInUserLocations } from '../utility/loginUser'
 import WorkingDialog from '../components/WorkingDialog'
+import NotificationBanner from '../components/NotificationBanner'
 
 export default function DashboardPage() {
 
@@ -488,11 +489,11 @@ function showThreshold(color){
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
       <ProfilePic/>
-   
-      
-      
-          
-        {user.processedThrough}
+      <NotificationBanner 
+        message={<div className='flex flex-row justify-center items-start gap-2  md:px-20 w-full md:text-lg text-green-800'><div className='hidden md:flex w-[22rem]'><img src="/logo.png" className='w-[14rem] md:w-[20rem]' /></div> <div className='flex flex-col gap-4'> <div className=''>You now have access to a full suite of tools that save professionals like yourself an average of 25% on operating costs.</div><div> If you need help or have questions, contact <a className='text-[#4777d0]' href="mailto:support@waterwatchpro.com">support@waterwatchpro.com</a> </div><div className='flex md:hidden text-md'>Click here to dismiss this message</div></div></div>} 
+        bgColor="bg-white" 
+        textColor="text-white" 
+      />
       
       <Card  className={`${convertTier(user) == 4 && 'hidden'}`}
       footer={<div className='flex justify-around items-center gap-2 text-sm'><div className='bg-[green] w-[1rem] h-[.5rem] px-2'></div><span>Below Threshold</span><div className='bg-[orange] w-[1rem] h-[.5rem] px-2'></div><span>Above Threshold</span><Upgrade showMsg={false} tier={2}> <div className='bg-[red] w-[1rem] h-[.5rem] px-2'></div><span>NOAA 14 Exceeded</span></Upgrade></div>} 

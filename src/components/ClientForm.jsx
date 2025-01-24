@@ -22,6 +22,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [account_type, setAccount_Type] = useState(clientToEdit?.account_type);
   const [invoiceDate, setInvoiceDate] = useState(clientToEdit?.invoice_day);
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
+  const [manualInvoice, setManualInvoice] = useState(clientToEdit?.manual_invoice);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
   const [msg,setMsg] = useState("")
@@ -40,6 +41,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
     sendMarketingTexts: false,
     enableGroupReportService: false,
     enable15MinReports: false,
+    
   });
 
   const navigate = useNavigate();
@@ -77,7 +79,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
       phone,
       status,
       tier,
-      
+      manual_invoice:manualInvoice,
       account_type
       
     };
@@ -214,7 +216,29 @@ const ClientForm = ({ clientToEdit,myself }) => {
             />
             <span className="ml-2">{myself ? `Pause Subscription` : `Suspend Account`}</span>
           </div>}
+          {user.is_superuser &&  <div className="flex items-center mb-2">
+            <Toggle
+            
+              checked={manualInvoice == true ? true : false }
+              onChange={() => setManualInvoice(manualInvoice === true ? false : true)} 
+            />
+            
+            <span className="ml-2">{ `Manual Invoice`}</span>
+          </div>}
+         
           {!user.is_superuser && <div  className='my-4'>Contact support@waterwatchpro.com if you would like to suspend or cancel your account</div>}
+          
+          <div className='border p-4 rounded my-4'>
+
+          {myself && <h2 className="text-xl font-bold mb-4">Invoice Type</h2>}
+  {myself && 
+        <label className="flex items-center capitalize">
+        
+        {manualInvoice ? 'manual' : 'subscription'}
+      </label>
+  }
+          </div>
+          
           <div className="border p-4 rounded">
   <h2 className="text-xl font-bold mb-4">Status</h2>
   {myself && 
@@ -223,6 +247,9 @@ const ClientForm = ({ clientToEdit,myself }) => {
         {account_type}
       </label>
   }
+
+  
+
   {!myself && <div className="flex items-center gap-4">
     <label className="flex items-center">
       <input
@@ -275,7 +302,8 @@ const ClientForm = ({ clientToEdit,myself }) => {
   </div>}
 </div>
 
-          <div>
+
+          <div  className='my-4'>
           <label htmlFor="account_type" className="block text-gray-700 font-bold">
             Last Payment Status
           </label>

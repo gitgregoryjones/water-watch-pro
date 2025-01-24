@@ -294,7 +294,7 @@ const GeneralSettingsPage = () => {
 {VITE_FEATURE_RAPIDRAIN_FIRST === "true" && <div>
     <div className="flex items-center">
         <Toggle
-          checked={settings.rapidrain_first_on}
+          checked={settings.rapidrain_first_on && convertTier(user) > 1}
           onChange={() => handleToggle('rapidrain_first_on')}
           tier={convertTier(user) > 1}
         />

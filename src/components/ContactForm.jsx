@@ -90,10 +90,10 @@ const ContactForm = ({ contactToEdit }) => {
   
 
   const [alertSettings, setAlertSettings] = useState({
-    'Daily Report': { email: true, sms: true },
-    Forecast: { email: true, sms: true },
-    'NOAA Atlas 14': { email: true, sms: true },
-    '24 Hour Threshold': { email: true, sms: true },
+    'Daily Report': { email: true, sms: true, show:true },
+    Forecast: { email: true, sms: true, show: convertTier(user) > 2 },
+    'NOAA Atlas 14': { email: true, sms: true, tier:1, show : convertTier(user) > 1 },
+    '24 Hour Threshold': { email: true, sms: true, show:true },
   });
   
 
@@ -227,9 +227,9 @@ const ContactForm = ({ contactToEdit }) => {
       const label = header.replace(/_/g, ' '); // Create a readable header
   
       return (
-        <div className="flex flex-col mb-4" key={header}>
+        ( <div className={`flex flex-col mb-4 ${label.toLocaleLowerCase().startsWith("forecast") && convertTier(user) < 3 ? 'hidden' : ''} ${label.toLocaleLowerCase().startsWith("atlas") && convertTier(user) < 2 ? 'hidden' : ''}`} key={header} >
           <span className="font-bold text-gray-700 capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
-  
+          
           <div className="flex items-center mt-2">
             <span className="mr-2">Email</span>
             <Toggle
@@ -245,7 +245,7 @@ const ContactForm = ({ contactToEdit }) => {
               onChange={() => handleChange({ name: sms, value: !settings[sms] })}
             />
           </div>
-        </div>
+        </div>)
       );
     });
   };

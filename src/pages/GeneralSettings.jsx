@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import WorkingDialog from '../components/WorkingDialog';
 import SettingsMenu from '../components/SettingsMenu';
 import {VITE_FEATURE_RAPIDRAIN_FIRST} from "../utility/constants"
+import { convertTier } from '../utility/loginUser';
 
 const GeneralSettingsPage = () => {
   const { state } = useLocation();
@@ -186,14 +187,15 @@ const GeneralSettingsPage = () => {
 <span>If turned off, contacts receive individual text and email notifications for each location exceeding the threshold.</span>
 </div>
             </div>
-            <Upgrade tier={2} showMsg={false}>
+            <Upgrade tier={1} showMsg={false}>
             {/* Forecast Section */}
-            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
+            <div className={`border p-6 rounded shadow-md flex flex-col gap-2 ${convertTier(user) < 3 ? 'opacity-40' : ''}`}>
               <h2 className="text-xl font-bold mb-4">Forecast</h2>
               <div className="flex items-center ">
                 <Toggle
-                  checked={settings.forecast_on}
+                  checked={settings.forecast_on && convertTier(user) > 2}
                   onChange={() => handleToggle('forecast_on')}
+                  tier={convertTier(user) > 2}
                 />
                 <span className="ml-2">Enabled</span>
               </div>
@@ -202,8 +204,9 @@ const GeneralSettingsPage = () => {
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.forecast_combine_locations}
+                  checked={settings.forecast_combine_locations && convertTier(user) > 2}
                   onChange={() => handleToggle('forecast_combine_locations')}
+                  tier={convertTier(user) > 2}
                 />
                 <span className="ml-2">Combine Locations</span>
               </div>
@@ -212,9 +215,10 @@ const GeneralSettingsPage = () => {
 </span>
 </div>
             </div>
-            
+            </Upgrade>
+            <Upgrade tier={1} showMsg={false}>
             {/* NOAA Atlas 14 Section */}
-            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
+            <div className={`border p-6 rounded shadow-md flex flex-col gap-2 ${convertTier(user) < 2 ? 'opacity-40' : ''}`}>
               <h2 className="text-xl font-bold mb-4">NOAA Atlas 14</h2>
               <div className="hidden flex items-center ">
                 <Toggle
@@ -225,8 +229,9 @@ const GeneralSettingsPage = () => {
               </div>
               <div className="flex items-center ">
                 <Toggle
-                  checked={settings.atlas14_24h_on}
+                  checked={settings.atlas14_24h_on && convertTier(user) > 1}
                   onChange={() => handleToggle('atlas14_24h_on')}
+                  tier={convertTier(user) > 1}
                 />
                 <span className="ml-2">24 Hour</span>
               </div>
@@ -234,8 +239,9 @@ const GeneralSettingsPage = () => {
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.atlas14_1h_on}
+                  checked={settings.atlas14_1h_on && convertTier(user) > 1}
                   onChange={() => handleToggle('atlas14_1h_on')}
+                  tier={convertTier(user) > 1}
                 />
                 <span className="ml-2">1 Hour</span>
               </div>
@@ -243,8 +249,9 @@ const GeneralSettingsPage = () => {
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.atlas14_first_on}
+                  checked={settings.atlas14_first_on && convertTier(user) > 1}
                   onChange={() => handleToggle('atlas14_first_on')}
+                  tier={convertTier(user) > 1}
                 />
                 <span className="ml-2">First</span>
               </div>
@@ -256,12 +263,13 @@ const GeneralSettingsPage = () => {
 
             {/* RapidRain Alerts */}
             
-            <div className="border p-6 rounded shadow-md flex flex-col gap-2">
+            <div className={`border p-6 rounded shadow-md flex flex-col gap-2 ${convertTier(user) < 2 ? 'opacity-40' : ''}`}>
               <h2 className="text-xl font-bold mb-4">RapidRain Alerts</h2>
               <div className="flex items-center ">
                 <Toggle
-                  checked={settings.rapidrain_on}
+                  checked={settings.rapidrain_on && convertTier(user) > 1}
                   onChange={() => handleToggle('rapidrain_on')}
+                  tier={convertTier(user) > 1}
                 />
                 <span className="ml-2">Enabled</span>
                 
@@ -271,8 +279,10 @@ const GeneralSettingsPage = () => {
               </div>
               <div className="flex items-center">
                 <Toggle
-                  checked={settings.rapidrain_combine_locations}
+                  checked={settings.rapidrain_combine_locations && convertTier(user) > 1}
                   onChange={() => handleToggle('rapidrain_combine_locations')}
+                  tier={convertTier(user) > 1}
+                  
                 />
                 <span className="ml-2">Combine Locations</span>
                
@@ -286,6 +296,7 @@ const GeneralSettingsPage = () => {
         <Toggle
           checked={settings.rapidrain_first_on}
           onChange={() => handleToggle('rapidrain_first_on')}
+          tier={convertTier(user) > 1}
         />
         <span className="ml-2">First</span>
       

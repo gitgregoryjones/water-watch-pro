@@ -1,11 +1,11 @@
 import React from 'react'
 
-export default function Toggle({checked,onChange}) {
+export default function Toggle({checked,onChange, tier}) {
   return (
    
  
     <div
-      onClick={onChange}
+      onClick={(e)=> { tier === false ? alert('Please upgrade to enable this feature') : onChange(e)} }
       className={`relative inline-block w-12 h-6 rounded-full cursor-pointer transition-colors duration-300 ${
         checked ? 'bg-green-500' : 'bg-gray-300'
       }`}

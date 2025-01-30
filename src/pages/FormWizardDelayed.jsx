@@ -701,6 +701,12 @@ const provisionAccount = async (customerMetadata, customer_email) => {
         if(formData.subscriptionLevel  == "trial"){
 
           formData.metadata = {...formData}
+          delete formData.metadata.password;
+          delete formData.metadata.companyName;
+          delete formData.metadata.companyEmail;
+          delete formData.metadata.companyPhone;
+          delete formData.metadata.accountType;
+
           await newTrialSignUp(formData,session.id)
         }
 

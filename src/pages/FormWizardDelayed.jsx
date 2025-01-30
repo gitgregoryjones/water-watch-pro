@@ -13,7 +13,7 @@ import { VITE_PAYMENT_LINK_GOLD, VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE,VITE_P
 import { validatePassword, validateEmail } from '../utility/passwordFunc';
 import Stripe from 'stripe';
 import Prices from './Prices';
-import { abandon } from '../utility/abandon';
+import { abandon, newTrialSignUp } from '../utility/abandon';
 
 
 
@@ -669,6 +669,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
     console.log(`Creating a NEW CUSTOMER!!!`)
 
     let r = await provisionAccount(formData,formData.email)
+
     sessionT.url = "/dashboard"
     sessionT.errors = r.errors;
     
@@ -695,7 +696,18 @@ const provisionAccount = async (customerMetadata, customer_email) => {
 
         setShowMsg(false)
         isNavigating.current = true;
+
+        try {
+        if(formData.subscriptionLevel  == "trial"){
+
+          formData.metadata = {...formData}
+          await newTrialSignUp(formData,session.id)
+        }
+
         window.location = session.url;
+      } catch(e){
+        setErrors(e.message.indexOf("properties of undefined") > -1 ? "Account Creation was successful but failed to send welcome email." : e.message)
+      }
 
 
 

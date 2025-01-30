@@ -57,4 +57,46 @@ Session ID: ${session_id}`,
 
 }
 
-export {abandon}
+
+const newTrialSignUp = async (customer, session_id) => {
+
+  const emailContent = {
+           
+      toEmail: VITE_WATER_WATCH_SUPPORT,
+      
+      subject: `${customer.email} is a new Trial User`,
+      textBody: `This is the new trial user:
+      Customer Email: ${customer.email}
+  
+  Metadata: ${getItems(customer.metadata,true)}
+  Session ID: ${session_id}`,
+      htmlBody: `<html>
+        <body>
+          <h1>New Trial User Notification</h1>
+          <p>A new trial user has signed up:</p>
+          <ul>
+            <li><strong>Customer Email:</strong> ${customer.email}</li>
+           
+            <li><strong>Metadata:</strong> ${getItems(customer.metadata) || ""}</li>
+            <li><strong>Session ID:</strong> ${session_id ? session_id : "Stripe session was not created"}</li>
+          </ul>
+        </body>
+      </html>`,
+    }
+  
+  
+      const emailResponse = await api.post(
+      VITE_EMAIL_PROXY,
+      emailContent,
+      {
+      headers: {
+          "Content-Type": "application/json"
+      },
+      }
+      );
+  
+      return emailResponse;
+  
+  }
+
+export {abandon,newTrialSignUp}

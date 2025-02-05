@@ -178,7 +178,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
           keys.push(day.date);
           labels.push(day.date);
           values.push(day.rainfall);
-          backgroundColors.push(day.rainfall > location.h24_threshold ? "orange" : "green");
+          backgroundColors.push(day.rainfall > location.h24_threshold ? location.atlas14_threshold && day.rainfall > location.atlas14_threshold["24h"][0] ?"red" : "orange" : "green");
         });
       }
       setOriginalKeys(keys); 

@@ -16,7 +16,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   
 
   const [accountName, setAccountName] = useState(clientToEdit?.account_name || '');
-  const [email, setEmail] = useState(clientToEdit?.invoice_email || '');
+  const [email, setEmail] = useState(clientToEdit?.email || '');
   const [phone, setPhone] = useState(clientToEdit?.phone || '');
   const [status, setStatus] = useState(clientToEdit?.status || false); // Toggle for account status
   const [account_type, setAccount_Type] = useState(clientToEdit?.account_type);
@@ -75,7 +75,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
 
     const payload = {
       account_name: accountName,
-      invoice_email:email,
+      email:email,
       phone,
       status,
       tier,

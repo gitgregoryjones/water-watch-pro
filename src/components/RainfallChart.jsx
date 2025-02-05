@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import api from "../utility/api";
+import { convertTier } from "../utility/loginUser";
 
 
 
@@ -171,14 +172,14 @@ const RainfallChart = ({ location, period, max = 72 }) => {
             }) 
           );
           values.push(value.total);
-          backgroundColors.push(value.total > location.h24_threshold ? location.atlas14_threshold && value.total > location.atlas14_threshold["1h"][0] ? "red" : "orange" : "green");
+          backgroundColors.push(value.total > location.h24_threshold ? location.atlas14_threshold && value.total > location.atlas14_threshold["1h"][0] &&  convertTier(user)  != 1 ? "red" : "orange" : "green");
         });
       } else {
         data.total_rainfall.forEach((day) => {
           keys.push(day.date);
           labels.push(day.date);
           values.push(day.rainfall);
-          backgroundColors.push(day.rainfall > location.h24_threshold ? location.atlas14_threshold && day.rainfall > location.atlas14_threshold["24h"][0] ?"red" : "orange" : "green");
+          backgroundColors.push(day.rainfall > location.h24_threshold ? location.atlas14_threshold && day.rainfall > location.atlas14_threshold["24h"][0] && convertTier(user)  != 1 ? "red" : "orange" : "green");
         });
       }
       setOriginalKeys(keys); 

@@ -59,17 +59,21 @@ export default function AdminCards() {
       const tier = account.tier || "trial";
       const isPaid = account.account_type === "paid";
 
-      console.log(`Looping Tier is ${tier}`)
+      console.log(`Looping Tier is ${tier} and account is `)
   
       // Increment tier-specific counts
-      table[tier] ? table[tier].count += 1 : 0;
-
-      if (isPaid) {
-        table[tier].paid += 1;
-        table.totalPaid += 1;
+    
+      if(table[tier]){
+        table[tier].count += 1
+        if (isPaid) {
+          table[tier].paid += 1;
+          table.totalPaid += 1;
+        } else {
+          table[tier].unpaid += 1;
+          table.totalUnpaid += 1;
+        }
       } else {
-        table[tier].unpaid += 1;
-        table.totalUnpaid += 1;
+        console.log(`Skipping Invalid Tier type ${tier} for account ${account.account_name}`)
       }
     });
   

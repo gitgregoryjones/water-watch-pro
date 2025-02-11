@@ -132,7 +132,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}
       >
         <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
-    <div className="relative mt-0 p-6 w-full  mx-auto bg-white shadow-md rounded-lg">
+    <div className="relative mt-0 p-6 w-full  mx-auto bg-white  rounded-lg">
       {/* Close Button */}
       {!myself && <button
         onClick={() => navigate('/settings-admin')}
@@ -143,12 +143,14 @@ const ClientForm = ({ clientToEdit,myself }) => {
 
       <h1 className="text-2xl font-bold mb-4">
         {clientToEdit ? `Edit ${accountName}` : 'Add Client'}
+        {clientToEdit && accountName.indexOf(" ") > -1 && <div class="py-4 max-w-16 max-h-16 px-2 text-center border rounded-full bg-[#128CA6] text-[white]">{accountName.substr(0,1)}{accountName.substr(accountName.indexOf(" ")+1,1)}</div>}
       </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div id="msg">{msg}</div>
+       
         
         {/* Account Name */}
-       
+        <div className='gap-6 flex flex-col shadow rounded border p-4'>
         <div>
           <label htmlFor="accountName" className="block text-gray-700 font-bold">
             Account Name
@@ -177,6 +179,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
+        
 
         {/* Phone */}
         <div>
@@ -192,7 +195,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
-
+        </div>
         {/* Status Toggle */}
         <div className="hidden flex items-center">
           <Toggle checked={account_type == "paid" ? true : false} onChange={() => setAccount_Type(account_type)} />
@@ -200,7 +203,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         </div>
 
         {/* Account Actions */}
-        <div className="border p-4 rounded">
+        <div className="border p-4 rounded shadow">
           <h2 className="text-xl font-bold mb-4">Account Actions</h2>
           <div className="hidden flex items-center mb-2">
             <Toggle
@@ -355,7 +358,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         </div>
 
         {/* Tier Radio Buttons */}
-        <div className="border p-4 rounded">
+        <div className="border p-4 rounded shadow">
            <h2 className="text-xl flex flex-col gap-2 font-bold mb-4"><span>Account Type</span>
          {myself && <Link to="/upgrade" className='text-sm'>I want to change my subscription</Link>}</h2>
           <div className="flex items-center mb-2">
@@ -401,7 +404,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         <div className="flex justify-between">
           <button
             type="submit"
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            className="bg-[#128CA6] text-white px-4 py-2 rounded hover:bg-green-600"
           >
             {isEditMode ? 'Update Client' : 'Create Client'}
           </button>

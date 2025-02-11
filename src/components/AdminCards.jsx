@@ -59,7 +59,7 @@ export default function AdminCards() {
       const tier = account.tier || "trial";
       const isPaid = account.account_type === "paid";
 
-      console.log(`Looping Tier is ${tier} and account is `)
+      //console.log(`Looping Tier is ${tier} and account is ${account.account_name}`)
   
       // Increment tier-specific counts
     

@@ -10,21 +10,35 @@ const swapUser = async (currentUser, newUser) => {
 
     if (window.confirm(`Are you sure you want to masquerade as ${newUser.name? newUser.name : newUser.account_name} ${newUser.email? newUser.email : newUser.invoice_email}`)) {
       try {
+       console.log(`The masquerade user is ${JSON.stringify(newUser)}`)
+
        
-        //fetchClients(currentPage);
-        //get token
-        //make call to user/me
-        //set locations
-        //set user in context
-        //go back to dashboard page
-        const tokenResponse = await api.post(`/api/services/user-token?email=${newUser.email? newUser.email : newUser.invoice_email}`)
-        localStorage.setItem("accessToken",tokenResponse.data.token)
-        //loginUser(null,null,tokenResponse.data.token)
-        console.log(`User token is now ${tokenResponse.data.token}`)
-        const me = await  api.get(`/users/me`)
-        const locations = await api.get(`/api/locations`)
-        console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
-        swapped.user = {...me.data, locations:locations.data}
+      
+        if(newUser.client_id){
+            console.log(`This is a contact`)
+            const locations = await api.get(`/api/contacts/${newUser.id}/locations?client_id=${newUser.client_id}`)
+
+            console.log(`The locations are ${JSON.stringify(locations.data)}`)
+
+            const tokenResponse = await api.post(`/api/services/user-token?email=${newUser.email? newUser.email : newUser.invoice_email}`)
+
+            localStorage.setItem("accessToken",tokenResponse.data.token)
+
+            const me = await  api.get(`/users/me`)
+
+            console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
+            swapped.user = {...me.data, locations:locations.data}
+
+        } else {
+            const tokenResponse = await api.post(`/api/services/user-token?email=${newUser.email? newUser.email : newUser.invoice_email}`)
+            localStorage.setItem("accessToken",tokenResponse.data.token)
+            //loginUser(null,null,tokenResponse.data.token)
+            console.log(`User token is now ${tokenResponse.data.token}`)
+            const me = await  api.get(`/users/me`)
+            const locations = await api.get(`/api/locations`)
+            console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
+            swapped.user = {...me.data, locations:locations.data}
+        }
         
  
       } catch (error) {
@@ -107,7 +121,7 @@ const colorLoggedInUserLocations = async(userData)=>{
                
             location.total_rainfall = loc24Data.total_rainfall;
             location.color_24 = location.total_rainfall > location.h24_threshold
-                ? location.atlas14_threshold && location.total_rainfall > location.atlas14_threshold['24h'][0] && convertTier(userData) != 1 ? "red" : "orange"
+                ? location.atlas14_threshold && location.total_rainfall > location.atlas14_threshold['24h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
                 : "green";
 
             
@@ -144,7 +158,7 @@ const colorLoggedInUserLocations = async(userData)=>{
             
             location.total_hourly_rainfall = locHourlyData.total_rainfall;
             location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
-               ? location.atlas14_threshold && location.total_hourly_rainfall > location.atlas14_threshold['1h'][0] && convertTier(userData) != 1 ? "red" : "orange"
+               ? location.atlas14_threshold && location.total_hourly_rainfall > location.atlas14_threshold['1h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
                 : "green";
         }
         return location;

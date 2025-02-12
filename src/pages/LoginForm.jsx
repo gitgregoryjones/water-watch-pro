@@ -373,7 +373,11 @@ export default function LoginForm() {
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
             <div onClick={()=> window.location.href = "/forgot-password"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I forgot my password</div>
                 {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
-                <ButtonContainer>
+                <div className={`flex rounded flex-col gap-4 p-4  text-center justify-center items-center bg-yellow-200 w-full border-slate-600`}>
+                    <div className=''>Welcome back WaterWatchPro Users. </div>
+                    <div>Having trouble signing in? Click the "I Forgot My Password" Link&nbsp;&nbsp;<i className="fa-solid fa-arrow-up"></i></div>
+                </div>
+                {1==0 && <ButtonContainer>
                     <Button className="hidden" onClick={() => setLogView(true)}>Login</Button>
                     {logView ? (
                         <Button disabled={loggingIn} className={`flex gap-2 ${loggingIn && 'bg-[white]'}`} type="submit">
@@ -390,7 +394,7 @@ export default function LoginForm() {
                         <Button>Register</Button>
                     )}
                     
-                </ButtonContainer>
+                </ButtonContainer>}
                 <div className='text-[white] font-bold'>Email</div>
                 <input
         ref={emailRef}
@@ -413,10 +417,32 @@ export default function LoginForm() {
         placeholder="Enter your Password"
         className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
       />
+      <ButtonContainer>
+                    <Button className="hidden"  onClick={() => setLogView(true)}>Login</Button>
+                    {logView ? (
+                        
+                        <Button  disabled={loggingIn}  className={`flex justify-center w-full py-4 items-center  bg-[#4DCAEA] rounded-2xl text-white ${loggingIn && 'bg-[white]' }`} type="submit">
+                            {loggingIn ? (
+                                <div className='flex justify-center gap-2 items-center'>
+                                    <i className="animate-spin text-[#128CA6] text-2xl fa-solid fa-spinner"></i>
+                                    <span className="animate-pulse text-[#128CA6]">Working...</span>
+                                </div>
+                            ) : (
+                                "Login"
+                            )}
+                        </Button>
+                    ) : (
+                        <Button>Register</Button>
+                    )}
+                    
+                </ButtonContainer>
 
-                
-                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
-                <Link className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
+                <div className={`flex rounded flex-col gap-4 p-4 mt-12  text-center justify-center items-center  bg-yellow-200  w-full border-slate-600`}>
+                    <div className='hidden'>Welcome back WaterWatchPro Users. </div>
+                    <div>First Time Subscriber?  Sign Up Below &nbsp;&nbsp;<i className="fa-solid fa-arrow-down"></i></div>
+                </div>
+                <Link className=" flex flex-1 bg-[#99BA93] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
+                <Link className=" flex flex-1 bg-[#99BA93] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
                 
             </FormContainer>
         </div>

@@ -158,7 +158,7 @@ const colorLoggedInUserLocations = async(userData)=>{
             
             location.total_hourly_rainfall = locHourlyData.total_rainfall;
             location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
-               ? location.atlas14_threshold && location.total_hourly_rainfall > location.atlas14_threshold['1h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
+               ? location.atlas14_threshold && location.total_hourly_rainfall > location.atlas14_threshold['24h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
                 : "green";
         }
         return location;

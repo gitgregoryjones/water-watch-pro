@@ -8,6 +8,7 @@ import api from '../utility/api';
 import { useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
+import ProfilePic from './ProfilePic';
 
 
 
@@ -108,7 +109,8 @@ export default function Header() {
   <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
     Logout
   </Link>
-    <div className=' hidden flex fa-stack relative flex justify-center items-center'>
+  {1 == 0 && <ProfilePic  mini={true} />}
+    <div className='hidden flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
       
         <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>

@@ -488,7 +488,7 @@ function showThreshold(color){
   return (
     
     <Dashboard className='mt-20  md:my-[8rem] px-8'>
-      <ProfilePic/>
+      <ProfilePic mini={false}/>
       {1==0 && <NotificationBanner 
         message={<div className='flex flex-row justify-center items-start gap-2  md:px-20 w-full md:text-lg text-green-800'><div className='hidden md:flex w-[22rem]'><img src="/logo.png" className='w-[14rem] md:w-[20rem]' /></div> <div className='flex flex-col gap-4'> <div className=''>You now have access to a full suite of tools that save professionals like yourself an average of 25% on operating costs.</div><div> If you need help or have questions, contact <a className='text-[#4777d0]' href="mailto:support@waterwatchpro.com">support@waterwatchpro.com</a> </div><div className='flex md:hidden text-md'>Click here to dismiss this message</div></div></div>} 
         bgColor="bg-white" 

@@ -23,6 +23,7 @@ export default function LoginForm() {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [passwordVisible,setPasswordVisible] = useState(false)
 
     let [loggingIn, setLoggingIn] = useState(false);
 
@@ -364,6 +365,10 @@ export default function LoginForm() {
         }
     };
 
+    const toggleVisibility = () => {
+        setPasswordVisible(!passwordVisible);
+      };
+
     return (
         <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%]'>
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
@@ -404,18 +409,46 @@ export default function LoginForm() {
         onInput={handleChange}
         value={email}
         placeholder="Email Address"
-        className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+        className="p-2 placeholder:text-center rounded placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
       />
-      <div className='text-[white] font-bold' >Password</div>
+       <div className=" w-full">
+            <span className="mb-2 text-white">Password </span>
+            <div className='relative flex mt-2 items-center justify-center flex-col' >
+            <input
+               type={passwordVisible ? 'text' : 'password'}
+              name="password"
+              value={password}
+              placeholder='Password (at least 8 characters)'
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded p-2"
+              required
+            />
+             <span
+                onClick={toggleVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                 
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  color: passwordVisible ? '#333' : '#888',
+                }}
+              >
+              {passwordVisible ? <i class="fa-solid fa-eye-slash"></i> : <i class="fa-solid fa-eye"></i>}
+             </span>
+            </div>
+            <div className='mt-2 hidden'>Password, 8 characters, must contain at least one capital letter, digit, special character</div>
+          </div>
+      <div className='text-[white] font-bold hidden' >Password</div>
       <input
         ref={passwordRef}
         name="password"
-        type="password"
+        type={passwordVisible ? 'text' : 'password'}
         autoComplete="current-password"
         onInput={handleChange}
         value={password}
         placeholder="Enter your Password"
-        className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+        className="placeholder:text-center hidden rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
       />
       <ButtonContainer>
                     <Button className="hidden"  onClick={() => setLogView(true)}>Login</Button>

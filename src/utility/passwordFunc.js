@@ -4,7 +4,9 @@ import { VITE_STRICT_VALIDATION } from "./constants";
 
 const  validatePassword = (password,retypePassword)=>{
 
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+    //const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>-])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>-]{8,}$/;
+
 
 
 // Test cases

@@ -316,8 +316,7 @@ const loginUser = async (email, password, token)=>{
     
 }catch(e){
 
-    response.errors.push(e.message);
-    
+    response.errors.push(e.message);    
 
 } finally {
     return response;

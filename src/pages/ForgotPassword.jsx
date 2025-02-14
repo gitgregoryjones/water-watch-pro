@@ -40,14 +40,14 @@ export default function ForgotPassword() {
 
         setLoggingIn(true)
 
-        setEmailSent(true)
+        setEmailSent(false)
        
         try {
             let post = await api.post('/auth/forgot-password',{
                 email
             })
 
-            setTimeout(()=> setLoggingIn(false),3000)
+            setTimeout(()=> {setLoggingIn(false); setEmailSent(true)},3000)
 
             
 
@@ -70,10 +70,11 @@ export default function ForgotPassword() {
         <img className="w-[24rem]" src="/logo.png" alt="Logo" />
     </div>
    { ( <FormContainer onSubmit={handleReset} className='min-w-full min-h-[20rem]'>
-        <div onClick={()=> window.location.href = "/"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I remember my password</div>
+        <div onClick={()=> window.location.href = "/"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>{emailSent ? 'Back to Login' :'I remember my password'}</div>
+        
         {errorMsg && <div className={`text-[red] bg-[whitesmoke] w-full p-4`}>{errorMsg}</div>}
-        <div className={`flex items-center justify-center text-[black] bg-slate-200 rounded-xl  w-full p-4`}>{emailSent ? 'Check your email for additional instructions' : 'Enter your email and we will send you instructions to reset your password'}</div>
-       
+        <div className={`flex items-center justify-center text-[black] ${emailSent ? 'bg-yellow-300' : 'bg-slate-200'} rounded-xl  w-full p-4`}>{emailSent ? 'Check your email for additional instructions' : 'Enter your email and we will email you instructions to reset your password'}</div>
+       <div  className={`${emailSent && 'hidden'} w-full`}>
         <div className='text-[white] font-bold'>Email</div>
         <input
 
@@ -85,9 +86,10 @@ value={email}
 placeholder="Enter Email"
 className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
 />
+</div>
 
         
-        <Button className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]">
+        <Button className={` ${emailSent && 'hidden'} flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]`}>
         {loggingIn ? (
                         <div className='flex justify-center gap-2 items-center'>
                             <i className="animate-spin text-[white] text-2xl fa-solid fa-spinner"></i>

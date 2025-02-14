@@ -23,6 +23,7 @@ export default function ResetPassword() {
 
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
+    const [passwordVisible,setPasswordVisible] = useState(false)
   
 
     const navigate = useNavigate();
@@ -65,6 +66,12 @@ export default function ResetPassword() {
             
 
         }catch(e){
+
+            if(e.message == "RESET_PASSWORD_BAD_TOKEN"){
+                e.message = <span>Your token has expired.  Please request a new token by clicking here -> <a href="/forgot-password">Reset Password</a></span>;
+               // alert('whhops')
+            }
+        
             setErrorMsg(e.message);
             console.log(e)
             setLoggingIn(false);
@@ -75,6 +82,9 @@ export default function ResetPassword() {
 
         
     }
+ const toggleVisibility = () => {
+        setPasswordVisible(!passwordVisible);
+      };
 
 
   return (
@@ -86,28 +96,59 @@ export default function ResetPassword() {
         <div onClick={()=> window.location.href = "/"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I remember my password</div>
         {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
         {successMsg && <div className={`text-[black] bg-slate-200 rounded-xl  w-full p-4`}>{successMsg}</div>}
+
+     
        
         <div className='text-[white] font-bold'>Password</div>
+        <div className='relative flex flex-col w-full justify-center items-center'>
+        <input
+            name="password"
+            type={passwordVisible ? 'text' : 'password'}
+            onInput={handleChange}
+            value={password}
+            placeholder="New Password"
+            className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+        />
+        <span
+                onClick={toggleVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  color: passwordVisible ? '#333' : '#888',
+                }}
+        >
+              {passwordVisible ? <i class="fa-solid fa-eye-slash"></i> : <i class="fa-solid fa-eye"></i>}
+        </span>
+        </div>
+
+    <div className='text-[white] font-bold' >Re-type Password</div>
+    <div className='relative flex flex-col w-full justify-center items-center'>
         <input
 
-name="password"
-type="password"
-
-onInput={handleChange}
-value={password}
-placeholder="New Password"
-className="p-2 placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
-/>
-<div className='text-[white] font-bold' >Re-type Password</div>
-<input
-
-name="retypePassword"
-type="password"
-onInput={handleChange}
-value={retypePassword}
-placeholder="Re-type your New Password"
-className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
-/>
+            name="retypePassword"
+            type={passwordVisible ? 'text' : 'password'}
+            onInput={handleChange}
+            value={retypePassword}
+            placeholder="Re-type your New Password"
+            className="placeholder:text-center rounded-xl placeholder:text-[#95b8c8] placeholder:text-md placeholder:font-bold"
+        />
+        <span
+                onClick={toggleVisibility}
+                style={{
+                  position: 'absolute',
+                  right: '1rem',
+                  
+                  cursor: 'pointer',
+                  fontSize: '20px',
+                  color: passwordVisible ? '#333' : '#888',
+                }}
+        >
+              {passwordVisible ? <i class="fa-solid fa-eye-slash"></i> : <i class="fa-solid fa-eye"></i>}
+        </span>
+    </div>
 
         
         <Button className="flex flex-1 bg-[#128CA6] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]">

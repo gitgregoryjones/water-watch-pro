@@ -135,7 +135,7 @@ const LocationListPage = () => {
             ))}
          
           </tbody>
-           : <tbody className='relative'><i className='absolute text-[green] fa fa-spinner top-[5rem] text-4xl left-1/2 animate-spin'></i></tbody>}
+           : <tbody className='relative'><td className='flex items-center justify-center font-bold'>...No records found...</td></tbody>}
         </table>
      
       {/* Pagination Controls */}

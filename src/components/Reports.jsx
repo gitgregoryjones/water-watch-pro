@@ -255,15 +255,15 @@ const Reports = () => {
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
     } else if(reportType === 'emails'){
-      query = `${API_HOST}/api/reports/sockletlabs-email-report?start_date=${fromDate}&end_date=${toDate}&page_size=250&page_number=1&sort_field=queuedTime&sort_directin=asc`
+      query = `${API_HOST}/api/reports/sockletlabs-email-report?format=${displayFormat}&start_date=${fromDate}&end_date=${toDate}&page_size=250&page_number=1&sort_field=queuedTime&sort_directin=asc`
     }  else if(reportType === 'sms'){
 
-       query = `${API_HOST}/api/reports/sms?status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
+       query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
    
     setShowDialog(true);
-    if (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') {
+    if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') && (reportType != 'sms' && reportType != 'emails')) {
       // POST Request for multiple locations
       requestData = {
         email_format: displayFormat,
@@ -272,7 +272,7 @@ const Reports = () => {
       };
   
       try {
-        const response = await api.post(query, requestData);
+        const response =  await api.post(query, requestData);
 
         setShowDialog(false);
   
@@ -458,8 +458,8 @@ const Reports = () => {
             
           >
             <option value="html">Formatted</option>
-            <option value="csv">CSV</option>
-            {VITE_FEATURE_EXCEL_REPORT  === "true" && <option value="excel">Excel</option>}
+            {reportType != "sms" && reportType != "emails" && <option value="csv">CSV</option>}
+            {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
           </select>
         </div>
 

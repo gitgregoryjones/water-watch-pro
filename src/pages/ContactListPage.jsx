@@ -150,7 +150,7 @@ const ContactListPage = () => {
             </tr>
           </thead>
        {
-        <tbody>
+        filtered.length > 0 ? <tbody>
           {filtered.map((contact) => (
             <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
@@ -200,7 +200,9 @@ const ContactListPage = () => {
             </tr>
           ))}
         </tbody>
-       }
+       
+      
+      : <tbody className='relative'><td className='flex items-center justify-center font-bold'>...No records found...</td></tbody>}
       </table>
 
       <div className="hidden flex justify-between items-center mt-4">

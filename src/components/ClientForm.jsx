@@ -106,9 +106,10 @@ const ClientForm = ({ clientToEdit,myself }) => {
         window.scrollTo({top:0,behavior: 'smooth',})
 
       }, 800);
-    } catch (error) {
+    } catch (e) {
+      console.log(`Log it ${e.message}`)
       setShowDialog(false)
-      setMsg(<span className="text-[red]">{error.message}</span>)
+      setMsg(<span className="text-[red]">{e.message}</span>)
     }
   };
 

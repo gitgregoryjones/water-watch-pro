@@ -4,6 +4,7 @@ import { API_HOST, VITE_PRICES_LINK, VITE_FEATURE_EXCEL_REPORT } from '../utilit
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
+import apiCSV from '../utility/apiCSV';
 import EmailRowManager from './EmailRowManager';
 import { convertTier } from '../utility/loginUser';
 import WorkingDialog from './WorkingDialog';
@@ -263,13 +264,18 @@ const Reports = () => {
     }
    
     setShowDialog(true);
-    if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') && (reportType != 'sms' && reportType != 'emails')) {
+    if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') ) {
       // POST Request for multiple locations
       requestData = {
         email_format: displayFormat,
         email_list: selectedContacts,
         locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
       };
+
+      if(reportType == "sms" || reportType == "emails"){
+
+        requestData = selectedContacts;
+      }
   
       try {
         const response =  await api.post(query, requestData);
@@ -310,7 +316,7 @@ const Reports = () => {
       }
   
       try {
-        const response = await api.get(query);
+        const response = await apiCSV.get(query);
         console.log('Report Data:', response.data);
         setShowDialog(false);
         /*
@@ -390,7 +396,7 @@ const Reports = () => {
             {/*<option value="files-processed">Files Processed</option>*/}
               <option value="sms">SMS Sent/Rejected</option>
               <option value="emails">Rejected Emails</option>
-              <option value="billing">Billing</option>
+              {1==0 && <option value="billing">Billing</option>}
             </Upgrade>
 
               {!user.is_superuser && <option value="daily">Custom</option>}
@@ -458,7 +464,7 @@ const Reports = () => {
             
           >
             <option value="html">Formatted</option>
-            {reportType != "sms" && reportType != "emails" && <option value="csv">CSV</option>}
+            {<option value="csv">CSV</option>}
             {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
           </select>
         </div>

@@ -279,18 +279,18 @@ const ClientForm = ({ clientToEdit,myself }) => {
       Trial
     </label>
 
-    { <label className="flex items-center">
+    { <div  className='hidden'><label className="flex items-center">
       <input
         type="radio"
         name="account_type"
         value="demo"
         checked={account_type === 'demo'}
-        onChange={(e) => setAccount_Type(e.target.value)}
+        onChange={(e) => {setAccount_Type(e.target.value)}}
         className="mr-2"
         
       />
       Demo
-    </label>}
+    </label></div>}
 
     {<label className="flex items-center">
       <input
@@ -298,7 +298,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         name="account_type"
         value="free"
         checked={account_type === 'free'}
-        onChange={(e) => setAccount_Type(e.target.value)}
+        onChange={(e) => { if(e.target.value =='free'){ setAccount_Type(e.target.value); setManualInvoice(true)}else{ setAccount_Type(e.target.value)} } }
         className="mr-2"
       />
       Free

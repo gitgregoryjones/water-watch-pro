@@ -140,10 +140,13 @@ const FormWizardDelayed = () => {
 
 
 useEffect(()=>{
-    console.log(`The location is ${location.state.account_type}`)
+    console.log(`The location is ${location.state?.account_type}`)
     if(location.state?.account_type){
-      setFormData({...formData, subscriptionLevel:location.state.account_type })
-    } 
+      setFormData({ subscriptionLevel:location.state.account_type })
+    } else if(queryParams.get('account_type')){
+      //setFormData({..fo})
+      setFormData({ subscriptionLevel:queryParams.get("account_type")})
+    }
 
     const b = async function(){
     //wwp_session = user id

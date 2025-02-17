@@ -26,6 +26,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
   const [msg,setMsg] = useState("")
+  const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
 
@@ -80,7 +81,8 @@ const ClientForm = ({ clientToEdit,myself }) => {
       status,
       tier,
       manual_invoice:manualInvoice,
-      account_type
+      account_type,
+      is_trial_account
       
     };
 
@@ -119,6 +121,21 @@ const ClientForm = ({ clientToEdit,myself }) => {
       [key]: !prev[key],
     }));
   };
+
+  function updateAccountTypeWhen(value){
+
+    if(value =='free'){ 
+      setAccount_Type(value); 
+      setIsTrialAccount(false);  
+      setManualInvoice(true)
+    }else if(value == 'trial'){ 
+      setAccount_Type(value);
+      setIsTrialAccount(true);
+    } else {
+      setAccount_Type(e.target.value);
+    }
+
+  }
 
   return (
       <div className="h-full w-full flex flex-col mt-28">
@@ -298,7 +315,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         name="account_type"
         value="free"
         checked={account_type === 'free'}
-        onChange={(e) => { if(e.target.value =='free'){ setAccount_Type(e.target.value); setManualInvoice(true)}else{ setAccount_Type(e.target.value)} } }
+        onChange={(e) =>  updateAccountTypeWhen(e.target.value)  }
         className="mr-2"
       />
       Free

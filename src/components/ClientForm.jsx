@@ -123,16 +123,20 @@ const ClientForm = ({ clientToEdit,myself }) => {
   };
 
   function updateAccountTypeWhen(value){
+   
 
     if(value =='free'){ 
       setAccount_Type(value); 
       setIsTrialAccount(false);  
       setManualInvoice(true)
     }else if(value == 'trial'){ 
+     
       setAccount_Type(value);
       setIsTrialAccount(true);
+      setManualInvoice(true)
     } else {
-      setAccount_Type(e.target.value);
+      setAccount_Type(value);
+      setManualInvoice(false)
     }
 
   }
@@ -279,7 +283,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         value="paid"
         checked={account_type === 'paid'}
         
-        onChange={(e) => setAccount_Type(e.target.value)}
+        onChange={(e) => updateAccountTypeWhen(e.target.value)}
         className="mr-2"
       />
       Paid
@@ -290,7 +294,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         name="account_type"
         value="trial"
         checked={account_type === 'trial'}
-        onChange={(e) => setAccount_Type(e.target.value)}
+        onChange={(e) => updateAccountTypeWhen(e.target.value)}
         className="mr-2"
       />
       Trial
@@ -302,7 +306,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         name="account_type"
         value="demo"
         checked={account_type === 'demo'}
-        onChange={(e) => {setAccount_Type(e.target.value)}}
+        onChange={(e) => {updateAccountTypeWhen(e.target.value)}}
         className="mr-2"
         
       />

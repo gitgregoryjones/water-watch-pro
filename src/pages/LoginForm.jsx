@@ -219,7 +219,11 @@ export default function LoginForm() {
                 userData = lresponse.userData;
 
             }  else {
+                if(lresponse.errors[0] == "LOGIN_BAD_CREDENTIALS"){
+                    setErrorMsg(<div className='flex flex-col justify-center items-center'><span>Sorry we could not login using the email address or password you provided. Click here if you <a href="/forgot-password">forgot your password.</a> </span><p className='mt-4'> If this is a new account, click here to create a <a href="/wizard?acccount_type=trial">New or Trial account</a></p></div>)
+                } else {
                 setErrorMsg(lresponse.errors[0])
+                }
                 console.log(`Encountered error ${JSON.stringify(lresponse)}`)
                 return;
             }  
@@ -370,15 +374,15 @@ export default function LoginForm() {
       };
 
     return (
-        <div className='bg-[#217e3f] md:rounded-xl min-w-full md:min-w-[30%]'>
+        <div className='bg-[#217e3f] md:max-w-md md:rounded-xl min-w-full md:min-w-[30%]'>
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
                 <img className="w-[24rem]" src="/logo.png" alt="Logo" />
             </div>
             
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
             <div onClick={()=> window.location.href = "/forgot-password"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I forgot my password</div>
-                {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>{errorMsg}</div>}
-                <div className={`flex rounded flex-col gap-4 p-4  text-center justify-center items-center bg-yellow-200 w-full border-slate-600`}>
+                {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>Error: {errorMsg}</div>}
+                <div className={`hidden flex rounded flex-col gap-4 p-4  text-center justify-center items-center bg-yellow-200 w-full border-slate-600`}>
                     <div className=''>Welcome back WaterWatchPro Users. </div>
                     <div>Having trouble signing in? Click the "I Forgot My Password" Link&nbsp;&nbsp;<i className="fa-solid fa-arrow-up"></i></div>
                 </div>

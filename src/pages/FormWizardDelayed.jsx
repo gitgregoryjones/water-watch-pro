@@ -741,7 +741,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
     <div className='text-xl text-[black] m-2'>{success}</div>
     <div className='p-6 bg-[white]'>
       {currentStep < 3 && (<div className="flex w-full justify-between mb-4">
-        Step {currentStep} of 3 
+        <span className='capitalize'>Step {currentStep} of 3 for new {formData.subscriptionLevel} account</span>
         
        { <Link to="/">I already have a login</Link>}
       </div>)}

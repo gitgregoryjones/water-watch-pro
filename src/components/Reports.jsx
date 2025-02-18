@@ -316,7 +316,7 @@ const Reports = () => {
       }
   
       try {
-        const response = await apiCSV.get(query);
+        const response = await api.get(query);
         console.log('Report Data:', response.data);
         setShowDialog(false);
         /*
@@ -331,7 +331,7 @@ const Reports = () => {
         setReportContent(response.data);
       } catch (error) {
         setShowDialog(false);
-        console.error('Error fetching report:', error.message);
+        console.log('Error fetching report:', error.message);
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> An error occurred while fetching the report.</p>

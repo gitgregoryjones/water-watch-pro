@@ -36,7 +36,7 @@ apiCSV.interceptors.response.use(
 
       // Extract filename from Content-Disposition header
       const contentDisposition = response.headers["Content-Disposition"];
-      console(`The disposition is ${contentDisposition}`)
+      console.log(`The disposition is ${contentDisposition}`)
       let filename = "report.csv"; // Default filename
 
       if (contentDisposition) {

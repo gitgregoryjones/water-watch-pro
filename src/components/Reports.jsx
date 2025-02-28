@@ -41,6 +41,9 @@ const Reports = () => {
   const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
     .toISOString()
     .slice(0, 7); // Get last month in YYYY-MM
+    const thisMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+    .toISOString()
+    .slice(0, 7); // Get last month in YYYY-MM
   
   
     useEffect(() => {
@@ -446,7 +449,7 @@ const Reports = () => {
             onChange={handleToDateChange}
             className="border border-gray-300 rounded p-2 w-full"
             min={reportType === 'monthly' && convertTier(user) < 2 ? "2024-11" : "2024-11"} // Disable months before last month for tier < 2
-            max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable current month for tier < 2
+            max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : thisMonth} // Disable current month for tier < 2
           />
         </div>
         {convertTier(user) == 1 && 

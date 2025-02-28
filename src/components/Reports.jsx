@@ -438,13 +438,14 @@ const Reports = () => {
         </div>
         <div className="">
           <label htmlFor="toDate" className="font-bold block text-gray-700">{reportType === 'monthly' ? 'Choose Month:' : 'To:'}</label>
+         
           <input
             type={reportType === 'monthly' ? 'month' : 'date'}
             id="toDate"
             value={toDate}
             onChange={handleToDateChange}
             className="border border-gray-300 rounded p-2 w-full"
-            min={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable months before last month for tier < 2
+            min={reportType === 'monthly' && convertTier(user) < 2 ? "2024-11" : "2024-11"} // Disable months before last month for tier < 2
             max={reportType === 'monthly' && convertTier(user) < 2 ? lastMonth : undefined} // Disable current month for tier < 2
           />
         </div>

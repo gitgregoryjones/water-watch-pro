@@ -452,7 +452,7 @@ const Reports = () => {
             max={reportType === 'monthly' && convertTier(user) < 3 ? lastMonth : thisMonth} // Disable current month for tier < 2
           />
         </div>
-        {convertTier(user) == 1 && 
+        {convertTier(user) < 3 && 
           <div className='p-1 items-center justify-center rounded border-[gold] border-2  text-center'>Want to run reports for all months including {new Date().toLocaleDateString('en-US', {
               month: 'short',              
             }) }?  Upgrade <Link to={"/upgrade"}  state={{url: "/reports"}}>here</Link>

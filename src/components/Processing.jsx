@@ -49,7 +49,7 @@ export default function Processing({showPlain = false}) {
   if(!showPlain) {  
   return (
   
-     !user.is_superuser ? <div className='flex gap-2 min-w-[8rem] flex-col md:flex-row justify-center items-center text-md md:w-[17rem] md:text-lg bg-[#ffbc00] p-2 rounded border border-[black]'><span>{status[0]?.toUpperCase()}{status?.substring(1)} </span><span>{displayTime} ET data</span> </div>
+     !user.is_superuser ? <div className='flex gap-2 min-w-[8rem] flex-col md:flex-row justify-center items-center text-md md:w-[17rem] md:text-lg bg-[#ffbc00] p-2 rounded border border-[black]'><span className='text-nowrap text-xs md:text-lg'>{status[0]?.toUpperCase()}{status?.substring(1)} {displayTime} ET data</span> </div>
      :  <Stats header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa fas fa-database'></i>Pass 1 </div>}>
      <div className='flex flex-col'>
      <div className='flex items-center justify-center text-3xl md:text-3xl'>Processed

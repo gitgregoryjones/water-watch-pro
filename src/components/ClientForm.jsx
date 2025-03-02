@@ -144,7 +144,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   return (
       <div className="h-full w-full flex flex-col mt-28">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
-        Settings &gt; Client: {clientToEdit?.account_name} 
+        Settings &gt; Account: {clientToEdit?.account_name} 
       </h1>
       
       <Card

@@ -253,6 +253,27 @@ const patchClient = async(clientData) =>{
     
 }
 
+const logoutUser = async ()=>{
+    //setShowDialog(true)
+    let success = false;
+    try {
+      
+      // Step 1: Log in to get the access token
+      const loginResponse = await api.post(`/auth/jwt/logout`)
+      success = true;
+      
+
+    }catch(e){
+     // setShowDialog(false)
+      console.log(e)
+      success = false;
+    } finally{
+        return success;
+    }
+
+
+  }
+
 const loginUser = async (email, password, token)=>{
 
     let userData = null;
@@ -323,4 +344,6 @@ const loginUser = async (email, password, token)=>{
 }
 }
 
-export  {loginUser, patchClient, postClient, convertTier, colorLoggedInUserLocations, swapUser};
+
+
+export  {loginUser, patchClient, postClient, convertTier, colorLoggedInUserLocations, swapUser, logoutUser};

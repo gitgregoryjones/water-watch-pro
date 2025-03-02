@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import ProfilePic from './ProfilePic';
+import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
 
 
 
@@ -106,10 +107,14 @@ export default function Header() {
   </Link></Upgrade>)}
   </div>
   
-  <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
-    Logout
-  </Link>
-  {1 == 0 && <ProfilePic  mini={true} />}
+  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && 
+    <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
+      Logout
+    </Link>
+  }
+
+
+  {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
     <div className='hidden flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
       

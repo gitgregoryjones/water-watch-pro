@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import Upgrade from './Upgrade';
 import { Link } from 'react-router-dom';
+import ProfileMenu from './ProfileMenu';
 
 
 export default function ProfilePic({className, mini}){
@@ -12,6 +13,27 @@ export default function ProfilePic({className, mini}){
     const user = useSelector( state => state.userInfo.user)
 
     console.log(`Mini is now ${JSON.stringify(mini)}`)
+
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const menuRef = useRef(null); // Reference for the profile menu
+
+    // Close menu when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+        if (menuRef.current && !menuRef.current.contains(event.target)) {
+            setIsMenuOpen(false);
+        }
+        }
+
+        // Attach event listener
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+        // Cleanup event listener on component unmount
+        document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <div>
@@ -26,9 +48,23 @@ export default function ProfilePic({className, mini}){
             </div>
             </div>}
             {mini  && (
-                <div onClick={()=> alert('show menu')} className='flex items-center justify-center h-8 w-8 rounded-full text-xs cursor-pointer bg-slate-400'>
-                    {user.first_name.substr(0,1)}{user.last_name && user.last_name.substr(0,1)}
-                </div>
+                <div className='relative' ref={menuRef}>
+                    <div className="flex flex-row">
+                        <div className="hidden  md:flex bg-[#128CA6] text-white px-4 h-10 flex items-center text-center text-nowrap text-ellipsis justify-center rounded-l-full text-sm">
+                        {user.clients[0].account_name}
+                        </div>
+                        <div 
+                        onClick={() => setIsMenuOpen(!isMenuOpen)} 
+                        className="flex items-center justify-center h-10 w-10 aspect-square rounded-full text-sm font-semibold cursor-pointer bg-gray-600 text-white -ml-2 border-2 border-white"
+                        >
+                        {user.first_name?.charAt(0)}
+                        {user.last_name?.charAt(0)}
+                        </div>
+                    </div>
+                    {isMenuOpen && <ProfileMenu user={user} closeMenu={() => setIsMenuOpen(false)} />}
+              </div>
+              
+              
                 )
             }
         </div>

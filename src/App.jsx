@@ -45,6 +45,8 @@ import AdminCards from "./components/AdminCards";
 import { useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
 import CancelSignUp from "./pages/CancelSignUp";
+import ProfileMenu from "./components/ProfileMenu";
+import {VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
 
 
 
@@ -90,8 +92,12 @@ function App() {
     <LandscapeOrientation>
       <ScrollToTop/>
     <div className={"md:hidden"}>
+    
+    {!isLoginPage && VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <div className="absolute right-0 z-[100] p-2"><ProfilePic mini={true}/></div>}
       
-    {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
+    {!isLoginPage && VITE_FEATURE_MULTIPLE_CLIENTS != "true" && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
+
+
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
     {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs

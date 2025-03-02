@@ -81,9 +81,12 @@ const Reports = () => {
 
   useEffect(() => {
     // Initialize the `toDate` for monthly based on user tier
+   
     if (reportType === 'monthly') {
-      if (convertTier(user) < 2) {
+      
+      if (convertTier(user) <= 2) {
         setToDate(lastMonth); // Default to last month if tier < 2
+      
       } else {
         setToDate(currentYearMonth); // Default to current month if tier >= 2
       }
@@ -453,8 +456,8 @@ const Reports = () => {
           />
         </div>
         {convertTier(user) < 3 && 
-          <div className='p-1 items-center justify-center rounded border-[gold] border-2  text-center'>Want to run reports for all months including {new Date().toLocaleDateString('en-US', {
-              month: 'short',              
+          <div className='px-4 py-1 items-center justify-center rounded border-[gold] border-2  text-start'>Want to run reports for all of {new Date().toLocaleDateString('en-US', {
+              month: 'long',              
             }) }?  Upgrade <Link to={"/upgrade"}  state={{url: "/reports"}}>here</Link>
           </div>}
         </div>

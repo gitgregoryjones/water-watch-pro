@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import ProfileMenu from './ProfileMenu';
 
 
-export default function ProfilePic({className, mini}){
+export default function ProfilePic({className, mini, mobile=false}){
 
     const dispatch = useDispatch();
 
@@ -53,13 +53,15 @@ export default function ProfilePic({className, mini}){
                         <div className="hidden  md:flex bg-[#128CA6] text-white px-4 h-10 flex items-center text-center text-nowrap text-ellipsis justify-center rounded-l-full text-sm">
                         {user.clients[0].account_name}
                         </div>
-                        <div 
+                        {mobile == false && <div 
                         onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                        className="flex items-center justify-center h-10 w-10 aspect-square rounded-full text-sm font-semibold cursor-pointer bg-gray-600 text-white -ml-2 border-2 border-white"
+                        className="flex items-center justify-center h-20 w-20 md:w-10 md:h-10 aspect-square rounded-full text-3xl md:text-sm font-semibold cursor-pointer bg-gray-600 text-white -ml-2 border-2 border-white"
                         >
                         {user.first_name?.charAt(0)}
                         {user.last_name?.charAt(0)}
-                        </div>
+                        </div>}
+                        {mobile == true && <i onClick={() => setIsMenuOpen(!isMenuOpen)}  className="fas fa-bars text-lg"></i>
+                        }
                     </div>
                     {isMenuOpen && <ProfileMenu user={user} closeMenu={() => setIsMenuOpen(false)} />}
               </div>

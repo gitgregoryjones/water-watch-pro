@@ -5,6 +5,7 @@ import WorkingDialog from './WorkingDialog';
 import api from '../utility/api';
 
 import { convertTier } from '../utility/loginUser';
+import Upgrade from "./Upgrade";
 
 const ProfileMenu = ({ closeMenu, embed=true }) => {
   let user = useSelector(state => state.userInfo.user)
@@ -61,7 +62,7 @@ const formatPhoneNumber = (phone) => {
        <p className="px-2 pt-4 text-xs text-gray-500 uppercase">user details</p>
       {/* User Info */}
       <div className="pt-2 px-4 mb-2 text-gray-800 text-sm">
-        <p className="font-semibold">{user.first_name} {user.last_name} <span className=" bg-white border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
+        <p className="font-semibold">{user.first_name} {user.last_name} <span className=" bg-white hidden border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
         <p className="text-gray-600">{user.email}</p>
         <p className="text-gray-600">{formatPhoneNumber(user.phone)}</p>
         <p className="text-gray-600 hidden capitalize"><span className=" bg-white border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
@@ -80,7 +81,21 @@ const formatPhoneNumber = (phone) => {
                 View Profile
               </Link>
       </div>
-
+      <hr></hr>
+      {/*<div><Link to={user.role != "admin" ? `/dashboard` : "/admin"}  className="text-sm px-4">Data</Link></div>
+        {user.role != "admin" &&<div><Link to="/dashboard#graphs"  className={`text-sm px-4 hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+        Graphs
+      </Link></div>}
+      {user.role != "admin" && <Link to="/dashboard#forecast"   className={`text-sm px-4 hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+        Forecasts
+      </Link>}
+        <div   className="flex flex-col">
+          <div><Link to="/reports"  className="text-sm px-4">Reports</Link></div>
+       <Upgrade showMsg={false} tier={1}>
+        {user.role != "contact" && <div><Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'}  className="text-sm px-4 menu-item bm-item">Settings</Link></div>}
+        {window.innerWidth > 600 && <Link to="/assignments"  className="text-sm px-4 menu-item bm-item">Assignments</Link>}
+        </Upgrade>
+        </div>*/}
       {/* Logout */}
       <div className="border-t border-gray-200">
         <Link onClick={logout} className={"text-sm px-4 text-red-800"}>
@@ -90,7 +105,7 @@ const formatPhoneNumber = (phone) => {
 
       {/* Client Selection */}
       {!user.is_superuser && <div className="border-t border-gray-200 p-2">
-        <p className="px-2 text-xs text-gray-500 uppercase">Available Accounts</p>
+        <p className="px-2 text-xs text-gray-500 uppercase"> Accounts</p>
         {user.clients.map((client, index) => (
           <div
             key={client.account_name}

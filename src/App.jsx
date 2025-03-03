@@ -54,6 +54,16 @@ import {VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
 function App() {
 
   const location = useLocation();
+  const user = useSelector((state) => state.userInfo.user);
+
+
+  const [selectedClient, setSelectedClient] = useState(user.clients[0]);
+
+  const handleClientChange = (client) => {
+    setSelectedClient(client);
+    location.reload(); // Reload the page to display relevant data
+  };
+
 
   
 
@@ -86,16 +96,24 @@ function App() {
     setOpen(state.isOpen);
   }
   
-  const user = useSelector((state) => state.userInfo.user);
-
+  
   return (
     <LandscapeOrientation>
       <ScrollToTop/>
     <div className={"md:hidden"}>
     
-    {!isLoginPage && VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <div className="absolute right-0 z-[100] p-2"><ProfilePic mini={true}/></div>}
+    {/*!isLoginPage && VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <div className="absolute right-0 z-[100] p-2"><ProfilePic mobile={true} mini={true}/></div>*/}
       
-    {!isLoginPage && VITE_FEATURE_MULTIPLE_CLIENTS != "true" && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
+    {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
+
+   {VITE_FEATURE_MULTIPLE_CLIENTS != "false" &&
+   <div className="flex flex-row gap-2 ">
+    <div className="px-2">
+      <ProfilePic mini={true}  />
+    </div>
+   
+      
+    </div>}
 
 
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
@@ -111,13 +129,40 @@ function App() {
     {user.role != "contact" && <div><Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link></div>}
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
     </Upgrade>
+    <a href="/" onClick={showSettings} className="menu-item bm-item">Logout</a>
+
     </div>
+    
+    {!user.is_superuser &&  VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <div className="border-t border-gray-200 p-2">
+        <p className="px-2 text-xs text-gray-500 uppercase font-bold"> Accounts</p>
+        {user.clients.map((client, index) => (
+          <div
+            key={client.account_name}
+            className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
+            onClick={() => handleClientChange(client)}
+          >
+            {/* Radio Button */}
+            <div className={`w-4 h-4 rounded-full border-2 ${index === 0 ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}></div>
+            <span className="ml-2 text-sm">{client.account_name} </span><span className="capitalize text-sm px-2">({client.tier})</span>
+          </div>
+          
+        ))}
+        <div
+            key={user.clients[0].account_name}
+            className="hidden flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
+            onClick={() => handleClientChange(user.clients[0])}
+          >
+            {/* Radio Button */}
+            <div className={`w-4 h-4 rounded-full border-2  border-gray-400'}`}></div>
+            <span className="ml-2 text-sm">{user.clients[0].account_name} </span><span className="capitalize text-sm px-2">({user.clients[0].tier})</span>
+          </div>
+      </div>}
    
     {/*<Link to="/profile" onClick={showSettings} className="menu-item bm-item">My Profile</Link>*/}
        
       {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" onClick={showSettings} className="menu-item bm-item">Switch Users</Link></Upgrade>*/}
           
-        <a href="/" onClick={showSettings} className="menu-item bm-item">Logout</a>
+       
       </Menu>}
 
             

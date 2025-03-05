@@ -1,19 +1,31 @@
 import { useEffect, useState, } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link , useNavigate} from "react-router-dom";
 import WorkingDialog from './WorkingDialog';
 import api from '../utility/api';
 
 import { convertTier } from '../utility/loginUser';
 import Upgrade from "./Upgrade";
+import { updateUser } from "../utility/UserSlice";
 
 const ProfileMenu = ({ closeMenu, embed=true }) => {
   let user = useSelector(state => state.userInfo.user)
+  const dispatch = useDispatch();
   const [selectedClient, setSelectedClient] = useState(user.clients[0]); // Default client
   const [showDialog,setShowDialog] = useState(false)
   const navigate = useNavigate();
-  const handleClientChange = (client) => {
+
+  const handleClientChange = async (client) => {
+    setShowDialog(true)
     setSelectedClient(client);
+    //alert(client.id)
+    let resp = await api.patch('/users/me',{
+      client_id:client.id
+    })
+    console.log(JSON.stringify(resp.data))
+    dispatch(updateUser({...user,clients:resp.data.clients}))
+    //alert(JSON.stringify(resp.data))
+    setShowDialog(false)
     location.reload(); // Reload the page to display relevant data
   };
 

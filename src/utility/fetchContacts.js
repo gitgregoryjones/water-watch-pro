@@ -1,6 +1,6 @@
 import api from "/src/utility/api.js"; // Import your api utility
 
-const fetchContacts = async () => {
+const fetchContacts = async (user) => {
   console.log(`Contacts called`);
 
   try {
@@ -9,7 +9,7 @@ const fetchContacts = async () => {
     let rows = [];
 
     while(page > 0){
-      const response = await api.get(`/api/contacts?page=${page++}&page_size=${pageSize}`);
+      const response = await api.get(`/api/contacts?page=${page++}&page_size=${pageSize}${user.clients.length > 1 ? `&client_id=${user.clients[0].id}`:``}`);
       if(response.data.length > 0){
         rows = rows.concat(response.data)
       }

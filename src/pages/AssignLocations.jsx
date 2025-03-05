@@ -44,7 +44,8 @@ const AssignLocations = () => {
     let b = async()=>{
     try {
 
-    let rows = await fetchByPage(`/api/contacts`)
+    let rows = await fetchByPage(`/api/contacts${user.clients.length > 1 ? `?client_id=${user.clients[0].id}`:``}`)
+    
     setContacts(rows)
 
    } catch(e){
@@ -62,7 +63,7 @@ const AssignLocations = () => {
       setWorking(true)
       
     let b = async () =>{
-      let rows = await fetchByPage(`/api/contacts/${selectedContact}/locations?`)
+      let rows = await fetchByPage(`/api/contacts/${selectedContact}/locations${user.clients.length > 1 ? `?client_id=${user.clients[0].id}`:``}`)
 
       setAssignedLocations(rows);
 

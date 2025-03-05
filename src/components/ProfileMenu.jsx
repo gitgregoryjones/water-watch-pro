@@ -20,10 +20,14 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
     setSelectedClient(client);
     //alert(client.id)
     let resp = await api.patch('/users/me',{
-      client_id:client.id
+      primary_client_id:client.id
     })
-    console.log(JSON.stringify(resp.data))
-    dispatch(updateUser({...user,clients:resp.data.clients}))
+    
+    //alert(`Client id passed to backend was ${client.id} and First id returned is ${resp.data.clients[0].id}`)
+    //alert(JSON.stringify(resp.data.clients[0]))
+    let resp2 = await api.get('/users/me')
+    console.log(`Second Pass Client id passed to backend was ${client.id} and First id returned is ${resp2.data.clients[0].id}`)
+    dispatch(updateUser({...user,clients:resp2.data.clients}))
     //alert(JSON.stringify(resp.data))
     setShowDialog(false)
     location.reload(); // Reload the page to display relevant data
@@ -126,7 +130,7 @@ const formatPhoneNumber = (phone) => {
           >
             {/* Radio Button */}
             <div className={`w-4 h-4 rounded-full border-2 ${index === 0 ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}></div>
-            <span className="ml-2 text-sm">{client.account_name} </span><span className="capitalize text-sm px-2">({client.tier})</span>
+            <span className="ml-2 text-sm">{client.account_name} {client.id} </span><span className="capitalize text-sm px-2">({client.tier})</span>
           </div>
         ))}
       </div>}

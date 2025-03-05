@@ -136,11 +136,11 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   
     // Determine the appropriate endpoint based on the `period`
     if (period === "rapidrain") {
-      endpoint = `/api/locations/${location.id}/15m_data?hours=${max}`;
+      endpoint = `/api/locations/${location.id}/15m_data?hours=${max}&${user.clients?.length > 1 ? `client_id=${user.clients[0].id}`:`` }`;
     } else if (period === "daily") {
-      endpoint = `/api/locations/${location.id}/24h_data/${getBeginEndRange()}`;
+      endpoint = `/api/locations/${location.id}/24h_data/${getBeginEndRange()}?${user.clients?.length > 1 ? `client_id=${user.clients[0].id}`:`` }`;
     } else {
-      endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
+      endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}&${user.clients?.length > 1 ? `client_id=${user.clients[0].id}`:`` }`;
     }
   
     try {

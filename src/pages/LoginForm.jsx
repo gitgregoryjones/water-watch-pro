@@ -240,6 +240,7 @@ export default function LoginForm() {
                     
                     page: 1,
                     page_size: 250,
+                    client_id:userData.clients[0].id
                 },
                 headers: {
                     "Authorization": `Bearer ${lresponse.userData.accessToken}`,
@@ -285,7 +286,7 @@ export default function LoginForm() {
 
             const location24History = await api.post(`/api/locations/24h_data`, ids, {
                 params: {
-                    
+                    client_id:userData.clients[0].id
                     
                 },
                 headers: {
@@ -328,6 +329,7 @@ export default function LoginForm() {
                 params: {
                    
                     date: todayStr,
+                    client_id:userData.clients[0].id
                 },
                 headers: {
                     "Authorization": `Bearer ${userData.accessToken}`,

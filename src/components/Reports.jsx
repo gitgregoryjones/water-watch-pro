@@ -53,7 +53,7 @@ const Reports = () => {
    
         try {
           
-          let rows = await fetchByPage(`/api/locations`)
+          let rows = await fetchByPage(`/api/locations${user.clients.length > 1 ? `?client_id=${user.clients[0].id}`:``}`)
           setLocations(rows)
          
           setShowDialog(false)

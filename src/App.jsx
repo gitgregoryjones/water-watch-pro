@@ -42,11 +42,15 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import Prices from "./pages/Prices";
 import AdminCards from "./components/AdminCards";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
 import CancelSignUp from "./pages/CancelSignUp";
 import ProfileMenu from "./components/ProfileMenu";
 import {VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
+import api from './utility/api';
+import { updateUser } from "./utility/UserSlice";
+import WorkingDialog from "./components/WorkingDialog";
+import UserForm from "./components/UserForm";
 
 
 
@@ -55,14 +59,30 @@ function App() {
 
   const location = useLocation();
   const user = useSelector((state) => state.userInfo.user);
+  const dispatch = useDispatch();
+  const [showDialog, setShowDialog] = useState(false);
 
 
   const [selectedClient, setSelectedClient] = useState(user.clients[0]);
 
-  const handleClientChange = (client) => {
-    setSelectedClient(client);
-    location.reload(); // Reload the page to display relevant data
+  const handleClientChange = async (client) => {
+    setShowDialog(true)
+    
+    //alert(client.id)
+    let resp = await api.patch('/users/me',{
+      primary_client_id:client.id
+    })
+    
+    //alert(`Client id passed to backend was ${client.id} and First id returned is ${resp.data.clients[0].id}`)
+    //alert(JSON.stringify(resp.data.clients[0]))
+    let resp2 = await api.get('/users/me')
+    console.log(`Second Pass Client id passed to backend was ${client.id} and First id returned is ${resp2.data.clients[0].id}`)
+    dispatch(updateUser({...user,clients:resp2.data.clients}))
+    //alert(JSON.stringify(resp.data))
+    setShowDialog(false)
+    window.location.reload(); // Reload the page to display relevant data
   };
+
 
 
   
@@ -109,7 +129,7 @@ function App() {
    {VITE_FEATURE_MULTIPLE_CLIENTS != "false" &&
    <div className="flex flex-row gap-2 ">
     <div className="px-2">
-      <ProfilePic mini={true}  />
+      <Link title={`Edit ${user.first_name}`}  onClick={()=>setOpen(false)}  to="/profile"><ProfilePic mobile={true} mini={true}  /></Link>
     </div>
    
       
@@ -179,7 +199,7 @@ function App() {
         <Route path="/reports" element={<ReportsPage/>} />
         <Route path="/assignments" element={<AssignmentsPage/>} />
         <Route path="/assign-locations" element={<AssignLocations/>} />
-        <Route path="/profile" element={<MyProfile/>} />
+        <Route path="/profile-backup" element={<MyProfile/>} />
         <Route path="/switch" element={<SwitchUser/>} />
         <Route path="/location-form" element={<LocationPage/>} />
         <Route path="/location-list" element={<LocationListPage/>} />
@@ -199,12 +219,13 @@ function App() {
        
 <Route path="/contact-form" element={<ContactPage />} />
 <Route path="/client-form" element={<ClientPage />} />
+<Route path="/profile" element={<UserForm />} />
 
       </Routes>
       
         
   
-         
+      <WorkingDialog showDialog={showDialog}/>
       </Container>
 
     </LandscapeOrientation>

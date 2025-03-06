@@ -39,7 +39,7 @@ export default function ProfilePic({className, mini, mobile=false}){
         <div>
             {!mini && <div className={`flex md:flex  text-sm items-end md:gap-2 justify-end mx-4 items-center tab ${className}`}>
             
-            <div className='text-lg text-[#3F6212] capitalize'>Welcome {user.first_name}  {user.is_superuser ? `(${user.role})` : `(${user.clients[0]?.tier} Level)`} </div>
+            <div className='text-lg text-[#3F6212] capitalize'>Welcome {user.first_name} {user.last_name}  {user.is_superuser ? `(${user.role})` : `(${user.clients[0]?.tier} Level)`} </div>
             <div className=' md:flex flex-col items-center justify-center'>
                 <Upgrade  showMsg={false}>
                 <Link className='hidden' to="/double">Switch User</Link>
@@ -60,8 +60,13 @@ export default function ProfilePic({className, mini, mobile=false}){
                         {user.first_name?.charAt(0)}
                         {user.last_name?.charAt(0)}
                         </div>}
-                        {mobile == true && <i onClick={() => setIsMenuOpen(!isMenuOpen)}  className="fas fa-bars text-lg"></i>
-                        }
+                        {mobile == true && <div 
+                        
+                        className="flex items-center justify-center h-20 w-20 md:w-10 md:h-10 aspect-square rounded-full text-3xl md:text-sm font-semibold cursor-pointer bg-gray-600 text-white -ml-2 border-2 border-white"
+                        >
+                        {user.first_name?.charAt(0)}
+                        {user.last_name?.charAt(0)}
+                        </div>}
                     </div>
                     {isMenuOpen && <ProfileMenu user={user} closeMenu={() => setIsMenuOpen(false)} />}
               </div>

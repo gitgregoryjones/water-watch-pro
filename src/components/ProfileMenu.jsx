@@ -75,14 +75,14 @@ const formatPhoneNumber = (phone) => {
   
   return (
     <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-md border border-gray-300 z-50">
-       <p className="px-2 pt-4 text-xs text-gray-500 uppercase">user details</p>
+       <p className="px-2 pt-4 text-xs text-gray-500 uppercase">user details </p>
       {/* User Info */}
       <div className="pt-2 px-4 mb-2 text-gray-800 text-sm">
         <p className="font-semibold">{user.first_name} {user.last_name} <span className=" bg-white hidden border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
         <p className="text-gray-600">{user.email}</p>
         <p className="text-gray-600">{formatPhoneNumber(user.phone)}</p>
         <p className="text-gray-600 hidden capitalize"><span className=" bg-white border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
-       
+       <p><a href="/profile">Edit</a></p>
       </div>
 
       {/* View Profile Link */}

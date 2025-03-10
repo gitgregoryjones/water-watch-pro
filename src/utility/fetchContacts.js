@@ -1,7 +1,7 @@
 import api from "/src/utility/api.js"; // Import your api utility
 
 const fetchContacts = async (user) => {
-  console.log(`Contacts called`);
+  console.log(`Contacts called user ${user.clients.id}` );
 
   try {
     let page = 1;

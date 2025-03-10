@@ -56,11 +56,11 @@ const AssignmentsPage = () => {
     // Fetch all contacts for the user
     let a = async ()=>{
     try {
-      let contactNames = await fetchContacts();
+      let contactNames = await fetchContacts(user);
       setContacts(contactNames);
       setUnassignedContacts(contactNames);
     } catch(e){
-          console.error('Error fetching contacts:', error.message);
+          console.error('Error fetching contacts:', e.message);
     };
     }
     a();

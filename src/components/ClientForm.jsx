@@ -27,6 +27,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [showDialog, setShowDialog] = useState(false);
   const [msg,setMsg] = useState("")
   const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
+  const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations)
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
 
@@ -82,7 +83,9 @@ const ClientForm = ({ clientToEdit,myself }) => {
       tier,
       manual_invoice:manualInvoice,
       account_type,
-      is_trial_account
+      is_trial_account: account_type == "trial",
+      
+      auto_add_locations
       
     };
 
@@ -222,6 +225,11 @@ const ClientForm = ({ clientToEdit,myself }) => {
         <div className="hidden flex items-center">
           <Toggle checked={account_type == "paid" ? true : false} onChange={() => setAccount_Type(account_type)} />
           <span className="ml-2">Archive Account</span>
+        </div>
+
+        <div className=" flex items-center">
+          <Toggle checked={JSON.stringify(auto_add_locations) == "true"} onChange={() => setAutoAddLocations(!auto_add_locations)} />
+          <span className="ml-2">Auto Add Locations</span>
         </div>
 
         {/* Account Actions */}

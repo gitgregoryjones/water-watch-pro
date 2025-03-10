@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
 import Toggle from './Toggle'; // Import the Toggle component
@@ -8,13 +9,20 @@ import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import {validateEmail} from '../utility/passwordFunc'
 
-const ContactForm = ({ contactToEdit }) => {
+const ContactForm = ({  }) => {
+  const { state } = useLocation();
+  const contactToEdit = state?.contact;
+  
+
   const [name, setName] = useState(contactToEdit?.name || '');
   const [email, setEmail] = useState(contactToEdit?.email || '');
   const [phone, setPhone] = useState(contactToEdit?.phone || '');
+
+  
   const [client_id, setClient_Id] = useState(contactToEdit?.client_id)
   const [accountName, setAccountName] = useState(contactToEdit?.account_name)
   const [daily_report_on, set] = useState(contactToEdit?.account_name)
+  const [role,setRole] = useState("contact");
   const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
@@ -39,6 +47,9 @@ const ContactForm = ({ contactToEdit }) => {
 
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(true);
   const user = useSelector((state) => state.userInfo.user);
+
+  //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
+  
   const [showDialog, setShowDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [clients, setClients] = useState([])
@@ -85,6 +96,26 @@ const ContactForm = ({ contactToEdit }) => {
 
   useEffect(() => {
    fetchClients(currentPage)
+   
+   let roleLookup = async ()=>{
+
+    console.log(`Lookup user for clientToEdit ${contactToEdit.user_id}`)
+    let adminResp =  await api.get(`/api/clients/${contactToEdit.client_id}/admins`);
+
+    
+    let me = adminResp.data.find((e)=> contactToEdit.user_id == e.id)
+    if(me){
+      console.log(`I found me as ${JSON.stringify(me)} ${contactToEdit.user_id}`)
+      setRole("co-owner");
+      console.log(`Found Me as co-owner`)
+    }
+
+   }
+
+   if(contactToEdit)
+    {
+      roleLookup();
+    }
    
   }, [currentPage])
   
@@ -163,6 +194,7 @@ const ContactForm = ({ contactToEdit }) => {
       phone,
       email: email ? email : null,
       status: 'active',
+      
       daily_report_on:formData.daily_report_on,
       daily_report_on_sms: formData.daily_report_on_sms,
       forecast_on: formData.forecast_on,
@@ -183,6 +215,38 @@ const ContactForm = ({ contactToEdit }) => {
        rec = await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${contactToEdit.client_id}`, payload);
       } else {
          rec = await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
+      }
+
+      if(role == "co-owner"){
+        //do upsert
+        let adminsResp = await api.get(`/api/clients/${rec.data.client_id}/admins`);
+
+        let admins = [];
+
+        admins = adminsResp.data;
+
+        console.log(`User id ${rec.data.user_id}`)
+
+        console.log(`What is an admin ${JSON.stringify(adminsResp)}`)
+
+        let me = admins.find((e)=>{ console.log(JSON.stringify(e)); return e.id == rec.data.user_id})
+
+        console.log(`Me USER ${JSON.stringify(me)} and rec is ${JSON.stringify(rec)}`)
+
+        if(!me){
+          console.log(`Me was not found in Admin. Do POST because ${rec.data.user_id} not found in table`)
+          await api.post(`/api/clients/${rec.data.client_id}/admins?client_id=${rec.data.client_id}&user_id=${rec.data.user_id}`);
+        }
+      
+      } else {
+
+        try { 
+          await api.delete(`/api/clients/${rec.data.client_id}/admins/${rec.data.user_id}`)
+        }catch(e){
+          console.log(`No Admin record found to delete`);
+          console.log(e.message)
+        }
+
       }
 
       setTimeout(() => {
@@ -259,7 +323,7 @@ const ContactForm = ({ contactToEdit }) => {
         <FaTimes />
       </button>
 
-      <h1 className="text-2xl font-bold mb-4">{contactToEdit ? `Edit ${name}` : 'Add Contact'}</h1>
+      <h1 className="text-2xl font-bold mb-4">{contactToEdit ? `Edit` : 'Add Contact'}  </h1>
       <h2 className='mb-2'>{msg}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Basic Info */}
@@ -309,7 +373,13 @@ const ContactForm = ({ contactToEdit }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
-        
+        <div className='flex items-center justify-start gap-2'>
+          <label>Make this contact a co-owner</label>
+          <Toggle
+              checked={role === "co-owner"}
+              onChange={(e) => role == "contact" ? setRole("co-owner") : setRole("contact")}
+            />
+        </div>
        { user.role == "admin" && (<div>
           <label htmlFor="accountName" className="block text-gray-700 font-bold">
             Account Name

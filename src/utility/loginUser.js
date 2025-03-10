@@ -281,6 +281,7 @@ const loginUser = async (email, password, token)=>{
     let response = {userData,errors:[]}
 
     
+    
     try {
 
     const loginResponse = await api.post(`/auth/jwt/login`, new URLSearchParams({
@@ -314,6 +315,8 @@ const loginUser = async (email, password, token)=>{
     });
 
     userData = verifyResponse.data;
+
+    
 
     userData.firstName = userData.first_name;
     userData.lastName = userData.last_name;

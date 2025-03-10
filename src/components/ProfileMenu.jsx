@@ -82,6 +82,7 @@ const formatPhoneNumber = (phone) => {
         <p className="text-gray-600">{user.email}</p>
         <p className="text-gray-600">{formatPhoneNumber(user.phone)}</p>
         <p className="text-gray-600 hidden capitalize"><span className=" bg-white border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
+        <p>Role: {user.co_owner == true ? "Co-owner" : user.role}</p>
        <p><a href="/profile">Edit</a></p>
       </div>
 
@@ -130,7 +131,7 @@ const formatPhoneNumber = (phone) => {
           >
             {/* Radio Button */}
             <div className={`w-4 h-4 rounded-full border-2 ${index === 0 ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}></div>
-            <span className="ml-2 text-sm">{client.account_name}</span><span className="capitalize text-sm px-2">({client.tier})</span>
+            <span className="ml-2 text-sm">{client.account_name} {client.id}</span><span className="capitalize text-sm px-2">({client.tier})</span>
           </div>
         ))}
       </div>}

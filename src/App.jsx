@@ -51,6 +51,7 @@ import api from './utility/api';
 import { updateUser } from "./utility/UserSlice";
 import WorkingDialog from "./components/WorkingDialog";
 import UserForm from "./components/UserForm";
+import ContactForm from "./components/ContactForm";
 
 
 
@@ -146,7 +147,7 @@ function App() {
     <div   className="flex flex-col">
       <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
    <Upgrade showMsg={false} tier={1}>
-    {user.role != "contact" && <div><Link to={window.innerWidth > 600 ? `/location-list` : '/settings-general'} onClick={showSettings} className="menu-item bm-item">Settings</Link></div>}
+    
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
     </Upgrade>
     <a href="/" onClick={showSettings} className="menu-item bm-item">Logout</a>
@@ -217,7 +218,7 @@ function App() {
         <Route path="/cancel-signup" element={<CancelSignUp />} />
 
        
-<Route path="/contact-form" element={<ContactPage />} />
+<Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
 <Route path="/profile" element={<UserForm />} />
 

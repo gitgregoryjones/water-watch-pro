@@ -33,6 +33,8 @@ export default function Header() {
   
   console.log(`User in header is ${JSON.stringify(user)}`)
 
+ 
+
   const trialEndDateStr = user.clients[0]?.trial_end_date;
   const trialEndDate = new Date(trialEndDateStr);
   const today = new Date();
@@ -95,15 +97,15 @@ export default function Header() {
       Reports
     </Link>
   
-  {(user.role != "admin" && user.role != "contact") && (<Link to="/assign-locations" className={location.pathname === "/assign-locations" || location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
+  {(user.role != "admin" && user.role != "contact") || user.co_owner == true && (<Link to="/assign-locations" className={location.pathname === "/assign-locations" || location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
     Assignments
   </Link>)}
   <div>
 
     {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
     Settings
-  </Link>): user.role != "contact" && (<Upgrade  tier={1} showMsg={false}><Link to="/contact-list" className={["/location-list", "/contact-list", "/settings-general","/client-form"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
-    Settings
+  </Link>): user.role != "contact"  || user.co_owner == true && (<Upgrade  tier={1} showMsg={false}><Link to="/contact-list" className={["/location-list", "/contact-list", "/settings-general","/client-form"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
+    Settings 
   </Link></Upgrade>)}
   </div>
   

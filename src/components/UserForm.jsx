@@ -34,7 +34,9 @@ const UserForm = ({ clientToEdit, myself }) => {
      
 
 
-        let updatedUser = await api.patch(`/users/me/`, payload);
+        let patchUser = await api.patch(`/users/me/`, payload);
+
+        let updatedUser = await api.get(`/users/me/`);
 
         //alert(user.first_name)
 

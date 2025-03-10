@@ -128,6 +128,7 @@ export default function DashboardPage() {
     setWorking(true)
     let response = {}
     try {
+      
        response = await colorLoggedInUserLocations(user);
     
       setLocationList(response.locations || [])

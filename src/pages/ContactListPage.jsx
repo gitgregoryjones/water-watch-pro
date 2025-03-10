@@ -83,6 +83,7 @@ const ContactListPage = () => {
  
 
   const handleEdit = (contact) => {
+    //alert(`sending ${contact.user_id}`)
     navigate('/contact-form', { state: { contact } });
   };
 

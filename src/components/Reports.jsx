@@ -231,7 +231,7 @@ const Reports = () => {
     if ((displayFormat === 'csv' || selectedLocations.length > 1) && selectedContacts.length === 0) {
       const errorMessage = `
         <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
-          <p><strong>Error:</strong> Please select at least one contact when generating a CSV report or selecting multiple locations.</p>
+          <p><strong>Error:</strong> Please select at least one contact when generating a CSV, HTML report or selecting multiple locations.</p>
         </div>
       `;
       setReportContent(errorMessage);
@@ -268,15 +268,17 @@ const Reports = () => {
        query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
+
+    requestData = {
+      email_format: displayFormat,
+      email_list: selectedContacts,
+      locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
+    };
    
     setShowDialog(true);
     if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') ) {
       // POST Request for multiple locations
-      requestData = {
-        email_format: displayFormat,
-        email_list: selectedContacts,
-        locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
-      };
+     
 
       if(reportType == "sms" || reportType == "emails"){
 
@@ -324,7 +326,15 @@ const Reports = () => {
       try {
         const response = await api.get(query);
         console.log('Report Data:', response.data);
+
+        if(requestData.email_list.length > 0){
+          console.log(`Trying to email one location`)
+          const response =  await api.post(query.substring(0, query.lastIndexOf("/")), requestData);
+        }
+
         setShowDialog(false);
+
+        
         /*
         if(window.innerWidth < 600){
         setReportContent(response.data.replace(
@@ -334,7 +344,7 @@ const Reports = () => {
       } else {
         setReportContent(response.data);
       }*/
-        setReportContent(response.data);
+        setReportContent(`<div style="${requestData.email_list.length > 0 ? '' : 'display:none;'} width:100%; font-weight:bold; background-color:blue; padding:2rem; color:white; background-color:red">Attention: The Report was also sent to ${JSON.stringify(requestData.email_list)}</div>` + response.data);
       } catch (error) {
         setShowDialog(false);
         console.log('Error fetching report:', error.message);
@@ -514,7 +524,7 @@ const Reports = () => {
         </div>}
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  displayFormat == "excel" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
+        {(displayFormat == "csv" ||  displayFormat == "excel" || displayFormat == "html" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
             <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
           

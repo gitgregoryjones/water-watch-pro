@@ -27,7 +27,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [showDialog, setShowDialog] = useState(false);
   const [msg,setMsg] = useState("")
   const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
-  const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations)
+  const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations || true)
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
 

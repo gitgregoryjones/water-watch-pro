@@ -122,7 +122,7 @@ const FormWizardDelayed = () => {
       if (!isNavigating.current) {        
         console.log("Current Chose again to leave or reload the page.");
         console.log(`I know this about you ${JSON.stringify(formData)}`)        
-        abandon({...formData}, null)
+        //abandon({...formData}, null)
         
       }
     };

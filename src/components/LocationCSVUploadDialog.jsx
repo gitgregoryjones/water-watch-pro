@@ -31,10 +31,15 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       errorMessages.push(`Invalid latitude: ${row.lat}. Latitude must be between 20 and 55 degrees.`);
     }
 
+    //convert longitude if necessary
+
+    
+
     // Validate longitude
     const longitude = parseFloat(row.lng);
-    if (isNaN(longitude) || longitude < -125 || longitude > -70) {
-      errorMessages.push(`Invalid longitude: ${row.lng}. Longitude must be between -125 and -70 degrees`);
+
+    if (isNaN(longitude) || longitude < -122 || longitude > -66) {
+      errorMessages.push(`Invalid longitude: ${row.lng}. Longitude must be between -122 and -66 degrees`);
     }
 
     // Validate limit24
@@ -82,6 +87,19 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       if (parts.length === 4) {
         parts.push(parts[3]); // Default the 5th part with the value of the 4th
       }
+
+      const longitude = parts[2];
+
+      if(parseFloat(longitude) > 0 ){
+        parts[2] = -longitude;
+        console.log(`Converted longitude value that was greater than zero [${parts[2]}]  to ${longitude}`)
+      }
+      
+     while(parts.length > 5){
+      console.log(`Before Extra information on the line ${JSON.stringify(parts)} cleaning it up`)
+      parts.pop();
+      console.log(`After Extra information on the line ${JSON.stringify(parts)} cleaning it up`)
+     }
   
       // Join the updated parts and add them to the output
       if (parts.length === 5) {

@@ -55,12 +55,15 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             return;
         }
 
+        let tmpLong = longitude > 0 ? -longitude : longitude;
+
         if(longitude > 0 ){
           setLongitude(-longitude);
           
+          
         }
 
-        if(!longitude || longitude < -122 || longitude > -66 ){
+        if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
             
             setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
             setIsWorking(false); 

@@ -94,10 +94,25 @@ const ClientForm = ({ clientToEdit,myself }) => {
     try {
       if (clientToEdit) {
         c = await api.patch(`/api/clients/${clientToEdit.id}`, payload);
+       // console.log(`Greg Clients is ${JSON.stringify(user)} BEFORE`)
+        let list = [];
         if(myself){
             let copy = {...user};
-            copy.clients = [c.data];
-            dispatch(updateUser(copy))
+            let list = []
+            copy.clients.forEach((myClient,idx)=> {
+              //console.log(`Looping clients ${idx} ${myClient.id}`)
+                if(myClient.id == c.data.id){
+                 // console.log(`Found Match ${idx} ${myClient.id}`)
+                    list.push(c.data)
+                   // console.log(`List length ${list.length}`)
+                } else {
+                 // console.log(`DID NOT Found Match ${idx} ${myClient.id}`)
+                  list.push(myClient)
+                //  console.log(`List length ${list.length}`)
+                }
+            })
+           // console.log(`Greg Clients is LIST AFTER ${JSON.stringify(list)} AFTER`) 
+            dispatch(updateUser({...copy,clients:list}))
         }
       } else {
         await api.post('/api/clients/', payload);

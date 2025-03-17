@@ -654,7 +654,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             key: 'alternate_billing_email',
             label: {
                 type: 'custom',
-                custom: `Billing (${formData.email})`,
+                custom: `Billing Email Address`,
             },
             type: "text",
             optional: true,

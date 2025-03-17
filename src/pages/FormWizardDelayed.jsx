@@ -311,7 +311,42 @@ const provisionAccount = async (customerMetadata, customer_email) => {
   
       console.log(`The location data is ${JSON.stringify(theLocation)}`);
   
-      const userCopy = { ...lresponse.userData, locations: [theLocation.data] };
+      let userCopy = { ...lresponse.userData, locations: [theLocation.data] };
+
+      let savedClient = lresponse.userData?.clients[0]
+      
+              let newClient =  {...savedClient, tier: formData.tier, is_trial_account: formData.subscriptionLevel == "trial",account_type: formData.subscriptionLevel, status:'pending' }
+      
+              //Gene Business Rules
+              newClient.daily_report_on = true;
+              newClient.exceed24h_on = true;
+              newClient.exceed24h_combine_locations = true;
+      
+              //Only Gold
+             
+              if(newClient.tier == "gold"){        
+                newClient.forecast_on = true;
+                newClient.forecast_combine_locations = true;
+              }
+      
+              if(newClient.tier == "gold" || newClient.tier == "silver"){
+                newClient.atlas14_on = true;
+                newClient.atlas14_24h_on = true;
+                newClient.atlas14_1h_on = true;
+                newClient.atlas14_first_on = true;
+                newClient.rapidrain_on = true;
+                newClient.rapidrain_combine_locations = true;
+              }
+             
+              //If not bronze, overwrite client
+              await patchClient(newClient)
+      
+             // let tmpUserCopy = {...lresponse.userData};
+      
+              userCopy.clients = [newClient];
+      
+              //dispatch(updateUser(userCopy));
+      
   
       dispatch(updateUser(userCopy));
     } catch (e) {

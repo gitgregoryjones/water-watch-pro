@@ -482,6 +482,7 @@ const Reports = () => {
           >
             <option value="html">Formatted</option>
             {<option value="csv">CSV</option>}
+            {<option value="pdf">PDF</option>}
             {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
           </select>
         </div>
@@ -524,7 +525,7 @@ const Reports = () => {
         </div>}
 
         {/* Row 2 */}
-        {(displayFormat == "csv" ||  displayFormat == "excel" || displayFormat == "html" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
+        {(displayFormat == "csv" ||  displayFormat == "excel" || displayFormat == "html" || displayFormat == "pdf" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
             <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
           

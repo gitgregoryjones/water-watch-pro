@@ -321,12 +321,15 @@ const provisionAccount = async (customerMetadata, customer_email) => {
               newClient.daily_report_on = true;
               newClient.exceed24h_on = true;
               newClient.exceed24h_combine_locations = true;
+              newClient.only_show_locations_with_non_zero = true;
+              newClient.sort_by_rainfall = true;
       
               //Only Gold
              
               if(newClient.tier == "gold"){        
                 newClient.forecast_on = true;
                 newClient.forecast_combine_locations = true;
+
               }
       
               if(newClient.tier == "gold" || newClient.tier == "silver"){
@@ -336,6 +339,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
                 newClient.atlas14_first_on = true;
                 newClient.rapidrain_on = true;
                 newClient.rapidrain_combine_locations = true;
+                rapidrain_first_on = true;
               }
              
               //If not bronze, overwrite client

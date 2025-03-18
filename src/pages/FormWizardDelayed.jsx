@@ -55,7 +55,7 @@ const FormWizardDelayed = () => {
     companyPhone: '',
     companyEmail: '',
     subscriptionLevel: 'paid',
-    tier: 'gold',
+    tier: '',
     locationName: '',
     latitude: '',
     longitude: '',
@@ -315,7 +315,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
 
       let savedClient = lresponse.userData?.clients[0]
       
-              let newClient =  {...savedClient, tier: formData.tier, is_trial_account: formData.subscriptionLevel == "trial",account_type: formData.subscriptionLevel, status:'active' }
+              let newClient =  {...savedClient, tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel == "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
       
               //Gene Business Rules
               newClient.daily_report_on = true;

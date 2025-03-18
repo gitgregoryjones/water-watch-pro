@@ -18,7 +18,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [accountName, setAccountName] = useState(clientToEdit?.account_name || '');
   const [email, setEmail] = useState(clientToEdit?.email || '');
   const [phone, setPhone] = useState(clientToEdit?.phone || '');
-  const [status, setStatus] = useState(clientToEdit?.status || false); // Toggle for account status
+  const [status, setStatus] = useState(clientToEdit?.status || 'active'); // Toggle for account status
   const [account_type, setAccount_Type] = useState(clientToEdit?.account_type);
   const [invoiceDate, setInvoiceDate] = useState(clientToEdit?.invoice_day);
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);

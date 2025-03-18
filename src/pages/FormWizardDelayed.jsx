@@ -316,7 +316,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
       let savedClient = lresponse.userData?.clients[0]
       
               let newClient =  {...savedClient, tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel == "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
-      
+              console.log(`Beflore preserving new fields ${JSON.stringify(newClient)}`)
               //Gene Business Rules
               newClient.daily_report_on = true;
               newClient.exceed24h_on = true;
@@ -324,6 +324,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
               newClient.only_show_locations_with_non_zero = true;
               newClient.sort_by_rainfall = true;
       
+              console.log(`After preserving new fields ${JSON.stringify(newClient)}`)
               //Only Gold
              
               if(newClient.tier == "gold"){        
@@ -339,11 +340,15 @@ const provisionAccount = async (customerMetadata, customer_email) => {
                 newClient.atlas14_first_on = true;
                 newClient.rapidrain_on = true;
                 newClient.rapidrain_combine_locations = true;
-                rapidrain_first_on = true;
+                newClient.rapidrain_first_on = true;
               }
+
+              console.log(`Patching client ${JSON.stringify(newClient)}`)
              
               //If not bronze, overwrite client
-              await patchClient(newClient)
+              let nc = await patchClient(newClient)
+
+              console.log(`Response from the path of client ${JSON.stringify(nc)}`)
       
              // let tmpUserCopy = {...lresponse.userData};
       

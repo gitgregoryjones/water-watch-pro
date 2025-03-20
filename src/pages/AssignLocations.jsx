@@ -95,7 +95,7 @@ const AssignLocations = () => {
 
       let locIds = selectedUnassignedLocations.map((m)=>m.id);
 
-      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/locations`,locIds)
+      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/locations?client_id=${user.clients[0]?.id`,locIds)
 
     }catch(e){
       setWorking(false);

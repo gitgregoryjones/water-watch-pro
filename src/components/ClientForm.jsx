@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { useDispatch } from 'react-redux';
 import { convertTier } from '../utility/loginUser';
+import ChildAccountsWidget from './ChildAccountsWidget';
 
 const ClientForm = ({ clientToEdit,myself }) => {
 
@@ -464,6 +465,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
           )}
         </div>
       </form>
+      {!user.is_superuser && <ChildAccountsWidget accounts={user?.clients}/>}
       <WorkingDialog showDialog={showDialog} />
     </div>
     </div> {/* div card div */}

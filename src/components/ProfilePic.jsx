@@ -51,7 +51,7 @@ export default function ProfilePic({className, mini, mobile=false}){
                 <div className='relative' ref={menuRef}>
                     <div className="flex flex-row">
                         <div className="hidden  md:flex bg-[#128CA6] text-white px-4 h-10 flex items-center text-center text-nowrap text-ellipsis justify-center rounded-l-full text-sm">
-                        {user.clients[0].account_name}
+                        {user.clients[0]?.account_name}
                         </div>
                         {mobile == false && <div 
                         onClick={() => setIsMenuOpen(!isMenuOpen)} 

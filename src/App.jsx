@@ -158,24 +158,24 @@ function App() {
         <p className="px-2 text-xs text-gray-500 uppercase font-bold"> Accounts</p>
         {user.clients.map((client, index) => (
           <div
-            key={client.account_name}
+            key={client?.account_name}
             className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
             onClick={() => handleClientChange(client)}
           >
             {/* Radio Button */}
             <div className={`w-4 h-4 rounded-full border-2 ${index === 0 ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}></div>
-            <span className="ml-2 text-sm">{client.account_name} </span><span className="capitalize text-sm px-2">({client.tier})</span>
+            <span className="ml-2 text-sm">{client?.account_name} </span><span className="capitalize text-sm px-2">({client.tier})</span>
           </div>
           
         ))}
         <div
-            key={user.clients[0].account_name}
+            key={user.clients[0]?.account_name}
             className="hidden flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
             onClick={() => handleClientChange(user.clients[0])}
           >
             {/* Radio Button */}
             <div className={`w-4 h-4 rounded-full border-2  border-gray-400'}`}></div>
-            <span className="ml-2 text-sm">{user.clients[0].account_name} </span><span className="capitalize text-sm px-2">({user.clients[0].tier})</span>
+            <span className="ml-2 text-sm">{user.clients[0]?.account_name} </span><span className="capitalize text-sm px-2">({user.clients[0]?.tier})</span>
           </div>
       </div>}
    

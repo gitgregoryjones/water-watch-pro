@@ -16,7 +16,7 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
   const navigate = useNavigate();
 
   const handleClientChange = async (client) => {
-    setShowDialog(true)
+    //setShowDialog(true)
     setSelectedClient(client);
     //alert(client.id)
     let resp = await api.patch('/users/me',{
@@ -29,8 +29,13 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
     console.log(`Second Pass Client id passed to backend was ${client.id} and First id returned is ${resp2.data.clients[0].id}`)
     dispatch(updateUser({...user,clients:resp2.data.clients}))
     //alert(JSON.stringify(resp.data))
-    setShowDialog(false)
-    location.reload(); // Reload the page to display relevant data
+    closeMenu();
+   // setShowDialog(false)
+    if(location.pathname.indexOf("client-form") == -1){
+      location.reload();
+    }else {
+      navigate("/dashboard")// Reload the page to display relevant data
+    }
   };
 
 

@@ -103,12 +103,13 @@ const colorLoggedInUserLocations = async(userData)=>{
 
     const todayStrHr = `${todayHr.getFullYear()}-${(todayHr.getMonth() + 1).toString().padStart(2, '0')}-${todayHr.getDate().toString().padStart(2, '0')}`;
 
-    const location24History = await api.post(userData.clients?.length > 1 ? `/api/locations/24h_data?client_id=${userData.clients[0].id}` :`/api/locations/24h_data`, ids, {
+
+    const location24History = ids.length > 0 ? await api.post(userData.clients?.length > 1 ? `/api/locations/24h_data?client_id=${userData.clients[0].id}` :`/api/locations/24h_data`, ids, {
         params: {
             
             
         }
-    });
+    }) : [];
 
     const loc24 = location24History.data;
 
@@ -141,12 +142,12 @@ const colorLoggedInUserLocations = async(userData)=>{
     
     const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
 
-    const locationHourlyHistory = await api.post(userData.clients?.length > 1 ? `/api/locations/24h_data?client_id=${userData.clients[0].id}` :`/api/locations/24h_data`, ids, {
+    const locationHourlyHistory = ids.length > 0 ? await api.post(userData.clients?.length > 1 ? `/api/locations/24h_data?client_id=${userData.clients[0].id}` :`/api/locations/24h_data`, ids, {
         params: {
            
             date: todayStr,
         }
-    });
+    }): [];
 
     const locHourly = locationHourlyHistory.data;
 

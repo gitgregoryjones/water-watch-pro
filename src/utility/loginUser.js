@@ -8,7 +8,7 @@ const swapUser = async (currentUser, newUser) => {
 
     let swapped = {errors:null,user:currentUser};
 
-    if (window.confirm(`Are you sure you want to masquerade as ${newUser.name? newUser.name : newUser.account_name} ${newUser.email? newUser.email : newUser.invoice_email}`)) {
+    if (window.confirm(`Hey Are you sure you want to masquerade as ${newUser.id} ${ newUser.name? newUser.name : newUser.account_name} ${newUser.email? newUser.email : newUser.invoice_email}`)) {
       try {
        console.log(`The masquerade user is ${JSON.stringify(newUser)}`)
 
@@ -30,12 +30,13 @@ const swapUser = async (currentUser, newUser) => {
             swapped.user = {...me.data, locations:locations.data}
 
         } else {
+            //This is a Client
             const tokenResponse = await api.post(`/api/services/user-token?email=${newUser.email? newUser.email : newUser.invoice_email}`)
             localStorage.setItem("accessToken",tokenResponse.data.token)
             //loginUser(null,null,tokenResponse.data.token)
             console.log(`User token is now ${tokenResponse.data.token}`)
             const me = await  api.get(`/users/me`)
-            const locations = await api.get(`/api/locations`)
+            const locations = await api.get(`/api/locations?client_id=${newUser.id}`)
             console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
             swapped.user = {...me.data, locations:locations.data}
         }

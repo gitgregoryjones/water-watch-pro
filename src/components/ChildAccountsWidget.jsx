@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { FaPlus, FaTrash, FaPencilAlt } from "react-icons/fa"; // FontAwesome icons
 import api from "../utility/api";
-import { useNavigate } from "react-router-dom";
+import { unstable_HistoryRouter, useNavigate } from "react-router-dom";
 import { updateUser } from "../utility/UserSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import WorkingDialog from "./WorkingDialog";
+ 
 
 const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
+  const user = useSelector((state) => state.userInfo.user);
   const [newClientName, setNewClientName] = useState("");
   const [childAccounts, setChildAccounts] = useState([]);
+  
 
   const [editIndex, setEditIndex] = useState(null);
   const [editName, setEditName] = useState("");
@@ -16,30 +19,36 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
 
   const [showDialog,setShowDialog] = useState(false)
   const navigate = useNavigate();
+  
   const dispatch = useDispatch();
 
   const handleClientChange = async (client) => {
-    setShowDialog(true)
-   
-    //If no client we don't need to do anything
-     
-    /*if(client){  
-      let resp = await api.patch('/users/me',{
-        primary_client_id:client.id
-      })
-    }*/
+    //setShowDialog(true)
+  
+    //alert(client.id)
+    let resp = await api.patch('/users/me',{
+      primary_client_id:client.id
+    })
     
-    //Always call this to get the most current list of accounts in order to update the UserSlice needed in other parts of the app
+    //alert(`Client id passed to backend was ${client.id} and First id returned is ${resp.data.clients[0].id}`)
+    //alert(JSON.stringify(resp.data.clients[0]))
     let resp2 = await api.get('/users/me')
-
     console.log(`Second Pass Client id passed to backend was ${client.id} and First id returned is ${resp2.data.clients[0].id}`)
-    //Always callUpdate User with the user from the response merged with the latest list of clients
-    dispatch(updateUser({...resp2.data,clients:resp2.data.clients}))
+    //dispatch(updateUser({...user,clients:resp2.data.clients}))
     //alert(JSON.stringify(resp.data))
-    setShowDialog(false)
-    return false;
-    //location.reload(); // Reload the page to display relevant data
+    //closeMenu();
+    setChildAccounts(resp2.data.clients)
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    })
+    dispatch(updateUser({...user,clients:resp2.data.clients}))
+   // setShowDialog(false)
+    //navigate("/dashboard", {state:{client:client, myself:true}})
+    //location.reload()
   };
+
 
   useEffect(() => {
     
@@ -104,6 +113,7 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
           <li
             key={account.id}
             className="bg-gray-200 p-2 rounded-md mb-2 flex items-center justify-between"
+            onClick={()=>handleClientChange(account)}
           >
             {editIndex === index ? (
               <input
@@ -126,14 +136,14 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
                 </button>
               ) : (
                 <button
-                  className="text-blue-600 hover:text-blue-800"
+                  className="hidden text-blue-600 hover:text-blue-800"
                   onClick={() => handleEdit(index)}
                 >
                   <FaPencilAlt />
                 </button>
               )}
               <button
-                className="text-red-600 hover:text-red-800"
+                className="hidden text-red-600 hover:text-red-800"
                 onClick={() => handleDelete(index)}
               >
                 <FaTrash />

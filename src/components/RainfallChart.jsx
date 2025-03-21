@@ -238,7 +238,12 @@ const RainfallChart = ({ location, period, max = 72 }) => {
     snapshotCanvas.height = canvas.height; // Full chart height
 
     const ctx = snapshotCanvas.getContext("2d");
-    ctx.drawImage(canvas, 0, 0, theWidth, canvas.height, 0, 0, theWidth, canvas.height);
+    try {
+      ctx.drawImage(canvas, 0, 0, 120, 120, 0, 0, theWidth, 120);
+    }catch(e){
+      console.log(e.message)
+      console.log(`Greg what is rainfall`)
+    }
 
     const dataUrl = snapshotCanvas.toDataURL();
     snapshotDivRef.current.style.backgroundImage = `url(${dataUrl})`;

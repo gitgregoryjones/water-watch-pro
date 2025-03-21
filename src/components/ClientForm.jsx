@@ -33,6 +33,12 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const dispatch = useDispatch();
 
   useEffect(()=>{
+    setTimeout(()=>
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    }),100)
 
   },[myself])
 

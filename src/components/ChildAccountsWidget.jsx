@@ -18,6 +18,7 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
   const [showInput, setShowInput] = useState(false);
 
   const [showDialog,setShowDialog] = useState(false)
+  
   const navigate = useNavigate();
   
   const dispatch = useDispatch();
@@ -37,16 +38,15 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
     //dispatch(updateUser({...user,clients:resp2.data.clients}))
     //alert(JSON.stringify(resp.data))
     //closeMenu();
+   
     setChildAccounts(resp2.data.clients)
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "smooth",
-    })
+   
     dispatch(updateUser({...user,clients:resp2.data.clients}))
    // setShowDialog(false)
-    //navigate("/dashboard", {state:{client:client, myself:true}})
-    //location.reload()
+    navigate("/client-form", {state:{client:client, myself:true}})
+    
+    setShowDialog(true)
+    setTimeout(()=> location.reload(), 100)
   };
 
 
@@ -105,7 +105,8 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
   };
 
   return (
-    <div className="p-4 w-full max-w-lg bg-white shadow-md rounded-md">
+    <>
+    <div className={ `${showDialog  && "blur"} p-4 w-full max-w-lg bg-white shadow-md rounded-md`}>
       <h2 className="text-lg font-semibold mb-2">Manage Associated Client Accounts</h2>
 
       <ul className="mb-2">
@@ -187,8 +188,10 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
           <span className="text-gray-700">Add Client Account</span>
         </button>
       )}
-      <WorkingDialog showDialog={showDialog} />
+      
     </div>
+    <WorkingDialog showDialog={showDialog} />
+    </>
   );
 };
 

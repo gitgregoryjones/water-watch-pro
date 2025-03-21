@@ -113,7 +113,7 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
         {childAccounts.map((account, index) => (
           <li
             key={account.id}
-            className="bg-gray-200 p-2 rounded-md mb-2 flex items-center justify-between"
+            className="bg-gray-200 hover:bg-slate-300 cursor-pointer p-2 rounded-md mb-2 flex items-center justify-between"
             onClick={()=>handleClientChange(account)}
           >
             {editIndex === index ? (

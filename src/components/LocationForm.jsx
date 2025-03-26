@@ -41,8 +41,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     e.preventDefault();
 
         if(!name){
-          setMsg(<span className="text-[red]">Location name is required</span>)
-          setIsWorking(false); 
+          await setMsg(<span className="text-[red]">Location name is required</span>)
+          await setIsWorking(false); 
             return;
         }
 
@@ -50,43 +50,41 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         if(!latitude || latitude < 24 || latitude > 49 ){
             
-            setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
-            setIsWorking(false); 
+            await setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
+            await setIsWorking(false); 
             return;
         }
 
         let tmpLong = longitude > 0 ? -longitude : longitude;
 
         if(longitude > 0 ){
-          setLongitude(-longitude);
-          
-          
+          await setLongitude(-longitude);
         }
 
         if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
             
-            setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
-            setIsWorking(false); 
+            await setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
+            await setIsWorking(false); 
 
             return;
         }
        
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
             
-            setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            setIsWorking(false); 
+            await setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            await setIsWorking(false); 
             return;
         }
 
        
         if(!rapidRainThreshold){
-            setRapidRainThreshold(h24Threshold)
+            await setRapidRainThreshold(h24Threshold)
             
         } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
             
-            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            setIsWorking(false); 
+            await setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            await setIsWorking(false); 
             return;
         }
      

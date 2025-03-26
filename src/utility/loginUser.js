@@ -36,7 +36,7 @@ const swapUser = async (currentUser, newUser) => {
             //loginUser(null,null,tokenResponse.data.token)
             console.log(`User token is now ${tokenResponse.data.token}`)
             const me = await  api.get(`/users/me`)
-            const locations = await api.get(`/api/locations?client_id=${newUser.id}`)
+            const locations = await api.get(`/api/locations?client_id=${me.data.clients[0].id}`)
             console.log(`now logged in as user ${JSON.stringify({...me.data, locations:locations.data})}`)
             swapped.user = {...me.data, locations:locations.data}
         }

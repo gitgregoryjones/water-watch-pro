@@ -38,6 +38,8 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
     //dispatch(updateUser({...user,clients:resp2.data.clients}))
     //alert(JSON.stringify(resp.data))
     //closeMenu();
+
+    
    
     setChildAccounts(resp2.data.clients)
    
@@ -52,7 +54,7 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
 
   useEffect(() => {
     
-    setChildAccounts(accounts.length > 1 ? accounts.slice(1) : []);
+    setChildAccounts(accounts.length > 1 ? accounts.slice(1).filter((c)=> c.status == "active") : []);
   }, [accounts]);
 
   // Handle adding a new client

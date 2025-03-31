@@ -8,8 +8,18 @@
     "host": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+  "release": "standard-version"
+
+
   },
+  "lint-staged": {
+  "package.json": [
+    "standard-version",
+    "git add"
+  ]
+}
+,
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",

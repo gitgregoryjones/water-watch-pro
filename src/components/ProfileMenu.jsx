@@ -131,7 +131,7 @@ const formatPhoneNumber = (phone) => {
         {user.clients.map((client, index) => (
           <div
             key={client.account_name}
-            className="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100"
+            className={`${client.status == "archived" && "hidden"} flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100`}
             onClick={() => handleClientChange(client)}
           >
             {/* Radio Button */}

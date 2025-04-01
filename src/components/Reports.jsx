@@ -231,7 +231,7 @@ const Reports = () => {
     if ((displayFormat === 'csv' || displayFormat == 'pdf' || displayFormat == 'excel' || selectedLocations.length > 1) && selectedContacts.length === 0) {
       const errorMessage = `
         <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
-          <p><strong>Error:</strong> Please select at least one contact when generating a CSV, HTML report or selecting multiple locations.</p>
+          <p><strong>Error:</strong> Please select at least one contact when generating a PDF,EXCEL,or CSV report or any report with  multiple locations.</p>
         </div>
       `;
       setReportContent(errorMessage);

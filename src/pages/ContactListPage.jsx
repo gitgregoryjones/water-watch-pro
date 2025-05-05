@@ -60,6 +60,7 @@ const ContactListPage = () => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
     try {
       //await api.delete(user.is_superuser ? `/api/contacts/${theContact.id}?client_id=${theContact.client_id}` : `/api/contacts/${theContact.id}`);
+      //Fix for ticket 
       await api.delete( `/api/contacts/${theContact.id}?client_id=${theContact.client_id}`)
       fetchContacts(currentPage); // Refresh the list
     } catch (error) {

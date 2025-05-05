@@ -47,6 +47,7 @@ import AdminCards from '../components/AdminCards'
 import { colorLoggedInUserLocations } from '../utility/loginUser'
 import WorkingDialog from '../components/WorkingDialog'
 import NotificationBanner from '../components/NotificationBanner'
+import Toggle from '../components/Toggle'
 
 export default function DashboardPage() {
 
@@ -109,6 +110,7 @@ export default function DashboardPage() {
   const [isWorking, setWorking] = useState(false);
 
 
+  const [tableOnly, setTableOnly] = useState(false);
   
   //const locations = useSelector((state) => state.locationContacts.locations);
   
@@ -676,10 +678,11 @@ function showThreshold(color){
         footer={(window.innerWidth <= 600  && <div className='flex gap-2 justify-around text-sm py-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <div className='bg-[red] h-2 w-4'></div>{ `Exceeds 24h NOAA Atlas 14`}</div>)}
         header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
       <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade></div></div>} >
+           <Toggle checked={tableOnly} onChange={()=> setTableOnly(!tableOnly)}/>
            <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               
-            <RainfallChart location={location} period={"daily"} max={3} />
+            <RainfallChart location={location} period={"daily"} max={3} tableOnly={tableOnly}/>
             </div>
             <div className='tab'>1 Hour 
             <RainfallChart location={location} period={"hourly"} max={2} />

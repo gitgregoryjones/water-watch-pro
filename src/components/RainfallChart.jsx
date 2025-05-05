@@ -7,7 +7,7 @@ import { convertTier } from "../utility/loginUser";
 
 
 
-const RainfallChart = ({ location, period, max = 72 }) => {
+const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   const user = useSelector((state) => state.userInfo.user);
   const [chartData, setChartData] = useState(null);
   const [error, setError] = useState(null);
@@ -414,7 +414,13 @@ const RainfallChart = ({ location, period, max = 72 }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full">
       
-    <div className="flex flex-row w-full ">
+    {tableOnly && period === "daily" &&  
+
+    <div>{JSON.stringify(chartData)}</div>
+    
+    
+    
+    || <div className="flex flex-row w-full ">
       <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (
@@ -438,7 +444,7 @@ const RainfallChart = ({ location, period, max = 72 }) => {
         
       </div>
       
-    </div>
+    </div>}
         <div className={`mt-4 text-xl ${period != "hourly" && 'hidden' }`}>Scroll to see other days</div>
     </div>
   );

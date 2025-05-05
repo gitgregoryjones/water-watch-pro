@@ -122,7 +122,7 @@ const AssignLocations = () => {
 
       let locIds = selectedAssignedLocations.map((location)=> location.id)
   
-      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/remove_locations`,locIds)
+      let assignedResponse = await api.post(`/api/contacts/${selectedContact}/remove_locations?client_id=${user.clients[0]?.id}`,locIds)
       
 
       setWorking(false)

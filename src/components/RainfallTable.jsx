@@ -3,7 +3,7 @@ import api from '../utility/api';
 import WorkingDialog from './WorkingDialog';
 
 
-const RainfallTable = ({ location, max = 3 }) => {
+const RainfallTable = ({ location, max = 2 }) => {
 
   const today = new Date();
   const year = today.getFullYear();

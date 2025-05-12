@@ -30,7 +30,7 @@ const RainfallTable = ({ location, max = 72 }) => {
 
     })()
 
-  },[])
+  },[location])
 
 
   const hourlyEntries =  data && Object.entries(data?.hourly_data)

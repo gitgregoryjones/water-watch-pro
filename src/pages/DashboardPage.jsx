@@ -34,7 +34,7 @@ import Upgrade from '../components/Upgrade'
 import { Link } from 'react-router-dom'
 import Alerts from '../components/Alerts'
 import ResponsiveTable from '../components/ResponsiveTable'
-import { API_HOST, VITE_GOOGLE_API_KEY } from '../utility/constants'
+import { API_HOST, VITE_GOOGLE_API_KEY, VITE_FEATURE_TABLE_VIEW } from '../utility/constants'
 import fetchJsonApi from '../utility/fetchByPage'
 import Processing from '../components/Processing'
 import MapWithGroupedMarkers from '../components/MapWithGroupedMarkers'
@@ -48,6 +48,7 @@ import { colorLoggedInUserLocations } from '../utility/loginUser'
 import WorkingDialog from '../components/WorkingDialog'
 import NotificationBanner from '../components/NotificationBanner'
 import Toggle from '../components/Toggle'
+import RainfallTable from '../components/RainfallTable'
 
 export default function DashboardPage() {
 
@@ -674,18 +675,20 @@ function showThreshold(color){
       {/*<span className={`${location?.name ? '' : "hidden"}`}>*/}
       {/* These next two cards are never shown at the same time. One is for mobile and the other is larger screens md:block */}
       <div id="graphs" className='h-[10px]'></div>
+      
       <Card className={`${convertTier(user) == 4 && 'hidden'}`} 
         footer={(window.innerWidth <= 600  && <div className='flex gap-2 justify-around text-sm py-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <div className='bg-[red] h-2 w-4'></div>{ `Exceeds 24h NOAA Atlas 14`}</div>)}
         header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
-      <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade></div></div>} >
-           <Toggle checked={tableOnly} onChange={()=> setTableOnly(!tableOnly)}/>
-           <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
+      <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade> </div></div>} >
+       <div className='grid w-full'>
+       {VITE_FEATURE_TABLE_VIEW == "true" && <div className='md:mt-0 my-4  flex flex-row gap-2 w-full   justify-end items-center p-2 md:mr-0'><div>Show {`${tableOnly && 'Chart' || 'Table'}`} View</div><Toggle className={`justify-self-end self-end`} checked={tableOnly} onChange={()=> setTableOnly(!tableOnly)}/></div>}
+           {!tableOnly && <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               
             <RainfallChart location={location} period={"daily"} max={3} tableOnly={tableOnly}/>
             </div>
             <div className='tab'>1 Hour 
-            <RainfallChart location={location} period={"hourly"} max={2} />
+            <RainfallChart location={location} period={"hourly"} max={2}  tableOnly={tableOnly}/>
             </div>
             <div className='tab'>RapidRain
            <Upgrade tier={2}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
@@ -693,7 +696,9 @@ function showThreshold(color){
             <div className='tab text-xs'>NOAA Atlas 14
             <Upgrade tier={2}><ResponsiveTable  location={location} /></Upgrade>
             </div>
-            </PillTabs>
+            </PillTabs>}
+            {tableOnly && VITE_FEATURE_TABLE_VIEW == "true" && <RainfallTable location={location} />}
+        </div>
         </Card>
   
   

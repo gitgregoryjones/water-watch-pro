@@ -4,6 +4,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } fro
 import { Bar } from "react-chartjs-2";
 import api from "../utility/api";
 import { convertTier } from "../utility/loginUser";
+import RainfallTable from "./RainfallTable";
 
 
 
@@ -14,6 +15,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   const chartContainerRef = useRef(null);
   const snapshotDivRef = useRef(null);
   const [hideYAxis, setHideYAxis] = useState(true); 
+
+  const [rawData, setRawData] = useState([]);
 
   const today = new Date();
   const year = today.getFullYear();
@@ -26,6 +29,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   const [originalKeys, setOriginalKeys] = useState([]);
 
   const [scrollPosition, setScrollPosition] = useState(0);
+
+  
 
   const barValuePlugin = {
     id: 'barValuePlugin',
@@ -151,6 +156,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
       const keys = []; 
   
       const data = response.data;
+
+      setRawData(data);
 
       
   
@@ -414,9 +421,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full">
       
-    {tableOnly && period === "daily" &&  
-
-    <div>{JSON.stringify(chartData)}</div>
+    {tableOnly && period === "hourly" &&
+   <RainfallTable data={rawData}/>
     
     
     

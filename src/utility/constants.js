@@ -21,6 +21,7 @@ export const VITE_EMAIL_PROXY=import.meta.env.VITE_EMAIL_PROXY
 export const VITE_WATER_WATCH_SUPPORT=import.meta.env.VITE_WATER_WATCH_SUPPORT
 export const VITE_FEATURE_MULTIPLE_CLIENTS=import.meta.env.VITE_FEATURE_MULTIPLE_CLIENTS
 export const VITE_FEATURE_PDF_REPORT = import.meta.env.VITE_FEATURE_PDF_REPORT
+export const VITE_FEATURE_TABLE_VIEW = import.meta.env.VITE_FEATURE_TABLE_VIEW;
 
 
 

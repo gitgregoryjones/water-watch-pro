@@ -122,7 +122,7 @@ const colorLoggedInUserLocations = async(userData)=>{
             try {
                
             location.total_rainfall = loc24Data.total_rainfall;
-            location.color_24 = location.total_rainfall > location.h24_threshold
+            location.color_24 = location.total_rainfall >= location.h24_threshold
                 ? location.atlas14_threshold && location.total_rainfall > location.atlas14_threshold['24h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
                 : "green";
 
@@ -159,7 +159,7 @@ const colorLoggedInUserLocations = async(userData)=>{
         if (locHourlyData) {
             
             location.total_hourly_rainfall = locHourlyData.total_rainfall;
-            location.color_hourly = location.total_hourly_rainfall > location.h24_threshold
+            location.color_hourly = location.total_hourly_rainfall >= location.h24_threshold
                ? location.atlas14_threshold && location.total_hourly_rainfall > location.atlas14_threshold['24h'][0] && userData.clients[0]?.tier != 1 ? "red" : "orange"
                 : "green";
         }

@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import api from '../utility/api';
 import WorkingDialog from './WorkingDialog';
+import { convertTier } from '../utility/loginUser';
+import { useSelector } from 'react-redux';
+import {VITE_FEATURE_TABLE_COLORS} from '../utility/constants'
 
 
 const RainfallTable = ({ location, max = 2 }) => {
+
+  const user = useSelector((state) => state.userInfo.user);
 
   const today = new Date();
   const year = today.getFullYear();
   const month = (today.getMonth() + 1).toString().padStart(2, "0");
   const day = (today.getDate() ).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
+
+  
 
   const [working, setWorking] = useState(false)
 
@@ -34,7 +41,7 @@ const RainfallTable = ({ location, max = 2 }) => {
 
 
   const hourlyEntries =  data && Object.entries(data?.hourly_data)
-  .sort((a, b) => new Date(b[0]) - new Date(a[0])) // Sort descending
+  .sort((a, b) => new Date(a[0]) - new Date(b[0])) // Sort descending
   .map(([dateStr, values]) => ({
     date: new Date(dateStr).toLocaleString('en-US', {
       month: '2-digit',
@@ -63,8 +70,8 @@ const RainfallTable = ({ location, max = 2 }) => {
           {hourlyEntries?.map((entry, index) => (
             <tr key={index} className="hover:bg-gray-50">
               <td className="px-4 py-2 border-b text-sm">{entry.date}</td>
-              <td className="px-4 py-2 border-b text-sm">{entry.hourlyTotal.toFixed(2)}</td>
-              <td className="px-4 py-2 border-b text-sm">{entry.total24h.toFixed(2)}</td>
+              <td className={`px-4 py-2 border-b text-sm`}>{entry.hourlyTotal.toFixed(2)}</td>
+              <td className={`px-4 py-2 border-b text-sm  ${VITE_FEATURE_TABLE_COLORS == "true" && entry.total24h.toFixed(2)  >= location.h24_threshold ? location.atlas14_threshold && entry.total24h.toFixed(2)  >= location.atlas14_threshold["24h"][0] &&  convertTier(user)  != 1 ? "bg-[red]" : "bg-[orange]" : "bg-[transparent]"}`}>{entry.total24h.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>}

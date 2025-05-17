@@ -184,9 +184,19 @@ useEffect(()=>{
         // Step 3: Retrieve the Customer Details
         const customer = await stripe.customers.retrieve(customerId);
 
+        
+        //customer = {...customer, stripe_customer_id:customerId, stripe_session_id:sessionParam}
+
+        console.log(`Making double sure to provision the client record with stripe_customer_id and stripe_session_id ${JSON.stringify(customer)}`);
+
         // Step 4: Access Metadata
-        const customerMetadata = customer.metadata;
-        console.log('Customer Metadata:', customerMetadata);
+        let customerMetadata = {...customer.metadata,stripe_customer_id:customerId, stripe_session_id:sessionParam};
+
+        
+
+        console.log('Customer Metadata with Stripe Info:', JSON.stringify(customerMetadata));
+
+        
 
         let r = provisionAccount(customerMetadata,customer.email)
 
@@ -315,7 +325,8 @@ const provisionAccount = async (customerMetadata, customer_email) => {
 
       let savedClient = lresponse.userData?.clients[0]
       
-              let newClient =  {...savedClient, tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel == "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
+              let newClient =  {...savedClient, stripe_customer_id:customerMetadata.stripe_customer_id, stripe_session_id:customerMetadata.stripe_session_id, tier: customerMetadata.tier, is_trial_account: customerMetadata.subscriptionLevel == "trial",account_type: customerMetadata.subscriptionLevel, status:'active' }
+             
               console.log(`Beflore preserving new fields ${JSON.stringify(newClient)}`)
               //Gene Business Rules
               newClient.daily_report_on = true;

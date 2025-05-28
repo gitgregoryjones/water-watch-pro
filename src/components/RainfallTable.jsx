@@ -25,6 +25,23 @@ const RainfallTable = ({ location, max = 2 }) => {
 
   const  endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
 
+  function subtractOneHour(dateStr) {
+    const date = new Date(dateStr.replace(' ', 'T') + ":00"); // Ensure correct ISO format
+    date.setHours(date.getHours() - 1);
+    
+    // Format back to "YYYY-MM-DD HH:mm"
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+  
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+  }
+  
+  // Example usage
+  const result = subtractOneHour("2025-05-28 08:00");
+  console.log(result); // "2025-05-28 07:00"
   
 
   useEffect(()=>{
@@ -36,7 +53,7 @@ const RainfallTable = ({ location, max = 2 }) => {
 
         const lastMeasureR = await api.get(`/api/services/process_status`);
 
-        setMeasure(lastMeasureR.data.datetime)
+        setMeasure(lastMeasureR.data.status === "processing" ? subtractOneHour(lastMeasureR.data.datetime) : lastMeasureR.data.datetime)
 
         setData(response.data);
 
@@ -61,8 +78,10 @@ const RainfallTable = ({ location, max = 2 }) => {
     rawDate: dateStr,
     hourlyTotal: values.total,
     total24h: values['24h_total'],
-  })).filter((obj)=> {console.log(`Compare ${obj.rawDate} to ${measure}`); return new Date(obj.rawDate) < new Date(measure) } );
+  })).filter((obj)=> {console.log(`Compare ${obj.rawDate} to ${measure}`); return new Date(obj.rawDate) <= new Date(measure) } );
 
+
+  //alert(measure)
 
   return (
     <>

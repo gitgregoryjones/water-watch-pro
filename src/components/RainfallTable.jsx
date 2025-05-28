@@ -16,6 +16,7 @@ const RainfallTable = ({ location, max = 2 }) => {
   const day = (today.getDate() ).toString().padStart(2, "0");
   const tomorrowDate = `${year}-${month}-${day}`;
 
+  const [measure,setMeasure] = useState( new Date().toString())
   
 
   const [working, setWorking] = useState(false)
@@ -24,12 +25,18 @@ const RainfallTable = ({ location, max = 2 }) => {
 
   const  endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
 
+  
+
   useEffect(()=>{
 
      (async ()=>{
         setWorking(true)
 
         const response = await api.get(endpoint);
+
+        const lastMeasureR = await api.get(`/api/services/process_status`);
+
+        setMeasure(lastMeasureR.data.datetime)
 
         setData(response.data);
 
@@ -48,11 +55,13 @@ const RainfallTable = ({ location, max = 2 }) => {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false,
+      hour12: false
+      
     }).replace(',', ''), // Format: MM-DD HH:mm
+    rawDate: dateStr,
     hourlyTotal: values.total,
     total24h: values['24h_total'],
-  }));
+  })).filter((obj)=> {console.log(`Compare ${obj.rawDate} to ${measure}`); return new Date(obj.rawDate) < new Date(measure) } );
 
 
   return (

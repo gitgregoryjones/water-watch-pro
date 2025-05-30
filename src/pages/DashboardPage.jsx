@@ -681,7 +681,7 @@ function showThreshold(color){
         header={window.outerWidth >= 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid fa-droplet"></i><span>Rainfall {location.name}</span>
       <div className='flex flex-col md:flex-row gap-2 items-center'><div className='bg-[orange] h-2 w-4'></div>Exceeds 24h threshold of {location.h24_threshold}  <Upgrade tier={2} showMsg={false}><div className='bg-[red] h-2 w-4'></div> Exceeds 24h NOAA Atlas 14</Upgrade> </div></div>} >
        <div className='grid w-full'>
-       {VITE_FEATURE_TABLE_VIEW == "true" && <div className='md:mt-0 my-4  flex flex-row gap-2 w-full   justify-end items-center p-2 md:mr-0'><div>{`${!tableOnly && 'Show Table' || 'Hide Table'}`} View</div><Toggle className={`justify-self-end self-end`} checked={tableOnly} onChange={()=> setTableOnly(!tableOnly)}/></div>}
+       {VITE_FEATURE_TABLE_VIEW == "true" && <div className='md:mt-0 my-4  flex flex-row gap-2 w-full   justify-end items-center p-2 md:mr-0'><div>{`${!tableOnly && 'Show Table' || 'Show Chart'}`}</div><Toggle className={`justify-self-end self-end`} checked={tableOnly} onChange={()=> setTableOnly(!tableOnly)}/></div>}
            {!tableOnly && <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
             <div className='tab'>24 Hour
               

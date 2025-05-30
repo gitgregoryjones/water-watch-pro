@@ -65,7 +65,7 @@ const RainfallTable = ({ location, max = 2 }) => {
 
 
   const hourlyEntries =  data && Object.entries(data?.hourly_data)
-  .sort((a, b) => new Date(a[0]) - new Date(b[0])) // Sort descending
+  .sort((a, b) => new Date(b[0]) - new Date(a[0])) // Sort descending
   .map(([dateStr, values]) => ({
     date: new Date(dateStr).toLocaleString('en-US', {
       month: '2-digit',

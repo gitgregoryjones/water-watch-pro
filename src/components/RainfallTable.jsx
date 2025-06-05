@@ -53,7 +53,7 @@ const RainfallTable = ({ location, max = 2 }) => {
 
         const lastMeasureR = await api.get(`/api/services/process_status`);
 
-        setMeasure(lastMeasureR.data.status === "processing" ? subtractOneHour(lastMeasureR.data.datetime) : lastMeasureR.data.datetime)
+        setMeasure(lastMeasureR.data.status === "processing" ? lastMeasureR.data.datetime /* Feedback from Gene, he wants to see the current hour all the time to match the emails showing current hour,subtractOneHour(lastMeasureR.data.datetime)*/ : lastMeasureR.data.datetime)
 
         setData(response.data);
 

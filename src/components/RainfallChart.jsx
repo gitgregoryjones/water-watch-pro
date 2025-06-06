@@ -32,6 +32,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   
 
+  
+
   const barValuePlugin = {
     id: 'barValuePlugin',
     afterDraw(chart) {
@@ -127,15 +129,19 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     const month = date.toLocaleString("en-US", { month: "short" });
     const day = date.toLocaleString("en-US", { day: "numeric" });
     const hour = date.toLocaleString("en-US", { hour: "numeric", hour12: true });
-  
+    console.log(`Returning date ${month} ${day}, ${hour.replace(" ","").substring(0,hour.length-2)}`)
     // Construct the desired format
     return `${month} ${day}, ${hour.replace(" ","").substring(0,hour.length-2)}`;
     //return `${month} ${day}, ${hour}`;
   };
+
+  
   
 
   const fetchChartData = async () => {
     if (!location.id) return;
+
+    
   
     let endpoint;
   
@@ -157,18 +163,35 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   
       const data = response.data;
 
+      const lastMeasureR = await api.get(`/api/services/process_status`);
+
+      const measure =  lastMeasureR.data.datetime; /* Feedback from Gene, he wants to see the current hour all the time to match the emails showing current hour,subtractOneHour(lastMeasureR.data.datetime)*/
+
       setRawData(data);
 
       
   
       if (period !== "daily") {
 
-        const entries = Object.entries(data.hourly_data).reverse();
+        console.log(`THE MEASURE IS ${measure}`)
 
+        let entries = Object.entries(data.hourly_data).reverse();
+
+        console.log(`Entries count is ${entries.length}`)
         
+
+        entries = [...entries.filter(([key,value])=>{console.log(`Geg comparing ${key} to ${measure} and is ${new Date(key) <= new Date(measure)}`); return new Date(key) <= new Date(measure)})]
+        
+        console.log(`Entries count AFTER is ${entries.length}`)
+
+
   
-        entries.forEach(([key, value]) => {
+        entries.forEach(([key, value],i) => {
+
+          console.log(`Looping ${i} and key is ${key}`)
+          
           keys.push(key);
+
           labels.push(
            period != "rapidrain" ? formatDate(key)
            : new Date(key).toLocaleString("en-US", {

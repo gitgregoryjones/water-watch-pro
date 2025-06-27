@@ -61,20 +61,21 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           await setLongitude(-longitude);
         }
 
-        if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
+        if(!longitude || longitude < -122 || longitude > -66 ){
             
             await setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
             await setIsWorking(false); 
 
             return;
         }
-       
+ 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
             
             await setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
             await setIsWorking(false); 
             return;
         }
+ 
 
        
         if(!rapidRainThreshold){
@@ -83,8 +84,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
             
+        if(user?.clients?.[0]?.tier != "bronze") {
             await setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
             await setIsWorking(false); 
+        }
             return;
         }
      

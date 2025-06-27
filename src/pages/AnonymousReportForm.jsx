@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -91,7 +92,7 @@ const AnonymousReportForm = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
       <img src="https://waterwatchpro25.com/logo.png" alt="WaterWatchPro Logo" className="mx-auto mb-6 max-w-[250px]" />
       <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
-        <div className='flex flex-row gap-1'>Order Historical Reports by Location<div className="text-yellow-300 hidden text-md">*</div></div>
+        <div className='flex flex-row gap-1'>Ad-Hoc Historical Reports by Location<div className="text-yellow-300 hidden text-md">*</div></div>
         <div className='text-white text-sm self-end md:self-center'>* This service requires a processing fee.</div> 
         <div className='text-white text-sm self-end md:self-center'>Contact support@waterwatchpro.com to learn more</div>
       </div>
@@ -110,6 +111,7 @@ const AnonymousReportForm = () => {
         <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
         <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Location(s) Detail</h2>
+       
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative">
             {formData.locations.length > 1 && (
@@ -121,10 +123,11 @@ const AnonymousReportForm = () => {
                 X
               </button>
             )}
-            <div className='w-full flex flex-col md:flex-row gap-4'>
+            <div className='w-full grid  md:flex-row gap-4'>
+            <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             <input type="number" step="any" required placeholder="Latitude" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             <input type="number" step="any" required placeholder="Longitude" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
-            <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+           
             </div>
 
             <div className="pt-4 flex flex-col gap-4">
@@ -142,8 +145,9 @@ const AnonymousReportForm = () => {
             </div>
           </div>
         ))}
-        <div className='flex flex-row justify-between  gap-4 mt-12'>
-        <button type="button" onClick={addLocation} className="bg-[#1DC0CB] text-white py-2 px-4 rounded max-w-xs ">+ Add Location</button>
+         <div className='text-sm'><Link to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Upgrade</Link> to a Gold trial account to get automatic monitoring for this location and much more!</div>
+        <div className='flex flex-row-reverse justify-between  gap-4 mt-12'>
+        <button type="button" onClick={addLocation} className="border border-[#1DC0CB] text-[#1DC0CB] py-2 px-4 rounded max-w-xs ">+ Add New Row</button>
         <button type="submit" className="bg-[#128DA6] shadow text-white py-2 px-4 rounded max-w-xs">Submit Report</button>
         </div>
       </form>

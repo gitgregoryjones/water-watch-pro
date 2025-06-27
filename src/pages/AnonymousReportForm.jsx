@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import api from '../utility/api';
+import { VITE_EMAIL_PROXY, VITE_WATER_WATCH_SUPPORT } from '../utility/constants';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -15,6 +17,35 @@ const AnonymousReportForm = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+
+  const emailSupport = async (subject,body)=>{
+
+    const emailContent = {
+           
+        toEmail: VITE_WATER_WATCH_SUPPORT,
+        
+        subject: subject,
+        textBody: body,
+      }
+    
+    
+        const emailResponse = await api.post(
+        VITE_EMAIL_PROXY,
+        emailContent,
+        {
+        headers: {
+            "Content-Type": "application/json"
+        },
+        }
+        );
+    
+        return emailResponse;
+    
+    
+
+
+  }
 
   const handleChange = (e, i = null, field = null) => {
     if (i !== null && field) {
@@ -50,7 +81,7 @@ const AnonymousReportForm = () => {
     setFormData({ ...formData, locations: updated });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const bodyLines = [
@@ -75,7 +106,8 @@ const AnonymousReportForm = () => {
     const body = encodeURIComponent(bodyLines.filter(Boolean).join('\n'));
     const mailto = `mailto:support@waterwatchpro.com?subject=${subject}&body=${body}`;
 
-    window.location.href = mailto;
+    //window.location.href = mailto;
+    await emailSupport(subject,body)
     setSubmitted(true);
   };
 

@@ -466,6 +466,7 @@ const Reports = () => {
             id="fromDate"
             value={fromDate}
             min={"2022-11-01"}
+            max={"2024-10-31"}
             onChange={(e) => setFromDate(e.target.value)}
             disabled={reportType == "monthly"}
             className={`border border-gray-300 rounded p-2 w-full  ${reportType == "monthly" ? 'opacity-[.1]' : ''} `}

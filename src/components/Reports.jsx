@@ -138,7 +138,12 @@ const Reports = () => {
       pastDate.setDate(currentDate.getDate() - 7);
       setFromDate(pastDate.toISOString().slice(0, 10));
       //setToDate(new Date().toISOString().slice(0, 10))
-    } else {
+    } else if(selectedType === "historical"){
+
+      setFromDate('2022-11-01')
+      setToDate('2024-10-31')
+
+    }else {
       setFromDate(''); // Clear From date
       setToDate(new Date().toISOString().slice(0, 10)); // Default to today
     }
@@ -154,6 +159,12 @@ const Reports = () => {
       pastDate.setDate(currentDate.getDate() - 7);
       setFromDate(pastDate.toISOString().slice(0, 10));
     }
+
+
+    const oldDate = new Date(selectedDate);
+    const cutoff = new Date('2024-11-01');
+
+
   };
 
   useEffect(() => {
@@ -215,7 +226,7 @@ const Reports = () => {
       return;
     }
   
-    if (reportType === 'weekly' || reportType === 'daily' || reportType === 'rapidrain' || reportType == 'emails') {
+    if (reportType === 'weekly' || reportType === 'daily' || reportType === "historical" ||  reportType === 'rapidrain' || reportType == 'emails') {
       if (!fromDate || !toDate) {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
@@ -245,6 +256,13 @@ const Reports = () => {
     console.log(`Selected Locations: ${selectedLocations}`);
     console.log(`Selected Contacts: ${selectedContacts}`);
     console.log(`Display Format: ${displayFormat}`);
+
+    if(reportType === "historical"){
+      let confirmed = window.confirm("Please confirm you wish to submit this Historical Report request and pay the fee.");
+      if(!confirmed){
+        return;
+      }
+    }
   
     let query = '';
     let requestData = null;
@@ -256,8 +274,8 @@ const Reports = () => {
   
       console.log(`Computed From Date: ${firstDay}, To Date: ${lastDay}`);
       query = `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
-    } else if (reportType === 'weekly' || reportType === 'daily') {
-      query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
+    } else if (reportType === 'weekly' || reportType === 'daily' || reportType === "historical") {
+      query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}?historical=${reportType === "historical"}`;
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
@@ -414,6 +432,7 @@ const Reports = () => {
               <option value="emails">Rejected Emails</option>
               {1==0 && <option value="billing">Billing</option>}
             </Upgrade>
+            <option value="historical">Historical Data</option>
 
               {!user.is_superuser && <option value="daily">Custom</option>}
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
@@ -446,7 +465,7 @@ const Reports = () => {
             type="date"
             id="fromDate"
             value={fromDate}
-           
+            min={"2022-11-01"}
             onChange={(e) => setFromDate(e.target.value)}
             disabled={reportType == "monthly"}
             className={`border border-gray-300 rounded p-2 w-full  ${reportType == "monthly" ? 'opacity-[.1]' : ''} `}
@@ -455,7 +474,7 @@ const Reports = () => {
         <div className="">
           <label htmlFor="toDate" className="font-bold block text-gray-700">{reportType === 'monthly' ? 'Choose Month:' : 'To:'}</label>
          
-          <input
+          {reportType != "historical" && <input
             type={reportType === 'monthly' ? 'month' : 'date'}
             id="toDate"
             value={toDate}
@@ -463,8 +482,19 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full"
             min={reportType === 'monthly' && convertTier(user) < 2 ? "2024-11" : "2024-11"} // Disable months before last month for tier < 2
             max={reportType === 'monthly' && convertTier(user) < 3 ? lastMonth : thisMonth} // Disable current month for tier < 2
-          />
+          />}
+            {reportType === "historical" && <input
+          type="date"
+          id="toDate"
+          value={toDate}
+          onChange={handleToDateChange}
+          className="border border-gray-300 rounded p-2 w-full"
+          min="2022-11-01"
+          max="2024-10-31"
+        />}
         </div>
+        {new Date(toDate) < new Date('2024-11-01') && <div className='px-4 py-1 items-center justify-center rounded border-[gold] border-2  text-start'>Historical reports before November 2024 are charged a fee.
+          </div>}
         {convertTier(user) < 3 && 
           <div className='px-4 py-1 items-center justify-center rounded border-[gold] border-2  text-start'>Want to run reports for all of {new Date().toLocaleDateString('en-US', {
               month: 'long',              
@@ -480,7 +510,7 @@ const Reports = () => {
             className="border border-gray-300 rounded p-2 w-full"
             
           >
-            <option value="html">Formatted</option>
+            {reportType != "historical" && <option value="html">Formatted</option>}
             {<option value="csv">CSV</option>}
             {VITE_FEATURE_PDF_REPORT == "true" && reportType != "sms" && reportType != "emails" && <option value="pdf">PDF</option>}
             {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
@@ -489,7 +519,7 @@ const Reports = () => {
 
         {/* Row 3 */}
         
-        {(reportType == "daily" || reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
+        {(reportType == "daily" || reportType=== "historical" ||reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
           <label htmlFor="locList" className="hidden md:flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations: ({selectedLocations.length})</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
           <select
         id="locList"
@@ -537,7 +567,7 @@ const Reports = () => {
         {(displayFormat == "csv" || displayFormat == "excel" || selectedLocations.length > 1) && 
           <div className={`md:hidden flex w-full flex-col`}>
           <div>EmailTo</div>
-          <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
+          <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); reportType === "historical" ? setSelectedContacts([...emails,"support@waterwatchpro.com"]) : setSelectedContacts(emails)}}/>
         </div>}
 
         

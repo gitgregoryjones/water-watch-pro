@@ -40,57 +40,64 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     setIsWorking(true)
     e.preventDefault();
 
+    let success = true;
+
         if(!name){
-          await setMsg(<span className="text-[red]">Location name is required</span>)
-          await setIsWorking(false); 
-            return;
+          setMsg(<span className="text-[red]">Location name is required</span>)
+          setIsWorking(false); 
+            success = false;
         }
 
        
 
         if(!latitude || latitude < 24 || latitude > 49 ){
             
-            await setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
-            await setIsWorking(false); 
-            return;
+             setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
+             setIsWorking(false); 
+            success = false;
         }
 
         let tmpLong = longitude > 0 ? -longitude : longitude;
 
         if(longitude > 0 ){
-          await setLongitude(-longitude);
+           setLongitude(-longitude);
         }
 
-        if(!longitude || longitude < -122 || longitude > -66 ){
+        if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
             
-            await setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
-            await setIsWorking(false); 
+             setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
+             setIsWorking(false); 
 
-            return;
+             success = false;
         }
  
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
             
-            await setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            await setIsWorking(false); 
-            return;
+             setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+             setIsWorking(false); 
+            success = false;
         }
  
 
        
         if(!rapidRainThreshold){
-            await setRapidRainThreshold(h24Threshold)
+             setRapidRainThreshold(h24Threshold)
             
         } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
             
         if(user?.clients?.[0]?.tier != "bronze") {
-            await setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            await setIsWorking(false); 
+            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            setIsWorking(false); 
         }
-            return;
+        success = false;
         }
      
+    if(!success){
+      alert('bad one')
+      
+      return false;    
+    }
 
     const locationData = {
       name,

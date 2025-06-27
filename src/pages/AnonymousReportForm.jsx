@@ -27,6 +27,7 @@ const AnonymousReportForm = () => {
         
         subject: subject,
         textBody: body,
+        htmlBody: body
       }
     
     

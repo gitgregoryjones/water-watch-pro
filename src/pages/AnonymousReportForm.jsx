@@ -103,8 +103,8 @@ const AnonymousReportForm = () => {
       bodyLines.push('');
     });
 
-    const subject = encodeURIComponent(`${formData.email} Report Request (${formData.locations.length} locations)`);
-    const body = encodeURIComponent(bodyLines.filter(Boolean).join('\n'));
+    const subject = `${formData.email} Report Request (${formData.locations.length} locations)`;
+    const body = bodyLines.filter(Boolean).join('\n');
     const mailto = `mailto:support@waterwatchpro.com?subject=${subject}&body=${body}`;
 
     //window.location.href = mailto;

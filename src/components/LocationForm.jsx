@@ -94,7 +94,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         }
      
     if(!success){
-      alert('bad one')
+     // alert('bad one')
       
       return false;    
     }

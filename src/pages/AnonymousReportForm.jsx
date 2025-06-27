@@ -140,8 +140,10 @@ const AnonymousReportForm = () => {
 
         <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - Oct 31 2024)</h2>
         <div className='w-full flex flex-row gap-4'>
-        <input type="date" name="fromDate" required value={formData.fromDate} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
-        <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="date" name="fromDate" required value={formData.fromDate} onChange={handleChange}  min="2022-11-01"
+          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange}  min="2022-11-01"
+          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
         <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Location(s) Detail</h2>
        
@@ -158,8 +160,8 @@ const AnonymousReportForm = () => {
             )}
             <div className='w-full grid  md:flex-row gap-4'>
             <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
-            <input type="number" step="any" required placeholder="Latitude" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
-            <input type="number" step="any" required placeholder="Longitude" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="number" step="any" required placeholder="Latitude"  min="24" max="49" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="number" step="any" required placeholder="Longitude" min="-122" max="-66" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
            
             </div>
 

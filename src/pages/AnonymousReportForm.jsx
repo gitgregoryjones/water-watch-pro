@@ -88,19 +88,28 @@ const AnonymousReportForm = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
       <img src="https://waterwatchpro25.com/logo.png" alt="WaterWatchPro Logo" className="mx-auto mb-6 max-w-[250px]" />
+      <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
+        <div className='flex flex-row gap-1'>Order Historical Reports by Location<div className="text-yellow-300 hidden text-md">*</div></div>
+        <div className='text-white text-sm self-end md:self-center'>* This service requires a processing fee.</div> 
+        <div className='text-white text-sm self-end md:self-center'>Contact support@waterwatchpro.com to learn more</div>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h2 className="text-xl font-semibold">Requester Info</h2>
-        <input type="text" name="name" required placeholder="Name" value={formData.name} onChange={handleChange} className="input" />
-        <input type="email" name="email" required placeholder="Email address" value={formData.email} onChange={handleChange} className="input" />
-        <input type="email" name="billingEmail" placeholder="Billing email (optional)" value={formData.billingEmail} onChange={handleChange} className="input" />
-        <input type="text" name="phone" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="input" />
+        <h2 className="text-xl font-semibold text-[#128DA6]">Requester Info</h2>
+        <div className='w-full flex flex-col md:flex-row gap-4'>
+        <input type="text" name="name" required placeholder="Name" value={formData.name} onChange={handleChange} className="input placeholder:text-slate-500 placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="email" name="email" required placeholder="Email address" value={formData.email} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="email" name="billingEmail" placeholder="Billing email (optional)" value={formData.billingEmail} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="text" name="phone" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        </div>
 
-        <h2 className="text-xl font-semibold pt-4">Data Request</h2>
-        <input type="date" name="fromDate" required value={formData.fromDate} onChange={handleChange} className="input" />
-        <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange} className="input" />
-
+        <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - Oct 31 2024)</h2>
+        <div className='w-full flex flex-row gap-4'>
+        <input type="date" name="fromDate" required value={formData.fromDate} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        </div>
+        <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Location(s) Detail</h2>
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative">
             {formData.locations.length > 1 && (
@@ -112,12 +121,14 @@ const AnonymousReportForm = () => {
                 X
               </button>
             )}
-            <input type="number" step="any" required placeholder="Latitude" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input" />
-            <input type="number" step="any" required placeholder="Longitude" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input" />
-            <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input" />
+            <div className='w-full flex flex-col md:flex-row gap-4'>
+            <input type="number" step="any" required placeholder="Latitude" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="number" step="any" required placeholder="Longitude" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            </div>
 
-            <div className="pt-2">
-              {['daily', 'hourly', '15min'].map((type) => (
+            <div className="pt-4 flex flex-col gap-4">
+              {['daily', 'hourly'].map((type) => (
                 <label key={type} className="mr-4">
                   <input
                     type="checkbox"
@@ -131,9 +142,10 @@ const AnonymousReportForm = () => {
             </div>
           </div>
         ))}
-
-        <button type="button" onClick={addLocation} className="bg-blue-600 text-white py-2 px-4 rounded mt-4">+ Add Location</button>
-        <button type="submit" className="bg-green-600 text-white py-2 px-4 rounded mt-2">Submit Request</button>
+        <div className='flex flex-row justify-between  gap-4 mt-12'>
+        <button type="button" onClick={addLocation} className="bg-[#1DC0CB] text-white py-2 px-4 rounded max-w-xs ">+ Add Location</button>
+        <button type="submit" className="bg-[#128DA6] shadow text-white py-2 px-4 rounded max-w-xs">Submit Report</button>
+        </div>
       </form>
     </div>
   );

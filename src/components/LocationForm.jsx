@@ -274,6 +274,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             </div>)}
         </div>
 
+        {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
+          <label className='text-sm'>Date data began</label>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
+        </div>}
+
         {/* Action Buttons */}
         <div className="flex justify-between">
           <button

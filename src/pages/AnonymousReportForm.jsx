@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, useSearchParams } from 'react-router-dom';
 import api from '../utility/api';
 import { VITE_EMAIL_PROXY, VITE_WATER_WATCH_SUPPORT } from '../utility/constants';
 import { useSelector } from 'react-redux';
@@ -338,6 +338,10 @@ If you have any questions, contact support@waterwatchpro.com. */
         <div className={`flex flex-row justify-between  gap-4 mt-12`}>
         
         <button type="submit" className={` bg-[#128DA6] shadow text-white py-2 px-4 rounded max-w-xs`}>Submit Report</button>
+        <a  type="cancel" onClick={(e) => {
+    e.preventDefault();
+    window.history.back();
+  }} className={` bg-white border cursor-pointer border-red-500 shadow text-red-500 py-2 px-4 rounded max-w-xs`}>Cancel</a>
         {!searchParams.get("location_id") && <button type="button" onClick={addLocation} className="border border-[#1DC0CB] text-[#1DC0CB] py-2 px-4 rounded max-w-xs ">+ Add New Row</button>}
         </div>
       </form>

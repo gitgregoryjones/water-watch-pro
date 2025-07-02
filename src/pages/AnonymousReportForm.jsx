@@ -117,16 +117,16 @@ const AnonymousReportForm = () => {
     e.preventDefault();
 
     const bodyLines = [
-      `Requester: ${formData.name}`,
-      `Email: ${formData.email}`,
-      formData.billingEmail && `Billing Email: ${formData.billingEmail}`,
-      formData.phone && `Phone: ${formData.phone}`,
+      `Requester: ${formData.name}<br/>`,
+      `Email: ${formData.email}<br/>`,
+      formData.billingEmail && `Billing Email: ${formData.billingEmail}<br/>`,
+      formData.phone && `Phone: ${formData.phone}<br/>`,
      /* `Date Range: ${formData.fromDate} to ${formData.toDate}`*/,
       '',
     ];
 
     formData.locations.forEach((loc, i) => {
-      bodyLines.push(`Location ${i + 1}:`);
+      bodyLines.push(`Location ${i + 1}:<br/>`);
      
       bodyLines.push(`- Name: ${loc.name}<br/>`);
       bodyLines.push(`- Range: ${loc.fromDate} - ${loc.toDate}<br/>`);
@@ -136,7 +136,7 @@ const AnonymousReportForm = () => {
       bodyLines.push(`<br/>`);
     });
 
-    const subject = `${formData.email} Report Request (${formData.locations.length} locations)`;
+    const subject = `${formData.email} Historical Report Request (${formData.locations.length} locations)`;
     const body = bodyLines.filter(Boolean).join('');
     const mailto = `mailto:support@waterwatchpro.com?subject=${subject}&body=${body}`;
 

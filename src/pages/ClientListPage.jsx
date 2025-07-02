@@ -151,7 +151,7 @@ const ClientListPage = () => {
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">
-        Settings > Clients
+        Settings &gt; Clients
       </h1>
       <Card
         className="w-full"
@@ -235,8 +235,11 @@ const ClientListPage = () => {
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">
                   Account Name
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-1/2">
                   Status
+                </th>
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
+                  Locations
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
                 Account Type
@@ -263,6 +266,9 @@ const ClientListPage = () => {
                     </td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell">
                       {client.account_type || "N/A"}
+                    </td>
+                    <td className="text-sm border border-gray-300 p-2 md:table-cell">
+                      {client.locations_count || "--"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell">
                       {client.tier || "N/A"}

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../utility/api';
 import { VITE_EMAIL_PROXY, VITE_WATER_WATCH_SUPPORT } from '../utility/constants';
+import { useSelector } from 'react-redux';
+import fetchByPage from '../utility/fetchByPage';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -12,11 +14,40 @@ const AnonymousReportForm = () => {
     fromDate: '',
     toDate: '',
     locations: [
-      { latitude: '', longitude: '', locationName: '', reportTypes: [] },
+      { latitude: '', longitude: '', name: '', reportTypes: [] },
     ],
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  const user = useSelector((state) => state.userInfo.user);
+
+  const client = user?.clients?.[0];
+
+  const [rows, setRows] = useState([]);
+
+  
+
+
+
+  useEffect(()=>{
+
+    (async ()=> {
+      let locs = await fetchByPage(`/api/locations`);
+
+      let enhanced = locs.map((m)=> {m.reportTypes = []; return m});
+
+     // alert(JSON.stringify(enhanced[0]))
+  
+
+      //setFormData({...formData,locations:enhanced.slice(0,3)});
+
+    })();
+
+ 
+
+  },[client])
+  
 
 
   const emailSupport = async (subject,body)=>{
@@ -90,27 +121,32 @@ const AnonymousReportForm = () => {
       `Email: ${formData.email}`,
       formData.billingEmail && `Billing Email: ${formData.billingEmail}`,
       formData.phone && `Phone: ${formData.phone}`,
-      `Date Range: ${formData.fromDate} to ${formData.toDate}`,
+     /* `Date Range: ${formData.fromDate} to ${formData.toDate}`*/,
       '',
     ];
 
     formData.locations.forEach((loc, i) => {
       bodyLines.push(`Location ${i + 1}:`);
-      bodyLines.push(`- Name: ${loc.locationName}`);
-      bodyLines.push(`- Latitude: ${loc.latitude}`);
-      bodyLines.push(`- Longitude: ${loc.longitude}`);
-      bodyLines.push(`- Report Types: ${loc.reportTypes.join(', ')}`);
-      bodyLines.push('');
+     
+      bodyLines.push(`- Name: ${loc.name}<br/>`);
+      bodyLines.push(`- Range: ${loc.fromDate} - ${loc.toDate}<br/>`);
+      bodyLines.push(`- Latitude: ${loc.latitude}<br/>`);
+      bodyLines.push(`- Longitude: ${loc.longitude}<br/>`);
+      bodyLines.push(`- Report Types: ${loc.reportTypes.join(', ')}<br/>`);
+      bodyLines.push(`<br/>`);
     });
 
     const subject = `${formData.email} Report Request (${formData.locations.length} locations)`;
-    const body = bodyLines.filter(Boolean).join('\n');
+    const body = bodyLines.filter(Boolean).join('');
     const mailto = `mailto:support@waterwatchpro.com?subject=${subject}&body=${body}`;
 
     //window.location.href = mailto;
     await emailSupport(subject,body)
     setSubmitted(true);
   };
+
+
+
 
   if (submitted) {
     return (
@@ -120,6 +156,8 @@ const AnonymousReportForm = () => {
       </div>
     );
   }
+
+
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
@@ -138,17 +176,18 @@ const AnonymousReportForm = () => {
         <input type="text" name="phone" placeholder="Phone number" value={formData.phone} onChange={handleChange} className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
 
-        <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - Oct 31 2024)</h2>
-        <div className='w-full flex flex-row gap-4'>
-        <input type="date" name="fromDate" required value={formData.fromDate} onChange={handleChange}  min="2022-11-01"
-          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
-        <input type="date" name="toDate" required value={formData.toDate} onChange={handleChange}  min="2022-11-01"
-          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
-        </div>
+     
         <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Location(s) Detail</h2>
        
         {formData.locations.map((loc, i) => (
-          <div key={i} className="border p-4 rounded-md relative">
+          <div key={i} className="border p-4 rounded-md relative flex flex-col gap-4">
+               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - Today)</h2>
+        <div className='w-full flex flex-row gap-4'>
+        <input type="date" name="fromDate" required value={loc.fromDate} onChange={(e)=>handleChange(e,i,'fromDate')}  min="2022-11-01"
+          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        <input type="date" name="toDate" required value={loc.toDate} onChange={(e)=> handleChange(e,i,"toDate")}  min="2022-11-01"
+           className="input placeholder:text-slate-500 border p-2 rounded-md" />
+        </div>
             {formData.locations.length > 1 && (
               <button
                 type="button"
@@ -159,7 +198,7 @@ const AnonymousReportForm = () => {
               </button>
             )}
             <div className='w-full grid  md:flex-row gap-4'>
-            <input type="text" required placeholder="Location Name" value={loc.locationName} onChange={(e) => handleChange(e, i, 'locationName')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="text" required placeholder="Location Name" value={loc.name} onChange={(e) => handleChange(e, i, 'name')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             <input type="number" step="any" required placeholder="Latitude"  min="24" max="49" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             <input type="number" step="any" required placeholder="Longitude" min="-122" max="-66" value={loc.longitude} onChange={(e) => handleChange(e, i, 'longitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
            
@@ -170,7 +209,7 @@ const AnonymousReportForm = () => {
                 <label key={type} className="mr-4">
                   <input
                     type="checkbox"
-                    checked={loc.reportTypes.includes(type)}
+                    checked={loc?.reportTypes && loc.reportTypes.includes(type)}
                     onChange={() => handleCheckboxChange(i, type)}
                     className="mr-1"
                   />

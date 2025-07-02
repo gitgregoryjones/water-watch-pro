@@ -432,7 +432,7 @@ const Reports = () => {
               <option value="emails">Rejected Emails</option>
               {1==0 && <option value="billing">Billing</option>}
             </Upgrade>
-            <option value="historical">Historical Data</option>
+            {/*<option value="historical">Historical Data</option>*/}
 
               {!user.is_superuser && <option value="daily">Custom</option>}
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}

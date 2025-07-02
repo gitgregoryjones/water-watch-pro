@@ -44,7 +44,7 @@ const AnonymousReportForm = () => {
     (async ()=> {
       let locs = await fetchByPage(`/api/locations`);
 
-      let enhanced = locs.filter((l)=> searchParams.get("location_id") && Number(l.id) === Number(searchParams.get("location_id"))).map((m)=> {m.reportTypes = []; return m});
+      let enhanced = locs.filter((l)=> searchParams.get("location_id") && Number(l.id) === Number(searchParams.get("location_id"))).map((m)=> {m.reportTypes = []; m.lastReportDate = beginOfPreviousMonth(new Date(m.created_at)); return m});
 
      // alert(JSON.stringify(enhanced[0]))
 
@@ -182,7 +182,11 @@ Our emails come from support@waterwatchpro.com. Be sure to look in your junk or 
 If you have any questions, contact support@waterwatchpro.com. */
   }
 
+function beginOfPreviousMonth(date : Date){
 
+  return new Date(date.getFullYear(), date.getMonth() - 1, 1)
+
+}
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
@@ -209,6 +213,7 @@ If you have any questions, contact support@waterwatchpro.com. */
         placeholder="Name"
         value={formData.name}
         onChange={handleChange}
+        
         className="input placeholder:text-slate-500 border p-2 rounded-md"
       />
     </div>
@@ -269,7 +274,7 @@ If you have any questions, contact support@waterwatchpro.com. */
        
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative flex flex-col gap-4">
-               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - {loc.created_at ? new Date(loc.created_at).toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : "Today"})</h2>
+               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : "Today"})</h2>
         <div className='w-full flex flex-row gap-4'>
         <div className='flex flex-col'>
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -285,7 +290,7 @@ If you have any questions, contact support@waterwatchpro.com. */
         To Date <span className="text-red-500">*</span>
       </label> 
         <input type="date" name="toDate" required value={loc.toDate} onChange={(e)=> handleChange(e,i,"toDate")}  min="2022-11-01"
-          max={loc.created_at ? `${new Date(loc.created_at).getFullYear()}-${new Date(loc.created_at).getMonth()+1}-${new Date(loc.created_at).getDate().toString().padStart(2,"0")}`: ""} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+          max={loc.lastReportDate ? `${loc.lastReportDate.getFullYear()}-${loc.lastReportDate.getMonth()+1}-${loc.lastReportDate.getDate().toString().padStart(2,"0")}`: ""} className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
         </div>
             {formData.locations.length > 1 && (
@@ -302,15 +307,15 @@ If you have any questions, contact support@waterwatchpro.com. */
             <label htmlFor="email" className="text-sm font-medium text-gray-700">
         Location name: <span className="text-red-500">*</span>
       </label> 
-            <input type="text" required placeholder="Location Name" value={loc.name} onChange={(e) => handleChange(e, i, 'name')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+            <input type="text" disabled={searchParams.get("location_id")} required placeholder="Location Name"  value={loc.name} onChange={(e) => handleChange(e, i, 'name')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             </div>
             <div className='flex flex-col-reverse gap-1'>
               <label className='text-[#128DA6] text-xs'>Latitude must be between 24 and 49 degrees</label>
-              <input type="number" step="any" required placeholder={"Latitude"} min="24" max="49" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+              <input type="number" disabled={searchParams.get("location_id")} step="any" required placeholder={"Latitude"} min="24" max="49" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             </div>
             <div className='flex flex-col-reverse gap-1'>
             <label className='text-[#128DA6] text-xs'>Longitude must be between -122 and -66 degrees *</label>
-            <input type="number" step="any" required placeholder="Longitude" min="-122" max="-66" value={loc.longitude} onChange={(e) => {
+            <input type="number" disabled={searchParams.get("location_id")}  step="any" required placeholder="Longitude" min="-122" max="-66" value={loc.longitude} onChange={(e) => {
     const value = -Math.abs(parseFloat(e.target.value));
     handleChange({ target: { value } }, i, 'longitude');
   }} className="input placeholder:text-slate-500 border p-2 rounded-md" />

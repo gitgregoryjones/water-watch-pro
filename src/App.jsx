@@ -217,7 +217,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        <Route path="/order-locations" element={<AnonymousReportForm/>}/>
+        {/*<Route  path="/order-locations" element={<AnonymousReportForm/>}/>*/}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

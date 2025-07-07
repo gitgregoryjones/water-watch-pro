@@ -288,13 +288,13 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
           
-          {isEditMode && <button
+          {/*isEditMode && <button
               type="button"
               onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
               className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
             >
               Past Data
-            </button>}
+            </button>*/}
           {isEditMode && convertTier(user) >= 2 && (
             <button
               type="button"

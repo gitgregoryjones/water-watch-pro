@@ -52,6 +52,7 @@ import { updateUser } from "./utility/UserSlice";
 import WorkingDialog from "./components/WorkingDialog";
 import UserForm from "./components/UserForm";
 import ContactForm from "./components/ContactForm";
+import AnonymousReportForm from "./pages/AnonymousReportForm";
 
 
 
@@ -89,7 +90,7 @@ function App() {
   
 
   // Check if the current path is the login page
-  const isLoginPage = (location.pathname === "/"  || location.pathname === "/wizard" || location.pathname === "/registration-complete" 
+  const isLoginPage = (location.pathname === "/"  || location.pathname === "/order-locations" ||  location.pathname === "/wizard" || location.pathname === "/registration-complete" 
     || location.pathname == "/reset-password" || location.pathname == "/forgot-password" || location.pathname == "/upgrade") ;
 
   
@@ -216,7 +217,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-
+        {/*<Route  path="/order-locations" element={<AnonymousReportForm/>}/>*/}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

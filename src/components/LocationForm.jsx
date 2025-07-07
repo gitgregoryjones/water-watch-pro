@@ -40,54 +40,64 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     setIsWorking(true)
     e.preventDefault();
 
+    let success = true;
+
         if(!name){
-          await setMsg(<span className="text-[red]">Location name is required</span>)
-          await setIsWorking(false); 
-            return;
+          setMsg(<span className="text-[red]">Location name is required</span>)
+          setIsWorking(false); 
+            success = false;
         }
 
        
 
         if(!latitude || latitude < 24 || latitude > 49 ){
             
-            await setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
-            await setIsWorking(false); 
-            return;
+             setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
+             setIsWorking(false); 
+            success = false;
         }
 
         let tmpLong = longitude > 0 ? -longitude : longitude;
 
         if(longitude > 0 ){
-          await setLongitude(-longitude);
+           setLongitude(-longitude);
         }
 
         if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
             
-            await setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
-            await setIsWorking(false); 
+             setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
+             setIsWorking(false); 
 
-            return;
+             success = false;
         }
-       
+ 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
             
-            await setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            await setIsWorking(false); 
-            return;
+             setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+             setIsWorking(false); 
+            success = false;
         }
+ 
 
        
         if(!rapidRainThreshold){
-            await setRapidRainThreshold(h24Threshold)
+             setRapidRainThreshold(h24Threshold)
             
         } else 
         if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
             
-            await setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            await setIsWorking(false); 
-            return;
+        if(user?.clients?.[0]?.tier != "bronze") {
+            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            setIsWorking(false); 
+        }
+        success = false;
         }
      
+    if(!success){
+     // alert('bad one')
+      
+      return false;    
+    }
 
     const locationData = {
       name,
@@ -264,6 +274,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             </div>)}
         </div>
 
+        {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
+          <label className='text-sm'>Date data began</label>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
+        </div>}
+
         {/* Action Buttons */}
         <div className="flex justify-between">
           <button
@@ -272,6 +287,14 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           >
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
+          
+          {/*isEditMode && <button
+              type="button"
+              onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
+              className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
+            >
+              Past Data
+            </button>*/}
           {isEditMode && convertTier(user) >= 2 && (
             <button
               type="button"

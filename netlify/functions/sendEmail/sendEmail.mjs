@@ -7,6 +7,10 @@ const SOCKETLABS_API_KEY = process.env.VITE_SOCKETLABS_API_KEY;
 const SOCKETLABS_FROM_EMAIL = process.env.VITE_SOCKETLABS_FROM_EMAIL;
 const SOCKETLABS_SERVER_ID = process.env.VITE_SOCKETLABS_SERVER_ID;
 
+const headers = {
+  "Access-Control-Allow-Origin": "*", // or specify 'http://localhost:3000' if you want to restrict
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 // The main handler function
 exports.handler = async (event) => {
   try {
@@ -17,6 +21,7 @@ exports.handler = async (event) => {
     if (!toEmail || !subject || !textBody || !htmlBody) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: "Missing required fields: toEmail, subject, textBody, htmlBody" }),
       };
     }
@@ -51,6 +56,7 @@ exports.handler = async (event) => {
     // Return a successful response
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         message: "Email sent successfully",
         data: response.data,
@@ -60,6 +66,7 @@ exports.handler = async (event) => {
     // Return an error response
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({
         error: "Failed to send email",
         details: error.message,

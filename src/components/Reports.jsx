@@ -266,6 +266,8 @@ const Reports = () => {
   
     let query = '';
     let requestData = null;
+
+
   
     if (reportType === 'monthly') {
       const [year, month] = toDate.split('-'); // Extract year and month
@@ -275,7 +277,8 @@ const Reports = () => {
       console.log(`Computed From Date: ${firstDay}, To Date: ${lastDay}`);
       query = `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
     } else if (reportType === 'weekly' || reportType === 'daily' || reportType === "historical") {
-      query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}?historical=${reportType === "historical"}`;
+      //query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}?historical=${reportType === "historical"}`;
+       query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
@@ -286,6 +289,8 @@ const Reports = () => {
        query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
+
+  
 
     requestData = {
       email_format: displayFormat,
@@ -342,6 +347,7 @@ const Reports = () => {
       }
   
       try {
+     
         const response = await api.get(query);
         console.log('Report Data:', response.data);
 
@@ -466,7 +472,7 @@ const Reports = () => {
             id="fromDate"
             value={fromDate}
             min={"2022-11-01"}
-            max={"2024-10-31"}
+            
             onChange={(e) => setFromDate(e.target.value)}
             disabled={reportType == "monthly"}
             className={`border border-gray-300 rounded p-2 w-full  ${reportType == "monthly" ? 'opacity-[.1]' : ''} `}

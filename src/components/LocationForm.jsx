@@ -4,7 +4,7 @@ import api from '../utility/api';
 import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
-import { VITE_PRICES_LINK } from '../utility/constants';
+import { VITE_FEATURE_HISTORY_REPORT, VITE_PRICES_LINK } from '../utility/constants';
 import { convertTier } from '../utility/loginUser';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
@@ -288,13 +288,13 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
           
-          {/*isEditMode && <button
+          {VITE_FEATURE_HISTORY_REPORT == "true" && isEditMode && <button
               type="button"
               onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
               className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
             >
               Past Data
-            </button>*/}
+            </button>}
           {isEditMode && convertTier(user) >= 2 && (
             <button
               type="button"

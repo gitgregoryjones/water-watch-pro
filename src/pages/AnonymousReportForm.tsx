@@ -4,6 +4,7 @@ import api from '../utility/api';
 import { VITE_EMAIL_PROXY, VITE_WATER_WATCH_SUPPORT } from '../utility/constants';
 import { useSelector } from 'react-redux';
 import fetchByPage from '../utility/fetchByPage';
+import waterportalLogo from '../assets/waterportal.png';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -190,11 +191,15 @@ function beginOfPreviousMonth(date : Date){
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
-      <img src="https://waterwatchpro25.com/logo.png" alt="WaterWatchPro Logo" className="mx-auto mb-6 max-w-[250px]" />
+      <img src={waterportalLogo} alt="WaterWatchPro Logo" className="mx-auto mb-6 smax-w-[250px]" />
+      
       <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
         <div className='flex flex-col gap-1 text-md'>Purchase past data for any Continental U.S. location as far back as November 2022. The cost is 25¢ per day or 10¢ per hour. Once data is entered, we will charge your card on file for the amount of data requested, We will send you the data in an Excel spreadsheet.
 
 <p className='py-4'>For data requests older than November 2022, contact <a className='text-white underline' href="mailto:support@waterwatchpro.com">support@waterwatchpro.com</a></p>
+
+{<p className='py-4 text-yellow-200'>
+This location will be automatically added to your account. If you do NOT wish to retain it, please delete it after you receive your past data spreadsheet.</p>}
 </div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -274,7 +279,7 @@ function beginOfPreviousMonth(date : Date){
        
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative flex flex-col gap-4">
-               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : "Today"})</h2>
+               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : new Date( new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1).toLocaleDateString("EN-US",{year:"numeric", month:"short", day:"2-digit"})})</h2>
         <div className='w-full flex flex-row gap-4'>
         <div className='flex flex-col'>
         <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -290,7 +295,7 @@ function beginOfPreviousMonth(date : Date){
         To Date <span className="text-red-500">*</span>
       </label> 
         <input type="date" name="toDate" required value={loc.toDate} onChange={(e)=> handleChange(e,i,"toDate")}  min="2022-11-01"
-          max={loc.lastReportDate ? `${loc.lastReportDate.getFullYear()}-${loc.lastReportDate.getMonth()+1}-${loc.lastReportDate.getDate().toString().padStart(2,"0")}`: ""} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+          max={loc.lastReportDate ? `${loc.lastReportDate.getFullYear()}-${loc.lastReportDate.getMonth()+1}-${loc.lastReportDate.getDate().toString().padStart(2,"0")}`: `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,"0")}-${(new Date().getDate()-1).toString().padStart(2,"0")}`} className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
         </div>
             {formData.locations.length > 1 && (

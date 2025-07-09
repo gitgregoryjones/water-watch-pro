@@ -46,7 +46,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
 import CancelSignUp from "./pages/CancelSignUp";
 import ProfileMenu from "./components/ProfileMenu";
-import {VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
+import {VITE_FEATURE_HISTORY_REPORT, VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
 import api from './utility/api';
 import { updateUser } from "./utility/UserSlice";
 import WorkingDialog from "./components/WorkingDialog";
@@ -217,7 +217,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {/*<Route  path="/order-locations" element={<AnonymousReportForm/>}/>*/}
+        {VITE_FEATURE_HISTORY_REPORT == "true" && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

@@ -300,7 +300,7 @@ This location will be automatically added to your account. If you do NOT wish to
         To Date <span className="text-red-500">*</span>
       </label> 
         <input type="date" name="toDate" required value={loc.toDate} onChange={(e)=> handleChange(e,i,"toDate")}  min="2022-11-01"
-          max={loc.lastReportDate ? `${loc.lastReportDate.getFullYear()}-${loc.lastReportDate.getMonth()+1}-${loc.lastReportDate.getDate().toString().padStart(2,"0")}`: `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,"0")}-${(new Date().getDate()-1).toString().padStart(2,"0")}`} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+          max={loc.lastReportDate ? `${loc.lastReportDate.getFullYear()}-${(loc.lastReportDate.getMonth()+1).toString().padStart(2,"0")}-${loc.lastReportDate.getDate().toString().padStart(2,"0")}`: `${new Date().getFullYear()}-${(new Date().getMonth()+1).toString().padStart(2,"0")}-${(new Date().getDate()-1).toString().padStart(2,"0")}`} className="input placeholder:text-slate-500 border p-2 rounded-md" />
         </div>
         </div>
             {formData.locations.length > 1 && (

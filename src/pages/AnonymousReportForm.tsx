@@ -45,7 +45,7 @@ const AnonymousReportForm = () => {
     (async ()=> {
       let locs = await fetchByPage(`/api/locations`);
 
-      let enhanced = locs.filter((l)=> searchParams.get("location_id") && Number(l.id) === Number(searchParams.get("location_id"))).map((m)=> {m.reportTypes = []; m.lastReportDate = beginOfPreviousMonth(new Date(m.created_at)); return m});
+      let enhanced = locs.filter((l)=> searchParams.get("location_id") && Number(l.id) === Number(searchParams.get("location_id"))).map((m)=> {m.reportTypes = []; m.lastReportDate = endOfPreviousMonth(new Date(m.created_at)); return m});
 
      // alert(JSON.stringify(enhanced[0]))
 
@@ -188,6 +188,11 @@ function beginOfPreviousMonth(date : Date){
   return new Date(date.getFullYear(), date.getMonth() - 1, 1)
 
 }
+
+function endOfPreviousMonth(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), 0);
+}
+
 
   return (
     <div className="w-full max-w-5xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">

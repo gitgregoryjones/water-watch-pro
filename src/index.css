@@ -211,6 +211,20 @@ body.dark {
   background: var(--primary-color);
   color: var(--text-color);
 }
+body.dark .bg-\[white\],
+body.dark .bg-\[whitesmoke\],
+body.dark .bg-\[\#CAD2C5\],
+body.dark .md\:bg-\[whitesmoke\] {
+  background-color: var(--secondary-color) !important;
+}
+body.dark .big-card,
+body.dark .header,
+body.dark .footer {
+  background-color: var(--secondary-color) !important;
+}
+body.dark .big-container {
+  background-color: var(--primary-color);
+}
 
 h1 {
   font-size: 3.2em;

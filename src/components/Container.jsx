@@ -11,7 +11,7 @@ const Container = styled.div`
     align-items:center;
     --background: purple;
     position:relative;
-    background: #CAD2C5;
+    background: var(--primary-color);
     padding-bottom:1rem;
     background:url(https://i.postimg.cc/GhGPCkYv/image.png) top left / contain;
     --background:url(https://i.postimg.cc/YCXvK9X1/Screenshot-2024-11-09-at-1-23-22-PM.png);

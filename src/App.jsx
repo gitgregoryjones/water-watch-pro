@@ -11,7 +11,7 @@ import DashboardPage from "./pages/DashboardPage";
 import Header from "./components/Header";
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { useContext } from 'react';
-import { ThemeContext } from './utility/ThemeContext';
+import { ThemeContext } from './utility/ThemeContext.jsx';
 import DoubleDash from "./components/DoubleDash";
 
 import DashboardContent from "./components/DashboardContent";
@@ -203,7 +203,7 @@ function App() {
        
      
        {!isLoginPage && <Header theme={theme} onToggleTheme={handleThemeToggle} />}
-       <Container className="big-container bg-[#CAD2C5] md:bg-[whitesmoke] h-full">
+       <Container className="big-container bg-[var(--primary-color)] h-full">
        <ScrollToHash />
       <Routes>
         <Route path="/" element={<LoginForm />} />

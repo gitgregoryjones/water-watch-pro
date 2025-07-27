@@ -29,6 +29,7 @@
   --map-color:#F0E483;
   --map-color:white;
   --primary-color: white; /* Soft, light green for background */
+  --header-bg: white;
   --secondary-color: #6B9080; /* Muted green for main elements */
   --main-color: green;
   --tertiary-color: #CAD2C5; /* Light, fresh green for accents */
@@ -208,6 +209,7 @@ body.dark {
   --secondary-color: #374151;
   --card-background: rgba(55, 65, 81, 0.7);
   --text-color: #f9fafb;
+  --header-bg: var(--secondary-color);
   background: var(--primary-color);
   color: var(--text-color);
 }
@@ -226,6 +228,11 @@ body.dark .big-container {
   background-color: var(--primary-color);
 }
 body.dark input {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+body.dark select,
+body.dark textarea {
   background-color: var(--secondary-color);
   color: var(--text-color);
 }

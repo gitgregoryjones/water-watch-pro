@@ -53,6 +53,7 @@ import WorkingDialog from "./components/WorkingDialog";
 import UserForm from "./components/UserForm";
 import ContactForm from "./components/ContactForm";
 import AnonymousReportForm from "./pages/AnonymousReportForm";
+import {useFeatureFlags} from '@geejay/use-feature-flags';
 
 
 
@@ -64,7 +65,7 @@ function App() {
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
 
-
+  const {isActive} = useFeatureFlags("aaba70cc-6ed2-4acf-a4c7-74c9e860fc75")
   const [selectedClient, setSelectedClient] = useState(user.clients[0]);
 
   const handleClientChange = async (client) => {
@@ -137,7 +138,7 @@ function App() {
       
     </div>}
 
-
+    {<div>HELLO GREG</div>}
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
     {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs

@@ -157,7 +157,7 @@ input::placeholder{
     color:#4CB5F5;
     color:#6AB187;
     text-shadow: 1px 1px black;
-    background-color: white;
+    background-color: var(--header-bg);
 }
 
 .footer {
@@ -222,7 +222,7 @@ body.dark .md\:bg-\[whitesmoke\] {
 body.dark .big-card,
 body.dark .header,
 body.dark .footer {
-  background-color: var(--secondary-color) !important;
+  background-color: var(--header-bg) !important;
 }
 body.dark .big-container {
   background-color: var(--primary-color);
@@ -233,6 +233,19 @@ body.dark input {
 }
 body.dark select,
 body.dark textarea {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+body.dark .bg-gray-50,
+body.dark .bg-gray-100,
+body.dark .bg-gray-200 {
+  background-color: var(--secondary-color) !important;
+}
+body.dark table {
+  background-color: var(--primary-color);
+}
+body.dark th,
+body.dark td {
   background-color: var(--secondary-color);
   color: var(--text-color);
 }

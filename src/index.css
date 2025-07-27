@@ -29,6 +29,7 @@
   --map-color:#F0E483;
   --map-color:white;
   --primary-color: white; /* Soft, light green for background */
+  --header-bg: white;
   --secondary-color: #6B9080; /* Muted green for main elements */
   --main-color: green;
   --tertiary-color: #CAD2C5; /* Light, fresh green for accents */
@@ -156,7 +157,7 @@ input::placeholder{
     color:#4CB5F5;
     color:#6AB187;
     text-shadow: 1px 1px black;
-    background-color: white;
+    background-color: var(--header-bg);
 }
 
 .footer {
@@ -197,10 +198,56 @@ a {
 
 body {
   margin: 0;
---display: flex;
+  --display: flex;
   --place-items: center;
  --min-width: 320px;
   --min-height: 100vh;
+}
+
+body.dark {
+  --primary-color: #1f2937;
+  --secondary-color: #374151;
+  --card-background: rgba(55, 65, 81, 0.7);
+  --text-color: #f9fafb;
+  --header-bg: var(--secondary-color);
+  background: var(--primary-color);
+  color: var(--text-color);
+}
+body.dark .bg-\[white\],
+body.dark .bg-\[whitesmoke\],
+body.dark .bg-\[\#CAD2C5\],
+body.dark .md\:bg-\[whitesmoke\] {
+  background-color: var(--secondary-color) !important;
+}
+body.dark .big-card,
+body.dark .header,
+body.dark .footer {
+  background-color: var(--header-bg) !important;
+}
+body.dark .big-container {
+  background-color: var(--primary-color);
+}
+body.dark input {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+body.dark select,
+body.dark textarea {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+body.dark .bg-gray-50,
+body.dark .bg-gray-100,
+body.dark .bg-gray-200 {
+  background-color: var(--secondary-color) !important;
+}
+body.dark table {
+  background-color: var(--primary-color);
+}
+body.dark th,
+body.dark td {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 h1 {

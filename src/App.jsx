@@ -9,6 +9,9 @@ import './index.css';
 import DashboardPage from "./pages/DashboardPage";
 
 import Header from "./components/Header";
+import { useFeatureFlags } from '@geejay/use-feature-flags';
+import { useContext } from 'react';
+import { ThemeContext } from './utility/ThemeContext.jsx';
 import DoubleDash from "./components/DoubleDash";
 
 import DashboardContent from "./components/DashboardContent";
@@ -61,6 +64,13 @@ import {useFeatureFlags} from '@geejay/use-feature-flags';
 function App() {
 
   const location = useLocation();
+  const { isActive, loading } = useFeatureFlags("4a35e59c-59ba-4d13-891f-e57fa0eee7ca");
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  const handleThemeToggle = () => {
+    if (isActive('dark-mode')) {
+      toggleTheme();
+    }
+  };
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
@@ -118,8 +128,9 @@ function App() {
 
     setOpen(state.isOpen);
   }
-  
-  
+
+  if (loading) return null;
+
   return (
     <LandscapeOrientation>
       <ScrollToTop/>
@@ -192,8 +203,8 @@ function App() {
     </div>
        
      
-       {!isLoginPage && <Header />}
-       <Container className="big-container bg-[#CAD2C5] md:bg-[whitesmoke] h-full">
+       {!isLoginPage && <Header theme={theme} onToggleTheme={handleThemeToggle} />}
+       <Container className="big-container bg-[var(--primary-color)] h-full">
        <ScrollToHash />
       <Routes>
         <Route path="/" element={<LoginForm />} />

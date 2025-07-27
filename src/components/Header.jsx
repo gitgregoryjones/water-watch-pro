@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { FaMoon, FaSun } from 'react-icons/fa'
 
 
 import { useLocation, Link } from 'react-router-dom';
@@ -16,7 +17,7 @@ import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
 
 
 
-export default function Header() {
+export default function Header({ theme, onToggleTheme }) {
 
   const menu = useRef(null);
 
@@ -68,8 +69,8 @@ export default function Header() {
 
   
   return (
-    
-    <div className=' flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center   zbg-[#CAD2C5] bg-[white] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
+
+    <div className='header flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center bg-[var(--header-bg)] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex  md:flex-row flex-col xlg:flex-row items-center md:gap-4 justify-center items-center'>
         <img src="/logo.png" className='w-[14rem] md:w-[20rem]' />
        { user.clients[0]?.is_trial_account && <span className="text-[#ecbf1d] text-xl md:text-2xl decoration-solid"><Link className="text-[#ecbf1d]" to="/upgrade">Trial Ends in {daysLeft} Days</Link></span>}
@@ -109,7 +110,7 @@ export default function Header() {
   </Link></Upgrade>)}
   </div>
   
-  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && 
+  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  &&
     <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
       Logout
     </Link>
@@ -117,9 +118,14 @@ export default function Header() {
 
 
   {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
+  {onToggleTheme && (
+    <button onClick={onToggleTheme} className='text-[--main-2]'>
+      {theme === 'dark' ? <FaSun /> : <FaMoon />}
+    </button>
+  )}
     <div className='hidden flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
-      
+
         <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>
       
       </div>

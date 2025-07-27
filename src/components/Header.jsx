@@ -70,7 +70,7 @@ export default function Header({ theme, onToggleTheme }) {
   
   return (
     
-    <div className=' flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center   zbg-[#CAD2C5] bg-[var(--primary-color)] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
+    <div className=' flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center bg-[var(--primary-color)] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
       <div className='flex  md:flex-row flex-col xlg:flex-row items-center md:gap-4 justify-center items-center'>
         <img src="/logo.png" className='w-[14rem] md:w-[20rem]' />
        { user.clients[0]?.is_trial_account && <span className="text-[#ecbf1d] text-xl md:text-2xl decoration-solid"><Link className="text-[#ecbf1d]" to="/upgrade">Trial Ends in {daysLeft} Days</Link></span>}

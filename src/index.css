@@ -225,6 +225,10 @@ body.dark .footer {
 body.dark .big-container {
   background-color: var(--primary-color);
 }
+body.dark input {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
 
 h1 {
   font-size: 3.2em;

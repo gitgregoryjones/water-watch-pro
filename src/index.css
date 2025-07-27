@@ -197,10 +197,19 @@ a {
 
 body {
   margin: 0;
---display: flex;
+  --display: flex;
   --place-items: center;
  --min-width: 320px;
   --min-height: 100vh;
+}
+
+body.dark {
+  --primary-color: #1f2937;
+  --secondary-color: #374151;
+  --card-background: rgba(55, 65, 81, 0.7);
+  --text-color: #f9fafb;
+  background: var(--primary-color);
+  color: var(--text-color);
 }
 
 h1 {

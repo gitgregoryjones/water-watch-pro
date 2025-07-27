@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { FaMoon, FaSun } from 'react-icons/fa'
 
 
 import { useLocation, Link } from 'react-router-dom';
@@ -16,7 +17,7 @@ import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
 
 
 
-export default function Header() {
+export default function Header({ theme, onToggleTheme }) {
 
   const menu = useRef(null);
 
@@ -109,7 +110,7 @@ export default function Header() {
   </Link></Upgrade>)}
   </div>
   
-  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && 
+  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  &&
     <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
       Logout
     </Link>
@@ -117,9 +118,14 @@ export default function Header() {
 
 
   {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
+  {onToggleTheme && (
+    <button onClick={onToggleTheme} className='text-[--main-2]'>
+      {theme === 'dark' ? <FaSun /> : <FaMoon />}
+    </button>
+  )}
     <div className='hidden flex fa-stack relative flex justify-center items-center'>
       <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
-      
+
         <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>
       
       </div>

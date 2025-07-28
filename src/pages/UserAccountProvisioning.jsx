@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Toggle from '../components/Toggle';
 import { useSelector } from 'react-redux';
+import { ThemeContext } from '../utility/ThemeContext.jsx';
+import { getLinkClasses } from '../utility/getLinkClasses';
 
 const UserAccountProvisioning = () => {
   const [showUpgrade, setShowUpgrade] = useState(false);
   const user = useSelector((state) => state.userInfo.user);
+  const { theme } = useContext(ThemeContext);
   const [settings, setSettings] = useState({
     turnAccountOn: false,
     suspendAccount: false,
@@ -54,20 +57,20 @@ const UserAccountProvisioning = () => {
           <div className="flex justify-start rounded space-x-6 mb-8 self-start bg-[transparent] w-full p-2">
             <Link
               to="/contact-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+              className={`${getLinkClasses(theme, false)} font-bold border-b-2 border-transparent hover:border-blue-700`}
             >
               Modify Contacts
             </Link>
 
             <Link
               to="/location-list"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+              className={`${getLinkClasses(theme, false)} font-bold border-b-2 border-transparent hover:border-blue-700`}
             >
               Modify Locations
             </Link>
             <Link
               to="/settings-general"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+              className={`${getLinkClasses(theme, false)} font-bold border-b-2 border-transparent hover:border-blue-700`}
             >
               Notifications
             </Link>

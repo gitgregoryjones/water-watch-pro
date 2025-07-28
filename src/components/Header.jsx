@@ -11,6 +11,7 @@ import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import ProfilePic from './ProfilePic';
 import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 
 
@@ -43,6 +44,7 @@ export default function Header({ theme, onToggleTheme }) {
 
   const differenceInMs = trialEndDate - today;
   
+  const {isActive} = useFeatureFlags()
 
   
 
@@ -118,7 +120,7 @@ export default function Header({ theme, onToggleTheme }) {
 
 
   {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
-  {onToggleTheme && (
+  {onToggleTheme && isActive("dark-mode") && (
     <button onClick={onToggleTheme} className='text-[--main-2]'>
       {theme === 'dark' ? <FaSun /> : <FaMoon />}
     </button>

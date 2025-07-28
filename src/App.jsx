@@ -9,7 +9,7 @@ import './index.css';
 import DashboardPage from "./pages/DashboardPage";
 
 import Header from "./components/Header";
-import { useFeatureFlags } from '@geejay/use-feature-flags';
+
 import { useContext } from 'react';
 import { ThemeContext } from './utility/ThemeContext.jsx';
 import DoubleDash from "./components/DoubleDash";
@@ -56,7 +56,8 @@ import WorkingDialog from "./components/WorkingDialog";
 import UserForm from "./components/UserForm";
 import ContactForm from "./components/ContactForm";
 import AnonymousReportForm from "./pages/AnonymousReportForm";
-import {useFeatureFlags} from '@geejay/use-feature-flags';
+import { useFeatureFlags } from "@geejay/use-feature-flags";
+
 
 
 
@@ -64,18 +65,22 @@ import {useFeatureFlags} from '@geejay/use-feature-flags';
 function App() {
 
   const location = useLocation();
-  const { isActive, loading } = useFeatureFlags("4a35e59c-59ba-4d13-891f-e57fa0eee7ca");
+  
   const { theme, toggleTheme } = useContext(ThemeContext);
+  
+  const user = useSelector((state) => state.userInfo.user);
+  const dispatch = useDispatch();
+  const [showDialog, setShowDialog] = useState(false);
+
+  const {isActive,loading} = useFeatureFlags("aaba70cc-6ed2-4acf-a4c7-74c9e860fc75")
+
   const handleThemeToggle = () => {
     if (isActive('dark-mode')) {
       toggleTheme();
     }
   };
-  const user = useSelector((state) => state.userInfo.user);
-  const dispatch = useDispatch();
-  const [showDialog, setShowDialog] = useState(false);
 
-  const {isActive} = useFeatureFlags("aaba70cc-6ed2-4acf-a4c7-74c9e860fc75")
+  
   const [selectedClient, setSelectedClient] = useState(user.clients[0]);
 
   const handleClientChange = async (client) => {

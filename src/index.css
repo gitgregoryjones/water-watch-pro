@@ -156,8 +156,8 @@ input::placeholder{
 .header, .footer {
     color:#4CB5F5;
     color:#6AB187;
-    text-shadow: 1px 1px black;
-    background-color: var(--header-bg);
+  
+    background-color: white;
 }
 
 .footer {

@@ -59,6 +59,6 @@ export default function Processing({showPlain = false}) {
    </Stats>
   )
   } else {
-   return <div className=' w-full justify-start mt-4 flex md:justify-center md:items-center text-green-800 md:my-0 text-lg px-2 md:text-2xl'>Data Up To {plainMsg} ET</div>
+   return <div className=' w-full justify-start mt-4 flex md:justify-center md:items-center  md:my-0 text-lg px-2 md:text-2xl'>Data Up To {plainMsg} ET</div>
   }
 }

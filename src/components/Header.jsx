@@ -13,7 +13,7 @@ import ProfilePic from './ProfilePic';
 import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 
-
+import {getLinkClasses} from '../utility/getLinkClasses';
 
 
 
@@ -70,12 +70,7 @@ export default function Header({ theme, onToggleTheme }) {
   }
 
   
-  const getLinkClasses = (isActive) => {
-    if (theme === 'dark') {
-      return `${isActive ? 'text-yellow-400' : 'text-white'} hover:text-yellow-400`;
-    }
-    return `${isActive ? 'text-slate-800' : 'text-[--main-2]'} hover:text-[--main-2]`;
-  };
+  
 
   return (
 
@@ -90,7 +85,7 @@ export default function Header({ theme, onToggleTheme }) {
       <div className='hidden md:flex justify-around items-center gap-4 items-end'> 
      <Link
         to={user.role == "admin" ? `/admin` : `/dashboard`}
-        className={getLinkClasses(location.pathname === "/dashboard")}
+        className={getLinkClasses(theme,location.pathname === "/dashboard")}
       >
         Data
       </Link>
@@ -98,13 +93,13 @@ export default function Header({ theme, onToggleTheme }) {
     <div className='flex gap-4'>
   <Link
         to="/dashboard#graphs"
-        className={getLinkClasses(location.hash === "#graphs" && location.pathname === "/dashboard")}
+        className={getLinkClasses(theme,location.hash === "#graphs" && location.pathname === "/dashboard")}
       >
         Graphs
       </Link>
       <Link
         to="/dashboard#forecast"
-        className={getLinkClasses(location.hash === "#forecast" && location.pathname === "/dashboard")}
+        className={getLinkClasses(theme,location.hash === "#forecast" && location.pathname === "/dashboard")}
       >
         Forecasts
       </Link>
@@ -114,7 +109,7 @@ export default function Header({ theme, onToggleTheme }) {
  
     <Link
         to="/reports"
-        className={getLinkClasses(location.pathname === "/reports")}
+        className={getLinkClasses(theme,location.pathname === "/reports")}
       >
         Reports
       </Link>
@@ -122,7 +117,7 @@ export default function Header({ theme, onToggleTheme }) {
   {((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) )  && (
       <Link
         to="/assign-locations"
-        className={getLinkClasses(location.pathname === "/assign-locations" || location.pathname === "/assignments")}
+        className={getLinkClasses(theme,location.pathname === "/assign-locations" || location.pathname === "/assignments")}
       >
         Assignments
       </Link>
@@ -132,7 +127,7 @@ export default function Header({ theme, onToggleTheme }) {
   {convertTier(user) == 4 ? (
       <Link
         to="/settings-admin"
-        className={getLinkClasses([
+        className={getLinkClasses(theme,[
           "/location-list",
           "/contact-list",
           "/settings-general",
@@ -145,7 +140,7 @@ export default function Header({ theme, onToggleTheme }) {
       <Upgrade tier={1} showMsg={false}>
         <Link
           to="/contact-list"
-          className={getLinkClasses([
+          className={getLinkClasses(theme,[
             "/location-list",
             "/contact-list",
             "/settings-general",
@@ -161,7 +156,7 @@ export default function Header({ theme, onToggleTheme }) {
   {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && (
       <Link
         onClick={logout}
-        className={getLinkClasses(location.pathname === "/")}
+        className={getLinkClasses(theme,location.pathname === "/")}
       >
         Logout
       </Link>

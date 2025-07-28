@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit, FaTrashAlt, FaCheck } from 'react-icons/fa';
 
@@ -6,6 +6,8 @@ import api from '../utility/api';
 import SubHeader from '../components/Subheader';
 import Card from '../components/Card';
 import ContactCSVFileUploadDialog from '../components/ContactCSVFileUploadDialog';
+import { ThemeContext } from '../utility/ThemeContext.jsx';
+import { getLinkClasses } from '../utility/getLinkClasses';
 
 const AccountListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -13,6 +15,7 @@ const AccountListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const { theme } = useContext(ThemeContext);
 
   const fetchContacts = async (page) => {
     try {
@@ -57,13 +60,13 @@ const AccountListPage = () => {
         </span>
         <Link
           to="/location-list"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+          className={`${getLinkClasses(theme, false)} font-bold border-b-2 border-transparent hover:border-blue-700`}
         >
           Modify Locations
         </Link>
         <Link
           to="/settings-general"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+          className={`${getLinkClasses(theme, false)} font-bold border-b-2 border-transparent hover:border-blue-700`}
         >
           Notifications
         </Link>

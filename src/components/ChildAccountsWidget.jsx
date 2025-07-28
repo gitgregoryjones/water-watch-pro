@@ -108,7 +108,7 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
 
   return (
     <>
-    <div className={ `${showDialog  && "blur"} p-4 w-full max-w-lg bg-white shadow-md rounded-md`}>
+    <div className={ `${showDialog  && "blur"} p-4 w-full max-w-lg border  shadow-md rounded-md`}>
       <h2 className="text-lg font-semibold mb-2">Manage Associated Client Accounts</h2>
 
       <ul className="mb-2">
@@ -183,11 +183,11 @@ const ChildAccountsWidget = ({ accounts = [], onUpdate }) => {
         </div>
       ) : (
         <button
-          className="flex items-center gap-2 p-2 border border-gray-400 rounded-md w-full text-left hover:bg-gray-100"
+          className="flex items-center gap-2 p-2 border border-gray-400 rounded-md w-full text-left "
           onClick={() => setShowInput(true)}
         >
-          <FaPlus className="text-gray-700" />
-          <span className="text-gray-700">Add Client Account</span>
+          <FaPlus className="" />
+          <span className="">Add Client Account</span>
         </button>
       )}
       

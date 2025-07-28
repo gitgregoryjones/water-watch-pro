@@ -103,9 +103,9 @@ const GeneralSettingsPage = () => {
         header={
           <SettingsMenu activeTab={"notifications"}/>
         }
-        className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}
+        className={'border-[whitesmoke]  md:rounded-[unset]'}
       >
-        <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
+        <div className="p-6 w-full md:w-full mx-auto  border shadow-md rounded-lg">
           <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
             <div>{msg}</div>
             <h2 className='py-4 px-2 border rounded bg-[#128CA6] text-[white]'>Note: The options below set notifications system wide. Modify contact settings to override settings for individual users</h2>

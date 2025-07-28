@@ -126,7 +126,7 @@ const ContactListPage = () => {
         
       </div>
       }>
-    <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
+    <div className="mt-2 p-6 w-full md:w-full mx-auto border shadow-md rounded-lg">
         <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className='text-yellow-500 fa fa-person'></i>{filtered.length} contacts are viewable. Scroll down see more</div>
          <div className="flex justify-around items-end md:items-center gap-4 mb-6">
         <div className='flex md:flex-row flex-col md:justify-between  flex-1'>

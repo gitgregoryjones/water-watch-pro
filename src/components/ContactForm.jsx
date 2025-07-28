@@ -292,7 +292,7 @@ const ContactForm = ({  }) => {
   
       return (
         ( <div className={`flex flex-col mb-4 ${label.toLocaleLowerCase().startsWith("forecast") && convertTier(user) < 3 ? 'hidden' : ''} ${label.toLocaleLowerCase().startsWith("atlas") && convertTier(user) < 2 ? 'hidden' : ''}`} key={header} >
-          <span className="font-bold text-gray-700 capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
+          <span className="font-bold capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
           
           <div className="flex items-center mt-2">
             <span className="mr-2">Email</span>
@@ -314,7 +314,7 @@ const ContactForm = ({  }) => {
     });
   };
   return (
-    <div className={`relative ${convertTier(user) >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg`}>
+    <div className={`relative ${convertTier(user) >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
       {/* Close Button */}
       <button
         onClick={() => navigate('/contact-list')}

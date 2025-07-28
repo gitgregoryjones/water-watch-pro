@@ -160,7 +160,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   };
 
   return (
-    <div className="relative mt-8 p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg">
+    <div className="relative mt-8 p-6 w-full max-w-lg mx-auto border bg-[var(--header-bg)]  shadow-md rounded-lg">
       
        <button
         onClick={() => navigate('/location-list')}
@@ -168,7 +168,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       >
         <FaTimes />
       </button>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+      <h2 className="text-2xl font-bold  mb-6">
         {isEditMode ? `Update :  ${name}` : 'Create New Location'}
       </h2>
       <div className='mb-4'>{msg}</div>

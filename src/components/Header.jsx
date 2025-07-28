@@ -70,6 +70,13 @@ export default function Header({ theme, onToggleTheme }) {
   }
 
   
+  const getLinkClasses = (isActive) => {
+    if (theme === 'dark') {
+      return `${isActive ? 'text-yellow-400' : 'text-white'} hover:text-yellow-400`;
+    }
+    return `${isActive ? 'text-slate-800' : 'text-[--main-2]'} hover:text-[--main-2]`;
+  };
+
   return (
 
     <div className='header flex h-[4rem] overflow-x-show md:flex px-5 justify-between md:justify-around md:gap-0 gap-4 top-0 left-0 fixed  z-50 items-center bg-[var(--header-bg)] text-slate-800 font-bold w-full md:min-h-24 md:text-xl border-b'>
@@ -81,42 +88,84 @@ export default function Header({ theme, onToggleTheme }) {
         <i className='fas fa-search absolute pl-4 pb-4 top-10 text-slate-400 text-sm'></i>
       </div>
       <div className='hidden md:flex justify-around items-center gap-4 items-end'> 
-     <Link to={user.role == "admin" ? `/admin`:`/dashboard`} className={`hover:text-[--main-2] ${location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Data
-  </Link>
+     <Link
+        to={user.role == "admin" ? `/admin` : `/dashboard`}
+        className={getLinkClasses(location.pathname === "/dashboard")}
+      >
+        Data
+      </Link>
   {convertTier(user) != 4 && (
     <div className='flex gap-4'>
-  <Link to="/dashboard#graphs" className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Graphs
-  </Link>
-  <Link to="/dashboard#forecast" className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Forecasts
-  </Link>
+  <Link
+        to="/dashboard#graphs"
+        className={getLinkClasses(location.hash === "#graphs" && location.pathname === "/dashboard")}
+      >
+        Graphs
+      </Link>
+      <Link
+        to="/dashboard#forecast"
+        className={getLinkClasses(location.hash === "#forecast" && location.pathname === "/dashboard")}
+      >
+        Forecasts
+      </Link>
   </div>
 )}
 
  
-    <Link to="/reports" className={location.pathname === "/reports" ? "text-slate-800" : "text-[--main-2]"}>
-      Reports
-    </Link>
+    <Link
+        to="/reports"
+        className={getLinkClasses(location.pathname === "/reports")}
+      >
+        Reports
+      </Link>
   
-  {((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) )  && (<Link to="/assign-locations" className={location.pathname === "/assign-locations" || location.pathname === "/assignments" ? "text-slate-800" : "text-[--main-2]"}>
-    Assignments 
-  </Link>)}
+  {((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) )  && (
+      <Link
+        to="/assign-locations"
+        className={getLinkClasses(location.pathname === "/assign-locations" || location.pathname === "/assignments")}
+      >
+        Assignments
+      </Link>
+    )}
   <div>
 
-    {convertTier(user) == 4 ? (<Link to="/settings-admin" className={["/location-list", "/contact-list", "/settings-general"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
-    Settings
-  </Link>):((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) ) && (<Upgrade  tier={1} showMsg={false}><Link to="/contact-list" className={["/location-list", "/contact-list", "/settings-general","/client-form"].includes(location.pathname) ? "text-slate-800" : "text-[--main-2]"}>
-    Settings 
-  </Link></Upgrade>)}
+  {convertTier(user) == 4 ? (
+      <Link
+        to="/settings-admin"
+        className={getLinkClasses([
+          "/location-list",
+          "/contact-list",
+          "/settings-general",
+        ].includes(location.pathname))}
+      >
+        Settings
+      </Link>
+    ) :
+    ((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) ) && (
+      <Upgrade tier={1} showMsg={false}>
+        <Link
+          to="/contact-list"
+          className={getLinkClasses([
+            "/location-list",
+            "/contact-list",
+            "/settings-general",
+            "/client-form",
+          ].includes(location.pathname))}
+        >
+          Settings
+        </Link>
+      </Upgrade>
+    )}
   </div>
   
-  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  &&
-    <Link onClick={logout} className={location.pathname === "/" ? "text-slate-800" : "text-[--main-2]"}>
-      Logout
-    </Link>
-  }
+  {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && (
+      <Link
+        onClick={logout}
+        className={getLinkClasses(location.pathname === "/")}
+      >
+        Logout
+      </Link>
+    )}
 
 
   {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}

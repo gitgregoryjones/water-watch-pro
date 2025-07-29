@@ -157,7 +157,7 @@ const ClientListPage = () => {
         className="w-full"
         header={<SettingsMenu activeTab={"clients"} />}
       >
-        <div className="mt-2 p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
+        <div className="mt-2 p-6 w-full md:w-full mx-auto border shadow-md rounded-lg">
           <div
             className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}
           >

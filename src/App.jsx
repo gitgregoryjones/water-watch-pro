@@ -9,12 +9,16 @@ import './index.css';
 import DashboardPage from "./pages/DashboardPage";
 
 import Header from "./components/Header";
+
+import { useContext } from 'react';
+import { ThemeContext } from './utility/ThemeContext.jsx';
 import DoubleDash from "./components/DoubleDash";
 
 import DashboardContent from "./components/DashboardContent";
 import SwitchUser from "./pages/SwitchUser";
 import {slide as Menu} from 'react-burger-menu';
 import Upgrade from "./components/Upgrade";
+import { FaMoon, FaSun } from 'react-icons/fa';
 import { useEffect, useState } from "react";
 import LandscapeOrientation from "./components/LandscapeOrientation";
 import SettingsPage from "./pages/SettingsPage";
@@ -46,13 +50,15 @@ import { useDispatch, useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
 import CancelSignUp from "./pages/CancelSignUp";
 import ProfileMenu from "./components/ProfileMenu";
-import {VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
+import {VITE_FEATURE_HISTORY_REPORT, VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
 import api from './utility/api';
 import { updateUser } from "./utility/UserSlice";
 import WorkingDialog from "./components/WorkingDialog";
 import UserForm from "./components/UserForm";
 import ContactForm from "./components/ContactForm";
 import AnonymousReportForm from "./pages/AnonymousReportForm";
+import { useFeatureFlags } from "@geejay/use-feature-flags";
+
 
 
 
@@ -60,11 +66,23 @@ import AnonymousReportForm from "./pages/AnonymousReportForm";
 function App() {
 
   const location = useLocation();
+  
+  const { theme, toggleTheme } = useContext(ThemeContext);
+  
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
 
+  const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
+  const {isActive,loading} = useFeatureFlags(featureFlagKey)
 
+  const handleThemeToggle = () => {
+    if (isActive('dark-mode')) {
+      toggleTheme();
+    }
+  };
+
+  
   const [selectedClient, setSelectedClient] = useState(user.clients[0]);
 
   const handleClientChange = async (client) => {
@@ -117,8 +135,9 @@ function App() {
 
     setOpen(state.isOpen);
   }
-  
-  
+
+  if (loading) return null;
+
   return (
     <LandscapeOrientation>
       <ScrollToTop/>
@@ -137,7 +156,16 @@ function App() {
       
     </div>}
 
-
+    {<div>HELLO GREG</div>}
+    {isActive('dark-mode') && (
+      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+        {theme === 'dark' ? (
+          <FaSun color="yellow" className="outline-none" />
+        ) : (
+          <FaMoon className="text-slate-800 outline-none" />
+        )}
+      </button>
+    )}
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
     {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs
@@ -191,8 +219,8 @@ function App() {
     </div>
        
      
-       {!isLoginPage && <Header />}
-       <Container className="big-container bg-[#CAD2C5] md:bg-[whitesmoke] h-full">
+       {!isLoginPage && <Header theme={theme} onToggleTheme={handleThemeToggle} />}
+       <Container className="big-container bg-[var(--primary-color)] h-full">
        <ScrollToHash />
       <Routes>
         <Route path="/" element={<LoginForm />} />
@@ -217,7 +245,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {/*<Route  path="/order-locations" element={<AnonymousReportForm/>}/>*/}
+        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

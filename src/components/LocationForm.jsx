@@ -4,8 +4,9 @@ import api from '../utility/api';
 import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
-import { VITE_PRICES_LINK } from '../utility/constants';
+import { VITE_FEATURE_HISTORY_REPORT, VITE_PRICES_LINK } from '../utility/constants';
 import { convertTier } from '../utility/loginUser';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -18,6 +19,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
   const [msg,setMsg] = useState("")
+  const {isActive} = useFeatureFlags();
 
   const navigate = useNavigate();
 
@@ -160,7 +162,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   };
 
   return (
-    <div className="relative mt-8 p-6 w-full max-w-lg mx-auto bg-white shadow-md rounded-lg">
+    <div className="relative mt-8 p-6 w-full max-w-lg mx-auto border bg-[var(--header-bg)]  shadow-md rounded-lg">
       
        <button
         onClick={() => navigate('/location-list')}
@@ -168,7 +170,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       >
         <FaTimes />
       </button>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
+      <h2 className="text-2xl font-bold  mb-6">
         {isEditMode ? `Update :  ${name}` : 'Create New Location'}
       </h2>
       <div className='mb-4'>{msg}</div>
@@ -288,13 +290,13 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
           
-          {/*isEditMode && <button
+          {isActive("past-data") && isEditMode && <button
               type="button"
               onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
               className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
             >
               Past Data
-            </button>*/}
+            </button>}
           {isEditMode && convertTier(user) >= 2 && (
             <button
               type="button"

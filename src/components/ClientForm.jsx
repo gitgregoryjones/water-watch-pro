@@ -176,10 +176,10 @@ const ClientForm = ({ clientToEdit,myself }) => {
         header={
           <SettingsMenu activeTab={myself ? `mysubscription` : `clients`}/>
         }
-        className={'border-[whitesmoke] bg-[whitesmoke] md:rounded-[unset]'}
+        className={'border-[whitesmoke]  md:rounded-[unset]'}
       >
-        <div className="p-6 w-full md:w-full mx-auto bg-white shadow-md rounded-lg">
-    <div className="relative mt-0 p-6 w-full  mx-auto bg-white  rounded-lg">
+        <div className="p-6 w-full md:w-full mx-auto shadow-md rounded-lg">
+    <div className="relative mt-0 p-6 w-full  mx-auto border rounded-lg">
       {/* Close Button */}
       {!myself && <button
         onClick={() => navigate('/settings-admin')}

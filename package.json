@@ -9,21 +9,19 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-  "release": "standard-version"
-
-
+    "release": "standard-version"
   },
   "lint-staged": {
-  "package.json": [
-    "standard-version",
-    "git add"
-  ]
-}
-,
+    "package.json": [
+      "standard-version",
+      "git add"
+    ]
+  },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.1.0",
+    "@geejay/use-feature-flags": "^1.0.13",
     "@mui/material": "^6.1.5",
     "@mui/x-charts": "^7.22.0",
     "@reduxjs/toolkit": "^2.3.0",

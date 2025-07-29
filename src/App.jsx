@@ -245,7 +245,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {VITE_FEATURE_HISTORY_REPORT == "true" && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
+        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

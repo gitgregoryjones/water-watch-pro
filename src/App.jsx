@@ -72,7 +72,8 @@ function App() {
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
 
-  const {isActive,loading} = useFeatureFlags("aaba70cc-6ed2-4acf-a4c7-74c9e860fc75")
+  const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
+  const {isActive,loading} = useFeatureFlags(featureFlagKey)
 
   const handleThemeToggle = () => {
     if (isActive('dark-mode')) {

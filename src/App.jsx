@@ -18,6 +18,7 @@ import DashboardContent from "./components/DashboardContent";
 import SwitchUser from "./pages/SwitchUser";
 import {slide as Menu} from 'react-burger-menu';
 import Upgrade from "./components/Upgrade";
+import { FaMoon, FaSun } from 'react-icons/fa';
 import { useEffect, useState } from "react";
 import LandscapeOrientation from "./components/LandscapeOrientation";
 import SettingsPage from "./pages/SettingsPage";
@@ -155,6 +156,15 @@ function App() {
     </div>}
 
     {<div>HELLO GREG</div>}
+    {isActive('dark-mode') && (
+      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+        {theme === 'dark' ? (
+          <FaSun color="yellow" className="outline-none" />
+        ) : (
+          <FaMoon className="text-slate-800 outline-none" />
+        )}
+      </button>
+    )}
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
     {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs

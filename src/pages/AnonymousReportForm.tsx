@@ -5,6 +5,10 @@ import { VITE_EMAIL_PROXY, VITE_WATER_WATCH_SUPPORT } from '../utility/constants
 import { useSelector } from 'react-redux';
 import fetchByPage from '../utility/fetchByPage';
 import waterportalLogo from '../assets/waterportal.png';
+import { useContext } from 'react';
+import { ThemeContext } from '../utility/ThemeContext';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
+import { FaMoon, FaSun } from 'react-icons/fa';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +24,10 @@ const AnonymousReportForm = () => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  const {isActive} = useFeatureFlags();
 
   const user = useSelector((state) => state.userInfo.user);
 
@@ -195,8 +203,19 @@ function endOfPreviousMonth(date: Date): Date {
 
 
   return (
-    <div className="w-full max-w-5xl mx-auto p-6 bg-white shadow-md rounded-md mt-10">
+    <div className="w-full max-w-5xl mx-auto p-6  bg-[var(--header-bg)] border shadow-md rounded-md mt-10">
+      <div className='flex flex-row items-center justify-center gap-12'>
       <img src={waterportalLogo} alt="WaterWatchPro Logo" className="mx-auto mb-6 smax-w-[250px]" />
+      {isActive('dark-mode') && (
+            <button onClick={toggleTheme} className="menu-item bm-item text-[--main-2]">
+              {theme === 'dark' ? (
+                <FaSun color="yellow" className="outline-none" size={20} />
+              ) : (
+                <FaMoon className="text-slate-800 outline-none" size={20}/>
+              )}
+            </button>
+          )}
+      </div>
       
       <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
         <div className='flex flex-col gap-1 text-md'>Purchase past data for any Continental U.S. location as far back as November 2022. The cost is 25¢ per day or 10¢ per hour. Once data is entered, we will charge your card on file for the amount of data requested, We will send you the data in an Excel spreadsheet.
@@ -212,7 +231,7 @@ This location will be automatically added to your account. If you do NOT wish to
 
   <div className="w-full flex flex-col md:flex-row gap-4">
     <div className="flex flex-col w-full">
-      <label htmlFor="name" className="text-sm font-medium text-gray-700">
+      <label htmlFor="name" className="text-sm font-medium ">
         Name <span className="text-red-500">*</span>
       </label>
       <input
@@ -229,7 +248,7 @@ This location will be automatically added to your account. If you do NOT wish to
     </div>
 
     <div className="flex flex-col w-full md:w-1/2">
-      <label htmlFor="email" className="text-sm font-medium text-gray-700">
+      <label htmlFor="email" className="text-sm font-medium ">
         Email address <span className="text-red-500">*</span>
       </label>
       <input
@@ -247,7 +266,7 @@ This location will be automatically added to your account. If you do NOT wish to
 
   <div className="w-full flex flex-col md:flex-row gap-4">
     <div className="flex flex-col w-full md:w-1/2">
-      <label htmlFor="billingEmail" className="text-sm font-medium text-gray-700">
+      <label htmlFor="billingEmail" className="text-sm font-medium ">
         Billing email (optional)
       </label>
       <input
@@ -262,7 +281,7 @@ This location will be automatically added to your account. If you do NOT wish to
     </div>
 
     <div className="flex flex-col w-full">
-      <label htmlFor="phone" className="text-sm font-medium text-gray-700">
+      <label htmlFor="phone" className="text-sm font-medium ">
         Phone number
       </label>
       <input
@@ -284,10 +303,10 @@ This location will be automatically added to your account. If you do NOT wish to
        
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative flex flex-col gap-4">
-               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : new Date( new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1).toLocaleDateString("EN-US",{year:"numeric", month:"short", day:"2-digit"})})</h2>
+               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range November 1, 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : new Date( new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1).toLocaleDateString("EN-US",{year:"numeric", month:"long", day:"2-digit"})})</h2>
         <div className='w-full flex flex-row gap-4'>
         <div className='flex flex-col'>
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="text-sm font-medium ">
         From Date <span className="text-red-500">*</span>
       </label> 
       <div className='flex flex-col'> 
@@ -296,7 +315,7 @@ This location will be automatically added to your account. If you do NOT wish to
       </div>
         </div>
         <div className='flex flex-col'> 
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="text-sm font-medium ">
         To Date <span className="text-red-500">*</span>
       </label> 
         <input type="date" name="toDate" required value={loc.toDate} onChange={(e)=> handleChange(e,i,"toDate")}  min="2022-11-01"
@@ -314,7 +333,7 @@ This location will be automatically added to your account. If you do NOT wish to
             )}
             <div className='w-full grid  md:flex-row gap-4'>
             <div className='flex flex-col'>
-            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            <label htmlFor="email" className="text-sm font-medium ">
         Location name: <span className="text-red-500">*</span>
       </label> 
             <input type="text" disabled={searchParams.get("location_id")} required placeholder="Location Name"  value={loc.name} onChange={(e) => handleChange(e, i, 'name')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
@@ -355,9 +374,9 @@ This location will be automatically added to your account. If you do NOT wish to
         <button type="submit" className={` bg-[#128DA6] shadow text-white py-2 px-4 rounded max-w-xs`}>Submit Report</button>
         <a  type="cancel" onClick={(e) => {
     e.preventDefault();
-    window.history.back();
+    searchParams.get("anon") ? window.location.href = "https://waterwatchpro.com/home" : window.history.back();
   }} className={` bg-white border cursor-pointer border-red-500 shadow text-red-500 py-2 px-4 rounded max-w-xs`}>Cancel</a>
-        {!searchParams.get("location_id") && <button type="button" onClick={addLocation} className="border border-[#1DC0CB] text-[#1DC0CB] py-2 px-4 rounded max-w-xs ">+ Add New Row</button>}
+        {!searchParams.get("location_id") && <button type="button" onClick={addLocation} className="border border-[#1DC0CB] text-[#1DC0CB] py-2 px-4 rounded max-w-xs ">+ Add New Location</button>}
         </div>
       </form>
     </div>

@@ -179,7 +179,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         {/* Name */}
         <div className="mb-4">
           <div className='flex justify-between'>
-          <label htmlFor="name" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="name" className="block  font-bold mb-2">
             Location Name
           </label>
           {isEditMode && user.role != "admin" && <Link to="/assignments"  className={`text-sm`}>Assign Contacts</Link>}
@@ -196,7 +196,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         {/* Latitude */}
         <div className="mb-4">
-          <label htmlFor="latitude" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="latitude" className="block  font-bold mb-2">
             Latitude
           </label>
           <input
@@ -213,7 +213,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         {/* Longitude */}
         <div className="mb-4">
-          <label htmlFor="longitude" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="longitude" className="block  font-bold mb-2">
             Longitude
           </label>
           <input
@@ -230,7 +230,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         {/* 24-Hour Threshold */}
         <div className="mb-4">
-          <label htmlFor="h24Threshold" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="h24Threshold" className="block  font-bold mb-2">
             24-Hour Rain Threshold (inches)
           </label>
           <select
@@ -252,7 +252,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         {/* RapidRain Threshold */}
         <div className="mb-4">
-          <label htmlFor="rapidRainThreshold" className="block text-gray-700 font-bold mb-2">
+          <label htmlFor="rapidRainThreshold" className="block  font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
           {convertTier(user) >= 2 ? (<select
@@ -312,7 +312,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       {/* Display Response Data */}
       {responseData && (
         <div className="hidden mt-6 p-4 bg-gray-100 rounded shadow">
-          <h3 className="font-bold text-lg text-gray-700">Response Data:</h3>
+          <h3 className="font-bold text-lg ">Response Data:</h3>
           <pre className="text-sm text-gray-600">{JSON.stringify(responseData, null, 2)}</pre>
         </div>
       )}

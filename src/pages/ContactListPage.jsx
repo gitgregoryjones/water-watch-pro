@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaEdit, FaTrashAlt, FaCheck, FaUser } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaCheck, FaUser, FaTrashRestore } from 'react-icons/fa';
 
 import api from '../utility/api';
 import SubHeader from '../components/Subheader';
@@ -14,6 +14,7 @@ import { useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import WorkingDialog from '../components/WorkingDialog';
 import fetchByPage from '../utility/fetchByPage';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 const ContactListPage = () => {
   const [contacts, setContacts] = useState([]);
@@ -26,6 +27,8 @@ const ContactListPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
 
+  const {isActive} = useFeatureFlags();
+
   const fetchContacts = async (page) => {
     try {
 
@@ -34,7 +37,8 @@ const ContactListPage = () => {
       let url = `/api/contacts/?client_id=${user.clients[0].id}`
       
       if(user.role == "admin"){
-        url = `/api/contacts/all/?a=true`;
+        url =  isActive("unarchive-contacts") ? `/api/contacts/all/?a=true&status=all` : `/api/contacts/all/?a=true`;
+
       }
      
       let rows = await fetchByPage(url)
@@ -57,11 +61,17 @@ const ContactListPage = () => {
 
   const handleDelete = async (theContact) => {
  
-    if (window.confirm('Are you sure you want to delete this contact?')) {
+    if (window.confirm(`Are you sure you want to ${theContact.status === "archived" ? "restore": "delete"} this contact?`)) {
     try {
       //await api.delete(user.is_superuser ? `/api/contacts/${theContact.id}?client_id=${theContact.client_id}` : `/api/contacts/${theContact.id}`);
       //Fix for ticket 
-      await api.delete( `/api/contacts/${theContact.id}?client_id=${theContact.client_id}`)
+
+      if(theContact.status === "active"){
+        
+        await api.delete( `/api/contacts/${theContact.id}?client_id=${theContact.client_id}`) 
+      } else {
+         await api.patch( `/api/contacts/${theContact.id}/unarchive?client_id=${theContact.client_id}`)
+      }
       fetchContacts(currentPage); // Refresh the list
     } catch (error) {
       console.error('Error deleting contact:', error.message);
@@ -155,7 +165,7 @@ const ContactListPage = () => {
        {
         filtered.length > 0 ? <tbody>
           {filtered.map((contact) => (
-            <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
+            <tr  className={`${window.innerWidth < 800 && 'cursor-pointer'} ${contact.status === "archived" && "bg-red-100"}`} key={contact.id} onClick={()=> window.innerWidth < 800 && handleEdit(contact)}>
               <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.name}</td>
               {user.role == "admin" && <td className="text-sm border border-gray-300 p-2  md:table-cell text-start">{contact.account_name}</td>}
               <td className="text-sm  text-start border border-gray-300 p-2  md:table-cell">{contact.email || ''}</td>
@@ -176,6 +186,7 @@ const ContactListPage = () => {
                 )}
               </td>
               <td className="text-sm border border-gray-300 p-2  items-center gap-4 hidden md:table-cell ">
+                {contact.status === "active" &&<>
               <Upgrade showMsg={false} tier={4}><button
                     onClick={() => masquerade(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
@@ -191,13 +202,14 @@ const ContactListPage = () => {
                   >
                     <FaEdit />
                   </button>
+                  </>}
                 
                   <button
                     onClick={() => handleDelete(contact)}
                     className="text-red-500 hover:text-red-700"
                     title="Delete Contact"
                   >
-                    <FaTrashAlt />
+                    {contact.status === "active" ? <FaTrashAlt /> : <FaTrashRestore/>}
                   </button>
                 </td>
             </tr>

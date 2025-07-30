@@ -329,7 +329,7 @@ const ContactForm = ({  }) => {
         {/* Basic Info */}
         <div>
           <div className="flex justify-between">
-            <label htmlFor="name" className="block text-gray-700 font-bold">
+            <label htmlFor="name" className="block  font-bold">
               Name
             </label>
             {contactToEdit && user.role != "admin" && (
@@ -348,7 +348,7 @@ const ContactForm = ({  }) => {
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-gray-700 font-bold">
+          <label htmlFor="email" className="block  font-bold">
             Email
           </label>
           <input
@@ -361,7 +361,7 @@ const ContactForm = ({  }) => {
           />
         </div>
         <div>
-          <label htmlFor="phone" className="block text-gray-700 font-bold">
+          <label htmlFor="phone" className="block  font-bold">
             Phone
           </label>
           <input
@@ -381,7 +381,7 @@ const ContactForm = ({  }) => {
             />
         </div>
        { user.role == "admin" && (<div>
-          <label htmlFor="accountName" className="block text-gray-700 font-bold">
+          <label htmlFor="accountName" className="block  font-bold">
             Account Name
           </label>
           <input type="text" name="account_name" id="account_name" value={accountName} readOnly/>

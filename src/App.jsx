@@ -156,7 +156,7 @@ function App() {
       
     </div>}
 
-    {<div>HELLO GREG</div>}
+    
     {isActive('dark-mode') && (
       <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
         {theme === 'dark' ? (

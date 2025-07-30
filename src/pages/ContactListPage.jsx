@@ -186,6 +186,7 @@ const ContactListPage = () => {
                 )}
               </td>
               <td className="text-sm border border-gray-300 p-2  items-center gap-4 hidden md:table-cell ">
+                {contact.status === "active" &&<>
               <Upgrade showMsg={false} tier={4}><button
                     onClick={() => masquerade(contact)}
                     className="text-blue-500 hover:text-blue-700 px-2"
@@ -201,6 +202,7 @@ const ContactListPage = () => {
                   >
                     <FaEdit />
                   </button>
+                  </>}
                 
                   <button
                     onClick={() => handleDelete(contact)}

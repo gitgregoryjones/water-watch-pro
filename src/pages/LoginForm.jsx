@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Button from '../components/WaterWatchProButton';
 import { useState } from 'react';
@@ -11,6 +11,8 @@ import { updateUser } from '../utility/UserSlice';
 import { API_HOST } from '../utility/constants';
 import api from '../utility/api';
 import {loginUser} from '../utility/loginUser';
+import { ThemeContext } from '../utility/ThemeContext';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 export default function LoginForm() {
     const [logView, setLogView] = useState(true);
@@ -375,8 +377,22 @@ export default function LoginForm() {
         setPasswordVisible(!passwordVisible);
       };
 
+    const {theme,toggleTheme} = useContext(ThemeContext)
+
+    const {isActive} = useFeatureFlags();
+    
+
+
+    function isLightMode(){
+
+        if(!isActive("dark-mode"))
+            return true;
+
+        return theme != "dark";
+    }
+
     return (
-        <div className='bg-[#217e3f] md:max-w-md md:rounded-xl min-w-full md:min-w-[30%]'>
+        <div className={`${isLightMode() ?  "bg-[#217e3f]" : "border"} md:max-w-md md:rounded-xl min-w-full md:min-w-[30%]`}>
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
                 <img className="w-[24rem]" src="/logo.png" alt="Logo" />
             </div>
@@ -460,7 +476,7 @@ export default function LoginForm() {
                     <Button className="hidden"  onClick={() => setLogView(true)}>Login</Button>
                     {logView ? (
                         
-                        <Button  disabled={loggingIn}  className={`flex justify-center w-full py-4 items-center  bg-[#4DCAEA] rounded-2xl text-white ${loggingIn && 'bg-[white]' }`} type="submit">
+                        <Button  disabled={loggingIn}  className={`flex justify-center w-full py-4 items-center ${isLightMode() ? "bg-[#4DCAEA]" : "bg-transparent border"} rounded-2xl text-white ${loggingIn && 'bg-[white]' }`} type="submit">
                             {loggingIn ? (
                                 <div className='flex justify-center gap-2 items-center'>
                                     <i className="animate-spin text-[#128CA6] text-2xl fa-solid fa-spinner"></i>
@@ -476,12 +492,12 @@ export default function LoginForm() {
                     
                 </ButtonContainer>
 
-                <div className={`flex rounded flex-col gap-4 p-4 mt-12  text-center justify-center items-center  bg-yellow-200  w-full border-slate-600`}>
+                <div className={`flex rounded flex-col gap-4 p-4 mt-12  text-center justify-center items-center   ${isLightMode() ? "bg-yellow-200" : "bg-blue-400 border"}   w-full border-slate-600`}>
                     <div className='hidden'>Welcome back WaterWatchPro Users. </div>
                     <div>First Time Subscriber?  Sign Up Below &nbsp;&nbsp;<i className="fa-solid fa-arrow-down"></i></div>
                 </div>
-                <Link className=" flex flex-1 bg-[#99BA93] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
-                <Link className=" flex flex-1 bg-[#99BA93] font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]" to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
+                <Link className={` flex flex-1  ${isLightMode() ? "bg-[#99BA93]" : "bg-transparent border"}  font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]`} to={{pathname:"/wizard"}} state={{account_type:"trial"}}>Create Trial Account</Link>
+                <Link className={` flex flex-1  ${isLightMode() ? "bg-[#99BA93]" : "bg-transparent border"}  font-bold py-3 text-md  w-full rounded-2xl justify-center items-center max-h-[3rem] text-[white]`} to={{pathname:"/wizard"}}  state={{account_type:"paid"}}>Create Paid Account</Link>
                 
             </FormContainer>
         </div>

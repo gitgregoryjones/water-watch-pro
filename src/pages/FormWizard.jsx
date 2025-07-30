@@ -979,7 +979,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
           <h2 className="text-xl font-bold mb-4">Monitored Location</h2>
           
           <div className="mb-4">
-            <label className="block text-gray-700">Location Name <span className='text-[red]'>*</span></label>
+            <label className="block ">Location Name <span className='text-[red]'>*</span></label>
             <input
               type="text"
               name="locationName"
@@ -990,7 +990,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Latitude <span className='text-[red]'>*</span></label>
+            <label className="block ">Latitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="latitude"
@@ -1001,7 +1001,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Longitude <span className='text-[red]'>*</span></label>
+            <label className="block ">Longitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="longitude"
@@ -1012,7 +1012,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-  <label htmlFor="threshold" className="block text-gray-700 font-bold mb-2">
+  <label htmlFor="threshold" className="block  font-bold mb-2">
     24-Hour Threshold (inches)
   </label>
   <div className='m-2 text-sm  italic'>When detected hourly rainfall exceeds this value, you and your contacts will receive text and email notifications.
@@ -1035,7 +1035,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
 {/* RapidRain Threshold */}
 {(user.clients[0].tier === "gold" || user.clients[0].tier === "silver") && (
   <div className="mb-4">
-    <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
+    <label htmlFor="rapidrain" className="block  font-bold mb-2">
       RapidRain Threshold (inches)
     </label>
     <div className='m-2 text-sm  italic'>When detected 15-minute rainfall exceeds this value, you and your contacts will receive text and email notifications. Ideal for pulling samples in a timely fashion. Learn more <a href="https://www.waterwatchpro.com/rapidrain">here</a>

@@ -806,7 +806,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
         <div className='border rounded-2xl p-4'>
           <h2 className="text-xl font-bold mb-4">User Details</h2>
           <div className="mb-4">
-            <label className="block text-gray-700">Email <span className='text-[red]'>*</span></label>
+            <label className="block ">Email <span className='text-[red]'>*</span></label>
             <input
               type="email"
               name="email"
@@ -820,7 +820,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             </div>
           
           <div className="mb-4">
-            <label className="block text-gray-700">Password <span className='text-[red]'>*</span></label>
+            <label className="block ">Password <span className='text-[red]'>*</span></label>
             <div className='flex  items-center justify-center flex-col' >
             <input
                type={passwordVisible ? 'text' : 'password'}
@@ -848,7 +848,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             <div className='mt-2'>Password must contain at least one capital letter, digit, special character</div>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Confirm Password <span className='text-[red]'>*</span></label>
+            <label className="block ">Confirm Password <span className='text-[red]'>*</span></label>
             <div className='flex  items-center justify-center flex-col' >
             <input
                type={passwordVisible ? 'text' : 'password'}
@@ -881,7 +881,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
           <div className='mt-4 border rounded-2xl p-4'>
           <div className="mb-4">
           <h2 className="text-xl font-bold mb-4">Contact Information </h2>
-            <label className="block text-gray-700">Name <span className='text-[red]'>*</span></label>
+            <label className="block ">Name <span className='text-[red]'>*</span></label>
             <div className='flex gap-4 justify-center items-center'>
             <input
               type="text"
@@ -905,7 +905,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             </div>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Phone <span className='text-[red]'>*</span></label>
+            <label className="block ">Phone <span className='text-[red]'>*</span></label>
             <input
               type="tel"
               name="phone"
@@ -919,7 +919,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
           </div>
           <div className='flex gap-2 justify-between'>
           <div className="mt-4 mb-4">
-            <label className="flex gap-2 items-start justify-start block text-gray-700">
+            <label className="flex gap-2 items-start justify-start block ">
               <input
                 type="checkbox"
                 name="termsAccepted"
@@ -931,7 +931,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
             </label>
           </div>
           <div className="mt-4 mb-4">
-            <label className="flex gap-2 items-start justify-start block text-gray-700">
+            <label className="flex gap-2 items-start justify-start block ">
               <input
                 type="checkbox"
                 name="smsAccepted"
@@ -953,7 +953,7 @@ const provisionAccount = async (customerMetadata, customer_email) => {
 
         <div className='border rounded-2xl p-4 mb-4'>
           <h2 className="hidden text-xl font-bold mb-4">Subscription Level </h2>
-          {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg text-[black]">
+          {formData.subscriptionLevel === "trial" && <div className="font-normal mb-4 text-lg ">
             Thanks for your interest in starting a trial WaterWatch PRO account. During the trial, our system will monitor one location and send you daily reports and threshold notifications for 30 days at the <a href="https://www.waterwatchpro.com/rapidrain">Gold</a> service level.
             <p className='mt-2'>Questions? Contact us at support@waterwatchpro.com</p>
             <p className='mt-2'>When the trial ends, you can upgrade for continued use.
@@ -973,7 +973,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
           {formData.subscriptionLevel === "trial"  && <div>Otherwise, click “Next” to continue with the trial registration.</div>}
           {formData.subscriptionLevel === 'paid' && (
             <div className="mb-4">
-              <label className="block text-gray-700">Tier</label>
+              <label className="block ">Tier</label>
               <div className="flex gap-4">
                 {['gold', 'silver', 'bronze'].map((tier) => (
                   <label key={tier}>
@@ -1005,7 +1005,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
           <h2 className="text-xl font-bold mb-4">Monitored Location</h2>
           
           <div className="mb-4">
-            <label className="block text-gray-700">Location Name <span className='text-[red]'>*</span></label>
+            <label className="block ">Location Name <span className='text-[red]'>*</span></label>
             <input
               type="text"
               name="locationName"
@@ -1016,7 +1016,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Latitude <span className='text-[red]'>*</span></label>
+            <label className="block ">Latitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="latitude"
@@ -1027,7 +1027,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Longitude <span className='text-[red]'>*</span></label>
+            <label className="block ">Longitude <span className='text-[red]'>*</span></label>
             <input
               type="number"
               name="longitude"
@@ -1038,7 +1038,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
             />
           </div>
           <div className="mb-4">
-  <label htmlFor="threshold" className="block text-gray-700 font-bold mb-2">
+  <label htmlFor="threshold" className="block  font-bold mb-2">
     24-Hour Threshold (inches)
   </label>
   <div className='m-2 text-sm  italic'>When detected hourly rainfall exceeds this value, you and your contacts will receive text and email notifications.
@@ -1061,7 +1061,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
 {/* RapidRain Threshold */}
 {(formData.tier === "gold" || formData.tier === "silver") && (
   <div className="mb-4">
-    <label htmlFor="rapidrain" className="block text-gray-700 font-bold mb-2">
+    <label htmlFor="rapidrain" className="block  font-bold mb-2">
       RapidRain Threshold (inches)
     </label>
     <div className='m-2 text-sm  italic'>When detected 15-minute rainfall exceeds this value, you and your contacts will receive text and email notifications. Ideal for pulling samples in a timely fashion. Learn more <a href="https://www.waterwatchpro.com/rapidrain">here</a>
@@ -1091,7 +1091,7 @@ You can also choose to upgrade now by sliding the toggle below to “Upgrade Now
         <div className="bg-white  p-8">
         
         <h1 className="text-3xl font-bold text-green-800 mb-4">Almost Done</h1>
-        <p className="text-lg text-gray-700 mb-6">
+        <p className="text-lg  mb-6">
           Configuring your account.  You will be redirected to the login page in a moment. Please wait...
         </p>
        

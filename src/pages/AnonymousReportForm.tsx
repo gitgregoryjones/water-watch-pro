@@ -303,7 +303,7 @@ This location will be automatically added to your account. If you do NOT wish to
        
         {formData.locations.map((loc, i) => (
           <div key={i} className="border p-4 rounded-md relative flex flex-col gap-4">
-               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range Nov 1, 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : new Date( new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1).toLocaleDateString("EN-US",{year:"numeric", month:"short", day:"2-digit"})})</h2>
+               <h2 className="text-xl font-semibold pt-4 text-[#128DA6]">Data Request (valid range November 1, 2022 - {loc.lastReportDate ? loc.lastReportDate.toLocaleDateString("US-EN",{month:"long", day:"numeric",year:"numeric"}) : new Date( new Date().getFullYear(), new Date().getMonth(), new Date().getDate()-1).toLocaleDateString("EN-US",{year:"numeric", month:"long", day:"2-digit"})})</h2>
         <div className='w-full flex flex-row gap-4'>
         <div className='flex flex-col'>
         <label htmlFor="email" className="text-sm font-medium ">

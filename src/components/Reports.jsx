@@ -23,10 +23,11 @@ const Reports = () => {
   const [displayFormat, setDisplayFormat] = useState('html'); // 'html' or 'csv'
   const [reportContent, setReportContent] = useState(''); // HTML content for the report
   const [contacts, setContacts] = useState([]);
-  const [selectAll, setSelectAll] = useState(false); 
+  const [selectAll, setSelectAll] = useState(false);
   const [showDialog,setShowDialog] = useState(false);
   const [searchTerm,setSearchTerm] = useState("")
   const [smsStatus, setSmsStatus] = useState("all")
+  const [timeType, setTimeType] = useState('hourly')
   
 
   const user = useSelector((state) => state.userInfo.user);
@@ -289,30 +290,33 @@ const Reports = () => {
        query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
-
-  
+    const typeParam = `type=${timeType}`
 
     requestData = {
       email_format: displayFormat,
       email_list: selectedContacts,
       locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
+      type: timeType,
     };
-   
+
     setShowDialog(true);
+    const baseQuery = query;
     if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') ) {
       // POST Request for multiple locations
-     
+
 
       if(reportType == "sms" || reportType == "emails"){
 
         requestData = selectedContacts;
       }
-  
+
       try {
-        const response =  await api.post(query, requestData);
+        const postDelimiter = baseQuery.includes('?') ? '&' : '?'
+        const postQuery = `${baseQuery}${postDelimiter}${typeParam}`
+        const response =  await api.post(postQuery, requestData);
 
         setShowDialog(false);
-  
+
         // Display task_id in the report area
         const taskIdMessage = `
           <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
@@ -330,7 +334,7 @@ const Reports = () => {
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> An error occurred while submitting the report</p>
             <p>${error.message}</p>
-            
+
           </div>
         `;
 
@@ -340,20 +344,25 @@ const Reports = () => {
       // GET Request for a single location
       if(reportType !=="sms"){
 
-        query = `${query}/${selectedLocations[0]}`;
+        query = `${baseQuery}/${selectedLocations[0]}`;
       } else {
 
-        //don't append anything to query
+        query = baseQuery;
       }
-  
+
+      const getDelimiter = query.includes('?') ? '&' : '?'
+      query = `${query}${getDelimiter}${typeParam}`
+
       try {
-     
+
         const response = await api.get(query);
         console.log('Report Data:', response.data);
 
         if(requestData.email_list.length > 0){
           console.log(`Trying to email one location`)
-          const response =  await api.post(query.substring(0, query.lastIndexOf("/")), requestData);
+          const emailDelimiter = baseQuery.includes('?') ? '&' : '?'
+          const emailQuery = `${baseQuery}${emailDelimiter}${typeParam}`
+          const response =  await api.post(emailQuery, requestData);
         }
 
         setShowDialog(false);
@@ -515,13 +524,35 @@ const Reports = () => {
             value={displayFormat}
             onChange={(e) => setDisplayFormat(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            
+
           >
             {reportType != "historical" && <option value="html">Formatted</option>}
             {<option value="csv">CSV</option>}
             {VITE_FEATURE_PDF_REPORT == "true" && reportType != "sms" && reportType != "emails" && <option value="pdf">PDF</option>}
             {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
           </select>
+        </div>
+
+        <div className="">
+          <label className="font-bold block text-gray-700">Type:</label>
+          <div className="flex gap-4">
+            <label className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={timeType === 'hourly'}
+                onChange={() => setTimeType('hourly')}
+              />
+              Hourly
+            </label>
+            <label className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={timeType === 'daily'}
+                onChange={() => setTimeType('daily')}
+              />
+              Daily
+            </label>
+          </div>
         </div>
 
         {/* Row 3 */}

@@ -1,17 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { API_HOST, VITE_PRICES_LINK, VITE_FEATURE_EXCEL_REPORT, VITE_FEATURE_PDF_REPORT } from '../utility/constants';
 import fetchContacts from '../utility/fetchContacts';
 import Upgrade from './Upgrade';
 import api from '../utility/api';
-import apiCSV from '../utility/apiCSV';
 import EmailRowManager from './EmailRowManager';
 import { convertTier } from '../utility/loginUser';
 import WorkingDialog from './WorkingDialog';
-import { colorLoggedInUserLocations } from '../utility/loginUser';
 import fetchByPage from '../utility/fetchByPage';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import { Link } from 'react-router-dom';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 
 const Reports = () => {
@@ -23,17 +22,21 @@ const Reports = () => {
   const [displayFormat, setDisplayFormat] = useState('html'); // 'html' or 'csv'
   const [reportContent, setReportContent] = useState(''); // HTML content for the report
   const [contacts, setContacts] = useState([]);
-  const [selectAll, setSelectAll] = useState(false); 
+  const [selectAll, setSelectAll] = useState(false);
   const [showDialog,setShowDialog] = useState(false);
   const [searchTerm,setSearchTerm] = useState("")
   const [smsStatus, setSmsStatus] = useState("all")
-  
+  const [timeType, setTimeType] = useState('hourly')
 
+
+  const { isActive } = useFeatureFlags();
   const user = useSelector((state) => state.userInfo.user);
   const [reportType, setReportType] = useState(user.is_superuser ? 'sms' :'monthly');
-  
+
   const [locations, setLocations] = useState([])
   const reportAreaRef = useRef(null);
+  const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
+  const isTypeFeatureActive = isActive(typeFlag);
 
 
   const currentDate = new Date();
@@ -161,10 +164,6 @@ const Reports = () => {
     }
 
 
-    const oldDate = new Date(selectedDate);
-    const cutoff = new Date('2024-11-01');
-
-
   };
 
   useEffect(() => {
@@ -176,27 +175,6 @@ const Reports = () => {
 
   
 
-  const handleDownloadCSV = async (query) => {
-    try {
-      const response = await api.get(query, { responseType: 'blob' });
-  
-      // Create a temporary link to download the file
-      const blob = new Blob([response.data], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `report-${toDate}-${selectedLocations.join('_')}.csv`;
-      document.body.appendChild(link);
-      link.click();
-  
-      // Clean up
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading CSV:', error.message);
-    }
-  };
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setReportContent(''); // Clear previous content
@@ -289,30 +267,32 @@ const Reports = () => {
        query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
-
-  
+    const typeParam = `type=${timeType}`
 
     requestData = {
       email_format: displayFormat,
       email_list: selectedContacts,
       locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
+      ...(isTypeFeatureActive && { type: timeType }),
     };
-   
+
     setShowDialog(true);
+    const baseQuery = query;
     if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') ) {
       // POST Request for multiple locations
-     
+
 
       if(reportType == "sms" || reportType == "emails"){
 
         requestData = selectedContacts;
       }
-  
+
       try {
-        const response =  await api.post(query, requestData);
+        const postQuery = isTypeFeatureActive ? `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}` : baseQuery
+        const response =  await api.post(postQuery, requestData);
 
         setShowDialog(false);
-  
+
         // Display task_id in the report area
         const taskIdMessage = `
           <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
@@ -330,7 +310,7 @@ const Reports = () => {
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> An error occurred while submitting the report</p>
             <p>${error.message}</p>
-            
+
           </div>
         `;
 
@@ -340,20 +320,26 @@ const Reports = () => {
       // GET Request for a single location
       if(reportType !=="sms"){
 
-        query = `${query}/${selectedLocations[0]}`;
+        query = `${baseQuery}/${selectedLocations[0]}`;
       } else {
 
-        //don't append anything to query
+        query = baseQuery;
       }
-  
+
+      if (isTypeFeatureActive) {
+        const getDelimiter = query.includes('?') ? '&' : '?'
+        query = `${query}${getDelimiter}${typeParam}`
+      }
+
       try {
-     
+
         const response = await api.get(query);
         console.log('Report Data:', response.data);
 
         if(requestData.email_list.length > 0){
           console.log(`Trying to email one location`)
-          const response =  await api.post(query.substring(0, query.lastIndexOf("/")), requestData);
+          const emailQuery = isTypeFeatureActive ? `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}` : baseQuery
+          await api.post(emailQuery, requestData);
         }
 
         setShowDialog(false);
@@ -422,7 +408,7 @@ const Reports = () => {
         
       <form onSubmit={handleSubmit} className="flex flex-col  md:max-w-[250px] bg-[white] md:rounded-[unset] min-h-full gap-6 p-4">
        
-      <div className={`p-2 px-2  border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i class="fa fa-table"></i> Report Query</div>
+      <div className={`p-2 px-2  border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}><i className="fa fa-table"></i> Report Query</div>
         {/* Row 1 */}
         <div className="col-span-1">
           <label htmlFor="reportType" className="font-bold block text-gray-700">Report Type:</label>
@@ -436,7 +422,7 @@ const Reports = () => {
             {/*<option value="files-processed">Files Processed</option>*/}
               <option value="sms">SMS Sent/Rejected</option>
               <option value="emails">Rejected Emails</option>
-              {1==0 && <option value="billing">Billing</option>}
+              {/* <option value="billing">Billing</option> */}
             </Upgrade>
             {/*<option value="historical">Historical Data</option>*/}
 
@@ -515,7 +501,7 @@ const Reports = () => {
             value={displayFormat}
             onChange={(e) => setDisplayFormat(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            
+
           >
             {reportType != "historical" && <option value="html">Formatted</option>}
             {<option value="csv">CSV</option>}
@@ -523,6 +509,30 @@ const Reports = () => {
             {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
           </select>
         </div>
+
+        {isTypeFeatureActive && (
+          <div className="">
+            <label className="font-bold block text-gray-700">Type:</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={timeType === 'hourly'}
+                  onChange={() => setTimeType('hourly')}
+                />
+                Hourly
+              </label>
+              <label className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={timeType === 'daily'}
+                  onChange={() => setTimeType('daily')}
+                />
+                Daily
+              </label>
+            </div>
+          </div>
+        )}
 
         {/* Row 3 */}
         

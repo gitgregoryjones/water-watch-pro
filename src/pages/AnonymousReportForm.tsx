@@ -311,7 +311,7 @@ This location will be automatically added to your account. If you do NOT wish to
       </label> 
       <div className='flex flex-col'> 
         <input type="date" name="fromDate" required value={loc.fromDate} onChange={(e)=>handleChange(e,i,'fromDate')}  min="2022-11-01"
-          max="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
+          smax="2024-10-31" className="input placeholder:text-slate-500 border p-2 rounded-md" />
       </div>
         </div>
         <div className='flex flex-col'> 

@@ -375,6 +375,7 @@ export default function LoginForm() {
 
     const toggleVisibility = () => {
         setPasswordVisible(!passwordVisible);
+{
       };
 
     const {theme,toggleTheme} = useContext(ThemeContext)
@@ -385,9 +386,6 @@ export default function LoginForm() {
 
     function isLightMode(){
 
-        if(!isActive("dark-mode"))
-            return true;
-
         return theme != "dark";
     }
 
@@ -396,7 +394,7 @@ export default function LoginForm() {
             <div className='bg-[white] w-full py-8 px-6 rounded-t-xl'>
                 <img className="w-[24rem]" src="/logo.png" alt="Logo" />
             </div>
-            
+}
             <FormContainer onSubmit={handleLogin} className='min-w-full'>
             <div onClick={()=> window.location.href = "/forgot-password"} className='cursor-pointer flex w-full justify-end items-center text-[white] text-underline underline'>I forgot my password</div>
                 {errorMsg && <div className={`text-[red] bg-[white] w-full p-4`}>Error: {errorMsg}</div>}

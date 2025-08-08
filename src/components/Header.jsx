@@ -163,10 +163,12 @@ export default function Header({ theme, onToggleTheme }) {
     )}
 
 
-  {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
-  {onToggleTheme && isActive("dark-mode") && (
-    <button onClick={onToggleTheme} className='text-[--main-2]'>
-      {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
+{```jsx
+{VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
+{onToggleTheme && (
+  <button onClick={onToggleTheme} className='text-[--main-2]'>
+    {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
+```
     </button>
   )}
     <div className='hidden flex fa-stack relative flex justify-center items-center'>

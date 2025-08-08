@@ -280,28 +280,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label className='text-sm'>Date data began</label>
           <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
         </div>}
-
-        {/* Action Buttons */}
-        <div className="flex justify-between">
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-          >
-            {isEditMode ? 'Update Location' : 'Create Location'}
-          </button>
-          
-          {isActive("past-data") && isEditMode && <button
-              type="button"
-              onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
-              className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
-            >
-              Past Data
-            </button>}
-          {isEditMode && convertTier(user) >= 2 && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
+{
+  "code": "<div className=\"flex justify-between\">\n          <button\n            type=\"submit\"\n            className=\"bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600\"\n          >\n            {isEditMode ? 'Update Location' : 'Create Location'}\n          </button>\n\n          {isEditMode && <button\n              type=\"button\"\n              onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}\n              className=\"bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]\"\n            >\n              Past Data\n            </button>}\n          {isEditMode && convertTier(user) >= 2 && (\n            <button\n              type=\"button\"\n              onClick={handleDelete}\n              className=\"bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600\""
+}
             >
               Delete Location
             </button>

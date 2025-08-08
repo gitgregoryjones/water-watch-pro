@@ -280,28 +280,20 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label className='text-sm'>Date data began</label>
           <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
         </div>}
+{/* Action Buttons */}
+<div className="flex justify-between">
+  <button
+    type="submit"
+    className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+  >
+    {isEditMode ? 'Update Location' : 'Create Location'}
+  </button>
 
-        {/* Action Buttons */}
-        <div className="flex justify-between">
-          <button
-            type="submit"
-            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-          >
-            {isEditMode ? 'Update Location' : 'Create Location'}
-          </button>
-          
-          {isActive("past-data") && isEditMode && <button
-              type="button"
-              onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
-              className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
-            >
-              Past Data
-            </button>}
-          {isEditMode && convertTier(user) >= 2 && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
+  {isEditMode && (
+    <button
+      type="button"
+      onClick={handleDelete}
+      className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
             >
               Delete Location
             </button>

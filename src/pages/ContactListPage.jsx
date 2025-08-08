@@ -36,9 +36,8 @@ const ContactListPage = () => {
 
       let url = `/api/contacts/?client_id=${user.clients[0].id}`
       
-      if(user.role == "admin"){
-        url =  isActive("unarchive-contacts") ? `/api/contacts/all/?a=true&status=all` : `/api/contacts/all/?a=true`;
-
+if(user.role == "admin"){
+        url =  `/api/contacts/all/?a=true&status=all`;
       }
      
       let rows = await fetchByPage(url)

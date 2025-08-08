@@ -16,10 +16,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [h24Threshold, setH24Threshold] = useState('');
   const [rapidRainThreshold, setRapidRainThreshold] = useState();
   const [responseData, setResponseData] = useState(null); // Store response data
-  const [isWorking, setIsWorking] = useState(false)
+  const [isWorking, setIsWorking] = useState(false);
   const isEditMode = locationToEdit !== null;
-  const [msg,setMsg] = useState("")
-  const {isActive} = useFeatureFlags();
+  const [msg, setMsg] = useState("");
+  const { isActive } = useFeatureFlags();
 
   const navigate = useNavigate();
 
@@ -31,74 +31,74 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setLongitude(locationToEdit.longitude || '');
       setH24Threshold(locationToEdit.h24_threshold || .5);
       setRapidRainThreshold(locationToEdit.rapidrain_threshold || locationToEdit.h24_threshold);
-      
-      
+
+
 
     }
   }, [locationToEdit, isEditMode]);
 
   const handleSubmit = async (e) => {
     setMsg("");
-    setIsWorking(true)
+    setIsWorking(true);
     e.preventDefault();
 
     let success = true;
 
-        if(!name){
-          setMsg(<span className="text-[red]">Location name is required</span>)
-          setIsWorking(false); 
-            success = false;
-        }
+    if (!name) {
+      setMsg(<span className="text-[red]">Location name is required</span>);
+      setIsWorking(false);
+      success = false;
+    }
 
-       
 
-        if(!latitude || latitude < 24 || latitude > 49 ){
-            
-             setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
-             setIsWorking(false); 
-            success = false;
-        }
 
-        let tmpLong = longitude > 0 ? -longitude : longitude;
+    if (!latitude || latitude < 24 || latitude > 49) {
 
-        if(longitude > 0 ){
-           setLongitude(-longitude);
-        }
+      setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>);
+      setIsWorking(false);
+      success = false;
+    }
 
-        if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
-            
-             setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
-             setIsWorking(false); 
+    let tmpLong = longitude > 0 ? -longitude : longitude;
 
-             success = false;
-        }
- 
-        if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))){
-            
-             setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-             setIsWorking(false); 
-            success = false;
-        }
- 
+    if (longitude > 0) {
+      setLongitude(-longitude);
+    }
 
-       
-        if(!rapidRainThreshold){
-             setRapidRainThreshold(h24Threshold)
-            
-        } else 
-        if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
-            
-        if(user?.clients?.[0]?.tier != "bronze") {
-            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
-            setIsWorking(false); 
-        }
-        success = false;
-        }
-     
-    if(!success){
-     // alert('bad one')
-      
-      return false;    
+    if (!tmpLong || tmpLong < -122 || tmpLong > -66) {
+
+      setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>);
+      setIsWorking(false);
+
+      success = false;
+    }
+
+    if (![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(h24Threshold))) {
+
+      setMsg(<span className="text-[red]">24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>);
+      setIsWorking(false);
+      success = false;
+    }
+
+
+
+    if (!rapidRainThreshold) {
+      setRapidRainThreshold(h24Threshold);
+
+    } else
+    if (![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))) {
+
+      if (user?.clients?.[0]?.tier != "bronze") {
+        setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>);
+        setIsWorking(false);
+      }
+      success = false;
+    }
+
+    if (!success) {
+      // alert('bad one')
+
+      return false;
     }
 
     const locationData = {
@@ -107,7 +107,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       longitude: parseFloat(longitude),
       status: 'active',
       h24_threshold: parseFloat(h24Threshold),
-      rapidrain_threshold: parseFloat(rapidRainThreshold ? rapidRainThreshold : h24Threshold),
+      rapidrain_threshold: parseFloat(rapidRainThreshold ? rapidRainThreshold : h24Threshold)
     };
 
     try {
@@ -118,32 +118,32 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           `/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`,
           locationData
         );
-        
+
       } else {
         // Create new location using POST
         response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData);
-       // alert('Location created successfully!');
+        // alert('Location created successfully!');
       }
       setResponseData(response.data); // Store response data for display
       console.log('Response Data:', response.data); // Log the response data
-      setMsg(<span className="text-[green]">Successfully Updated</span>)
-      setTimeout(()=>{
-        setIsWorking(false); 
-       
-        navigate("/location-list")
-        },2000)
+      setMsg(<span className="text-[green]">Successfully Updated</span>);
+      setTimeout(() => {
+        setIsWorking(false);
+
+        navigate("/location-list");
+      }, 2000);
     } catch (error) {
       console.error('Error submitting location:', error.message);
-      setMsg(<span className="text-[red]">{error.message}</span>)
-      setIsWorking(false)
+      setMsg(<span className="text-[red]">{error.message}</span>);
+      setIsWorking(false);
     }
   };
 
   const handleDelete = async () => {
-    setIsWorking(true)
+    setIsWorking(true);
     if (!isEditMode) {
-      setMsg(<span className="text-[red]">{error.message}</span>)
-      setIsWorking(false)
+      setMsg(<span className="text-[red]">{error.message}</span>);
+      setIsWorking(false);
       return;
     }
 
@@ -151,12 +151,12 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       try {
         await api.delete(`/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`);
         //alert('Location deleted successfully!');
-        setIsWorking(false)
+        setIsWorking(false);
         onSubmitSuccess(); // Refresh the parent list or close the form
       } catch (error) {
         console.error('Error deleting location:', error.message);
-        setIsWorking(false)
-        setMsg(<span className="text-[red]">{error.message}</span>)
+        setIsWorking(false);
+        setMsg(<span className="text-[red]">{error.message}</span>);
       }
     }
   };
@@ -166,8 +166,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       
        <button
         onClick={() => navigate('/location-list')}
-        className="absolute top-4 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600"
-      >
+        className="absolute top-4 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600">
+
         <FaTimes />
       </button>
       <h2 className="text-2xl font-bold  mb-6">
@@ -182,16 +182,16 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="name" className="block  font-bold mb-2">
             Location Name
           </label>
-          {isEditMode && user.role != "admin" && <Link to="/assignments"  className={`text-sm`}>Assign Contacts</Link>}
+          {isEditMode && user.role != "admin" && <Link to="/assignments" className={`text-sm`}>Assign Contacts</Link>}
           </div>
           <input
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="border border-gray-300 rounded p-2 w-full"
-            
-          />
+            className="border border-gray-300 rounded p-2 w-full" />
+
+
         </div>
 
         {/* Latitude */}
@@ -206,9 +206,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={latitude}
             onChange={(e) => setLatitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            
-            disabled={isEditMode}
-          />
+
+            disabled={isEditMode} />
+
         </div>
 
         {/* Longitude */}
@@ -223,9 +223,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             value={longitude}
             onChange={(e) => setLongitude(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-            
-            disabled={isEditMode}
-          />
+
+            disabled={isEditMode} />
+
         </div>
 
         {/* 24-Hour Threshold */}
@@ -234,17 +234,17 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             24-Hour Rain Threshold (inches)
           </label>
           <select
-            
+
             step="0.01"
             id="h24Threshold"
             value={h24Threshold}
-            onChange={(e) => {setH24Threshold(e.target.value); if(convertTier(user) < 2){setRapidRainThreshold(e.target.value)}}}
-            className="border border-gray-300 rounded p-2 w-full"
-            
-          >
+            onChange={(e) => {setH24Threshold(e.target.value);if (convertTier(user) < 2) {setRapidRainThreshold(e.target.value);}}}
+            className="border border-gray-300 rounded p-2 w-full">
+
+
                  <option value="">-- Select Threshhold --</option>
-           {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
-                return <option value={o} key={i}>{o}</option>
+           {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o, i) => {
+              return <option value={o} key={i}>{o}</option>;
             })
             }
             </select>
@@ -255,70 +255,70 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="rapidRainThreshold" className="block  font-bold mb-2">
             RapidRain Threshold (inches)
           </label>
-          {convertTier(user) >= 2 ? (<select
-            
-            
+          {convertTier(user) >= 2 ? <select
+
+
             id="rapidRainThreshold"
             value={rapidRainThreshold}
             onChange={(e) => setRapidRainThreshold(e.target.value)}
-            className="border border-gray-300 rounded p-2 w-full"
-            
-            
-            >
+            className="border border-gray-300 rounded p-2 w-full">
+
+
+
               <option value="">-- Select Threshhold --</option>
           
-            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
-                return <option value={o} key={i}>{o}</option>
+            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o, i) => {
+              return <option value={o} key={i}>{o}</option>;
             })
             }
-            </select>) : (<div className='flex w-full flex-col'><input type="text" disabled value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full"  name="rapidrain_threshold" />
+            </select> : <div className='flex w-full flex-col'><input type="text" disabled value={rapidRainThreshold} className="border border-gray-300 rounded p-2 w-full" name="rapidrain_threshold" />
                           <div className='flex text-sm gap-2'>Upgrade to set distinct RapidRain thresholds <Link to={"/upgrade"}>Upgrade Now</Link></div>
-            </div>)}
+            </div>}
         </div>
 
         {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
           <label className='text-sm'>Date data began</label>
-          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")} />
         </div>}
 
         {/* Action Buttons */}
         <div className="flex justify-between">
           <button
             type="submit"
-            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
-          >
+            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">
+
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
           
-          {isActive("past-data") && isEditMode && <button
-              type="button"
-              onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
-              className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"
-            >
+          {isEditMode && <button
+            type="button"
+            onClick={() => navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
+            className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]">
+
               Past Data
             </button>}
-          {isEditMode && convertTier(user) >= 2 && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
-            >
+          {isEditMode && convertTier(user) >= 2 &&
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">
+
               Delete Location
             </button>
-          )}
+          }
         </div>
       </form>
 
       {/* Display Response Data */}
-      {responseData && (
-        <div className="hidden mt-6 p-4 bg-gray-100 rounded shadow">
+      {responseData &&
+      <div className="hidden mt-6 p-4 bg-gray-100 rounded shadow">
           <h3 className="font-bold text-lg ">Response Data:</h3>
           <pre className="text-sm text-gray-600">{JSON.stringify(responseData, null, 2)}</pre>
         </div>
-      )}
-      <WorkingDialog showDialog={isWorking}/>
-    </div>
-  );
+      }
+      <WorkingDialog showDialog={isWorking} />
+    </div>);
+
 };
 
 export default LocationForm;

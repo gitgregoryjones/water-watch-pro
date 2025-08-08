@@ -154,28 +154,12 @@ export default function Header({ theme, onToggleTheme }) {
   </div>
   
   {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && (
-      <Link
-        onClick={logout}
-        className={getLinkClasses(theme,location.pathname === "/")}
-      >
-        Logout
-      </Link>
-    )}
+{
+  "<Link\n    onClick={logout}\n    className={getLinkClasses(theme,location.pathname === \"/\")}>\n    Logout\n  </Link>\n)}
 
 
-  {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
-  {onToggleTheme && isActive("dark-mode") && (
-    <button onClick={onToggleTheme} className='text-[--main-2]'>
-      {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
-    </button>
-  )}
-    <div className='hidden flex fa-stack relative flex justify-center items-center'>
-      <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
-
-        <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>
-      
-      </div>
-    
+  {VITE_FEATURE_MULTIPLE_CLIENTS == \"true\" && <ProfilePic  mini={true} />}\n  <button onClick={onToggleTheme} className='text-[--main-2]'>\n    {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}\n  </button>\n<div className='hidden flex fa-stack relative flex justify-center items-center'>\n  <a href=\"#alerts\" className='text-[#ecbf1d]'><i className=\"fa-regular fa-bell\"></i></a>\n\n    <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>\n\n  </div>\n"
+}
    {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" className={location.pathname == "/switch" ? "text-slate-800"  : "text-[--main-2]"}>Switch User</Link></Upgrade>*/}
     </div>
 

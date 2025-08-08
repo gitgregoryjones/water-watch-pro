@@ -235,28 +235,9 @@ function App() {
         <Route path="/location-list" element={<LocationListPage/>} />
         <Route path="/contact-list" element={<ContactListPage />} />
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
-       
-        <Route path="/settings-admin" element={<ClientListPage />} />
-        <Route path="/wizard" element={<FormWizardDelayed />} />
-        <Route path="/registration-complete" element={<RegistrationComplete />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/upgrade" element={<Prices />} />
-        <Route path="/admin" element={<AdminCards />} />
-        <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
-       
-<Route path="/contact-form" element={<ContactForm />} />
-<Route path="/client-form" element={<ClientPage />} />
-<Route path="/profile" element={<UserForm />} />
-
-      </Routes>
-      
-        
-  
-      <WorkingDialog showDialog={showDialog}/>
-      </Container>
+{
+    "<Route path=\"/settings-admin\" element={<ClientListPage />} />\n        <Route path=\"/wizard\" element={<FormWizardDelayed />} />\n        <Route path=\"/registration-complete\" element={<RegistrationComplete />} />\n        <Route path=\"/verify-email\" element={<VerifyEmail />} />\n        <Route path=\"/reset-password\" element={<ResetPassword />} />\n        <Route path=\"/forgot-password\" element={<ForgotPassword />} />\n        <Route path=\"/upgrade\" element={<Prices />} />\n        <Route path=\"/admin\" element={<AdminCards />} />\n        <Route path=\"/cancel-signup\" element={<CancelSignUp />} />\n        <Route  path=\"/order-locations\" element={<AnonymousReportForm/>}/>\n       \n<Route path=\"/contact-form\" element={<ContactForm />} />\n<Route path=\"/client-form\" element={<ClientPage />} />\n<Route path=\"/profile\" element={<UserForm />} />\n\n      </Routes>\n      \n        \n  \n      <WorkingDialog showDialog={showDialog}>\n      </Container>"
+}
 
     </LandscapeOrientation>
   )

@@ -67,28 +67,21 @@ function App() {
 
   const location = useLocation();
   
-  const { theme, toggleTheme } = useContext(ThemeContext);
-  
-  const user = useSelector((state) => state.userInfo.user);
-  const dispatch = useDispatch();
-  const [showDialog, setShowDialog] = useState(false);
+const { theme, toggleTheme } = useContext(ThemeContext);
 
-  const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
-  const {isActive,loading} = useFeatureFlags(featureFlagKey)
+const user = useSelector((state) => state.userInfo.user);
+const dispatch = useDispatch();
+const [showDialog, setShowDialog] = useState(false);
 
-  const handleThemeToggle = () => {
-    if (isActive('dark-mode')) {
-      toggleTheme();
-    }
-  };
+const handleThemeToggle = () => {
+  toggleTheme();
+};
 
-  
-  const [selectedClient, setSelectedClient] = useState(user.clients[0]);
+const [selectedClient, setSelectedClient] = useState(user.clients[0]);
 
-  const handleClientChange = async (client) => {
-    setShowDialog(true)
-    
-    //alert(client.id)
+const handleClientChange = async (client) => {
+  setShowDialog(true)
+}
     let resp = await api.patch('/users/me',{
       primary_client_id:client.id
     })
@@ -154,28 +147,25 @@ function App() {
     </div>
    
       
-    </div>}
+</div>}
 
-    
-    {isActive('dark-mode') && (
-      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
-        {theme === 'dark' ? (
-          <FaSun color="yellow" className="outline-none" />
-        ) : (
-          <FaMoon className="text-slate-800 outline-none" />
-        )}
-      </button>
-    )}
-    <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
-    {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Graphs
-  </Link>}
-  {user.role != "admin" && <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Forecasts
-  </Link>}
-    <div   className="flex flex-col">
-      <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
-   <Upgrade showMsg={false} tier={1}>
+<button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+  {theme === 'dark' ? (
+    <FaSun color="yellow" className="outline-none" />
+  ) : (
+    <FaMoon className="text-slate-800 outline-none" />
+  )}
+</button>
+<Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
+{user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+Graphs
+</Link>}
+{user.role != "admin" && <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+Forecasts
+</Link>}
+<div   className="flex flex-col">
+  <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
+<Upgrade showMsg={false} tier={1}>
     
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
     </Upgrade>
@@ -245,21 +235,22 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
-       
+{
+<Route  path="/order-locations" element={<AnonymousReportForm/>}/>
+
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
 <Route path="/profile" element={<UserForm />} />
 
-      </Routes>
-      
-        
-  
-      <WorkingDialog showDialog={showDialog}/>
-      </Container>
+</Routes>
 
-    </LandscapeOrientation>
-  )
+
+
+<WorkingDialog showDialog={showDialog}/>
+</Container>
+
+</LandscapeOrientation>
+)
 }
 
 export default App

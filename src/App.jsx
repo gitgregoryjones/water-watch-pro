@@ -76,10 +76,9 @@ function App() {
   const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
   const {isActive,loading} = useFeatureFlags(featureFlagKey)
 
-  const handleThemeToggle = () => {
-    if (isActive('dark-mode')) {
-      toggleTheme();
-    }
+const handleThemeToggle = () => {
+  toggleTheme();
+}
   };
 
   
@@ -156,10 +155,11 @@ function App() {
       
     </div>}
 
-    
-    {isActive('dark-mode') && (
-      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
-        {theme === 'dark' ? (
+{```jsx
+{(
+  <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+    {theme === 'dark' ? (
+```
           <FaSun color="yellow" className="outline-none" />
         ) : (
           <FaMoon className="text-slate-800 outline-none" />
@@ -244,9 +244,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
-        <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
-       
+<Route path="/cancel-signup" element={<CancelSignUp />} />
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
 <Route path="/profile" element={<UserForm />} />

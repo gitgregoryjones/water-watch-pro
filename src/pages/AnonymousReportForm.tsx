@@ -196,28 +196,25 @@ function beginOfPreviousMonth(date : Date){
   return new Date(date.getFullYear(), date.getMonth() - 1, 1)
 
 }
-
 function endOfPreviousMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 0);
 }
 
-
-  return (
-    <div className="w-full max-w-5xl mx-auto p-6  bg-[var(--header-bg)] border shadow-md rounded-md mt-10">
-      <div className='flex flex-row items-center justify-center gap-12'>
+return (
+  <div className="w-full max-w-5xl mx-auto p-6  bg-[var(--header-bg)] border shadow-md rounded-md mt-10">
+    <div className='flex flex-row items-center justify-center gap-12'>
       <img src={waterportalLogo} alt="WaterWatchPro Logo" className="mx-auto mb-6 smax-w-[250px]" />
-      {isActive('dark-mode') && (
-            <button onClick={toggleTheme} className="menu-item bm-item text-[--main-2]">
-              {theme === 'dark' ? (
-                <FaSun color="yellow" className="outline-none" size={20} />
-              ) : (
-                <FaMoon className="text-slate-800 outline-none" size={20}/>
-              )}
-            </button>
-          )}
-      </div>
-      
-      <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
+      <button onClick={toggleTheme} className="menu-item bm-item text-[--main-2]">
+        {theme === 'dark' ? (
+          <FaSun color="yellow" className="outline-none" size={20} />
+        ) : (
+          <FaMoon className="text-slate-800 outline-none" size={20}/>
+        )}
+      </button>
+    </div>
+    
+    <div className='border rounded-lg flex  flex-col gap-2 justify-center items-center text-[24px] text-center p-8 mb-12 text-white bg-[#128DA6]'>
+)
         <div className='flex flex-col gap-1 text-md'>Purchase past data for any Continental U.S. location as far back as November 2022. The cost is 25¢ per day or 10¢ per hour. Once data is entered, we will charge your card on file for the amount of data requested, We will send you the data in an Excel spreadsheet.
 
 <p className='py-4'>For data requests older than November 2022, contact <a className='text-white underline' href="mailto:support@waterwatchpro.com">support@waterwatchpro.com</a></p>

@@ -235,28 +235,24 @@ function App() {
         <Route path="/location-list" element={<LocationListPage/>} />
         <Route path="/contact-list" element={<ContactListPage />} />
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
-       
-        <Route path="/settings-admin" element={<ClientListPage />} />
-        <Route path="/wizard" element={<FormWizardDelayed />} />
-        <Route path="/registration-complete" element={<RegistrationComplete />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/upgrade" element={<Prices />} />
-        <Route path="/admin" element={<AdminCards />} />
-        <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
-       
+<Route path="/settings-admin" element={<ClientListPage />} />
+<Route path="/wizard" element={<FormWizardDelayed />} />
+<Route path="/registration-complete" element={<RegistrationComplete />} />
+<Route path="/verify-email" element={<VerifyEmail />} />
+<Route path="/reset-password" element={<ResetPassword />} />
+<Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/upgrade" element={<Prices />} />
+<Route path="/admin" element={<AdminCards />} />
+<Route path="/cancel-signup" element={<CancelSignUp />} />
+<Route path="/order-locations" element={<AnonymousReportForm/>}/>
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
 <Route path="/profile" element={<UserForm />} />
+</Routes>
 
-      </Routes>
-      
-        
-  
-      <WorkingDialog showDialog={showDialog}/>
-      </Container>
+
+<WorkingDialog showDialog={showDialog}/>
+</Container>
 
     </LandscapeOrientation>
   )

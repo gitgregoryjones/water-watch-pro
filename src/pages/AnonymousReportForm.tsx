@@ -205,10 +205,8 @@ function endOfPreviousMonth(date: Date): Date {
   return (
     <div className="w-full max-w-5xl mx-auto p-6  bg-[var(--header-bg)] border shadow-md rounded-md mt-10">
       <div className='flex flex-row items-center justify-center gap-12'>
-      <img src={waterportalLogo} alt="WaterWatchPro Logo" className="mx-auto mb-6 smax-w-[250px]" />
-      {isActive('dark-mode') && (
-            <button onClick={toggleTheme} className="menu-item bm-item text-[--main-2]">
-              {theme === 'dark' ? (
+<img src={waterportalLogo} alt="WaterWatchPro Logo" className="mx-auto mb-6 smax-w-[250px]" />
+<button onClick={toggleTheme} className="menu-item bm-item text-[--main-2]">
                 <FaSun color="yellow" className="outline-none" size={20} />
               ) : (
                 <FaMoon className="text-slate-800 outline-none" size={20}/>

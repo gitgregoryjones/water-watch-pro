@@ -67,28 +67,23 @@ function App() {
 
   const location = useLocation();
   
-  const { theme, toggleTheme } = useContext(ThemeContext);
+const { theme, toggleTheme } = useContext(ThemeContext);
+
+const user = useSelector((state) => state.userInfo.user);
+const dispatch = useDispatch();
+const [showDialog, setShowDialog] = useState(false);
+
+const handleThemeToggle = () => {
+  toggleTheme();
+};
+
+const [selectedClient, setSelectedClient] = useState(user.clients[0]);
+
+const handleClientChange = async (client) => {
+  setShowDialog(true)
   
-  const user = useSelector((state) => state.userInfo.user);
-  const dispatch = useDispatch();
-  const [showDialog, setShowDialog] = useState(false);
-
-  const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
-  const {isActive,loading} = useFeatureFlags(featureFlagKey)
-
-  const handleThemeToggle = () => {
-    if (isActive('dark-mode')) {
-      toggleTheme();
-    }
-  };
-
-  
-  const [selectedClient, setSelectedClient] = useState(user.clients[0]);
-
-  const handleClientChange = async (client) => {
-    setShowDialog(true)
-    
-    //alert(client.id)
+  //alert(client.id)
+}
     let resp = await api.patch('/users/me',{
       primary_client_id:client.id
     })
@@ -147,28 +142,26 @@ function App() {
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
 
-   {VITE_FEATURE_MULTIPLE_CLIENTS != "false" &&
+{VITE_FEATURE_MULTIPLE_CLIENTS != "false" &&
    <div className="flex flex-row gap-2 ">
     <div className="px-2">
       <Link title={`Edit ${user.first_name}`}  onClick={()=>setOpen(false)}  to="/profile"><ProfilePic mobile={true} mini={true}  /></Link>
     </div>
-   
-      
+
+
     </div>}
 
-    
-    {isActive('dark-mode') && (
-      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
-        {theme === 'dark' ? (
-          <FaSun color="yellow" className="outline-none" />
-        ) : (
-          <FaMoon className="text-slate-800 outline-none" />
-        )}
-      </button>
+
+  <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+    {theme === 'dark' ? (
+      <FaSun color="yellow" className="outline-none" />
+    ) : (
+      <FaMoon className="text-slate-800 outline-none" />
     )}
-    <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
-    {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
-    Graphs
+  </button>
+<Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
+{user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
+Graphs
   </Link>}
   {user.role != "admin" && <Link to="/dashboard#forecast"  onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#forecast" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Forecasts
@@ -235,28 +228,24 @@ function App() {
         <Route path="/location-list" element={<LocationListPage/>} />
         <Route path="/contact-list" element={<ContactListPage />} />
         <Route path="/settings-general" element={<GeneralSettingsPage />} />
-       
-        <Route path="/settings-admin" element={<ClientListPage />} />
-        <Route path="/wizard" element={<FormWizardDelayed />} />
-        <Route path="/registration-complete" element={<RegistrationComplete />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/upgrade" element={<Prices />} />
-        <Route path="/admin" element={<AdminCards />} />
-        <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
-       
+<Route path="/settings-admin" element={<ClientListPage />} />
+<Route path="/wizard" element={<FormWizardDelayed />} />
+<Route path="/registration-complete" element={<RegistrationComplete />} />
+<Route path="/verify-email" element={<VerifyEmail />} />
+<Route path="/reset-password" element={<ResetPassword />} />
+<Route path="/forgot-password" element={<ForgotPassword />} />
+<Route path="/upgrade" element={<Prices />} />
+<Route path="/admin" element={<AdminCards />} />
+<Route path="/cancel-signup" element={<CancelSignUp />} />
+<Route  path="/order-locations" element={<AnonymousReportForm/>}/>
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
 <Route path="/profile" element={<UserForm />} />
+</Routes>
 
-      </Routes>
-      
-        
-  
-      <WorkingDialog showDialog={showDialog}/>
-      </Container>
+
+<WorkingDialog showDialog={showDialog}/>
+</Container>
 
     </LandscapeOrientation>
   )

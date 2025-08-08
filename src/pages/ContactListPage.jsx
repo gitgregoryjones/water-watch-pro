@@ -27,7 +27,8 @@ const ContactListPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
 
-  const {isActive} = useFeatureFlags();
+{
+  "code": "const {isActive} = useFeatureFlags();
 
   const fetchContacts = async (page) => {
     try {
@@ -36,8 +37,8 @@ const ContactListPage = () => {
 
       let url = `/api/contacts/?client_id=${user.clients[0].id}`
       
-      if(user.role == "admin"){
-        url =  isActive("unarchive-contacts") ? `/api/contacts/all/?a=true&status=all` : `/api/contacts/all/?a=true`;
+      if(user.role == \"admin\"){
+        url =  `/api/contacts/all/?a=true&status=all`;
 
       }
      
@@ -48,7 +49,8 @@ const ContactListPage = () => {
       setShowDialog(false)
       //setTotalPages(response.data.total_pages);
     } catch (error) {
-      console.error('Error fetching contacts:', user);
+      console.error('Error fetching contacts:', user);"
+}
       setShowDialog(false)
     }
   };

@@ -384,10 +384,9 @@ export default function LoginForm() {
 
 
     function isLightMode(){
+```javascript
 
-        if(!isActive("dark-mode"))
-            return true;
-
+```
         return theme != "dark";
     }
 

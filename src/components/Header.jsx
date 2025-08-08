@@ -154,28 +154,26 @@ export default function Header({ theme, onToggleTheme }) {
   </div>
   
   {VITE_FEATURE_MULTIPLE_CLIENTS != "true"  && (
-      <Link
-        onClick={logout}
-        className={getLinkClasses(theme,location.pathname === "/")}
-      >
-        Logout
-      </Link>
-    )}
+<Link
+  onClick={logout}
+  className={getLinkClasses(theme,location.pathname === "/")}
+>
+  Logout
+</Link>
+)}
 
+{VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
+{
+  <button onClick={onToggleTheme} className='text-[--main-2]'>
+    {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
+  </button>
+}
+<div className='hidden flex fa-stack relative flex justify-center items-center'>
+  <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
 
-  {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
-  {onToggleTheme && isActive("dark-mode") && (
-    <button onClick={onToggleTheme} className='text-[--main-2]'>
-      {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
-    </button>
-  )}
-    <div className='hidden flex fa-stack relative flex justify-center items-center'>
-      <a href="#alerts" className='text-[#ecbf1d]'><i className="fa-regular fa-bell"></i></a>
-
-        <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>
-      
-      </div>
-    
+    <div className='flex flex-1 bg-[#ecbf1d] rounded-2xl w-2 h-2 absolute top-1 left-6' ></div>
+  
+</div>
    {/* <Upgrade tier={3} showMsg={false}><Link  to="/switch" className={location.pathname == "/switch" ? "text-slate-800"  : "text-[--main-2]"}>Switch User</Link></Upgrade>*/}
     </div>
 

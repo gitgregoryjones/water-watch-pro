@@ -27,28 +27,29 @@ const ContactListPage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
 
-  const {isActive} = useFeatureFlags();
+const {isActive} = useFeatureFlags();
 
-  const fetchContacts = async (page) => {
-    try {
+const fetchContacts = async (page) => {
+  try {
 
-      setShowDialog(true)
+    setShowDialog(true)
 
-      let url = `/api/contacts/?client_id=${user.clients[0].id}`
-      
-      if(user.role == "admin"){
-        url =  isActive("unarchive-contacts") ? `/api/contacts/all/?a=true&status=all` : `/api/contacts/all/?a=true`;
+    let url = `/api/contacts/?client_id=${user.clients[0].id}`
+    
+    if(user.role == "admin"){
+      url = `/api/contacts/all/?a=true&status=all`
+    }
+   
+    let rows = await fetchByPage(url)
 
-      }
-     
-      let rows = await fetchByPage(url)
+    setContacts(rows);
 
-      setContacts(rows);
-
-      setShowDialog(false)
-      //setTotalPages(response.data.total_pages);
-    } catch (error) {
-      console.error('Error fetching contacts:', user);
+    setShowDialog(false)
+    //setTotalPages(response.data.total_pages);
+  } catch (error) {
+    console.error('Error fetching contacts:', user);
+  }
+}
       setShowDialog(false)
     }
   };

@@ -273,7 +273,7 @@ const Reports = () => {
       email_format: displayFormat,
       email_list: selectedContacts,
       locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
-      ...(isTypeFeatureActive && { type: timeType }),
+      ...(isTypeFeatureActive && { daily: timeType === "hourly"}),
     };
 
     setShowDialog(true);
@@ -518,7 +518,7 @@ const Reports = () => {
                 <input
                   type="checkbox"
                   checked={timeType === 'hourly'}
-                  onChange={() => setTimeType('hourly')}
+                  onChange={() => setTimeType(true)}
                 />
                 Hourly
               </label>

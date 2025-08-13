@@ -518,7 +518,7 @@ const Reports = () => {
                 <input
                   type="checkbox"
                   checked={timeType === 'hourly'}
-                  onChange={() => setTimeType(true)}
+                  onChange={() => setTimeType("hourly")}
                 />
                 Hourly
               </label>

@@ -267,13 +267,13 @@ const Reports = () => {
        query = `${API_HOST}/api/reports/sms?format=${displayFormat}&status=${smsStatus}&start_date=${fromDate}&end_date=${toDate}&sort_field=queuedTime&sort_directin=asc`
 
     }
-    const typeParam = `type=${timeType}`
+    const typeParam = `daily=${timeType === "daily"}`
 
     requestData = {
       email_format: displayFormat,
       email_list: selectedContacts,
       locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
-      ...(isTypeFeatureActive && { type: timeType }),
+      ...(isTypeFeatureActive && { daily: timeType === "daily"}),
     };
 
     setShowDialog(true);
@@ -518,7 +518,7 @@ const Reports = () => {
                 <input
                   type="checkbox"
                   checked={timeType === 'hourly'}
-                  onChange={() => setTimeType('hourly')}
+                  onChange={() => setTimeType("hourly")}
                 />
                 Hourly
               </label>

@@ -654,7 +654,10 @@ const provisionAccount = async (customerMetadata, customer_email) => {
     
     if(formData.subscriptionLevel != "trial") {
 
-    
+        console.log(`Stripe integration paused. Contact WaterWatchPro for more information.`)  
+
+        return;
+
         const customer = await stripe.customers.create({
             email: formData.email,
             name: `${formData.first_name} ${formData.last_name}`,

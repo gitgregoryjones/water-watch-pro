@@ -39,7 +39,7 @@ import UserAccountProvisioning from "./pages/UserAccountProvisioning";
 import ClientListPage from "./pages/ClientListPage";
 import ClientForm from "./components/ClientForm";
 import ClientPage from "./pages/ClientPage";
-import FormWizard from "./pages/FormWizard";
+
 import RegistrationComplete from "./pages/RegistrationComplete";
 import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";

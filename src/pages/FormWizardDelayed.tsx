@@ -59,7 +59,7 @@ const FormWizardDelayed = () => {
     companyPhone: '',
     companyEmail: '',
     subscriptionLevel: 'paid', // or 'trial'
-    tier: '',
+    tier: 'gold',
     locationName: '',
     latitude: '',
     longitude: '',

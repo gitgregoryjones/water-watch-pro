@@ -58,7 +58,7 @@ Session ID: ${session_id}`,
 }
 
 
-const newTrialSignUp = async (customer, session_id) => {
+const newTrialSignUp = async (customer) => {
 
   const emailContent = {
            
@@ -78,7 +78,7 @@ const newTrialSignUp = async (customer, session_id) => {
             <li><strong>Customer Email:</strong> ${customer.email}</li>
            
             <li><strong>Metadata:</strong> ${getItems(customer.metadata) || ""}</li>
-            <li><strong>Session ID:</strong> ${session_id ? session_id : "Stripe session was not created"}</li>
+           
           </ul>
         </body>
       </html>`,

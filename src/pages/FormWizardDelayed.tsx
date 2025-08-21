@@ -7,36 +7,18 @@ import api from '../utility/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
-import { VITE_PRICE_ID_GOLD, VITE_PRICE_ID_BRONZE, VITE_PRICE_ID_SILVER, VITE_PRICE_ID_TRIAL, VITE_STRIPE_SUCCESS_URL, VITE_STRIPE_CANCEL_URL } from '../utility/constants';
+
 import { validatePassword, validateEmail } from '../utility/passwordFunc';
 import Prices from './Prices';
 import { abandon, newTrialSignUp } from '../utility/abandon';
 import { useFeatureFlags } from "@geejay/use-feature-flags";
 import { loadStripe } from '@stripe/stripe-js';
-import netlifyIdentity from 'netlify-identity-widget';
+
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 const NETLIFY_FUNC_BASE = '/.netlify/functions';
 
-/**
- * Helper: Netlify Identity auth header.
- * Ensures we send Authorization: Bearer <identity_jwt> to Netlify Functions.
- */
-async function identityHeaders() {
-  try {
-    // initialize if not already
-    if (typeof window !== 'undefined') netlifyIdentity.init();
-    const user = netlifyIdentity.currentUser();
-    if (!user) return {}; // unauthenticated — caller should be blocked server-side
-    // Some builds expose .token.access_token synchronously; jwt() is the canonical promise.
-    const token =
-      (user as any)?.token?.access_token ||
-      (await user.jwt());
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  } catch {
-    return {};
-  }
-}
+
 
 const FormWizardDelayed = () => {
   const isNavigating = useRef(false);
@@ -128,6 +110,7 @@ const FormWizardDelayed = () => {
         });
         if (!resp.ok) throw new Error('Failed to finalize Stripe session');
         const sessionDetails = await resp.json(); // safe subset per function
+        if (sessionDetails.status !== 'paid') { setErrors('Payment not settled'); return; }
 
         // Rehydrate info we DIDN'T send to Stripe (e.g., password) from sessionStorage
         const cached = JSON.parse(sessionStorage.getItem('signup.cache') || '{}');
@@ -235,76 +218,54 @@ const FormWizardDelayed = () => {
     function setErr(msg) { setErrors(msg); return false; }
   };
 
-  const getPriceTier = (tier, subscriptionLevel) => {
-    let pTier = VITE_PRICE_ID_BRONZE;
-    switch (tier) {
-      case 'gold': pTier = VITE_PRICE_ID_GOLD; break;
-      case 'silver': pTier = VITE_PRICE_ID_SILVER; break;
-      case 'bronze': pTier = VITE_PRICE_ID_BRONZE; break;
-      default: pTier = VITE_PRICE_ID_BRONZE;
-    }
-    if (subscriptionLevel === 'trial') pTier = VITE_PRICE_ID_TRIAL;
-    return pTier;
-  };
+
 
   const createSession = async () => {
-    // Trial path stays local
-    if (formData.subscriptionLevel === "trial") {
-      const r = await provisionAccount(formData, formData.email);
-      return { url: "/dashboard", errors: r.errors };
-    }
+  // Trial path stays local
+  if (formData.subscriptionLevel === "trial") {
+    const r = await provisionAccount(formData, formData.email);
+    return { url: "/dashboard", errors: r.errors };
+  }
 
-    if (!isActive("stripe-refactor")) {
-      throw new Error("Legacy client-side Stripe flow is disabled.");
-    }
+  // Cache fields we must NOT send to Stripe
+  sessionStorage.setItem('signup.cache', JSON.stringify({
+    email: formData.email,
+    password: formData.password,
+    first_name: formData.first_name,
+    last_name: formData.last_name,
+    phone: formData.phone,
+    smsAccepted: formData.smsAccepted,
+    termsAccepted: formData.termsAccepted,
+    subscriptionLevel: formData.subscriptionLevel,
+    tier: formData.tier,
+    locationName: formData.locationName,
+    latitude: formData.latitude,
+    longitude: formData.longitude,
+    threshold: formData.threshold,
+    rapidrain: formData.rapidrain,
+  }));
 
-    // Cache fields we must NOT send to Stripe but need after redirect (e.g., password)
-    sessionStorage.setItem('signup.cache', JSON.stringify({
-      email: formData.email,
-      password: formData.password,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      phone: formData.phone,
-      smsAccepted: formData.smsAccepted,
-      termsAccepted: formData.termsAccepted,
-      subscriptionLevel: formData.subscriptionLevel,
-      tier: formData.tier,
-      locationName: formData.locationName,
-      latitude: formData.latitude,
-      longitude: formData.longitude,
-      threshold: formData.threshold,
-      rapidrain: formData.rapidrain,
-    }));
-
-    const price = getPriceTier(formData.tier, formData.subscriptionLevel);
-
-    const headers = {
+  // 👇 tokenless: just send email + plan
+  const res = await fetch(`${NETLIFY_FUNC_BASE}/create-checkout-session`, {
+    method: 'POST',
+    headers: {
       'Content-Type': 'application/json',
       'X-Idempotency-Key': crypto.randomUUID(),
-      ...(await identityHeaders()),
-    };
+    },
+    body: JSON.stringify({
+      email: formData.email,
+      plan: formData.tier, // "gold" | "silver" | "bronze"
+    }),
+  });
 
-    const res = await fetch(`${NETLIFY_FUNC_BASE}/create-checkout-session`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        price,
-        // keep metadata minimal and non-sensitive; server sets netlify_uid
-        metadata: {
-          plan_tier: formData.tier,
-          email: formData.email,
-          subscription_level: formData.subscriptionLevel,
-          location_name: formData.locationName,
-        },
-        success_url: VITE_STRIPE_SUCCESS_URL,
-        cancel_url: VITE_STRIPE_CANCEL_URL,
-      }),
-    });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(text || 'Failed to create Checkout session');
+  }
+  const data = await res.json(); // { sessionId }
+  return { sessionId: data.sessionId };
+};
 
-    if (!res.ok) throw new Error('Failed to create Checkout session');
-    const data = await res.json(); // { sessionId }
-    return { sessionId: data.sessionId };
-  };
 
   const handleSubmit = async () => {
     setShowMsg(true);
@@ -319,7 +280,7 @@ const FormWizardDelayed = () => {
         isNavigating.current = true;
 
         if (formData.subscriptionLevel === "trial") {
-          const s = await newTrialSignUp(formData, session.id);
+          const s = await newTrialSignUp(formData);
           window.location = session.url;
           return;
         }

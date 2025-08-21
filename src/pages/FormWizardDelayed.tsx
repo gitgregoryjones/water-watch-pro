@@ -292,6 +292,7 @@ const FormWizardDelayed = () => {
         // keep metadata minimal and non-sensitive; server sets netlify_uid
         metadata: {
           plan_tier: formData.tier,
+          email: formData.email,
           subscription_level: formData.subscriptionLevel,
           location_name: formData.locationName,
         },
@@ -599,7 +600,7 @@ const FormWizardDelayed = () => {
                   <div className="flex gap-4">
                     {['gold', 'silver', 'bronze'].map((tier) => (
                       <label key={tier}>
-                        <input type="radio" name="tier" value={tier} checked={formData.tier === tier} onChange={handleChange} className='mx-2' />
+                        <input type="radio" name="tier"  value={tier} checked={formData.tier === tier} onChange={handleChange} className='mx-2' />
                         {tier.charAt(0).toUpperCase() + tier.slice(1)}
                       </label>
                     ))}

@@ -6,7 +6,7 @@ import { updateUser } from '../utility/UserSlice';
 import { convertTier, patchClient } from '../utility/loginUser';
 import { loadStripe } from '@stripe/stripe-js';
 
-import PricesCopy from '../utility/PricesCopy'; // (optional) if you had text broken out; else ignore
+
 
 const NETLIFY_FUNC_BASE = '/.netlify/functions';
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);

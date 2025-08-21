@@ -40,6 +40,11 @@ const FormWizardDelayed = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const toggleVisibility = () => setPasswordVisible(!passwordVisible);
 
+  const uuid = () =>
+  (self.crypto?.randomUUID ? self.crypto.randomUUID()
+                           : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -100,8 +105,8 @@ const FormWizardDelayed = () => {
       try {
         setShowMsg(true);
         const headers = {
-          'Content-Type': 'application/json',
-          ...(await identityHeaders()),
+          'Content-Type': 'application/json'
+        
         };
         const resp = await fetch(`${NETLIFY_FUNC_BASE}/finalize-checkout-session`, {
           method: 'POST',
@@ -250,7 +255,7 @@ const FormWizardDelayed = () => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-Idempotency-Key': crypto.randomUUID(),
+      'X-Idempotency-Key': uuid()
     },
     body: JSON.stringify({
       email: formData.email,
@@ -288,7 +293,7 @@ const FormWizardDelayed = () => {
         // Refactor path: redirect to Stripe with Stripe.js
         const stripeJs = await stripePromise;
         await stripeJs?.redirectToCheckout({ sessionId: session.sessionId });
-      } catch (e: any) {
+      } catch (e) {
         const msg = (e.message || '').includes('properties of undefined')
           ? "Account Creation was successful but failed to send welcome email."
           : (e.message || 'Submission failed');
@@ -371,7 +376,7 @@ const FormWizardDelayed = () => {
   };
 
   const addUser = async (obj) => {
-    let loginResponse: any = {};
+    let loginResponse = {};
     const newUser = {
       password: obj.password,
       email: obj.email,

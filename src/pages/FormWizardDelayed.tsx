@@ -408,7 +408,7 @@ const FormWizardDelayed = () => {
       const locationResponse = await api.post(`/api/locations`, {
         name: obj.locationName,
         latitude: obj.latitude,
-        longitude: obj.longitude,
+        longitude: obj.longitude > -1 ? -obj.longitude/-1 : obj.longitude, // normalize to WGS84
         status: "active",
         h24_threshold: obj.threshold,
         rapidrain_threshold: obj.rapidrain,

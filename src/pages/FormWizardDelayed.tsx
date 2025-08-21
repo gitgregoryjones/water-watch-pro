@@ -594,7 +594,7 @@ const FormWizardDelayed = () => {
             </div>
             <div className="mb-4">
               <label className="block">Longitude <span className='text-[red]'>*</span></label>
-              <input type="number" name="longitude" value={formData.longitude} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />
+              <input type="number" name="longitude" min="-122" max="-66" value={formData.longitude} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />
             </div>
 
             <div className="mb-4">

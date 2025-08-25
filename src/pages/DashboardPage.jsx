@@ -446,7 +446,7 @@ function onRenderedRowHourly(raw,row,index){
 
   let clone = React.cloneElement(row,{
     
-      style:{color: isDark && raincolor === "green" , fontWeight:"bold", display:display},
+      style:{color: isDark && raincolor === "green" ? "lime" : raincolor, fontWeight:"bold", display:display},
       filter: raincolor
   }
       
@@ -480,7 +480,7 @@ function onRenderedRow24HourAccum(raw,row,index){
 
   let clone = React.cloneElement(row,{
     
-      style:{color: isDark && raincolor === "green" ? "white" : raincolor, fontWeight:"bold", display:display},
+      style:{color: isDark && raincolor === "green" ? "lime" : raincolor, fontWeight:"bold", display:display},
       filter: raw.total_rainfall + " " + currentColor
   }
       

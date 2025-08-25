@@ -9,7 +9,7 @@ import './ItemControl.css';
 // Styled components for the container layout
 export function Container({children, className}){
 
-  return (<div className={`flex flex-col  max-h-[20rem] overflow-auto min-h-[20rem] ${className}`}>{children}</div>)
+  return (<div className={`item-control bg-[--item-control-bg] flex flex-col  max-h-[20rem] overflow-auto min-h-[20rem] ${className}`}>{children}</div>)
 }
 
 const Button = styled.button`
@@ -40,7 +40,7 @@ const SearchBar = styled.input`
   margin-bottom: 10px;
   font-size:small;
   &::placeholder {
-    color: black
+    ---color: black
   }
  
   @media (max-width:550px) {

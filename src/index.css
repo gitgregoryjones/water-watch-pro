@@ -209,7 +209,7 @@ body.dark {
   --card-background: rgba(55, 65, 81, 0.7);
   --text-color: #f9fafb;
   --header-bg: var(--secondary-color);
-  --item-control-bg: lightgray;
+  
   background: var(--primary-color);
   color: var(--text-color);
 }

@@ -49,6 +49,7 @@ import WorkingDialog from '../components/WorkingDialog'
 import NotificationBanner from '../components/NotificationBanner'
 import Toggle from '../components/Toggle'
 import RainfallTable from '../components/RainfallTable'
+import { ThemeContext } from '../utility/ThemeContext'
 
 export default function DashboardPage() {
 
@@ -418,6 +419,10 @@ useEffect(() => {
   fetchHourlyData();
   fetchDailyData();
 }, [currentLocation]);
+
+
+const { theme } = useContext(ThemeContext);
+  const isDark = theme === 'dark';
   
 /* Render A Row A Different Color Based on Rainfall for That Area Hourly */
 function onRenderedRowHourly(raw,row,index){
@@ -441,7 +446,7 @@ function onRenderedRowHourly(raw,row,index){
 
   let clone = React.cloneElement(row,{
     
-      style:{color: raincolor, fontWeight:"bold", display:display},
+      style:{color: isDark && raincolor === "green" , fontWeight:"bold", display:display},
       filter: raincolor
   }
       
@@ -450,6 +455,8 @@ function onRenderedRowHourly(raw,row,index){
   row = clone;
   return row;
 }
+
+
 
 /* Render A Row A Different Color Based on Rainfall for That Area 24hrAccum */
 function onRenderedRow24HourAccum(raw,row,index){
@@ -473,7 +480,7 @@ function onRenderedRow24HourAccum(raw,row,index){
 
   let clone = React.cloneElement(row,{
     
-      style:{color: raincolor, fontWeight:"bold", display:display},
+      style:{color: isDark && raincolor === "green" ? "white" : raincolor, fontWeight:"bold", display:display},
       filter: raw.total_rainfall + " " + currentColor
   }
       

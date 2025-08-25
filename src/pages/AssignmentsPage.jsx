@@ -183,16 +183,16 @@ const AssignmentsPage = () => {
   return (
     <div className="mt-16 md:p-6 w-full text-sm flex flex-col items-center ">
       {/* Top Navigation Links */}
-      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Assignments > Assign Contacts</h1>
+      <h1 className="text-2xl font-bold  m-8 self-start">Assignments > Assign Contacts</h1>
      
       <div className="hidden flex justify-start rounded space-x-6 mb-8 self-start bg-[white] w-full p-2">
         <Link
           to="/assign-locations"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+          className="dark:text-inherit text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
           Assign Locations
         </Link>
-        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+        <span className="dark:text-inherit text-gray-800 font-bold border-b-2 border-blue-500">
           Assign Contacts
         </span>
       </div>
@@ -201,11 +201,11 @@ const AssignmentsPage = () => {
      <Card header={<div className="flex justify-start rounded space-x-6 mb-8 self-start  w-full p-2">
         <Link
           to="/assign-locations"
-          className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+          className="dark:text-inherit text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
         >
           Assign Locations
         </Link>
-        <span className="text-gray-800 font-bold border-b-2 border-blue-500">
+        <span className="dark:text-inherit text-gray-800 font-bold border-b-2 border-blue-500">
           Assign Contacts
         </span>
       </div>} footer={``} className={'w-full  border-[whitesmoke] bg-[whitesmoke]  md:rounded-[unset]'}> 

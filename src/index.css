@@ -57,7 +57,7 @@
   --shadow: box-shadow: 0 0 50px #ccc;
   --notification:rgb(71, 84, 102);
   --alert: red;
-  --item-control-bg: var(--primary-color);
+  
 
 }
 
@@ -211,7 +211,7 @@ body.dark {
   --card-background: rgba(55, 65, 81, 0.7);
   --text-color: #f9fafb;
   --header-bg: var(--secondary-color);
-  --item-control-bg: #4B5563;
+  --item-control-bg: lightgray;
   background: var(--primary-color);
   color: var(--text-color);
 }

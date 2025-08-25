@@ -40,7 +40,7 @@ const SearchBar = styled.input`
   margin-bottom: 10px;
   font-size:small;
   &::placeholder {
-    color: black
+    ---color: black
   }
  
   @media (max-width:550px) {

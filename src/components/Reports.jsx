@@ -560,7 +560,7 @@ const Reports = () => {
 
       <input
         type="text"
-        className="hidden md:block p-2 mt-2 w-full border border-green-800 rounded text-md placeholder-[black]"
+        className="hidden md:block p-2 mt-2 w-full border border-green-800 rounded text-md dark:placeholder:text-white"
         onChange={filterLocations}
         placeholder="Search Locations..."
         value={searchTerm}
@@ -574,7 +574,7 @@ const Reports = () => {
         {/* Row 2 */}
         {(displayFormat == "csv" ||  displayFormat == "excel" || displayFormat == "html" || displayFormat == "pdf" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
-            <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
+            <label htmlFor="contacts" className="font-bold block text-gray-700 dark:text-inherit">Email To:</label>
           
           </div>
          

@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import { useSelector } from "react-redux";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import api from "../utility/api";
 import { convertTier } from "../utility/loginUser";
 import RainfallTable from "./RainfallTable";
+import { ThemeContext } from "../utility/ThemeContext";
 
 
 
@@ -30,6 +31,8 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   const [scrollPosition, setScrollPosition] = useState(0);
 
+  const { theme } = useContext(ThemeContext);
+    const isDark = theme === 'dark';
   
 
   
@@ -379,6 +382,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
         title: {
           display: false,
         },
+        
         ticks: {
           autoSkip: false,
           callback: function (value, index, ticks) {
@@ -392,6 +396,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   
             return label;
           },
+           color: isDark &&'white'
         },
         grid: {
           display: true,
@@ -407,6 +412,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
         font: {
             size: 12, // Control font size
         },
+        color: isDark &&'white'
         },
         grid: {
           display: true,
@@ -450,7 +456,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     
     
     || <div className="flex flex-row w-full ">
-      <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white`}></div>
+      <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white ]`}></div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (
           <div>Error loading data. Please try again later. {error}</div>

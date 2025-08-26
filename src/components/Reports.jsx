@@ -581,10 +581,14 @@ const Reports = () => {
           <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
-        {(displayFormat == "csv" || displayFormat == "excel" || selectedLocations.length > 1) && 
+        <div className='hidden'>
+          <div className='mb-2 font-bold'>Email To:</div>
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/></div>
+        {
           <div className={`md:hidden flex w-full flex-col`}>
-          <div>EmailTo</div>
-          <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); reportType === "historical" ? setSelectedContacts([...emails,"support@waterwatchpro.com"]) : setSelectedContacts(emails)}}/>
+          <div>Email To:</div>
+          <MultiSelectDropdown className={`hidden`} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); reportType === "historical" ? setSelectedContacts([...emails,"support@waterwatchpro.com"]) : setSelectedContacts(emails)}}/>
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
         

@@ -46,7 +46,7 @@ const EmailRowManager = ({ contacts, onModify}) => {
   }
 
   return (
-    <div className="flex flex-col flex w-full gap-4">
+    <div className="flex flex-col flex w-full gap-4 ">
       {/* Add Button */}
      
 

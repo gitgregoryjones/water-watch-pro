@@ -59,6 +59,12 @@ Session ID: ${session_id}`,
 
 
 const newTrialSignUp = async (customer) => {
+  
+//alert(`New trial signup for ${JSON.stringify(customer)}`);
+
+customer.metadata = {...customer,metadata:{...customer}}
+
+   try {
 
   const emailContent = {
            
@@ -68,8 +74,7 @@ const newTrialSignUp = async (customer) => {
       textBody: `This is the new trial user:
       Customer Email: ${customer.email}
   
-  Metadata: ${getItems(customer.metadata,true)}
-  Session ID: ${session_id}`,
+  Metadata: ${getItems(customer.metadata,true)}`,
       htmlBody: `<html>
         <body>
           <h1>New Trial User Notification</h1>
@@ -84,6 +89,7 @@ const newTrialSignUp = async (customer) => {
       </html>`,
     }
   
+   // alert(`This sending email to support: ${JSON.stringify(emailContent)}`);
   
       const emailResponse = await api.post(
       VITE_EMAIL_PROXY,
@@ -96,6 +102,10 @@ const newTrialSignUp = async (customer) => {
       );
   
       return emailResponse;
+    } catch (error) {
+        console.log(`Error sending new trial signup email:${error.message}`);
+        return null;
+    }
   
   }
 

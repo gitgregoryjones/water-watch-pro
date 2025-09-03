@@ -220,7 +220,7 @@ function App() {
        
      
        {!isLoginPage && <Header theme={theme} onToggleTheme={handleThemeToggle} />}
-       <Container className="big-container bg-[var(--primary-color)] h-full">
+       <Container className="big-container dark:bg-inherit bg-[var(--primary-color)] h-full">
        <ScrollToHash />
       <Routes>
         <Route path="/" element={<LoginForm />} />

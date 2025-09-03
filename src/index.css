@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 @font-face {
   font-family: 'MyriadPro';
@@ -57,6 +55,7 @@
   --shadow: box-shadow: 0 0 50px #ccc;
   --notification:rgb(71, 84, 102);
   --alert: red;
+  
 
 }
 
@@ -210,6 +209,7 @@ body.dark {
   --card-background: rgba(55, 65, 81, 0.7);
   --text-color: #f9fafb;
   --header-bg: var(--secondary-color);
+  
   background: var(--primary-color);
   color: var(--text-color);
 }
@@ -631,3 +631,6 @@ header {
   
   
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

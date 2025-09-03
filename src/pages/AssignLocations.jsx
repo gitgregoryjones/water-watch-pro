@@ -139,15 +139,15 @@ const AssignLocations = () => {
 
   return (
     <div className="mt-16 md:p-6 w-full text-sm flex flex-col items-center">
-      <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Assignments > Assign Locations</h1>
+      <h1 className="text-2xl font-bold m-8 self-start">Assignments > Assign Locations</h1>
 
       <Card
         header={
           <div className="flex justify-start rounded space-x-6 mb-8 self-start w-full p-2">
-            <span className="text-gray-800 font-bold border-b-2 border-blue-500">Assign Locations</span>
+            <span className="dark:text-inherit text-gray-800 font-bold border-b-2 border-blue-500">Assign Locations</span>
             <Link
               to="/assignments"
-              className="text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
+              className="dark:text-inherit text-blue-500 hover:text-blue-700 font-bold border-b-2 border-transparent hover:border-blue-700"
             >
               Assign Contacts
             </Link>

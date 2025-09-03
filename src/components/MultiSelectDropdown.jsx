@@ -67,10 +67,10 @@ const MultiSelectDropdown = ({ className, locations, onSelectedOption, idField})
     <div className={`${className} relative w-full  mx-auto`} ref={dropdownRef}>
       {/* Dropdown Trigger */}
       <div
-        className="flex justify-between items-center border border-gray-300 bg-white rounded-md px-4 py-2 cursor-pointer"
+        className="flex justify-between items-center border border-gray-300  rounded-md px-4 py-2 cursor-pointer"
         onClick={toggleDropdown}
       >
-        <span className="text-gray-600">
+        <span className="">
           {selectedOptions.length > 0
             ? selectedOptions.join(", ")
             : "Select options"}
@@ -91,7 +91,7 @@ const MultiSelectDropdown = ({ className, locations, onSelectedOption, idField})
 
       {/* Dropdown Options */}
       {isDropdownOpen && (
-        <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-md mt-2">
+        <div className="absolute z-10 w-full bg-white dark:bg-slate-600  border-gray-300 rounded-md shadow-md mt-2">
           {/* Close Icon */}
           <div className="flex justify-end p-2">
             <button

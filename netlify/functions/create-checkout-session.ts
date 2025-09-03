@@ -22,7 +22,7 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
   try {
-    const { email, plan } = JSON.parse(event.body || '{}');
+    const { email, plan, context } = JSON.parse(event.body || '{}');
     if (!email || !plan || !PRICE_BY_PLAN[plan]) {
       return { statusCode: 400, headers: cors(), body: 'Bad request' };
     }
@@ -34,6 +34,11 @@ export const handler: Handler = async (event) => {
     const exp = Math.floor(Date.now() / 1000) + 15 * 60; // 15 min
     const sig = sign(`${email}.${plan}.${nonce}.${exp}`);
 
+    const successBase =
+  context === 'wizard'
+    ? process.env.WIZARD_SUCCESS_URL
+    : process.env.UPGRADE_SUCCESS_URL;
+
     const session = await stripe.checkout.sessions.create(
       {
         mode: 'payment',
@@ -43,7 +48,7 @@ export const handler: Handler = async (event) => {
             setup_future_usage: 'off_session', // ← save for future backend charges
         },
         line_items: [{ price, quantity: 1 }],
-        success_url: `${process.env.SUCCESS_URL}?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${successBase}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: process.env.CANCEL_URL!,
         // minimal, non-sensitive metadata
         metadata: { email, plan, nonce, exp: String(exp), sig },

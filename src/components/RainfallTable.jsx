@@ -99,7 +99,7 @@ const RainfallTable = ({ location, max = 2 }) => {
             <tr key={index} className="hover:bg-gray-50">
               <td className="px-4 py-2 border-b text-sm">{entry.date}</td>
               <td className={`px-4 py-2 border-b text-sm`}>{entry.hourlyTotal.toFixed(2)}</td>
-              <td className={`px-4 py-2 border-b text-sm  ${VITE_FEATURE_TABLE_COLORS == "true" && entry.total24h.toFixed(2)  >= location.h24_threshold ? location.atlas14_threshold && entry.total24h.toFixed(2)  > location.atlas14_threshold["24h"][0] &&  convertTier(user)  != 1 ? "bg-[red]" : "bg-[orange]" : "bg-[transparent]"}`}>{entry.total24h.toFixed(2)}</td>
+              <td className={`px-4 py-2 border-b text-sm  ${VITE_FEATURE_TABLE_COLORS == "true" && entry.total24h.toFixed(2)  >= location.h24_threshold ? location.atlas14_threshold && entry.total24h.toFixed(2)  > location.atlas14_threshold["24h"][0] &&  convertTier(user)  != 1 ? "bg-[red] dark:bg-[red]" : "bg-[orange] dark:bg-[orange]" : "bg-[transparent]"}`}>{entry.total24h.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>}

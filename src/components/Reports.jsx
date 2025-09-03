@@ -560,7 +560,7 @@ const Reports = () => {
 
       <input
         type="text"
-        className="hidden md:block p-2 mt-2 w-full border border-green-800 rounded text-md placeholder-[black]"
+        className="hidden md:block p-2 mt-2 w-full border border-green-800 rounded text-md dark:placeholder:text-white"
         onChange={filterLocations}
         placeholder="Search Locations..."
         value={searchTerm}
@@ -574,17 +574,21 @@ const Reports = () => {
         {/* Row 2 */}
         {(displayFormat == "csv" ||  displayFormat == "excel" || displayFormat == "html" || displayFormat == "pdf" || selectedLocations.length > 1) && <div className="hidden md:flex  flex-col">
           <div className={`flex justify-between items-center`}>
-            <label htmlFor="contacts" className="font-bold block text-gray-700">Email To:</label>
+            <label htmlFor="contacts" className="font-bold block text-gray-700 dark:text-inherit">Email To:</label>
           
           </div>
          
           <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
-        {(displayFormat == "csv" || displayFormat == "excel" || selectedLocations.length > 1) && 
+        <div className='hidden'>
+          <div className='mb-2 font-bold'>Email To:</div>
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/></div>
+        {
           <div className={`md:hidden flex w-full flex-col`}>
-          <div>EmailTo</div>
-          <MultiSelectDropdown className={``} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); reportType === "historical" ? setSelectedContacts([...emails,"support@waterwatchpro.com"]) : setSelectedContacts(emails)}}/>
+          <div>Email To:</div>
+          <MultiSelectDropdown className={`hidden`} locations={contacts} idField={"email"} onSelectedOption={(emails)=> {console.log(`Contacts are ${emails}`); reportType === "historical" ? setSelectedContacts([...emails,"support@waterwatchpro.com"]) : setSelectedContacts(emails)}}/>
+          <EmailRowManager contacts={contacts} onModify={(emails)=> {console.log(`Contacts are ${emails}`); setSelectedContacts(emails)}}/>
         </div>}
 
         

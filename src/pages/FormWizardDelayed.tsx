@@ -267,6 +267,7 @@ const FormWizardDelayed = () => {
     body: JSON.stringify({
       email: formData.email,
       plan: formData.tier, // "gold" | "silver" | "bronze"
+      context: 'wizard' // or: 'upgrade'
     }),
   });
 

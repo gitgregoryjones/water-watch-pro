@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import Papa from "papaparse";
 import api from "../utility/api"; // Replace with your actual API utility
+import { useSelector } from "react-redux";
 
 const ContactCSVFileUploadDialog = ({className, onClose}) => {
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState([]);
   const [success, setSuccess] = useState(false);
   const [processing, setProcessing] = useState(false);
-
+  const user = useSelector((state) => state.userInfo.user);
   const requiredFields = ["name", "email", "phone"];
 
   const validateRow = (row) => {
@@ -56,7 +57,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
       const line = lines[i].trim();
   
       // Skip lines starting with #
-      if (line.startsWith("#")) {
+      if (line.startsWith("#") || line.replace(/,/g, '') === "") {
         lastHashLineIndex = i; // Track the last line with #
         continue;
       }
@@ -164,7 +165,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
               delete eBody.phone;
             }
 
-            await api.post("/api/contacts/", eBody);
+            await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, eBody);
           } catch (error) {
             postErrors.push(`Failed to process row with email ${row.email}: ${error.message}`);
           }

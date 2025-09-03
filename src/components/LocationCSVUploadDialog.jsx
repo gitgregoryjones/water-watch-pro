@@ -72,7 +72,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
       const line = lines[i].trim();
   
       // Skip lines starting with #
-      if (line.startsWith("#")) {
+      if (line.startsWith("#") || line.replace(/,/g, '') === "") {
         lastHashLineIndex = i; // Track the last line with #
         continue;
       }
@@ -171,7 +171,7 @@ const LocationCSVFileUploadDialog = ({ className, onClose }) => {
         const postErrors = [];
         for (const row of validRows) {
           try {
-            await api.post("/api/locations/", {
+            await api.post(`/api/locations/?client_id=${user.clients[0].id}`, {
               name: row.name,
               latitude: parseFloat(row.lat),
               longitude: parseFloat(row.lng),

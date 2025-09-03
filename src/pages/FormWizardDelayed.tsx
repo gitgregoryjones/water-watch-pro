@@ -286,7 +286,9 @@ const FormWizardDelayed = () => {
         setShowMsg(false);
         isNavigating.current = true;
 
+       
         if (formData.subscriptionLevel === "trial") {
+           
           const s = await newTrialSignUp(formData);
           window.location = session.url;
           return;

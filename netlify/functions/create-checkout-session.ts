@@ -38,7 +38,7 @@ export const handler: Handler = async (event) => {
 
     const successBase =
   context === 'wizard'
-    ? process.env.WIZARD_SUCCESS_URL
+    ? process.env.SUCCESS_URL
     : process.env.UPGRADE_SUCCESS_URL;
 
     console.log(`Creating checkout session for ${email}, plan ${plan}, price ${price} ${successBase}`);

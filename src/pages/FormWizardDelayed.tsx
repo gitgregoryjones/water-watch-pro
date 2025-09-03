@@ -120,6 +120,7 @@ const FormWizardDelayed = () => {
         // Rehydrate info we DIDN'T send to Stripe (e.g., password) from sessionStorage
         const cached = JSON.parse(sessionStorage.getItem('signup.cache') || '{}');
 
+        
         // Provision account with your API using the combined data
         const meta = {
           ...cached, // contains password, names, phone, thresholds, etc.
@@ -318,6 +319,7 @@ const FormWizardDelayed = () => {
         txn.errors = aResponse.errors?.[0] || 'Registration failed';
         setErrors(txn.errors);
         setShowMsg(false);
+        console.log(`Failed to register user ${txn.errors}`);
         return txn;
       }
 

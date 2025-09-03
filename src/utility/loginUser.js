@@ -286,6 +286,8 @@ const loginUser = async (email, password, token)=>{
     
     try {
 
+        console.log(`Logging in user ${email} with token ${token? "provided": "not provided"}`)
+
     const loginResponse = await api.post(`/auth/jwt/login`, new URLSearchParams({
         
         username: email,
@@ -297,6 +299,7 @@ const loginUser = async (email, password, token)=>{
         },
     });
 
+    console.log(`Login response: ${JSON.stringify(loginResponse.data)}`)
     const { access_token: accessToken } = token ? {accessToken: token } : loginResponse.data;
 
     localStorage.setItem("accessToken", accessToken);
@@ -304,6 +307,7 @@ const loginUser = async (email, password, token)=>{
     if (!accessToken) {
         setErrorMsg("Login failed. Please check your credentials.");
         setServerError(true);
+        console.log("Login failed. No access token received.");
         throw new Error("Login failed");
     }
 

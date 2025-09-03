@@ -27,6 +27,8 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, headers: cors(), body: 'Bad request' };
     }
 
+    console.log(`Received checkout session request for ${email}, plan ${plan}, context ${context}`);
+
     // OPTIONAL: verify captcha token here
 
     const price = PRICE_BY_PLAN[plan];
@@ -36,8 +38,10 @@ export const handler: Handler = async (event) => {
 
     const successBase =
   context === 'wizard'
-    ? process.env.WIZARD_SUCCESS_URL
+    ? process.env.SUCCESS_URL
     : process.env.UPGRADE_SUCCESS_URL;
+
+    console.log(`Creating checkout session for ${email}, plan ${plan}, price ${price} ${successBase}`);
 
     const session = await stripe.checkout.sessions.create(
       {

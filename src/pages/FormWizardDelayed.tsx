@@ -108,11 +108,14 @@ const FormWizardDelayed = () => {
           'Content-Type': 'application/json'
         
         };
+        console.log(`Finalizing Stripe session ${sessionParam}`);
         const resp = await fetch(`${NETLIFY_FUNC_BASE}/finalize-checkout-session`, {
           method: 'POST',
           headers,
           body: JSON.stringify({ sessionId: sessionParam }),
         });
+
+        console.log(`Finalize response: ${resp.status}`);
         if (!resp.ok) throw new Error('Failed to finalize Stripe session');
         const sessionDetails = await resp.json(); // safe subset per function
         if (sessionDetails.status !== 'paid') { setErrors('Payment not settled'); return; }
@@ -120,6 +123,7 @@ const FormWizardDelayed = () => {
         // Rehydrate info we DIDN'T send to Stripe (e.g., password) from sessionStorage
         const cached = JSON.parse(sessionStorage.getItem('signup.cache') || '{}');
 
+        console.log(`Cached signup data: ${JSON.stringify(cached).slice(0,100)}`);
         // Provision account with your API using the combined data
         const meta = {
           ...cached, // contains password, names, phone, thresholds, etc.
@@ -129,11 +133,12 @@ const FormWizardDelayed = () => {
           tier: cached.tier || sessionDetails?.metadata?.plan_tier,
           subscriptionLevel: cached.subscriptionLevel || sessionDetails?.metadata?.subscription_level,
         };
-
+        console.log(`Provisioning with metadata: ${JSON.stringify(meta).slice(0,200)}`);
         const r = await provisionAccount(meta, meta.email);
         if (r.errors) {
           setErrors(r.errors);
           setShowMsg(false);
+          console.log(`Failed to provision account ${r.errors}`);
           return;
         }
 
@@ -262,6 +267,7 @@ const FormWizardDelayed = () => {
     body: JSON.stringify({
       email: formData.email,
       plan: formData.tier, // "gold" | "silver" | "bronze"
+      context: 'wizard' // or: 'upgrade'
     }),
   });
 
@@ -312,15 +318,18 @@ const FormWizardDelayed = () => {
   const provisionAccount = async (customerMetadata, customer_email) => {
     let txn = {};
     try {
+      console.log(`Provisioning account for ${customer_email} (${JSON.stringify(customerMetadata)})`);
       // 1) Register user
       const aResponse = await addUser({ ...customerMetadata, email: customer_email });
       if (!aResponse?.data) {
         txn.errors = aResponse.errors?.[0] || 'Registration failed';
         setErrors(txn.errors);
         setShowMsg(false);
+        console.log(`Failed to register user ${txn.errors}`);
         return txn;
       }
 
+      console.log(`Registered user ${customer_email} successfully`);
       // 2) Login
       const lresponse = await loginUser(customer_email, customerMetadata.password);
       if (lresponse.errors?.length > 0) {

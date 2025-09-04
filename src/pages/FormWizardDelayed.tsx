@@ -381,6 +381,25 @@ const FormWizardDelayed = () => {
       await patchClient(newClient);
       userCopy.clients = [newClient];
       dispatch(updateUser(userCopy));
+
+
+      //Get Contacts
+      const contactsR = await api.post("/api/contacts/?page=1&page_size=1");
+      const contacts = contactsR.data || [];
+      const firstContact = contacts?.[0];
+
+      //Assign First Contact to Location
+      const assignR = await api.post(`/api/contacts/${firstContact?.id}/locations?client_id=${newClient?.id}`,[theLocation?.data?.id]);
+
+      if (!assignR?.data) {
+        console.log(`Failed to assign contact ${firstContact?.id} to location ${theLocation?.data?.id}`);
+        // non-fatal
+      } else {
+        console.log(`Provisioned account for ${customer_email} successfully`);
+        console.log(`Assigned contact ${firstContact?.id} to location ${theLocation?.data?.id} successfully`);
+
+      }
+    
     } catch (e: any) {
       txn.errors = e.message;
       console.log(`Failed to provision account ${e.message}`);

@@ -384,7 +384,7 @@ const FormWizardDelayed = () => {
 
 
       //Get Contacts
-      const contactsR = await api.post("/api/contacts/?page=1&page_size=1");
+      const contactsR = await api.get("/api/contacts/?page=1&page_size=1");
       const contacts = contactsR.data || [];
       const firstContact = contacts?.[0];
 

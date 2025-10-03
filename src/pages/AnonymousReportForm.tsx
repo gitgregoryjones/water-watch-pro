@@ -51,7 +51,7 @@ const AnonymousReportForm = () => {
 
   if(!searchParams.get("anon")){
     (async ()=> {
-      let locs = await fetchByPage(`/api/locations`);
+      let locs = await fetchByPage(`/api/locations?client_id=${client.id}`, client?.access_token);
 
       let enhanced = locs.filter((l)=> searchParams.get("location_id") && Number(l.id) === Number(searchParams.get("location_id"))).map((m)=> {m.reportTypes = []; m.lastReportDate = endOfPreviousMonth(new Date(m.created_at)); return m});
 

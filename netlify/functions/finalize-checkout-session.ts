@@ -6,13 +6,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
+
   try {
     const { sessionId } = JSON.parse(event.body || '{}');
     if (!sessionId) return { statusCode: 400, body: 'Missing sessionId' };
 
-    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['line_items.data.price.product'] });
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items.data.price.product', 'customer'],
+    });
 
-    // DO NOT provision here; just return info for the page
+    const stripeCustomerId =
+      typeof session.customer === 'string'
+        ? session.customer
+        : session.customer?.id ?? null;
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -21,9 +28,11 @@ export const handler: Handler = async (event) => {
         status: session.payment_status,
         email: session.customer_details?.email,
         plan: session.metadata?.plan,
+        stripe_customer_id: stripeCustomerId,
       }),
     };
-  } catch {
+  } catch (err) {
     return { statusCode: 500, body: 'Internal error' };
   }
 };
+

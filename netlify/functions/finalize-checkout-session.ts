@@ -28,7 +28,7 @@ export const handler: Handler = async (event) => {
         status: session.payment_status,
         email: session.customer_details?.email,
         plan: session.metadata?.plan,
-        stripe_customer_id: stripeCustomerId,
+        customerId: stripeCustomerId,
       }),
     };
   } catch (err) {

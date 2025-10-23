@@ -52,9 +52,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
        
 
-        if(!latitude || latitude < 24 || latitude > 49 ){
+        if(!latitude || latitude < 24 || latitude > 48 ){
             
-             setMsg(<span className="text-[red]">Latitude must be between 24 and 49 degrees</span>)
+             setMsg(<span className="text-[red]">Latitude must be between 24 and 48 degrees</span>)
              setIsWorking(false); 
             success = false;
         }

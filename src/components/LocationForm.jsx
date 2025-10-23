@@ -62,12 +62,12 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         let tmpLong = longitude > 0 ? -longitude : longitude;
 
         if(longitude > 0 ){
-           setLongitude(-longitude);
+           setLongitude(tmpLong);
         }
 
-        if(!tmpLong || tmpLong < -122 || tmpLong > -66 ){
+        if(!tmpLong || tmpLong < -124.9 || tmpLong > -69.21 ){
             
-             setMsg(<span className="text-[red]">Longitude must be between -122 and -66 degrees</span>)
+             setMsg(<span className="text-[red]">Longitude must be between -124.9 and -69.21 degrees</span>)
              setIsWorking(false); 
 
              success = false;
@@ -104,7 +104,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     const locationData = {
       name,
       latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
+      longitude: parseFloat(tmpLong),
       status: 'active',
       h24_threshold: parseFloat(h24Threshold),
       rapidrain_threshold: parseFloat(rapidRainThreshold ? rapidRainThreshold : h24Threshold),

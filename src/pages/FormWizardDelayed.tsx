@@ -210,7 +210,7 @@ const FormWizardDelayed = () => {
         if (lat < 24 || lat > 49) return setErr('Latitude must be between 24 and 49 degrees');
         const fixedLon = lon > 0 ? -lon : lon;
       
-        if (fixedLon < -124 || fixedLon > -66) return setErr('Longitude must be between -124 and -66 degrees');
+        if (fixedLon < -124.9 || fixedLon > -69.21) return setErr('Longitude must be between -124.9 and -69.21 degrees');
         setFormData(prev => ({ ...prev, longitude: fixedLon }));
         if (![0.01,0.1,0.25,0.5,0.75,1.0,1.5,2,3,4].includes(parseFloat(formData.threshold)))
           return setErr('24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4');

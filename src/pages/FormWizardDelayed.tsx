@@ -360,7 +360,8 @@ const FormWizardDelayed = () => {
         daily_report_on: true,
         exceed24h_on: true,
         exceed24h_combine_locations: true,
-        only_show_locations_with_non_zero: true,
+        // Gene on Oct 23, 2025 asked that we turn only_show_locations_with_non_zero OFF by default
+        only_show_locations_with_non_zero: false,
         sort_by_rainfall: true,
       };
 

@@ -34,6 +34,9 @@ const ContactForm = ({  }) => {
       forecast_on_sms: contactToEdit? contactToEdit?.forecast_on_sms  : true,
       atlas14_24h_on: contactToEdit? contactToEdit?.atlas14_24h_on  : true,
       atlas14_24h_on_sms: contactToEdit? contactToEdit?.atlas14_24h_on_sms  : true,
+
+      rapidrain_on: contactToEdit? contactToEdit?.rapidrain_on  : true,
+      rapidrain_on_sms: contactToEdit? contactToEdit?.rapidrain_on_sms  : true,
       //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
@@ -125,8 +128,10 @@ const ContactForm = ({  }) => {
     Forecast: { email: true, sms: true, show: convertTier(user) > 2 },
     'NOAA Atlas 14': { email: true, sms: true, tier:1, show : convertTier(user) > 1 },
     '24 Hour Threshold': { email: true, sms: true, show:true },
+    'RapidRain': { email: false, sms: true, tier:4, show : convertTier(user) > 2 },
   });
   
+ // alert(`Alert Settings are ${JSON.stringify(alertSettings)}`)
 
   const isEditMode = contactToEdit !== null;
   const navigate = useNavigate();
@@ -207,6 +212,8 @@ const ContactForm = ({  }) => {
       atlas14_first_on_sms: formData.atlas14_first_on_sms,
       exceed24h_on : formData.exceed24h_on,
       exceed24h_on_sms: formData.exceed24h_on_sms,
+      rapidrain_on : formData.rapidrain_on,
+      rapidrain_on_sms: formData.rapidrain_on_sms,
     };
 
     try {

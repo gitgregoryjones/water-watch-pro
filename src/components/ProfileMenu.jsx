@@ -15,11 +15,11 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
   const [showDialog,setShowDialog] = useState(false)
   const navigate = useNavigate();
 
-  const handleClientChange = async (client) => {
+  const handleClientChange = async (client,user) => {
     //setShowDialog(true)
     setSelectedClient(client);
     //alert(client.id)
-    let resp = await api.patch('/users/me',{
+    let resp = user.role === 'contact' ? await api.post(`/api/contacts/change-client/${client.id}`) : await api.patch('/users/me',{
       primary_client_id:client.id
     })
     
@@ -132,7 +132,7 @@ const formatPhoneNumber = (phone) => {
           <div
             key={client.account_name}
             className={`${client.status == "archived" && "hidden"} flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100`}
-            onClick={() => handleClientChange(client)}
+            onClick={() => handleClientChange(client,user)}
           >
             {/* Radio Button */}
             <div className={`w-4 h-4 rounded-full border-2 ${index === 0 ? 'bg-green-500 border-green-500' : 'border-gray-400'}`}></div>

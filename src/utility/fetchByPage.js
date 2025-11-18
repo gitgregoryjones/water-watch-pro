@@ -96,9 +96,9 @@ export default async function fetchByPage(url, page = 1, pageSize = 250) {
             for (const row of rows) {
                 if (!seenIds.has(row.id)) {
                     seenIds.add(row.id);
-                    //uniqueRows.push(row);
+                    uniqueRows.push(row);
                 }
-                uniqueRows.push(row);
+               // uniqueRows.push(row);
             }
             console.log(`Removed duplicates, returning ${uniqueRows.length} unique items`);
             return uniqueRows;

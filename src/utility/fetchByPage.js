@@ -36,14 +36,14 @@ export default async function fetchByPage(url, page = 1, pageSize = 250) {
                 }
 
                 // Check for duplicates (simple check on first item)
-                if (rows.length > 0 && pageData.length > 0) {
+                /*if (rows.length > 0 && pageData.length > 0) {
                     const lastRowId = rows[rows.length - 1].id;
                     const firstNewRowId = pageData[0].id;
                     if (lastRowId === firstNewRowId) {
                         console.warn(`Duplicate data detected on page ${currentPage}, stopping.`);
                         break;
                     }
-                }
+                }*/
 
                 // Add the page data
                 rows = rows.concat(pageData);
@@ -96,8 +96,9 @@ export default async function fetchByPage(url, page = 1, pageSize = 250) {
             for (const row of rows) {
                 if (!seenIds.has(row.id)) {
                     seenIds.add(row.id);
-                    uniqueRows.push(row);
+                    //uniqueRows.push(row);
                 }
+                uniqueRows.push(row);
             }
             console.log(`Removed duplicates, returning ${uniqueRows.length} unique items`);
             return uniqueRows;

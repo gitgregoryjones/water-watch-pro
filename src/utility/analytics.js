@@ -3,12 +3,14 @@ const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
 export const trackAnalyticsEvent = (eventName, params = {}) => {
   if (typeof window === 'undefined') return;
   window.dataLayer = window.dataLayer || [];
+  
   window.dataLayer.push({
     event: eventName,
     ...params,
   });
 
   if (typeof window.gtag === 'function') {
+    console.log(`Google Tracking analytics event!! ${eventName}`, params);
     window.gtag('event', eventName, params);
   }
 };

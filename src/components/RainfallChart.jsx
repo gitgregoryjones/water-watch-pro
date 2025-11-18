@@ -144,12 +144,12 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   const describeDateRange = () => {
     if (period === "daily") {
-      return getBeginEndRange();
+      return `24hr tab clicked ${getBeginEndRange()}`
     }
     if (period === "rapidrain") {
-      return `${max} hours`;
+      return `rapidrain tab clicked ${getBeginEndRange()}`;
     }
-    return `${max} days`;
+    return `hourly tab clicked ${getBeginEndRange()}`;
   };
 
   const fetchChartData = async () => {

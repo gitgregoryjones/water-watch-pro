@@ -32,6 +32,7 @@ const ContactListPage = () => {
   const fetchContacts = async (page) => {
     try {
       setShowDialog(true);
+      setContacts([]);
 
       let url = `/api/contacts/?client_id=${user.clients[0].id}`;
 
@@ -109,6 +110,8 @@ const ContactListPage = () => {
     // document.title = `Contacts - ${process.env.REACT_APP_SITE_NAME}`;
   }, [filteredContacts]);
 
+ // alert(`filteredContacts length: ${JSON.stringify(filteredContacts.map(c => {return {id:c.id, account_name:c.account_name, name:c.name}}))}`);
+
   return (
     <div className="mt-16 p-6 w-full text-sm flex flex-col items-center font-sans ">
       <h1 className="text-2xl font-bold text-green-800 m-8 self-start">Settings &gt; Contacts</h1>
@@ -158,12 +161,12 @@ const ContactListPage = () => {
 
             {filteredContacts.length > 0 ? (
               <tbody>
-                {filteredContacts.map((contact) => (
-                  <tr
-                    className={`${window.innerWidth < 800 && 'cursor-pointer'} ${contact.status === "archived" && "bg-red-100"}`}
-                    key={contact.id}
-                    onClick={() => window.innerWidth < 800 && handleEdit(contact)}
-                  >
+                {filteredContacts.map((contact,index) => (
+                   <tr
+      key={`${contact.id}-${searchTerm}-${index}`} // Force re-render on search
+      className={`${window.innerWidth < 800 && 'cursor-pointer'} ${contact.status === "archived" && "bg-red-100"}`}
+      onClick={() => window.innerWidth < 800 && handleEdit(contact)}
+    >
                     <td className="text-sm border border-gray-300 p-2 md:table-cell text-start">{contact.name}</td>
                     {user.role == "admin" && <td className="text-sm border border-gray-300 p-2 md:table-cell text-start">{contact.account_name}</td>}
                     <td className="text-sm text-start border border-gray-300 p-2 md:table-cell">{contact.email || ''}</td>

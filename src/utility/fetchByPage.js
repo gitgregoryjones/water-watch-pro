@@ -94,8 +94,8 @@ export default async function fetchByPage(url, page = 1, pageSize = 250) {
             const uniqueRows = [];
             const seenIds = new Set();
             for (const row of rows) {
-                if (!seenIds.has(row.id)) {
-                    seenIds.add(row.id);
+                if (!seenIds.has(row.id+row.account_name)) {
+                    seenIds.add(row.id+row.account_name);
                     uniqueRows.push(row);
                 }
                // uniqueRows.push(row);

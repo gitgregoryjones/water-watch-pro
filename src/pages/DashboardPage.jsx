@@ -50,6 +50,7 @@ import NotificationBanner from '../components/NotificationBanner'
 import Toggle from '../components/Toggle'
 import RainfallTable from '../components/RainfallTable'
 import { ThemeContext } from '../utility/ThemeContext'
+import { trackAnalyticsEvent } from '../utility/analytics'
 
 export default function DashboardPage() {
 
@@ -117,6 +118,15 @@ export default function DashboardPage() {
   //const locations = useSelector((state) => state.locationContacts.locations);
   
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!user) return;
+    const client = user?.clients?.[0];
+    const planType = client?.account_type || (client?.is_trial_account ? 'trial' : 'paid');
+    trackAnalyticsEvent('dashboard_view', {
+      plan_type: planType || 'unknown',
+    });
+  }, [user]);
   
   
 

@@ -6,6 +6,7 @@ import api from "../utility/api";
 import { convertTier } from "../utility/loginUser";
 import RainfallTable from "./RainfallTable";
 import { ThemeContext } from "../utility/ThemeContext";
+import { trackAnalyticsEvent } from "../utility/analytics";
 
 
 
@@ -141,6 +142,16 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   
   
 
+  const describeDateRange = () => {
+    if (period === "daily") {
+      return getBeginEndRange();
+    }
+    if (period === "rapidrain") {
+      return `${max} hours`;
+    }
+    return `${max} days`;
+  };
+
   const fetchChartData = async () => {
     if (!location.id) return;
 
@@ -223,12 +234,16 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
             label: "Rainfall",
             data: values,
             maxBarThickness: 150,
-            
-            
+
+
             backgroundColor: backgroundColors,
 
           },
         ],
+      });
+      trackAnalyticsEvent('rainfall_report_view', {
+        site_id: String(location.id),
+        date_range: describeDateRange(),
       });
     } catch (err) {
       setError(err.message);

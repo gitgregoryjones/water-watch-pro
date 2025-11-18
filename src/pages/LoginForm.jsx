@@ -13,6 +13,7 @@ import api from '../utility/api';
 import {loginUser} from '../utility/loginUser';
 import { ThemeContext } from '../utility/ThemeContext';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
+import { determineUserType, trackAnalyticsEvent } from '../utility/analytics';
 
 export default function LoginForm() {
     const [logView, setLogView] = useState(true);
@@ -190,6 +191,11 @@ export default function LoginForm() {
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));
 
+            trackAnalyticsEvent('login', {
+                method: 'email',
+                user_type: determineUserType(userData),
+            });
+
             console.log("User logged in and verified:", userData);
 
             // Navigate to the dashboard
@@ -358,6 +364,11 @@ export default function LoginForm() {
 
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));
+
+            trackAnalyticsEvent('login', {
+                method: 'email',
+                user_type: determineUserType(userData),
+            });
 
             console.log("User logged in and verified:", userData);
 

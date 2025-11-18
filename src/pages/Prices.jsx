@@ -1,10 +1,11 @@
 // src/pages/Prices.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { updateUser } from '../utility/UserSlice';
 import { convertTier, patchClient } from '../utility/loginUser';
 import { loadStripe } from '@stripe/stripe-js';
+import { trackAnalyticsEvent } from '../utility/analytics';
 
 
 
@@ -22,6 +23,7 @@ export default function Prices({ isSmall = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
+  const upgradeTrackedRef = useRef(false);
 
   // --- Upgrade → create Checkout Session via Netlify function ---
   const handleUpgrade = async (tier) => {
@@ -105,6 +107,14 @@ export default function Prices({ isSmall = false }) {
             clients: [patchResponse.clientData],
           })
         );
+
+        if (!upgradeTrackedRef.current) {
+          trackAnalyticsEvent('upgrade_plan', {
+            previous_plan: user?.clients?.[0]?.tier || 'unknown',
+            new_plan: tier || 'unknown',
+          });
+          upgradeTrackedRef.current = true;
+        }
 
         // Optional UI tweaks you had before:
         try {

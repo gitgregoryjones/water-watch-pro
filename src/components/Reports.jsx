@@ -11,6 +11,7 @@ import fetchByPage from '../utility/fetchByPage';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import { Link } from 'react-router-dom';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
+import { trackAnalyticsEvent } from '../utility/analytics';
 
 
 const Reports = () => {
@@ -37,6 +38,19 @@ const Reports = () => {
   const reportAreaRef = useRef(null);
   const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
   const isTypeFeatureActive = isActive(typeFlag);
+
+  const resolveLocationNames = (ids = []) => {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return user?.is_superuser ? 'all_locations' : 'unspecified';
+    }
+    const normalized = ids
+      .map((id) => parseInt(id, 10))
+      .filter((num) => !Number.isNaN(num));
+    const matches = locations
+      .filter((location) => normalized.includes(location.id))
+      .map((location) => location.name);
+    return matches.length > 0 ? matches.join(', ') : 'unknown';
+  };
 
 
   const currentDate = new Date();
@@ -217,7 +231,10 @@ const Reports = () => {
       }
     }
   
-    if ((displayFormat === 'csv' || displayFormat == 'pdf' || displayFormat == 'excel' || selectedLocations.length > 1) && selectedContacts.length === 0) {
+    const isExportFormat = ['csv', 'pdf', 'excel'].includes(displayFormat);
+    const selectedLocationNames = resolveLocationNames(selectedLocations);
+
+    if ((isExportFormat || selectedLocations.length > 1) && selectedContacts.length === 0) {
       const errorMessage = `
         <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
           <p><strong>Error:</strong> Please select at least one contact when generating a PDF,EXCEL,or CSV report or any report with  multiple locations.</p>
@@ -240,6 +257,11 @@ const Reports = () => {
       if(!confirmed){
         return;
       }
+      trackAnalyticsEvent('past_data_query', {
+        location: selectedLocationNames,
+        start_date: fromDate,
+        end_date: toDate,
+      });
     }
   
     let query = '';
@@ -303,6 +325,13 @@ const Reports = () => {
         `;
         setReportContent(taskIdMessage);
         window.scrollTo({top: 0, behavior: 'smooth'});
+        if (isExportFormat) {
+          trackAnalyticsEvent('export_report', {
+            format: displayFormat,
+            report_type: reportType,
+            locations: selectedLocationNames,
+          });
+        }
       } catch (error) {
         setShowDialog(false)
         console.error('Error submitting report:', error.message);
@@ -355,6 +384,13 @@ const Reports = () => {
         setReportContent(response.data);
       }*/
         setReportContent(`<div style="${requestData.email_list.length > 0 ? '' : 'display:none;'} width:100%; font-weight:bold; background-color:blue; padding:2rem; color:white; background-color:red">Attention: The Report was also sent to ${JSON.stringify(requestData.email_list)}</div>` + response.data);
+        if (isExportFormat) {
+          trackAnalyticsEvent('export_report', {
+            format: displayFormat,
+            report_type: reportType,
+            locations: selectedLocationNames,
+          });
+        }
       } catch (error) {
         setShowDialog(false);
         console.log('Error fetching report:', error.message);

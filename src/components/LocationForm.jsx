@@ -7,6 +7,7 @@ import WorkingDialog from './WorkingDialog';
 import { VITE_FEATURE_HISTORY_REPORT, VITE_PRICES_LINK } from '../utility/constants';
 import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
+import { trackAnalyticsEvent } from '../utility/analytics';
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -122,6 +123,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       } else {
         // Create new location using POST
         response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData);
+        trackAnalyticsEvent('site_added', {
+          site_id: response?.data?.id ? String(response.data.id) : name,
+        });
        // alert('Location created successfully!');
       }
       setResponseData(response.data); // Store response data for display

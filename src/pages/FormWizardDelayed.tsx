@@ -7,6 +7,7 @@ import api from '../utility/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import { loginUser, patchClient } from '../utility/loginUser';
+import { trackAnalyticsEvent } from '../utility/analytics';
 
 import { validatePassword, validateEmail } from '../utility/passwordFunc';
 import Prices from './Prices';
@@ -20,8 +21,16 @@ const NETLIFY_FUNC_BASE = '/.netlify/functions';
 
 
 
+const STEP_NAME_LOOKUP = {
+  1: 'user_details',
+  2: 'plan_selection',
+  3: 'location_details',
+  4: 'finalizing',
+};
+
 const FormWizardDelayed = () => {
   const isNavigating = useRef(false);
+  const wizardStartedRef = useRef(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
@@ -96,6 +105,23 @@ const FormWizardDelayed = () => {
       setFormData(prev => ({ ...prev, subscriptionLevel: accountType }));
     }
   }, [location]);
+
+  useEffect(() => {
+    if (wizardStartedRef.current) return;
+    if (!formData.subscriptionLevel) return;
+    wizardStartedRef.current = true;
+    trackAnalyticsEvent('wizard_start', {
+      plan_type: formData.subscriptionLevel,
+    });
+  }, [formData.subscriptionLevel]);
+
+  useEffect(() => {
+    if (!currentStep) return;
+    trackAnalyticsEvent('wizard_step', {
+      step_number: currentStep,
+      step_name: STEP_NAME_LOOKUP[currentStep] || `step_${currentStep}`,
+    });
+  }, [currentStep]);
 
   // Success return from Stripe: finalize the session and provision
   useEffect(() => {
@@ -382,6 +408,16 @@ const FormWizardDelayed = () => {
       await patchClient(newClient);
       userCopy.clients = [newClient];
       dispatch(updateUser(userCopy));
+
+      const planType = customerMetadata.subscriptionLevel === 'trial' ? 'trial' : 'paid';
+      trackAnalyticsEvent('sign_up', {
+        method: 'email',
+        plan_type: planType,
+        company_name: customerMetadata.companyName || 'unknown',
+      });
+      trackAnalyticsEvent('wizard_complete', {
+        plan_type: planType,
+      });
 
 
       //Get Contacts

@@ -191,10 +191,7 @@ export default function LoginForm() {
             // Dispatch user data to Redux store
             dispatch(updateUser(userData));
 
-            trackAnalyticsEvent('login', {
-                method: 'email',
-                user_type: determineUserType(userData),
-            });
+          
 
             console.log("User logged in and verified:", userData);
 

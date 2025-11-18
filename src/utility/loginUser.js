@@ -1,3 +1,4 @@
+import { determineUserType, trackAnalyticsEvent } from "./analytics";
 import api from "./api";
 import fetchByPage from "./fetchByPage";
 import { updateUser } from "./UserSlice";
@@ -339,6 +340,11 @@ const loginUser = async (email, password, token)=>{
     if (!clients) {
         throw new Error(`Client Account information missing for this user ${userData.firstName} ${userData.lastName}`);
     }
+
+      trackAnalyticsEvent('login', {
+                    method: 'email',
+                    user_type: determineUserType(userData),
+    });
 
     response.userData = userData;
 

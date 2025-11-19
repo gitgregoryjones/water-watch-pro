@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
@@ -8,35 +8,48 @@ import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import {validateEmail} from '../utility/passwordFunc'
+import PropTypes from 'prop-types';
 
-const ContactForm = ({  }) => {
+const ContactForm = ({ contact = null, embedded = false, initialValues = {}, onSaved }) => {
   const { state } = useLocation();
-  const contactToEdit = state?.contact;
-  
+  const stateContact = state?.contact;
+  const user = useSelector((state) => state.userInfo.user);
+  const contactToEdit = contact ?? stateContact ?? null;
 
-  const [name, setName] = useState(contactToEdit?.name || '');
-  const [email, setEmail] = useState(contactToEdit?.email || '');
-  const [phone, setPhone] = useState(contactToEdit?.phone || '');
-
+  const fallbackInitialValues = useMemo(
+    () => ({
+      name: initialValues.name ?? '',
+      email: initialValues.email ?? '',
+      phone: initialValues.phone ?? '',
+      client_id: initialValues.client_id ?? user?.clients?.[0]?.id,
+      account_name: initialValues.account_name ?? user?.clients?.[0]?.account_name,
+    }),
+    [initialValues, user?.clients]
+  );
   
-  const [client_id, setClient_Id] = useState(contactToEdit?.client_id)
-  const [accountName, setAccountName] = useState(contactToEdit?.account_name)
+  const [name, setName] = useState(contactToEdit?.name || fallbackInitialValues.name || '');
+  const [email, setEmail] = useState(contactToEdit?.email || fallbackInitialValues.email || '');
+  const [phone, setPhone] = useState(contactToEdit?.phone || fallbackInitialValues.phone || '');
+
+
+  const [client_id, setClient_Id] = useState(contactToEdit?.client_id || fallbackInitialValues.client_id)
+  const [accountName, setAccountName] = useState(contactToEdit?.account_name || fallbackInitialValues.account_name)
   const [daily_report_on, set] = useState(contactToEdit?.account_name)
   const [role,setRole] = useState("contact");
   const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
-    daily_report_on: contactToEdit ? contactToEdit?.daily_report_on : true,
-    daily_report_on_sms: contactToEdit ? contactToEdit?.daily_report_on_sms  : true,
-    exceed24h_on: contactToEdit ? contactToEdit?.exceed24h_on : true,
-    exceed24h_on_sms: contactToEdit ? contactToEdit?.exceed24h_on_sms  : true,
-      forecast_on: contactToEdit? contactToEdit?.forecast_on   : true,
-      forecast_on_sms: contactToEdit? contactToEdit?.forecast_on_sms  : true,
-      atlas14_24h_on: contactToEdit? contactToEdit?.atlas14_24h_on  : true,
-      atlas14_24h_on_sms: contactToEdit? contactToEdit?.atlas14_24h_on_sms  : true,
+    daily_report_on: contactToEdit ? contactToEdit?.daily_report_on : (initialValues.daily_report_on ?? true),
+    daily_report_on_sms: contactToEdit ? contactToEdit?.daily_report_on_sms  : (initialValues.daily_report_on_sms ?? true),
+    exceed24h_on: contactToEdit ? contactToEdit?.exceed24h_on : (initialValues.exceed24h_on ?? true),
+    exceed24h_on_sms: contactToEdit ? contactToEdit?.exceed24h_on_sms  : (initialValues.exceed24h_on_sms ?? true),
+      forecast_on: contactToEdit? contactToEdit?.forecast_on   : (initialValues.forecast_on ?? true),
+      forecast_on_sms: contactToEdit? contactToEdit?.forecast_on_sms  : (initialValues.forecast_on_sms ?? true),
+      atlas14_24h_on: contactToEdit? contactToEdit?.atlas14_24h_on  : (initialValues.atlas14_24h_on ?? true),
+      atlas14_24h_on_sms: contactToEdit? contactToEdit?.atlas14_24h_on_sms  : (initialValues.atlas14_24h_on_sms ?? true),
 
-      rapidrain_on: contactToEdit? contactToEdit?.rapidrain_on  : true,
-      rapidrain_on_sms: contactToEdit? contactToEdit?.rapidrain_on_sms  : true,
+      rapidrain_on: contactToEdit? contactToEdit?.rapidrain_on  : (initialValues.rapidrain_on ?? true),
+      rapidrain_on_sms: contactToEdit? contactToEdit?.rapidrain_on_sms  : (initialValues.rapidrain_on_sms ?? true),
       //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
@@ -49,7 +62,6 @@ const ContactForm = ({  }) => {
   
 
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(true);
-  const user = useSelector((state) => state.userInfo.user);
 
   //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
   
@@ -136,6 +148,14 @@ const ContactForm = ({  }) => {
   const isEditMode = contactToEdit !== null;
   const navigate = useNavigate();
 
+  const handlePostSubmit = (payload) => {
+    if (typeof onSaved === 'function') {
+      onSaved(payload);
+    } else {
+      navigate('/contact-list');
+    }
+  };
+
   const handleDelete = async () => {
     setMsg(null)
     if (!contactToEdit) {
@@ -148,7 +168,7 @@ const ContactForm = ({  }) => {
         await api.delete(`/api/contacts/${contactToEdit.id}?client_id=${contactToEdit.client_id}`);
         setTimeout(() => {
           setShowDialog(false);
-          navigate('/contact-list');
+          handlePostSubmit(null);
         }, 2000);
         
       } catch (error) {
@@ -259,8 +279,8 @@ const ContactForm = ({  }) => {
       setTimeout(() => {
         setShowDialog(false);
         setMsg(<span className="text-[green]">Contact updated Successfully</span>)
-        navigate('/contact-list');
-        
+        handlePostSubmit(rec.data);
+
       }, 2000);
     } catch (error) {
       console.error('Error saving contact:', error.message);
@@ -320,15 +340,19 @@ const ContactForm = ({  }) => {
       );
     });
   };
+  const containerMargin = embedded ? 'mt-4' : (convertTier(user) >= 4 ? 'mt-24' : 'mt-8');
+
   return (
-    <div className={`relative ${convertTier(user) >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
+    <div className={`relative ${containerMargin} p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
       {/* Close Button */}
-      <button
-        onClick={() => navigate('/contact-list')}
-        className="absolute top-4 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600"
-      >
-        <FaTimes />
-      </button>
+      {!embedded && (
+        <button
+          onClick={() => navigate('/contact-list')}
+          className="absolute top-4 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600"
+        >
+          <FaTimes />
+        </button>
+      )}
 
       <h1 className="text-2xl font-bold mb-4">{contactToEdit ? `Edit` : 'Add Contact'}  </h1>
       <h2 className='mb-2'>{msg}</h2>
@@ -452,3 +476,33 @@ const ContactForm = ({  }) => {
 };
 
 export default ContactForm;
+
+ContactForm.propTypes = {
+  contact: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    name: PropTypes.string,
+    email: PropTypes.string,
+    phone: PropTypes.string,
+    client_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    account_name: PropTypes.string,
+  }),
+  embedded: PropTypes.bool,
+  initialValues: PropTypes.shape({
+    name: PropTypes.string,
+    email: PropTypes.string,
+    phone: PropTypes.string,
+    client_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    account_name: PropTypes.string,
+    daily_report_on: PropTypes.bool,
+    daily_report_on_sms: PropTypes.bool,
+    exceed24h_on: PropTypes.bool,
+    exceed24h_on_sms: PropTypes.bool,
+    forecast_on: PropTypes.bool,
+    forecast_on_sms: PropTypes.bool,
+    atlas14_24h_on: PropTypes.bool,
+    atlas14_24h_on_sms: PropTypes.bool,
+    rapidrain_on: PropTypes.bool,
+    rapidrain_on_sms: PropTypes.bool,
+  }),
+  onSaved: PropTypes.func,
+};

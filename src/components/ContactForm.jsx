@@ -238,10 +238,15 @@ const ContactForm = ({ contact = null, embedded = false, initialValues = {}, onS
 
     try {
       let rec = {};
+
+      if (embedded && !contactToEdit) {
+        throw new Error('Unable to update contact information because your contact record could not be found.');
+      }
+
       if (contactToEdit) {
-       rec = await api.patch(`/api/contacts/${contactToEdit.id}/?client_id=${contactToEdit.client_id}`, payload);
+       rec = await api.patch(`/api/contacts/${contactToEdit.id}`, payload);
       } else {
-         rec = await api.post(`/api/contacts/?client_id=${user.clients[0]?.id}`, payload);
+         rec = await api.post(`/api/contacts/`, payload);
       }
 
       if(role == "co-owner"){
@@ -341,9 +346,10 @@ const ContactForm = ({ contact = null, embedded = false, initialValues = {}, onS
     });
   };
   const containerMargin = embedded ? 'mt-4' : (convertTier(user) >= 4 ? 'mt-24' : 'mt-8');
+  const embeddedWidth = embedded ? 'w-full' : 'w-full max-w-lg mx-auto';
 
   return (
-    <div className={`relative ${containerMargin} p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
+    <div className={`relative ${containerMargin} ${embeddedWidth} p-6 bg-[var(--header-bg)]  shadow-md rounded-lg`}>
       {/* Close Button */}
       {!embedded && (
         <button
@@ -457,9 +463,9 @@ const ContactForm = ({ contact = null, embedded = false, initialValues = {}, onS
             type="submit"
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
           >
-            {isEditMode ? 'Update Contact' : 'Create Contact'}
+            {embedded || isEditMode ? 'Save Contact' : 'Create Contact'}
           </button>
-          {isEditMode && (
+          {isEditMode && !embedded && (
             <button
               type="button"
               onClick={handleDelete}

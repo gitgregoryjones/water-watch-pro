@@ -1,15 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../utility/api';
 import WorkingDialog from './WorkingDialog';
 import Card from './Card';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import ContactForm from './ContactForm';
-import fetchByPage from '../utility/fetchByPage';
+import findUserContact from '../utility/findUserContact';
 
 const UserForm = ({ clientToEdit, myself }) => {
 
   const user = useSelector((state) => state.userInfo.user);
+  const location = useLocation();
+  const seededContact = location?.state?.contact;
 
   const [firstName, setFirstName] = useState(user.first_name || '');
   const [lastName, setLastName] = useState(user.last_name || '');
@@ -20,8 +23,8 @@ const UserForm = ({ clientToEdit, myself }) => {
 
   
   const dispatch = useDispatch();
-  const [contact, setContact] = useState(null);
-  const [contactLoading, setContactLoading] = useState(true);
+  const [contact, setContact] = useState(seededContact ?? null);
+  const [contactLoading, setContactLoading] = useState(!seededContact);
   const [contactError, setContactError] = useState('');
 
   const loadContact = useCallback(async () => {
@@ -34,10 +37,7 @@ const UserForm = ({ clientToEdit, myself }) => {
     try {
       setContactLoading(true);
       setContactError('');
-      const rows = await fetchByPage(`/api/contacts/?client_id=${user.clients[0].id}`);
-      const match =
-        rows.find((row) => row.user_id === user.id) ||
-        rows.find((row) => row.email?.toLowerCase() === user.email?.toLowerCase());
+      const match = await findUserContact(user);
       setContact(match || null);
     } catch (err) {
       console.error('Error loading profile contact', err);
@@ -48,8 +48,14 @@ const UserForm = ({ clientToEdit, myself }) => {
   }, [user]);
 
   useEffect(() => {
+    if (seededContact) {
+      setContact(seededContact);
+      setContactLoading(false);
+      return;
+    }
+
     loadContact();
-  }, [loadContact]);
+  }, [seededContact, loadContact]);
 
   const contactInitialValues = useMemo(
     () => ({

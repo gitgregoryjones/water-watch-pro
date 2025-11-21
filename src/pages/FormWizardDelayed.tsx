@@ -55,26 +55,26 @@ const FormWizardDelayed = () => {
 
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    first_name: '',
-    last_name: '',
-    phone: '',
-    termsAccepted: false,
-    smsAccepted: false,
-    accountType: 'self',
-    companyName: '',
-    companyPhone: '',
-    companyEmail: '',
-    subscriptionLevel: 'paid', // or 'trial'
-    tier: 'gold',
-    locationName: '',
-    latitude: '',
-    longitude: '',
-    threshold: '0.5',
-    rapidrain: '',
-  });
+  email: '',
+  password: '',
+  confirmPassword: '',
+  first_name: '',
+  last_name: '',
+  phone: '',
+  termsAccepted: false,
+  smsAccepted: false,
+  accountType: 'self',
+  companyName: '',
+  companyPhone: '',
+  companyEmail: '',
+  subscriptionLevel: 'paid', // or 'trial'
+  tier: 'gold',
+  locationName: '',
+  latitude: '', // Keep as string for input, convert when submitting
+  longitude: '', // Keep as string for input, convert when submitting
+  threshold: 0.5, // Store as number
+  rapidrain: '', // Keep as string, will use threshold as fallback
+});
 
   // preserve / warn on unload
   useEffect(() => {
@@ -158,6 +158,11 @@ const FormWizardDelayed = () => {
           stripe_session_id: sessionDetails.sessionId,
           tier: cached.tier || sessionDetails?.metadata?.plan_tier,
           subscriptionLevel: cached.subscriptionLevel || sessionDetails?.metadata?.subscription_level,
+          // Ensure numeric fields are numbers
+          latitude: parseFloat(cached.latitude),
+          longitude: parseFloat(cached.longitude),
+          threshold: parseFloat(cached.threshold),
+          rapidrain: parseFloat(cached.rapidrain || cached.threshold),
         };
         console.log(`Provisioning with metadata: ${JSON.stringify(meta).slice(0,200)}`);
         const r = await provisionAccount(meta, meta.email);
@@ -234,10 +239,12 @@ const FormWizardDelayed = () => {
         const lon = Number(formData.longitude);
         const lat = Number(formData.latitude);
         if (lat < 24 || lat > 48) return setErr('Latitude must be between 24 and 48 degrees');
+        
+        // Normalize longitude immediately and use the normalized value for validation
         const fixedLon = lon > 0 ? -lon : lon;
-      
+        
         if (fixedLon < -124.9 || fixedLon > -69.21) return setErr('Longitude must be between -124.9 and -69.21 degrees');
-        setFormData(prev => ({ ...prev, longitude: fixedLon }));
+        
         if (![0.01,0.1,0.25,0.5,0.75,1.0,1.5,2,3,4].includes(parseFloat(formData.threshold)))
           return setErr('24 hour Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4');
 
@@ -245,8 +252,13 @@ const FormWizardDelayed = () => {
         if (![0.01,0.1,0.25,0.5,0.75,1.0,1.5,2,3,4].includes(parseFloat(rr)))
           return setErr('Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4');
 
-        // persist normalized lon + rr into state
-        setFormData(prev => ({ ...prev, longitude: fixedLon, rapidrain: rr }));
+        // Update state with normalized values - this ensures consistency
+        setFormData(prev => ({ 
+          ...prev, 
+          longitude: fixedLon, 
+          rapidrain: rr 
+        }));
+        
         return true;
       }
       default:
@@ -266,22 +278,22 @@ const FormWizardDelayed = () => {
   }
 
   // Cache fields we must NOT send to Stripe
-  sessionStorage.setItem('signup.cache', JSON.stringify({
-    email: formData.email,
-    password: formData.password,
-    first_name: formData.first_name,
-    last_name: formData.last_name,
-    phone: formData.phone,
-    smsAccepted: formData.smsAccepted,
-    termsAccepted: formData.termsAccepted,
-    subscriptionLevel: formData.subscriptionLevel,
-    tier: formData.tier,
-    locationName: formData.locationName,
-    latitude: formData.latitude,
-    longitude: formData.longitude,
-    threshold: formData.threshold,
-    rapidrain: formData.rapidrain,
-  }));
+sessionStorage.setItem('signup.cache', JSON.stringify({
+  email: formData.email,
+  password: formData.password,
+  first_name: formData.first_name,
+  last_name: formData.last_name,
+  phone: formData.phone,
+  smsAccepted: formData.smsAccepted,
+  termsAccepted: formData.termsAccepted,
+  subscriptionLevel: formData.subscriptionLevel,
+  tier: formData.tier,
+  locationName: formData.locationName,
+  latitude: parseFloat(formData.latitude), // Store as number
+  longitude: parseFloat(formData.longitude), // Store as number
+  threshold: parseFloat(formData.threshold), // Store as number
+  rapidrain: parseFloat(formData.rapidrain || formData.threshold), // Store as number
+}));
 
   // 👇 tokenless: just send email + plan
   const res = await fetch(`${NETLIFY_FUNC_BASE}/create-checkout-session`, {
@@ -473,21 +485,24 @@ const FormWizardDelayed = () => {
   };
 
   const addLocation = async (obj) => {
-    try {
-      const locationResponse = await api.post(`/api/locations`, {
-        name: obj.locationName,
-        latitude: obj.latitude,
-        longitude: obj.longitude > -1 ? -obj.longitude/-1 : obj.longitude, // normalize to WGS84
-        status: "active",
-        h24_threshold: obj.threshold,
-        rapidrain_threshold: obj.rapidrain,
-      });
-      return locationResponse;
-    } catch (e: any) {
-      setErrors(e.message);
-      return null;
-    }
-  };
+  try {
+    // Ensure longitude is negative (West) - consistent normalization
+    const normalizedLongitude = obj.longitude > 0 ? -obj.longitude : obj.longitude;
+    
+    const locationResponse = await api.post(`/api/locations`, {
+      name: obj.locationName,
+      latitude: parseFloat(obj.latitude), // Convert to number
+      longitude: parseFloat(normalizedLongitude), // Convert to number
+      status: "active",
+      h24_threshold: parseFloat(obj.threshold), // Convert to number
+      rapidrain_threshold: parseFloat(obj.rapidrain), // Convert to number
+    });
+    return locationResponse;
+  } catch (e: any) {
+    setErrors(e.message);
+    return null;
+  }
+};
 
   return (
     <div className="w-full mt-8 md:mt-0 md:max-w-[60%] mx-auto bg-gradient-to-br from-white to-[green] shadow-md md:rounded-xl relative">

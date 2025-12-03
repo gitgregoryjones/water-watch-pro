@@ -99,7 +99,7 @@ const UserForm = ({ clientToEdit, myself }) => {
 
         dispatch(updateUser(updatedUser.data));
 
-        if (user.role === 'contact' && clientId && contactId) {
+        if (clientId && contactId) {
           await api.patch(`/api/contacts/${contactId}/?client_id=${clientId}`, {
             name: `${firstName} ${lastName}`.trim(),
             phone,
@@ -201,109 +201,107 @@ const UserForm = ({ clientToEdit, myself }) => {
                 </div>
               </div>
 
-              {user.role === 'contact' && (
-                <div className="flex flex-col shadow rounded border p-4 gap-4">
-                  <h2 className="text-xl font-bold">Notification Settings</h2>
+              <div className="flex flex-col shadow rounded border p-4 gap-4">
+                <h2 className="text-xl font-bold">Notification Settings</h2>
 
-                  <div className="grid grid-cols-2 gap-4 border-t pt-4">
-                    <div>
-                      <span className="font-bold">Daily Report</span>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Email</span>
-                        <Toggle
-                          checked={contactSettings.daily_report_on}
-                          onChange={() => handleNotificationToggle('daily_report_on')}
-                        />
-                      </div>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Text</span>
-                        <Toggle
-                          checked={contactSettings.daily_report_on_sms}
-                          onChange={() => handleNotificationToggle('daily_report_on_sms')}
-                        />
-                      </div>
+                <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                  <div>
+                    <span className="font-bold">Daily Report</span>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Email</span>
+                      <Toggle
+                        checked={contactSettings.daily_report_on}
+                        onChange={() => handleNotificationToggle('daily_report_on')}
+                      />
                     </div>
-
-                    <div>
-                      <span className="font-bold">24 Hour Threshold</span>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Email</span>
-                        <Toggle
-                          checked={contactSettings.exceed24h_on}
-                          onChange={() => handleNotificationToggle('exceed24h_on')}
-                        />
-                      </div>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Text</span>
-                        <Toggle
-                          checked={contactSettings.exceed24h_on_sms}
-                          onChange={() => handleNotificationToggle('exceed24h_on_sms')}
-                        />
-                      </div>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Text</span>
+                      <Toggle
+                        checked={contactSettings.daily_report_on_sms}
+                        onChange={() => handleNotificationToggle('daily_report_on_sms')}
+                      />
                     </div>
+                  </div>
 
-                    <div className={`${convertTier(user) < 3 ? 'opacity-40' : ''}`}>
-                      <span className="font-bold">Forecast</span>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Email</span>
-                        <Toggle
-                          checked={contactSettings.forecast_on && convertTier(user) > 2}
-                          onChange={() => handleNotificationToggle('forecast_on')}
-                          tier={convertTier(user) > 2}
-                        />
-                      </div>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Text</span>
-                        <Toggle
-                          checked={contactSettings.forecast_on_sms && convertTier(user) > 2}
-                          onChange={() => handleNotificationToggle('forecast_on_sms')}
-                          tier={convertTier(user) > 2}
-                        />
-                      </div>
+                  <div>
+                    <span className="font-bold">24 Hour Threshold</span>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Email</span>
+                      <Toggle
+                        checked={contactSettings.exceed24h_on}
+                        onChange={() => handleNotificationToggle('exceed24h_on')}
+                      />
                     </div>
-
-                    <div className={`${convertTier(user) < 2 ? 'opacity-40' : ''}`}>
-                      <span className="font-bold">NOAA Atlas 14</span>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Email</span>
-                        <Toggle
-                          checked={contactSettings.atlas14_24h_on && convertTier(user) > 1}
-                          onChange={() => handleNotificationToggle('atlas14_24h_on')}
-                          tier={convertTier(user) > 1}
-                        />
-                      </div>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Text</span>
-                        <Toggle
-                          checked={contactSettings.atlas14_24h_on_sms && convertTier(user) > 1}
-                          onChange={() => handleNotificationToggle('atlas14_24h_on_sms')}
-                          tier={convertTier(user) > 1}
-                        />
-                      </div>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Text</span>
+                      <Toggle
+                        checked={contactSettings.exceed24h_on_sms}
+                        onChange={() => handleNotificationToggle('exceed24h_on_sms')}
+                      />
                     </div>
+                  </div>
 
-                    <div className={`${convertTier(user) < 3 ? 'opacity-40' : ''}`}>
-                      <span className="font-bold">RapidRain</span>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Email</span>
-                        <Toggle
-                          checked={contactSettings.rapidrain_on && convertTier(user) > 2}
-                          onChange={() => handleNotificationToggle('rapidrain_on')}
-                          tier={convertTier(user) > 2}
-                        />
-                      </div>
-                      <div className="flex items-center mt-2 gap-2">
-                        <span>Text</span>
-                        <Toggle
-                          checked={contactSettings.rapidrain_on_sms && convertTier(user) > 2}
-                          onChange={() => handleNotificationToggle('rapidrain_on_sms')}
-                          tier={convertTier(user) > 2}
-                        />
-                      </div>
+                  <div className={`${convertTier(user) < 3 ? 'opacity-40' : ''}`}>
+                    <span className="font-bold">Forecast</span>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Email</span>
+                      <Toggle
+                        checked={contactSettings.forecast_on && convertTier(user) > 2}
+                        onChange={() => handleNotificationToggle('forecast_on')}
+                        tier={convertTier(user) > 2}
+                      />
+                    </div>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Text</span>
+                      <Toggle
+                        checked={contactSettings.forecast_on_sms && convertTier(user) > 2}
+                        onChange={() => handleNotificationToggle('forecast_on_sms')}
+                        tier={convertTier(user) > 2}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={`${convertTier(user) < 2 ? 'opacity-40' : ''}`}>
+                    <span className="font-bold">NOAA Atlas 14</span>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Email</span>
+                      <Toggle
+                        checked={contactSettings.atlas14_24h_on && convertTier(user) > 1}
+                        onChange={() => handleNotificationToggle('atlas14_24h_on')}
+                        tier={convertTier(user) > 1}
+                      />
+                    </div>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Text</span>
+                      <Toggle
+                        checked={contactSettings.atlas14_24h_on_sms && convertTier(user) > 1}
+                        onChange={() => handleNotificationToggle('atlas14_24h_on_sms')}
+                        tier={convertTier(user) > 1}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={`${convertTier(user) < 3 ? 'opacity-40' : ''}`}>
+                    <span className="font-bold">RapidRain</span>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Email</span>
+                      <Toggle
+                        checked={contactSettings.rapidrain_on && convertTier(user) > 2}
+                        onChange={() => handleNotificationToggle('rapidrain_on')}
+                        tier={convertTier(user) > 2}
+                      />
+                    </div>
+                    <div className="flex items-center mt-2 gap-2">
+                      <span>Text</span>
+                      <Toggle
+                        checked={contactSettings.rapidrain_on_sms && convertTier(user) > 2}
+                        onChange={() => handleNotificationToggle('rapidrain_on_sms')}
+                        tier={convertTier(user) > 2}
+                      />
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Form Actions */}
               <div className="flex justify-between">

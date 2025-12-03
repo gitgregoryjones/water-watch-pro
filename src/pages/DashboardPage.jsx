@@ -62,6 +62,7 @@ export default function DashboardPage() {
 
   const locations = user.locations;
   
+  const [period, setPeriod] = useState("hourly");
 
   var [show, setShow] = useState(false);
 
@@ -704,17 +705,34 @@ function showThreshold(color){
               
             <RainfallChart location={location} period={"daily"} max={3} tableOnly={tableOnly}/>
             </div>
-            <div className='tab'>1 Hour 
+            <div className='tab'  onTabChange={()=>{ setPeriod("Hourly")}}>1 Hour 
             <RainfallChart location={location} period={"hourly"} max={2}  tableOnly={tableOnly}/>
             </div>
-            <div className='tab'>RapidRain
-           <Upgrade tier={2}><RainfallChart location={location} period={"rapidrain"} max={12} /></Upgrade>
+            <div className='tab' onTabChange={()=>{ setPeriod("RapidRain")}}>RapidRain
+           <Upgrade tier={2}><RainfallChart  location={location} period={"rapidrain"} max={12} tableOnly={tableOnly} /></Upgrade>
             </div>
             <div className='tab text-xs'>NOAA Atlas 14
             <Upgrade tier={2}><ResponsiveTable  location={location} /></Upgrade>
             </div>
             </PillTabs>}
-            {tableOnly && VITE_FEATURE_TABLE_VIEW == "true" && <RainfallTable location={location} />}
+            {tableOnly && VITE_FEATURE_TABLE_VIEW == "true" && 
+            <>
+            <PillTabs defaultActive={0} mini={false} header={window.outerWidth < 600 && <div className='flex gap-2 items-center '><i className="text-lg text-[--main-1] fa-solid droplet"></i>Rainfall {location.name}</div>} className={`pb-8 md:border-0 md:shadow-[unset] ${convertTier(user) == 4 && 'hidden'}`}>
+            
+            <div className='tab'  onTabChange={()=>{ setPeriod("Hourly")}}>1 Hour 
+            <RainfallTable location={location}  period={"Hourly"} tableOnly={tableOnly} />
+            </div>
+            <div className='tab' onTabChange={()=>{ setPeriod("RapidRain")}}>RapidRain
+           <Upgrade tier={2}>
+            <RainfallTable location={location}  period={"RapidRain"} tableOnly={tableOnly} /></Upgrade>
+            </div>
+            <div className='tab text-xs'>NOAA Atlas 14
+            <Upgrade tier={2}><ResponsiveTable  location={location} /></Upgrade>
+            </div>
+            </PillTabs>
+           
+            </>
+            }
         </div>
         </Card>
   

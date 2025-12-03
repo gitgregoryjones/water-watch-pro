@@ -5,7 +5,7 @@ import React, {
   } from "react";
   import LittleMenu from "./LittleMenu";
   
-  export default function PillTabs({ children, className, mini, header, defaultActive = 0 }) {
+  export default function PillTabs({ children, className, mini, header, defaultActive = 0,  }) {
     const [active, setActive] = useState(defaultActive);
     const [menuActions, setMenuActions] = useState([]);
     const [littleText, setLittleText] = useState("");
@@ -63,7 +63,7 @@ import React, {
               Children.toArray(children).map((child, index) => (
                 <div
                   key={index}
-                  onClick={() => setActive(index)}
+                  onClick={() => {setActive(index); child.props.onTabChange && child.props.onTabChange()}}
                   className={`justify-start text-sm md:text-lg transition-all duration-300 ease-in-out justify-center text-[white] bg-[#197285] flex w-full flex-1 p-2 zhover:bg-lime-800/100 ease-in-out cursor-pointer ${
                     active === index ? "activeTab" : "inactiveTab"
                   } ${addUserSuppliedClasses(className, "tab")} ${

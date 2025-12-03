@@ -147,14 +147,14 @@ function App() {
       
     {!isLoginPage && <Menu   onStateChange={ isMenuOpen } width={'100vw'} isOpen={open}>
 
-   {VITE_FEATURE_MULTIPLE_CLIENTS != "false" &&
+   
    <div className="flex flex-row gap-2 ">
     <div className="px-2">
       <Link title={`Edit ${user.first_name}`}  onClick={()=>setOpen(false)}  to="/profile"><ProfilePic mobile={true} mini={true}  /></Link>
     </div>
    
       
-    </div>}
+    </div>
 
     
     {isActive('dark-mode') && (

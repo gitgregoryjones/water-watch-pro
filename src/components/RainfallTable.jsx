@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import {VITE_FEATURE_TABLE_COLORS} from '../utility/constants'
 
 
-const RainfallTable = ({ location, max = 2 }) => {
+const RainfallTable = ({ location, max = 2 , period = 'hourly'}) => {
 
   const user = useSelector((state) => state.userInfo.user);
 
@@ -23,7 +23,16 @@ const RainfallTable = ({ location, max = 2 }) => {
 
   const [data, setData] = useState(null);
 
-  const  endpoint = `/api/locations/${location.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
+  let endpoint = "";
+
+  //alert(`period is ${period}`)
+
+  if (period === "RapidRain") {
+      endpoint = `/api/locations/${location?.id}/15m_data?hours=${12}&${user.clients?.length > 1 ? `client_id=${user.clients[0].id}`:`` }`;
+    } else {
+
+      endpoint = `/api/locations/${location?.id}/hourly_data?days=${max}&date=${tomorrowDate}`;
+  }
 
   function subtractOneHour(dateStr) {
     const date = new Date(dateStr.replace(' ', 'T') + ":00"); // Ensure correct ISO format
@@ -86,6 +95,7 @@ const RainfallTable = ({ location, max = 2 }) => {
   return (
     <>
     <div className="h-[400px] overflow-y-scroll  border-gray-300 rounded shadow-md">
+      <div className='py-4'>Viewing {period} data</div>
     <table className="min-w-full table-fixed">
         <thead className="bg-[#007D8C] sticky top-0 z-10">
           <tr>

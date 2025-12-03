@@ -246,6 +246,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
         date_range: describeDateRange(),
       });
     } catch (err) {
+      alert(`Error fetching rainfall data: ${err.message}`);
       setError(err.message);
     }
   };
@@ -303,7 +304,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   useEffect(() => {
     fetchChartData();
-  }, [ location.id,period]);
+  }, [ location.id,period], tableOnly);
 
   useEffect(() => {
     if (chartData) {
@@ -459,14 +460,14 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   };
   
   
-  
+  //alert(`tableOnly is ${tableOnly} and period is ${period}`)
   
 
   return (
     <div className="flex flex-col items-center justify-center w-full">
       
-    {tableOnly && period === "hourly" &&
-   <RainfallTable data={rawData}/>
+    {(tableOnly && period === "hourly" ||  tableOnly && period === "rapidrain") &&
+   <RainfallTable data={location} period={period}/>
     
     
     

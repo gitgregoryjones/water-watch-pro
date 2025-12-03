@@ -7,6 +7,7 @@ import api from '../utility/api';
 import { convertTier } from '../utility/loginUser';
 import Upgrade from "./Upgrade";
 import { updateUser } from "../utility/UserSlice";
+import findUserContact from "../utility/findUserContact";
 
 const ProfileMenu = ({ closeMenu, embed=true }) => {
   let user = useSelector(state => state.userInfo.user)
@@ -14,6 +15,7 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
   const [selectedClient, setSelectedClient] = useState(user.clients[0]); // Default client
   const [showDialog,setShowDialog] = useState(false)
   const navigate = useNavigate();
+  const [profileContact, setProfileContact] = useState(null);
 
   const handleClientChange = async (client,user) => {
     //setShowDialog(true)
@@ -77,7 +79,35 @@ const formatPhoneNumber = (phone) => {
 
 
   }
-  
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchContact = async () => {
+      if (!user?.clients?.length) {
+        if (isMounted) {
+          setProfileContact(null);
+        }
+        return;
+      }
+
+      try {
+        const contact = await findUserContact(user);
+        if (isMounted) {
+          setProfileContact(contact ?? null);
+        }
+      } catch (err) {
+        console.error('Unable to load contact for profile menu', err);
+      }
+    };
+
+    fetchContact();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
   return (
     <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-md border border-gray-300 z-50">
        <p className="px-2 pt-4 text-xs text-gray-500 uppercase">user details </p>
@@ -88,7 +118,15 @@ const formatPhoneNumber = (phone) => {
         <p className="text-gray-600">{formatPhoneNumber(user.phone)}</p>
         <p className="text-gray-600 hidden capitalize"><span className=" bg-white border-black border-2 rounded-2xl px-1 py-1 text-xs">{user.role}</span></p>
         <p>Role: {user.co_owner == true ? "Co-owner" : user.role}</p>
-       <p><a href="/profile">Edit</a></p>
+       <p>
+        <Link
+          to="/profile"
+          onClick={() => closeMenu()}
+          state={profileContact ? { contact: profileContact } : undefined}
+        >
+          Edit
+        </Link>
+       </p>
       </div>
 
       {/* View Profile Link */}

@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaTimes } from 'react-icons/fa';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import api from '../utility/api';
 import WorkingDialog from './WorkingDialog';
 import Card from './Card';
-import SettingsMenu from './SettingsMenu';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
+import ContactForm from './ContactForm';
+import findUserContact from '../utility/findUserContact';
 
 const UserForm = ({ clientToEdit, myself }) => {
 
   const user = useSelector((state) => state.userInfo.user);
+  const location = useLocation();
+  const seededContact = location?.state?.contact;
 
   const [firstName, setFirstName] = useState(user.first_name || '');
   const [lastName, setLastName] = useState(user.last_name || '');
@@ -21,7 +23,50 @@ const UserForm = ({ clientToEdit, myself }) => {
 
   
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [contact, setContact] = useState(seededContact ?? null);
+  const [contactLoading, setContactLoading] = useState(!seededContact);
+  const [contactError, setContactError] = useState('');
+
+  const loadContact = useCallback(async () => {
+    if (!user?.clients?.length) {
+      setContact(null);
+      setContactLoading(false);
+      return;
+    }
+
+    try {
+      setContactLoading(true);
+      setContactError('');
+      const match = await findUserContact(user);
+      setContact(match || null);
+    } catch (err) {
+      console.error('Error loading profile contact', err);
+      setContactError('Unable to load your contact information. Please refresh and try again.');
+    } finally {
+      setContactLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (seededContact) {
+      setContact(seededContact);
+      setContactLoading(false);
+      return;
+    }
+
+    loadContact();
+  }, [seededContact, loadContact]);
+
+  const contactInitialValues = useMemo(
+    () => ({
+      name: `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim(),
+      email: user?.email ?? '',
+      phone: user?.phone ?? '',
+      client_id: user?.clients?.[0]?.id,
+      account_name: user?.clients?.[0]?.account_name,
+    }),
+    [user]
+  );
   
 
   const handleSubmit = async (e) => {
@@ -149,6 +194,34 @@ const UserForm = ({ clientToEdit, myself }) => {
             </form>
             <WorkingDialog showDialog={showDialog} />
           </div>
+        </div>
+
+        <div className="mt-10">
+          <h2 className="text-xl font-semibold text-gray-800">Notification &amp; Contact Preferences</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Adjust the alerts and contact details tied to your profile so your notifications stay accurate.
+          </p>
+
+          {contactError && (
+            <div className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+              {contactError}
+            </div>
+          )}
+
+          {contactLoading ? (
+            <div className="py-6 text-center text-gray-600">Loading contact preferences...</div>
+          ) : contact ? (
+            <ContactForm
+              contact={contact}
+              embedded
+              initialValues={contactInitialValues}
+              onSaved={loadContact}
+            />
+          ) : (
+            <div className="rounded border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+              We couldn't find a contact record associated with your account. Please reach out to your administrator for assistance.
+            </div>
+          )}
         </div>
       </Card>
     </div>

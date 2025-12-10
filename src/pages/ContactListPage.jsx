@@ -149,6 +149,7 @@ const ContactListPage = () => {
           <table className="table-auto block md:w-full min-h-[300px] h-[300px] overflow-auto border border-gray-300">
             <thead>
               <tr className="bg-gray-100 sticky top-0 ">
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[50px]">ID</th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">Contact</th>
                 {user.role == "admin" && <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">Account Name</th>}
                 <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">Email</th>
@@ -166,7 +167,7 @@ const ContactListPage = () => {
       key={`${contact.id}-${searchTerm}-${index}`} // Force re-render on search
       className={`${window.innerWidth < 800 && 'cursor-pointer'} ${contact.status === "archived" && "bg-red-100"}`}
       onClick={() => window.innerWidth < 800 && handleEdit(contact)}
-    >
+    >               <td className="text-sm border border-gray-300 p-2 text-center">{contact.id}</td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell text-start">{contact.name}</td>
                     {user.role == "admin" && <td className="text-sm border border-gray-300 p-2 md:table-cell text-start">{contact.account_name}</td>}
                     <td className="text-sm text-start border border-gray-300 p-2 md:table-cell">{contact.email || ''}</td>

@@ -132,9 +132,17 @@ const UserForm = ({ clientToEdit, myself }) => {
       >
         <div className=" w-full md:w-full mx-auto  rounded-lg">
           <div className="relative mt-0 w-full mx-auto rounded-lg">
-            
+            <button
+                    onClick={() => navigate('/dashboard')}
+                    className="absolute top-0 right-4 bg-red-400 text-white rounded-full p-2 shadow-lg hover:bg-red-600"
+                  >
+                    <FaTimes />
+                  </button>
 
-            <h1 className="text-2xl font-bold mb-4">Edit User {firstName}</h1>
+          <div className=''>
+            <h1 className="text-2xl font-bold mb-4 px-6">Edit User {firstName}</h1>
+            
+          </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div id="msg">{msg}</div>

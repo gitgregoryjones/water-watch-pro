@@ -42,7 +42,7 @@ const ProfileMenu = ({ closeMenu, embed=true }) => {
 
 
 const formatPhoneNumber = (phone) => {
-  if (!phone) return "N/A"; // Return 'N/A' if phone number is missing
+  if (!phone) return ""; // Return 'N/A' if phone number is missing
 
   // Remove all non-digit characters
   const cleaned = phone.replace(/\D/g, "");

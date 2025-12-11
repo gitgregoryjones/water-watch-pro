@@ -121,7 +121,7 @@ const UserForm = ({ clientToEdit, myself }) => {
   };
 
   return (
-    <div className="h-full w-full flex flex-col items-center  mt-18 text-gray-900">
+    <div className=" h-full w-full flex flex-col items-center  mt-18 text-gray-900">
       <h1 className="text-2xl font-bold text-green-800 dark:text-green-200 m-8 self-start">
         User Profile &gt;{firstName} {lastName}
       </h1>
@@ -150,7 +150,7 @@ const UserForm = ({ clientToEdit, myself }) => {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="border border-gray-300 rounded p-2 w-full"
+                    className="border border-gray-300  rounded p-2 w-full"
                     required
                   />
                 </div>
@@ -181,7 +181,7 @@ const UserForm = ({ clientToEdit, myself }) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border border-gray-300 rounded p-2 w-full"
+                    className="border border-gray-300  rounded p-2 w-full"
                     required
                   />
                 </div>
@@ -196,7 +196,7 @@ const UserForm = ({ clientToEdit, myself }) => {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="border border-gray-300 rounded p-2 w-full"
+                    className="border border-gray-300  rounded p-2 w-full"
                     required
                   />
                 </div>
@@ -205,7 +205,7 @@ const UserForm = ({ clientToEdit, myself }) => {
               <div className="flex flex-col shadow rounded  p-4 gap-4">
                 <h2 className="text-xl font-bold">Notification Settings</h2>
 
-                <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 dark:border-slate-700">
                   <div>
                     <span className="font-bold">Daily Report</span>
                     <div className="flex items-center mt-2 gap-2">

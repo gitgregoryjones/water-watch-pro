@@ -261,7 +261,7 @@ const AssignmentsPage = () => {
             onClick={handleAssign}
             className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 w-full"
           >
-            <span className='text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black]'>3</span>  Click To Assign >>
+            <span className='text-sm text-[white] font-bold px-3 py-2 rounded-2xl bg-[black]'>3</span>  Click To Assign &gt;&gt;
           </button>
         </div>
 

@@ -321,7 +321,7 @@ const ContactForm = ({  }) => {
     });
   };
   return (
-    <div className={`relative ${convertTier(user) >= 4 ? "mt-24" : "mt-8"} p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
+    <div className={`relative mt-8 p-6 w-full max-w-lg mx-auto  bg-[var(--header-bg)]  shadow-md rounded-lg`}>
       {/* Close Button */}
       <button
         onClick={() => navigate('/contact-list')}

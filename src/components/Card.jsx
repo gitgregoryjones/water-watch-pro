@@ -2,8 +2,8 @@ import React from 'react'
 
 export default function Card({children, header, footer, className, onClick, bodyClassName}) {
   return (
-    <div  onClick={()=> onClick && onClick()} className={` bg-[white] border rounded-xl md:rounded-2xl mx-4 flex flex-col min-w-[30%] md:min-h-[20%] md:p-4 ${className}`}>
-       { header? <h1 className="card-header text-sm font-bold text-left w-full  p-2 text-3xl text-[--text-color]">{header}</h1> :<></>}
+    <div  onClick={()=> onClick && onClick()} className={` bg-[white] border rounded-xl md:rounded-2xl mx-4 flex flex-col min-w-[30%] md:min-h-[20%] md:p-4 dark:bg-slate-900 dark:border-slate-800 dark:text-gray-100 ${className}`}>
+       { header? <h1 className="card-header text-sm font-bold text-left w-full  p-2 text-3xl text-[--text-color] dark:text-white">{header}</h1>:<></>}
             <div className={` flex w-full flex-row h-full justify-center items-center ${bodyClassName}`}>{children}</div>
         {footer && <div className="card-footer flex justify-around items-center ">{footer}</div>}
     </div>

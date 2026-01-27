@@ -87,6 +87,13 @@ const ContactListPage = () => {
     return sortConfig.direction === "asc" ? "▲" : "▼";
   };
 
+  const sortButtonClass = (key) =>
+    `w-full rounded px-2 py-1 text-sm font-semibold shadow-sm transition ${
+      sortConfig.key === key
+        ? "bg-green-200 text-green-900"
+        : "bg-white/80 text-gray-800 hover:bg-white"
+    }`;
+
   const sortedContacts = useMemo(() => {
     const { key, direction } = sortConfig;
     if (!key) return filteredContacts;
@@ -193,7 +200,7 @@ const ContactListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("id")}
-                    className="w-full"
+                    className={sortButtonClass("id")}
                   >
                     ID {sortIndicator("id")}
                   </button>
@@ -202,7 +209,7 @@ const ContactListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("name")}
-                    className="w-full"
+                    className={sortButtonClass("name")}
                   >
                     Contact {sortIndicator("name")}
                   </button>
@@ -212,7 +219,7 @@ const ContactListPage = () => {
                     <button
                       type="button"
                       onClick={() => handleSort("account_name")}
-                      className="w-full"
+                      className={sortButtonClass("account_name")}
                     >
                       Account Name {sortIndicator("account_name")}
                     </button>
@@ -222,7 +229,7 @@ const ContactListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("email")}
-                    className="w-full"
+                    className={sortButtonClass("email")}
                   >
                     Email {sortIndicator("email")}
                   </button>
@@ -231,7 +238,7 @@ const ContactListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("phone")}
-                    className="w-full"
+                    className={sortButtonClass("phone")}
                   >
                     Phone {sortIndicator("phone")}
                   </button>

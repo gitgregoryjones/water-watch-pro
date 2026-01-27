@@ -161,6 +161,13 @@ const ClientListPage = () => {
     if (sortConfig.key !== key) return "";
     return sortConfig.direction === "asc" ? "▲" : "▼";
   };
+
+  const sortButtonClass = (key) =>
+    `w-full rounded px-2 py-1 text-sm font-semibold shadow-sm transition ${
+      sortConfig.key === key
+        ? "bg-green-200 text-green-900"
+        : "bg-white/80 text-gray-800 hover:bg-white"
+    }`;
   
   
   const handleDelete = async (clientId) => {
@@ -276,7 +283,7 @@ const ClientListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("account_name")}
-                    className="w-full"
+                    className={sortButtonClass("account_name")}
                   >
                     Account Name {sortIndicator("account_name")}
                   </button>
@@ -285,7 +292,7 @@ const ClientListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("account_type")}
-                    className="w-full"
+                    className={sortButtonClass("account_type")}
                   >
                     Status {sortIndicator("account_type")}
                   </button>
@@ -294,7 +301,7 @@ const ClientListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("locations_count")}
-                    className="w-full"
+                    className={sortButtonClass("locations_count")}
                   >
                     Locations {sortIndicator("locations_count")}
                   </button>
@@ -303,7 +310,7 @@ const ClientListPage = () => {
                   <button
                     type="button"
                     onClick={() => handleSort("tier")}
-                    className="w-full"
+                    className={sortButtonClass("tier")}
                   >
                     Account Type {sortIndicator("tier")}
                   </button>

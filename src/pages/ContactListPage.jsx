@@ -23,6 +23,7 @@ const ContactListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showDialog, setShowDialog] = useState(false);
   const [pageSize, setPageSize] = useState(250);
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.userInfo.user);
@@ -71,6 +72,45 @@ const ContactListPage = () => {
   const filterContacts = (e) => {
     setSearchTerm(e.target.value);
   };
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+  };
+
+  const sortIndicator = (key) => {
+    if (sortConfig.key !== key) return "";
+    return sortConfig.direction === "asc" ? "▲" : "▼";
+  };
+
+  const sortedContacts = useMemo(() => {
+    const { key, direction } = sortConfig;
+    if (!key) return filteredContacts;
+
+    return [...filteredContacts].sort((a, b) => {
+      const aValue = a?.[key];
+      const bValue = b?.[key];
+
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return direction === "asc" ? 1 : -1;
+      if (bValue == null) return direction === "asc" ? -1 : 1;
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return direction === "asc" ? aValue - bValue : bValue - aValue;
+      }
+
+      const aString = String(aValue).toLowerCase();
+      const bString = String(bValue).toLowerCase();
+
+      if (aString < bString) return direction === "asc" ? -1 : 1;
+      if (aString > bString) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filteredContacts, sortConfig]);
 
   const handleDelete = async (theContact) => {
     if (window.confirm(`Are you sure you want to ${theContact.status === "archived" ? "restore" : "delete"} this contact?`)) {
@@ -123,7 +163,7 @@ const ContactListPage = () => {
         <div className="mt-2 p-6 w-full md:w-full mx-auto border shadow-md rounded-lg">
           <div className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}>
             <i className='text-yellow-500 fa fa-person'></i>
-            {filteredContacts.length} contacts are viewable. Scroll down see more
+            {sortedContacts.length} contacts are viewable. Scroll down see more
           </div>
 
           <div className="flex justify-around items-end md:items-center gap-4 mb-6">
@@ -149,20 +189,62 @@ const ContactListPage = () => {
           <table className="table-auto block md:w-full min-h-[300px] h-[300px] overflow-auto border border-gray-300">
             <thead>
               <tr className="bg-gray-100 sticky top-0 ">
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[50px]">ID</th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">Contact</th>
-                {user.role == "admin" && <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">Account Name</th>}
-                <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">Email</th>
-                <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full md:min-w-[300px]">Phone</th>
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[50px]">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("id")}
+                    className="w-full"
+                  >
+                    ID {sortIndicator("id")}
+                  </button>
+                </th>
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("name")}
+                    className="w-full"
+                  >
+                    Contact {sortIndicator("name")}
+                  </button>
+                </th>
+                {user.role == "admin" && (
+                  <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">
+                    <button
+                      type="button"
+                      onClick={() => handleSort("account_name")}
+                      className="w-full"
+                    >
+                      Account Name {sortIndicator("account_name")}
+                    </button>
+                  </th>
+                )}
+                <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("email")}
+                    className="w-full"
+                  >
+                    Email {sortIndicator("email")}
+                  </button>
+                </th>
+                <th className="text-sm text-center border border-gray-300 p-2 text-left sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("phone")}
+                    className="w-full"
+                  >
+                    Phone {sortIndicator("phone")}
+                  </button>
+                </th>
                 <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap sticky hidden top-0">Text Alert</th>
                 <th className="hidden text-sm border border-gray-300 p-2 text-left text-nowrap hidden sticky top-0">Email Alert</th>
                 <th className="hidden text-sm border border-gray-300 p-2 text-left sticky top-0 md:table-cell">Actions</th>
               </tr>
             </thead>
 
-            {filteredContacts.length > 0 ? (
+            {sortedContacts.length > 0 ? (
               <tbody>
-                {filteredContacts.map((contact,index) => (
+                {sortedContacts.map((contact,index) => (
                    <tr
       key={`${contact.id}-${searchTerm}-${index}`} // Force re-render on search
       className={`${window.innerWidth < 800 && 'cursor-pointer'} ${contact.status === "archived" && "bg-red-100"}`}

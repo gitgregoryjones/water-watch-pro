@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaEdit, FaTrashAlt, FaUser } from "react-icons/fa";
 
@@ -18,6 +18,7 @@ const ClientListPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({});
   const [pageSize, setPageSize] = useState(250);
+  const [sortConfig, setSortConfig] = useState({ key: "account_name", direction: "asc" });
   const location = useLocation();
 
   
@@ -94,33 +95,72 @@ const ClientListPage = () => {
     }));
   };
 
-  const filtered = clients.filter((client) => {
-    const matchesSearch =
-      client.account_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.phone?.toLowerCase().includes(searchTerm.toLowerCase());
-  
-    // Create an array of selected tiers
-    const selectedTiers = [];
-    if (selectedFilters.gold) selectedTiers.push("gold");
-    if (selectedFilters.silver) selectedTiers.push("silver");
-    if (selectedFilters.bronze) selectedTiers.push("bronze");
+  const filtered = useMemo(() => {
+    const searchLower = searchTerm.toLowerCase();
+    return clients.filter((client) => {
+      const matchesSearch =
+        client.account_name.toLowerCase().includes(searchLower) ||
+        client.email?.toLowerCase().includes(searchLower) ||
+        client.phone?.toLowerCase().includes(searchLower);
     
-  
-    // Check if the client's tier matches any of the selected tiers
-    const matchesTier = selectedTiers.length === 0 || selectedTiers.includes(client.tier);
+      // Create an array of selected tiers
+      const selectedTiers = [];
+      if (selectedFilters.gold) selectedTiers.push("gold");
+      if (selectedFilters.silver) selectedTiers.push("silver");
+      if (selectedFilters.bronze) selectedTiers.push("bronze");
+      
+    
+      // Check if the client's tier matches any of the selected tiers
+      const matchesTier = selectedTiers.length === 0 || selectedTiers.includes(client.tier);
 
-    let matchesTrial = true;
+      let matchesTrial = true;
 
-    if (selectedFilters.trial) {
-        matchesTrial = client.account_type != "paid"
-    }
-  
-  
-   
-  
-    return matchesSearch && matchesTier && matchesTrial;
-  });
+      if (selectedFilters.trial) {
+          matchesTrial = client.account_type != "paid"
+      }
+    
+      return matchesSearch && matchesTier && matchesTrial;
+    });
+  }, [clients, searchTerm, selectedFilters]);
+
+  const sortedClients = useMemo(() => {
+    const { key, direction } = sortConfig;
+    if (!key) return filtered;
+
+    return [...filtered].sort((a, b) => {
+      const aValue = a?.[key];
+      const bValue = b?.[key];
+
+      if (aValue == null && bValue == null) return 0;
+      if (aValue == null) return direction === "asc" ? 1 : -1;
+      if (bValue == null) return direction === "asc" ? -1 : 1;
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return direction === "asc" ? aValue - bValue : bValue - aValue;
+      }
+
+      const aString = String(aValue).toLowerCase();
+      const bString = String(bValue).toLowerCase();
+
+      if (aString < bString) return direction === "asc" ? -1 : 1;
+      if (aString > bString) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [filtered, sortConfig]);
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+  };
+
+  const sortIndicator = (key) => {
+    if (sortConfig.key !== key) return "";
+    return sortConfig.direction === "asc" ? "▲" : "▼";
+  };
   
   
   const handleDelete = async (clientId) => {
@@ -162,7 +202,7 @@ const ClientListPage = () => {
             className={`p-2 px-2 mb-2 border rounded bg-[#128CA6] text-[white] flex gap-2 items-center`}
           >
             <i className="text-yellow-500 fa fa-building"></i>
-            {filtered.length} clients are viewable. Scroll down to see more.
+            {sortedClients.length} clients are viewable. Scroll down to see more.
           </div>
           <div className="flex justify-around items-end md:items-center gap-4 mb-6">
             <div className="flex md:flex-row flex-col md:justify-between flex-1">
@@ -233,25 +273,49 @@ const ClientListPage = () => {
             <thead>
               <tr className="bg-gray-100 sticky top-0">
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">
-                  Account Name
+                  <button
+                    type="button"
+                    onClick={() => handleSort("account_name")}
+                    className="w-full"
+                  >
+                    Account Name {sortIndicator("account_name")}
+                  </button>
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-1/2">
-                  Status
+                  <button
+                    type="button"
+                    onClick={() => handleSort("account_type")}
+                    className="w-full"
+                  >
+                    Status {sortIndicator("account_type")}
+                  </button>
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
-                  Locations
+                  <button
+                    type="button"
+                    onClick={() => handleSort("locations_count")}
+                    className="w-full"
+                  >
+                    Locations {sortIndicator("locations_count")}
+                  </button>
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
-                Account Type
+                  <button
+                    type="button"
+                    onClick={() => handleSort("tier")}
+                    className="w-full"
+                  >
+                    Account Type {sortIndicator("tier")}
+                  </button>
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell">
                   Actions
                 </th>
               </tr>
             </thead>
-            {filtered.length > 0 ? (
+            {sortedClients.length > 0 ? (
               <tbody>
-                {filtered.map((client) => (
+                {sortedClients.map((client) => (
                   <tr
                     className={`${
                       window.innerWidth < 800 && "cursor-pointer"

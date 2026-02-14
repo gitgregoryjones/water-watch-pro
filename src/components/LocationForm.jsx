@@ -24,6 +24,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const isEditMode = locationToEdit !== null;
   const [msg,setMsg] = useState("")
   const {isActive} = useFeatureFlags();
+  const isClick2PointEnabled = isActive('click2point');
 
   const navigate = useNavigate();
 
@@ -230,7 +231,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             <label htmlFor="latitude" className="block font-bold">
               Latitude
             </label>
-            {!isEditMode && (
+            {!isEditMode && isClick2PointEnabled && (
               <button
                 type="button"
                 className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
@@ -252,7 +253,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           />
         </div>
 
-        {showMapPicker && !isEditMode && (
+        {showMapPicker && !isEditMode && isClick2PointEnabled && (
           <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
             <div className="flex justify-between items-center mb-2">
               <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>

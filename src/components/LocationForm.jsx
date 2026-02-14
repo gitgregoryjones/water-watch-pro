@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import api from '../utility/api';
 import { FaTimes } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { APIProvider, AdvancedMarker, Map } from '@vis.gl/react-google-maps';
 import WorkingDialog from './WorkingDialog';
 import { VITE_FEATURE_HISTORY_REPORT, VITE_PRICES_LINK } from '../utility/constants';
 import { convertTier } from '../utility/loginUser';
@@ -16,6 +17,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [longitude, setLongitude] = useState('');
   const [h24Threshold, setH24Threshold] = useState('');
   const [rapidRainThreshold, setRapidRainThreshold] = useState();
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [pickedLocation, setPickedLocation] = useState(null);
   const [responseData, setResponseData] = useState(null); // Store response data
   const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
@@ -32,11 +35,34 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setLongitude(locationToEdit.longitude || '');
       setH24Threshold(locationToEdit.h24_threshold || .5);
       setRapidRainThreshold(locationToEdit.rapidrain_threshold || locationToEdit.h24_threshold);
-      
-      
+
+
 
     }
   }, [locationToEdit, isEditMode]);
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      setPickedLocation({ lat: parseFloat(latitude), lng: parseFloat(longitude) });
+    }
+  }, [latitude, longitude]);
+
+  const handleMapClick = (mapEvent) => {
+    const lat = mapEvent?.detail?.latLng?.lat;
+    const lng = mapEvent?.detail?.latLng?.lng;
+
+    if (typeof lat !== 'number' || typeof lng !== 'number') {
+      return;
+    }
+
+    const roundedLat = lat.toFixed(6);
+    const roundedLng = lng.toFixed(6);
+
+    setLatitude(roundedLat);
+    setLongitude(roundedLng);
+    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
+    setShowMapPicker(false);
+  };
 
   const handleSubmit = async (e) => {
     setMsg("");
@@ -200,9 +226,20 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
         {/* Latitude */}
         <div className="mb-4">
-          <label htmlFor="latitude" className="block  font-bold mb-2">
-            Latitude
-          </label>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <label htmlFor="latitude" className="block font-bold">
+              Latitude
+            </label>
+            {!isEditMode && (
+              <button
+                type="button"
+                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                onClick={() => setShowMapPicker(true)}
+              >
+                Pick on map
+              </button>
+            )}
+          </div>
           <input
             type="number"
             step="0.000001"
@@ -214,6 +251,35 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             disabled={isEditMode}
           />
         </div>
+
+        {showMapPicker && !isEditMode && (
+          <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
+            <div className="flex justify-between items-center mb-2">
+              <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+              <button
+                type="button"
+                className="text-xs text-gray-600 underline"
+                onClick={() => setShowMapPicker(false)}
+              >
+                Close map
+              </button>
+            </div>
+            <div className="h-72 w-full rounded overflow-hidden border border-gray-200">
+              <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+                <Map
+                  mapId={'mainMap'}
+                  defaultZoom={5}
+                  defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                  onClick={handleMapClick}
+                  gestureHandling={'greedy'}
+                  disableDefaultUI={false}
+                >
+                  {pickedLocation && <AdvancedMarker position={pickedLocation} />}
+                </Map>
+              </APIProvider>
+            </div>
+          </div>
+        )}
 
         {/* Longitude */}
         <div className="mb-4">

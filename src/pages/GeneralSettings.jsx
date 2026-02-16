@@ -10,10 +10,13 @@ import WorkingDialog from '../components/WorkingDialog';
 import SettingsMenu from '../components/SettingsMenu';
 import {VITE_FEATURE_RAPIDRAIN_FIRST} from "../utility/constants"
 import { convertTier } from '../utility/loginUser';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 const GeneralSettingsPage = () => {
   const DAILY_REPORT_HOURS = [5, 6, 7, 8, 9];
   const { state } = useLocation();
+  const { isActive } = useFeatureFlags();
+  const isCustomDailyReportTimeEnabled = isActive('customDailyReportTime');
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
   const [settings, setSettings] = useState({});
@@ -90,7 +93,10 @@ const GeneralSettingsPage = () => {
     setWorking(true)
     setMsg("")
     try {
-      await api.patch(`/api/clients/${client.id}`, settings);
+      const payload = isCustomDailyReportTimeEnabled
+        ? settings
+        : { ...settings, daily_report_hour: undefined };
+      await api.patch(`/api/clients/${client.id}`, payload);
       //alert('Settings updated successfully!');
       setTimeout(() => {
         setWorking(false);
@@ -138,24 +144,26 @@ const GeneralSettingsPage = () => {
               </div>
               <div className='ml-[56px] mb-4 flex flex-col gap-2'>
                 <span>
-                  All contacts will receive the daily report, sent at {settings.daily_report_hour || 6} am EDT
+                  All contacts will receive the daily report, sent at {isCustomDailyReportTimeEnabled ? (settings.daily_report_hour || 6) : 6} am EDT
                 </span>
-                <label htmlFor="daily-report-hour" className="flex items-center gap-2">
-                  <span>Send time:</span>
-                  <select
-                    id="daily-report-hour"
-                    className="border rounded px-2 py-1"
-                    value={settings.daily_report_hour || 6}
-                    onChange={(e) => handleSettingChange('daily_report_hour', Number(e.target.value))}
-                    disabled={!settings.daily_report_on}
-                  >
-                    {DAILY_REPORT_HOURS.map((hour) => (
-                      <option key={hour} value={hour}>
-                        {hour} am
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                {isCustomDailyReportTimeEnabled && (
+                  <label htmlFor="daily-report-hour" className="flex items-center gap-2">
+                    <span>Send time:</span>
+                    <select
+                      id="daily-report-hour"
+                      className="border rounded px-2 py-1"
+                      value={settings.daily_report_hour || 6}
+                      onChange={(e) => handleSettingChange('daily_report_hour', Number(e.target.value))}
+                      disabled={!settings.daily_report_on}
+                    >
+                      {DAILY_REPORT_HOURS.map((hour) => (
+                        <option key={hour} value={hour}>
+                          {hour} am
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
               </div>
               <div className="hidden flex items-center mb-4 gap-2">
                 <Toggle

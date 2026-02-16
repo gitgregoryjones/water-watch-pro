@@ -12,6 +12,7 @@ import {VITE_FEATURE_RAPIDRAIN_FIRST} from "../utility/constants"
 import { convertTier } from '../utility/loginUser';
 
 const GeneralSettingsPage = () => {
+  const DAILY_REPORT_HOURS = [5, 6, 7, 8, 9];
   const { state } = useLocation();
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
@@ -41,6 +42,9 @@ const GeneralSettingsPage = () => {
           invoice_day: response.data.invoice_day || 0,
           invoice_email: response.data.invoice_email || '',
           daily_report_on: response.data.daily_report_on || false,
+          daily_report_hour: DAILY_REPORT_HOURS.includes(Number(response.data.daily_report_hour))
+            ? Number(response.data.daily_report_hour)
+            : 6,
           daily_report_combine_locations: response.data.daily_report_combine_locations || false,
           daily_report_suppress_zero: response.data.daily_report_suppress_zero || true,
           sort_by_rainfall: response.data.sort_by_rainfall || false,
@@ -72,6 +76,13 @@ const GeneralSettingsPage = () => {
     setSettings((prev) => ({
       ...prev,
       [key]: !prev[key],
+    }));
+  };
+
+  const handleSettingChange = (key, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: value,
     }));
   };
 
@@ -125,7 +136,26 @@ const GeneralSettingsPage = () => {
                 <span className="">Enabled</span>
                 
               </div>
-              <div className='ml-[56px] mb-4'>All contacts will receive the daily report, sent at 6 am EDT
+              <div className='ml-[56px] mb-4 flex flex-col gap-2'>
+                <span>
+                  All contacts will receive the daily report, sent at {settings.daily_report_hour || 6} am EDT
+                </span>
+                <label htmlFor="daily-report-hour" className="flex items-center gap-2">
+                  <span>Send time:</span>
+                  <select
+                    id="daily-report-hour"
+                    className="border rounded px-2 py-1"
+                    value={settings.daily_report_hour || 6}
+                    onChange={(e) => handleSettingChange('daily_report_hour', Number(e.target.value))}
+                    disabled={!settings.daily_report_on}
+                  >
+                    {DAILY_REPORT_HOURS.map((hour) => (
+                      <option key={hour} value={hour}>
+                        {hour} am
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
               <div className="hidden flex items-center mb-4 gap-2">
                 <Toggle

@@ -208,6 +208,7 @@ const FormWizardDelayed = () => {
 
 
   useEffect(() => {
+    if (!isClick2PointEnabled) return;
     if (!formData.latitude || !formData.longitude) return;
 
     const lat = Number(formData.latitude);
@@ -216,9 +217,17 @@ const FormWizardDelayed = () => {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return;
 
     setPickedLocation({ lat, lng });
-  }, [formData.latitude, formData.longitude]);
+  }, [formData.latitude, formData.longitude, isClick2PointEnabled]);
+
+  useEffect(() => {
+    if (!isClick2PointEnabled) {
+      setShowMapPicker(false);
+      setPickedLocation(null);
+    }
+  }, [isClick2PointEnabled]);
 
   const handleWizardMapClick = (mapEvent) => {
+    if (!isClick2PointEnabled) return;
     const lat = mapEvent?.detail?.latLng?.lat;
     const lng = mapEvent?.detail?.latLng?.lng;
 

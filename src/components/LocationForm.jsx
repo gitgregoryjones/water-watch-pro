@@ -43,12 +43,22 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   }, [locationToEdit, isEditMode]);
 
   useEffect(() => {
+    if (!isClick2PointEnabled) return;
+
     if (latitude && longitude) {
       setPickedLocation({ lat: parseFloat(latitude), lng: parseFloat(longitude) });
     }
-  }, [latitude, longitude]);
+  }, [latitude, longitude, isClick2PointEnabled]);
+
+  useEffect(() => {
+    if (!isClick2PointEnabled) {
+      setShowMapPicker(false);
+      setPickedLocation(null);
+    }
+  }, [isClick2PointEnabled]);
 
   const handleMapClick = (mapEvent) => {
+    if (!isClick2PointEnabled) return;
     const lat = mapEvent?.detail?.latLng?.lat;
     const lng = mapEvent?.detail?.latLng?.lng;
 

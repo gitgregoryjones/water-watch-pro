@@ -509,7 +509,7 @@ const Reports = () => {
             value={toDate}
             onChange={handleToDateChange}
             className="border border-gray-300 rounded p-2 w-full"
-            min={reportType === 'monthly' && convertTier(user) < 2 ? "2024-11" : "2024-11"} // Disable months before last month for tier < 2
+            min={reportType === 'monthly' && convertTier(user) < 2 ? "2022-01" : "2022-01"} // Disable months before last month for tier < 2
             max={reportType === 'monthly' && convertTier(user) < 3 ? lastMonth : thisMonth} // Disable current month for tier < 2
           />}
             {reportType === "historical" && <input

@@ -58,6 +58,7 @@ import UserForm from "./components/UserForm";
 import ContactForm from "./components/ContactForm";
 import AnonymousReportForm from "./pages/AnonymousReportForm";
 import { useFeatureFlags } from "@geejay/use-feature-flags";
+import RainIQPage from "./pages/RainIQPage";
 
 
 
@@ -175,6 +176,7 @@ function App() {
   </Link>}
     <div   className="flex flex-col">
       <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
+      {isActive('rainIQ') && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
    <Upgrade showMsg={false} tier={1}>
     
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
@@ -227,6 +229,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/settings" element={<LocationListPage/>} />
         <Route path="/reports" element={<ReportsPage/>} />
+        <Route path="/rainiq" element={<RainIQPage/>} />
         <Route path="/assignments" element={<AssignmentsPage/>} />
         <Route path="/assign-locations" element={<AssignLocations/>} />
         <Route path="/profile-backup" element={<MyProfile/>} />

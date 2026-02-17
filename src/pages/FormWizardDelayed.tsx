@@ -14,6 +14,7 @@ import Prices from './Prices';
 import { abandon, newTrialSignUp } from '../utility/abandon';
 import { useFeatureFlags } from "@geejay/use-feature-flags";
 import { loadStripe } from '@stripe/stripe-js';
+import { APIProvider, AdvancedMarker, Map } from '@vis.gl/react-google-maps';
 
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
@@ -45,8 +46,11 @@ const FormWizardDelayed = () => {
   const [success, setSuccess] = useState("");
 
   const { isActive } = useFeatureFlags();
+  const isClick2PointEnabled = isActive('click2point');
 
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [pickedLocation, setPickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const toggleVisibility = () => setPasswordVisible(!passwordVisible);
 
   const uuid = () =>
@@ -200,6 +204,45 @@ const FormWizardDelayed = () => {
       ...prev,
       [name]: prev[name] === 'self' ? 'company' : 'self',
     }));
+  };
+
+
+  useEffect(() => {
+    if (!isClick2PointEnabled) return;
+    if (!formData.latitude || !formData.longitude) return;
+
+    const lat = Number(formData.latitude);
+    const lng = Number(formData.longitude);
+
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+    setPickedLocation({ lat, lng });
+  }, [formData.latitude, formData.longitude, isClick2PointEnabled]);
+
+  useEffect(() => {
+    if (!isClick2PointEnabled) {
+      setShowMapPicker(false);
+      setPickedLocation(null);
+    }
+  }, [isClick2PointEnabled]);
+
+  const handleWizardMapClick = (mapEvent) => {
+    if (!isClick2PointEnabled) return;
+    const lat = mapEvent?.detail?.latLng?.lat;
+    const lng = mapEvent?.detail?.latLng?.lng;
+
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+
+    const roundedLat = lat.toFixed(6);
+    const roundedLng = lng.toFixed(6);
+
+    setFormData(prev => ({
+      ...prev,
+      latitude: roundedLat,
+      longitude: roundedLng,
+    }));
+    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
+    setShowMapPicker(false);
   };
 
   const handleNext = () => {
@@ -673,9 +716,49 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
               <input type="text" name="locationName" value={formData.locationName} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />
             </div>
             <div className="mb-4">
-              <label className="block">Latitude <span className='text-[red]'>*</span></label>
+              <div className="flex items-center justify-between gap-2">
+                <label className="block">Latitude <span className='text-[red]'>*</span></label>
+                {isClick2PointEnabled && (
+                  <button
+                    type="button"
+                    className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    onClick={() => setShowMapPicker(true)}
+                  >
+                    Pick on map
+                  </button>
+                )}
+              </div>
               <input type="number" name="latitude" value={formData.latitude} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />
             </div>
+
+            {showMapPicker && isClick2PointEnabled && (
+              <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
+                <div className="flex justify-between items-center mb-2">
+                  <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+                  <button
+                    type="button"
+                    className="text-xs text-gray-600 underline"
+                    onClick={() => setShowMapPicker(false)}
+                  >
+                    Close map
+                  </button>
+                </div>
+                <div className="h-72 w-full rounded overflow-hidden border border-gray-200">
+                  <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
+                    <Map
+                      mapId={'mainMap'}
+                      defaultZoom={5}
+                      defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                      onClick={handleWizardMapClick}
+                      gestureHandling={'greedy'}
+                      disableDefaultUI={false}
+                    >
+                      {pickedLocation && <AdvancedMarker position={pickedLocation} />}
+                    </Map>
+                  </APIProvider>
+                </div>
+              </div>
+            )}
             <div className="mb-4">
               <label className="block">Longitude <span className='text-[red]'>*</span></label>
               <input type="number" name="longitude" min="-122" max="-66" value={formData.longitude} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />

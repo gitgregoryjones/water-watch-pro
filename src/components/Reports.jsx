@@ -257,6 +257,12 @@ const Reports = () => {
     });
   }, [user.id]);
 
+  useEffect(() => {
+    if (!user.is_superuser && locations.length === 1 && selectedLocations.length === 0) {
+      setSelectedLocations([locations[0].id]);
+    }
+  }, [locations, selectedLocations.length, user.is_superuser]);
+
   
 
   const handleSubmit = async (e) => {
@@ -730,13 +736,18 @@ const Reports = () => {
         id="locList"
         multiple={!isMultiMonthReport}
         size={isMultiMonthReport ? 8 : undefined}
-        value={selectedLocations}
+        value={isMultiMonthReport ? (selectedLocations[0] || '') : selectedLocations}
         onChange={(e) => {
+          if (isMultiMonthReport) {
+            setSelectedLocations(e.target.value ? [parseInt(e.target.value, 10)] : []);
+            return;
+          }
+
           const options = Array.from(e.target.options);
           const selected = options
             .filter((option) => option.selected)
             .map((option) => parseInt(option.value, 10));
-          setSelectedLocations(isMultiMonthReport ? selected.slice(0, 1) : selected);
+          setSelectedLocations(selected);
         }}
         className="hidden md:block border border-gray-300 w-full rounded p-2"
       >

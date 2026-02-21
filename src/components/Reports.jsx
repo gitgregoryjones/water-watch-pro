@@ -217,6 +217,25 @@ const Reports = () => {
     ));
   };
 
+
+  const areMonthsConsecutive = (months) => {
+    if (!months || months.length <= 1) {
+      return true;
+    }
+
+    const sortedMonths = [...months]
+      .map((month) => parseInt(month, 10))
+      .sort((a, b) => a - b);
+
+    for (let index = 1; index < sortedMonths.length; index += 1) {
+      if (sortedMonths[index] !== sortedMonths[index - 1] + 1) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleToDateChange = (e) => {
     const selectedDate = e.target.value;
     setToDate(selectedDate);
@@ -237,6 +256,12 @@ const Reports = () => {
       setContacts(contacts);
     });
   }, [user.id]);
+
+  useEffect(() => {
+    if (!user.is_superuser && locations.length === 1 && selectedLocations.length === 0) {
+      setSelectedLocations([locations[0].id]);
+    }
+  }, [locations, selectedLocations.length, user.is_superuser]);
 
   
 
@@ -304,6 +329,17 @@ const Reports = () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
         return;
       }
+
+      if (!areMonthsConsecutive(selectedMonths)) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Multi-month reports require consecutive months (for example, Jan-Feb-Mar).</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
     }
   
     const isExportFormat = ['csv', 'pdf', 'excel'].includes(displayFormat);
@@ -360,7 +396,7 @@ const Reports = () => {
       const endMonth = sortedMonths[sortedMonths.length - 1];
       const lastDay = new Date(multiMonthYear, parseInt(endMonth, 10), 0).toISOString().slice(0, 10);
 
-      query = `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
+      query = `${API_HOST}/api/reports/daily_excel_by_date_range/${firstDay}/${lastDay}`;
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
@@ -632,7 +668,7 @@ const Reports = () => {
             </select>
           </div>
           <div>
-            <label className="font-bold block text-gray-700">Months (same year):</label>
+            <label className="font-bold block text-gray-700">Months (same year, consecutive):</label>
             <div className="grid grid-cols-3 gap-2 border border-gray-300 rounded p-2">
               {monthOptions.map((month) => (
                 <label key={month.value} className="flex items-center gap-1 text-xs">
@@ -647,7 +683,7 @@ const Reports = () => {
             </div>
           </div>
           <div className='px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-900'>
-            Multi-month reports export to Excel only and use one location per submission.
+            Multi-month reports export to Excel only, use one location per submission, and require consecutive months.
           </div>
         </div>}
         </div>
@@ -700,8 +736,13 @@ const Reports = () => {
         id="locList"
         multiple={!isMultiMonthReport}
         size={isMultiMonthReport ? 8 : undefined}
-        value={selectedLocations}
+        value={isMultiMonthReport ? (selectedLocations[0] || '') : selectedLocations}
         onChange={(e) => {
+          if (isMultiMonthReport) {
+            setSelectedLocations(e.target.value ? [parseInt(e.target.value, 10)] : []);
+            return;
+          }
+
           const options = Array.from(e.target.options);
           const selected = options
             .filter((option) => option.selected)

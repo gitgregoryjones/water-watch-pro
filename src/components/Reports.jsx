@@ -747,7 +747,7 @@ const Reports = () => {
           const selected = options
             .filter((option) => option.selected)
             .map((option) => parseInt(option.value, 10));
-          setSelectedLocations(selected);
+          setSelectedLocations(isMultiMonthReport ? selected.slice(0, 1) : selected);
         }}
         className="hidden md:block border border-gray-300 w-full rounded p-2"
       >

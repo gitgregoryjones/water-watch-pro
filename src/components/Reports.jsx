@@ -40,7 +40,8 @@ const Reports = () => {
   const reportAreaRef = useRef(null);
   const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
   const isTypeFeatureActive = isActive(typeFlag);
-  const isMultiMonthReport = reportType === 'multi-month';
+  const isMultiMonthFeatureActive = isActive('multi-month');
+  const isMultiMonthReport = isMultiMonthFeatureActive && reportType === 'multi-month';
 
   const availableYears = Array.from(
     { length: Math.max(1, new Date().getFullYear() - 2022 + 1) },
@@ -152,6 +153,15 @@ const Reports = () => {
     }
   }, [reportType, convertTier(user)]);
 
+
+  useEffect(() => {
+    if (!isMultiMonthFeatureActive && reportType === 'multi-month') {
+      setReportType(user.is_superuser ? 'sms' : 'monthly');
+      setDisplayFormat('html');
+      setSelectedMonths([]);
+    }
+  }, [isMultiMonthFeatureActive, reportType, user.is_superuser]);
+
   useEffect(() => {
     const h1Element = reportAreaRef.current?.querySelector("h1");
     if (h1Element) {
@@ -161,6 +171,9 @@ const Reports = () => {
 
   const handleReportTypeChange = (e) => {
     const selectedType = e.target.value;
+    if (selectedType === 'multi-month' && !isMultiMonthFeatureActive) {
+      return;
+    }
     setReportType(selectedType);
 
     if (selectedType === 'monthly') {
@@ -536,7 +549,7 @@ const Reports = () => {
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
             {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
-            {!user.is_superuser && <option value="multi-month">Multi-Month</option>}
+            {!user.is_superuser && isMultiMonthFeatureActive && <option value="multi-month">Multi-Month</option>}
           </select>
         </div>
         {reportType === "sms" && <div className="col-span-1">

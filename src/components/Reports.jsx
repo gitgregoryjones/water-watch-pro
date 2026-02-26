@@ -351,6 +351,32 @@ const Reports = () => {
         window.scrollTo({top: 0, behavior: 'smooth'});
         return;
       }
+
+      const selectedLocationId = parseInt(selectedLocations[0], 10);
+      const selectedLocation = locations.find((location) => location.id === selectedLocationId);
+      const sortedMonths = [...selectedMonths].sort();
+      const firstSelectedDate = new Date(`${multiMonthYear}-${sortedMonths[0]}-01T00:00:00`);
+      const locationCreatedDate = selectedLocation?.created_at
+        ? new Date(selectedLocation.created_at)
+        : null;
+      const locationDataStartDate = locationCreatedDate
+        ? new Date(locationCreatedDate.getFullYear(), locationCreatedDate.getMonth(), 1)
+        : null;
+
+      if (locationDataStartDate && firstSelectedDate < locationDataStartDate) {
+        const availableDate = locationDataStartDate.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+        const errorMessage = `
+          <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
+            <p><strong>Info:</strong> Rainfall data is not available before ${availableDate} please click this link to <a href="order-locations?location_id=${selectedLocationId}">Visit</a> Order Past Data</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
     }
   
     const isExportFormat = ['csv', 'pdf', 'excel'].includes(displayFormat);

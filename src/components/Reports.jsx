@@ -401,7 +401,7 @@ const Reports = () => {
         });
         const errorMessage = `
           <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
-            <p><strong>Info:</strong> Rainfall data is not available before ${availableDate} please click this link to <a href="order-locations?location_id=${selectedLocationId}">Visit</a> Order Past Data</p>
+            <p><strong>Info:</strong> Rainfall data is not available before ${availableDate}. <a href="order-locations?location_id=${selectedLocationId}" class='text-yellow-500 text-lg'>Order Past Data</a></p>
           </div>
         `;
         setReportContent(errorMessage);

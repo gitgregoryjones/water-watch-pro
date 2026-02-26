@@ -217,6 +217,17 @@ const Reports = () => {
     ));
   };
 
+  const areAllMonthsSelected = selectedMonths.length === monthOptions.length;
+
+  const handleSelectAllMonths = () => {
+    if (areAllMonthsSelected) {
+      setSelectedMonths([]);
+      return;
+    }
+
+    setSelectedMonths(monthOptions.map((month) => month.value));
+  };
+
 
   const areMonthsConsecutive = (months) => {
     if (!months || months.length <= 1) {
@@ -584,8 +595,8 @@ const Reports = () => {
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
-            {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
             {!user.is_superuser && isMultiMonthFeatureActive && <option value="multi-month">Multi-Month</option>}
+            {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
         {reportType === "sms" && <div className="col-span-1">
@@ -669,6 +680,14 @@ const Reports = () => {
           </div>
           <div>
             <label className="font-bold block text-gray-700">Months (same year, consecutive):</label>
+            <label className="mt-1 mb-2 flex items-center gap-2 text-xs text-gray-700">
+              <input
+                type="checkbox"
+                checked={areAllMonthsSelected}
+                onChange={handleSelectAllMonths}
+              />
+              Select all months
+            </label>
             <div className="grid grid-cols-3 gap-2 border border-gray-300 rounded p-2">
               {monthOptions.map((month) => (
                 <label key={month.value} className="flex items-center gap-1 text-xs">

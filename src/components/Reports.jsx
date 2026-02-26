@@ -62,6 +62,26 @@ const Reports = () => {
     { value: '12', label: 'Dec' },
   ];
 
+  const isFutureMonthForYear = (monthValue, yearValue) => {
+    const now = new Date();
+    const selectedYear = parseInt(yearValue, 10);
+    const selectedMonth = parseInt(monthValue, 10) - 1;
+
+    if (selectedYear > now.getFullYear()) {
+      return true;
+    }
+
+    if (selectedYear < now.getFullYear()) {
+      return false;
+    }
+
+    return selectedMonth > now.getMonth();
+  };
+
+  const selectableMonthOptions = monthOptions.filter(
+    (month) => !isFutureMonthForYear(month.value, multiMonthYear)
+  );
+
   const resolveLocationNames = (ids = []) => {
     if (!Array.isArray(ids) || ids.length === 0) {
       return user?.is_superuser ? 'all_locations' : 'unspecified';
@@ -217,6 +237,17 @@ const Reports = () => {
     ));
   };
 
+  const areAllMonthsSelected = selectableMonthOptions.length > 0 && selectableMonthOptions.every((month) => selectedMonths.includes(month.value));
+
+  const handleSelectAllMonths = () => {
+    if (areAllMonthsSelected) {
+      setSelectedMonths([]);
+      return;
+    }
+
+    setSelectedMonths(selectableMonthOptions.map((month) => month.value));
+  };
+
 
   const areMonthsConsecutive = (months) => {
     if (!months || months.length <= 1) {
@@ -330,10 +361,47 @@ const Reports = () => {
         return;
       }
 
+      if (selectedMonths.some((month) => isFutureMonthForYear(month, multiMonthYear))) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Future months are not available for multi-month reports.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
       if (!areMonthsConsecutive(selectedMonths)) {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> Multi-month reports require consecutive months (for example, Jan-Feb-Mar).</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
+      const selectedLocationId = parseInt(selectedLocations[0], 10);
+      const selectedLocation = locations.find((location) => location.id === selectedLocationId);
+      const sortedMonths = [...selectedMonths].sort();
+      const firstSelectedDate = new Date(`${multiMonthYear}-${sortedMonths[0]}-01T00:00:00`);
+      const locationCreatedDate = selectedLocation?.created_at
+        ? new Date(selectedLocation.created_at)
+        : null;
+      const locationDataStartDate = locationCreatedDate
+        ? new Date(locationCreatedDate.getFullYear(), locationCreatedDate.getMonth(), 1)
+        : null;
+
+      if (locationDataStartDate && firstSelectedDate < locationDataStartDate) {
+        const availableDate = locationDataStartDate.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+        const errorMessage = `
+          <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
+            <p><strong>Info:</strong> Rainfall data is not available before ${availableDate} please click this link to <a href="order-locations?location_id=${selectedLocationId}">Visit</a> Order Past Data</p>
           </div>
         `;
         setReportContent(errorMessage);
@@ -584,8 +652,8 @@ const Reports = () => {
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
-            {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
             {!user.is_superuser && isMultiMonthFeatureActive && <option value="multi-month">Multi-Month</option>}
+            {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
         {reportType === "sms" && <div className="col-span-1">
@@ -669,17 +737,30 @@ const Reports = () => {
           </div>
           <div>
             <label className="font-bold block text-gray-700">Months (same year, consecutive):</label>
+            <label className="mt-1 mb-2 flex items-center gap-2 text-xs text-gray-700">
+              <input
+                type="checkbox"
+                checked={areAllMonthsSelected}
+                onChange={handleSelectAllMonths}
+              />
+              Select all months
+            </label>
             <div className="grid grid-cols-3 gap-2 border border-gray-300 rounded p-2">
-              {monthOptions.map((month) => (
-                <label key={month.value} className="flex items-center gap-1 text-xs">
+              {monthOptions.map((month) => {
+                const isFutureMonth = isFutureMonthForYear(month.value, multiMonthYear);
+
+                return (
+                <label key={month.value} className={`flex items-center gap-1 text-xs ${isFutureMonth ? 'opacity-50 cursor-not-allowed' : ''}`}>
                   <input
                     type="checkbox"
                     checked={selectedMonths.includes(month.value)}
                     onChange={() => handleMultiMonthToggle(month.value)}
+                    disabled={isFutureMonth}
                   />
                   {month.label}
                 </label>
-              ))}
+                );
+              })}
             </div>
           </div>
           <div className='px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-900'>

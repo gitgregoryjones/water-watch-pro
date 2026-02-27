@@ -28,6 +28,8 @@ const Reports = () => {
   const [searchTerm,setSearchTerm] = useState("")
   const [smsStatus, setSmsStatus] = useState("all")
   const [timeType, setTimeType] = useState('hourly')
+  const [multiMonthYear, setMultiMonthYear] = useState(new Date().getFullYear());
+  const [selectedMonths, setSelectedMonths] = useState([]);
 
 
   const { isActive } = useFeatureFlags();
@@ -38,6 +40,47 @@ const Reports = () => {
   const reportAreaRef = useRef(null);
   const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
   const isTypeFeatureActive = isActive(typeFlag);
+  const isMultiMonthFeatureActive = isActive('multi-month');
+  const isMultiMonthReport = isMultiMonthFeatureActive && reportType === 'multi-month';
+
+  const availableYears = Array.from(
+    { length: Math.max(1, new Date().getFullYear() - 2022 + 1) },
+    (_, index) => 2022 + index
+  );
+  const monthOptions = [
+    { value: '01', label: 'Jan' },
+    { value: '02', label: 'Feb' },
+    { value: '03', label: 'Mar' },
+    { value: '04', label: 'Apr' },
+    { value: '05', label: 'May' },
+    { value: '06', label: 'Jun' },
+    { value: '07', label: 'Jul' },
+    { value: '08', label: 'Aug' },
+    { value: '09', label: 'Sep' },
+    { value: '10', label: 'Oct' },
+    { value: '11', label: 'Nov' },
+    { value: '12', label: 'Dec' },
+  ];
+
+  const isFutureMonthForYear = (monthValue, yearValue) => {
+    const now = new Date();
+    const selectedYear = parseInt(yearValue, 10);
+    const selectedMonth = parseInt(monthValue, 10) - 1;
+
+    if (selectedYear > now.getFullYear()) {
+      return true;
+    }
+
+    if (selectedYear < now.getFullYear()) {
+      return false;
+    }
+
+    return selectedMonth > now.getMonth();
+  };
+
+  const selectableMonthOptions = monthOptions.filter(
+    (month) => !isFutureMonthForYear(month.value, multiMonthYear)
+  );
 
   const resolveLocationNames = (ids = []) => {
     if (!Array.isArray(ids) || ids.length === 0) {
@@ -130,6 +173,15 @@ const Reports = () => {
     }
   }, [reportType, convertTier(user)]);
 
+
+  useEffect(() => {
+    if (!isMultiMonthFeatureActive && reportType === 'multi-month') {
+      setReportType(user.is_superuser ? 'sms' : 'monthly');
+      setDisplayFormat('html');
+      setSelectedMonths([]);
+    }
+  }, [isMultiMonthFeatureActive, reportType, user.is_superuser]);
+
   useEffect(() => {
     const h1Element = reportAreaRef.current?.querySelector("h1");
     if (h1Element) {
@@ -139,6 +191,9 @@ const Reports = () => {
 
   const handleReportTypeChange = (e) => {
     const selectedType = e.target.value;
+    if (selectedType === 'multi-month' && !isMultiMonthFeatureActive) {
+      return;
+    }
     setReportType(selectedType);
 
     if (selectedType === 'monthly') {
@@ -160,10 +215,56 @@ const Reports = () => {
       setFromDate('2022-11-01')
       setToDate('2024-10-31')
 
+    }else if (selectedType === 'multi-month') {
+      setDisplayFormat('excel');
+      setFromDate('');
+      setToDate('');
+      setSelectedMonths([]);
+      if (selectedLocations.length > 1) {
+        setSelectedLocations([selectedLocations[0]]);
+      }
     }else {
       setFromDate(''); // Clear From date
       setToDate(new Date().toISOString().slice(0, 10)); // Default to today
     }
+  };
+
+  const handleMultiMonthToggle = (monthValue) => {
+    setSelectedMonths((prev) => (
+      prev.includes(monthValue)
+        ? prev.filter((month) => month !== monthValue)
+        : [...prev, monthValue]
+    ));
+  };
+
+  const areAllMonthsSelected = selectableMonthOptions.length > 0 && selectableMonthOptions.every((month) => selectedMonths.includes(month.value));
+
+  const handleSelectAllMonths = () => {
+    if (areAllMonthsSelected) {
+      setSelectedMonths([]);
+      return;
+    }
+
+    setSelectedMonths(selectableMonthOptions.map((month) => month.value));
+  };
+
+
+  const areMonthsConsecutive = (months) => {
+    if (!months || months.length <= 1) {
+      return true;
+    }
+
+    const sortedMonths = [...months]
+      .map((month) => parseInt(month, 10))
+      .sort((a, b) => a - b);
+
+    for (let index = 1; index < sortedMonths.length; index += 1) {
+      if (sortedMonths[index] !== sortedMonths[index - 1] + 1) {
+        return false;
+      }
+    }
+
+    return true;
   };
 
   const handleToDateChange = (e) => {
@@ -186,6 +287,12 @@ const Reports = () => {
       setContacts(contacts);
     });
   }, [user.id]);
+
+  useEffect(() => {
+    if (!user.is_superuser && locations.length === 1 && selectedLocations.length === 0) {
+      setSelectedLocations([locations[0].id]);
+    }
+  }, [locations, selectedLocations.length, user.is_superuser]);
 
   
 
@@ -223,6 +330,78 @@ const Reports = () => {
         const errorMessage = `
           <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
             <p><strong>Error:</strong> Please specify both a from date and a to date for this report.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+    }
+
+    if (isMultiMonthReport) {
+      if (selectedLocations.length !== 1) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Multi-month reports support exactly one location.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
+      if (selectedMonths.length === 0) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Please select one or more months in the same year.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
+      if (selectedMonths.some((month) => isFutureMonthForYear(month, multiMonthYear))) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Future months are not available for multi-month reports.</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
+      if (!areMonthsConsecutive(selectedMonths)) {
+        const errorMessage = `
+          <div class="bg-red-100 text-red-900 p-4 rounded shadow-md">
+            <p><strong>Error:</strong> Multi-month reports require consecutive months (for example, Jan-Feb-Mar).</p>
+          </div>
+        `;
+        setReportContent(errorMessage);
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        return;
+      }
+
+      const selectedLocationId = parseInt(selectedLocations[0], 10);
+      const selectedLocation = locations.find((location) => location.id === selectedLocationId);
+      const sortedMonths = [...selectedMonths].sort();
+      const firstSelectedDate = new Date(`${multiMonthYear}-${sortedMonths[0]}-01T00:00:00`);
+      const locationCreatedDate = selectedLocation?.created_at
+        ? new Date(selectedLocation.created_at)
+        : null;
+      const locationDataStartDate = locationCreatedDate
+        ? new Date(locationCreatedDate.getFullYear(), locationCreatedDate.getMonth(), 1)
+        : null;
+
+      if (locationDataStartDate && firstSelectedDate < locationDataStartDate) {
+        const availableDate = locationDataStartDate.toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        });
+        const errorMessage = `
+          <div class="bg-blue-100 text-blue-900 p-4 rounded shadow-md">
+            <p><strong>Info:</strong> Rainfall data is not available before ${availableDate}. <a href="order-locations?location_id=${selectedLocationId}" class='text-yellow-500 text-lg'>Order Past Data</a></p>
           </div>
         `;
         setReportContent(errorMessage);
@@ -279,6 +458,13 @@ const Reports = () => {
     } else if (reportType === 'weekly' || reportType === 'daily' || reportType === "historical") {
       //query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}?historical=${reportType === "historical"}`;
        query = `${API_HOST}/api/reports/data_by_date_range/${fromDate}/${toDate}`;
+    } else if (reportType === 'multi-month') {
+      const sortedMonths = [...selectedMonths].sort();
+      const firstDay = `${multiMonthYear}-${sortedMonths[0]}-01`;
+      const endMonth = sortedMonths[sortedMonths.length - 1];
+      const lastDay = new Date(multiMonthYear, parseInt(endMonth, 10), 0).toISOString().slice(0, 10);
+
+      query = `${API_HOST}/api/reports/daily_excel_by_date_range/${firstDay}/${lastDay}`;
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
       
@@ -466,6 +652,7 @@ const Reports = () => {
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
+            {!user.is_superuser && isMultiMonthFeatureActive && <option value="multi-month">Multi-Month</option>}
             {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
@@ -486,6 +673,7 @@ const Reports = () => {
         </div>}
         {/* Dude */}
         <div className='flex flex-col justify-start gap-4'>
+        {!isMultiMonthReport && <>
         <div className={`${reportType == "monthly" ? "hidden" : ""} `}>
           <label htmlFor="fromDate" className="font-bold block text-gray-700">From:</label>
          
@@ -529,21 +717,72 @@ const Reports = () => {
               month: 'long',              
             }) }?  Upgrade <Link to={"/upgrade"}  state={{url: "/reports"}}>here</Link>
           </div>}
+        </>}
+        {isMultiMonthReport && <div className='flex flex-col gap-3'>
+          <div>
+            <label htmlFor="multiMonthYear" className="font-bold block text-gray-700">Year:</label>
+            <select
+              id="multiMonthYear"
+              value={multiMonthYear}
+              onChange={(e) => {
+                setMultiMonthYear(parseInt(e.target.value, 10));
+                setSelectedMonths([]);
+              }}
+              className="border border-gray-300 rounded p-2 w-full"
+            >
+              {availableYears.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="font-bold block text-gray-700">Months (same year, consecutive):</label>
+            <label className="mt-1 mb-2 flex items-center gap-2 text-xs text-gray-700">
+              <input
+                type="checkbox"
+                checked={areAllMonthsSelected}
+                onChange={handleSelectAllMonths}
+              />
+              Select all months
+            </label>
+            <div className="grid grid-cols-3 gap-2 border border-gray-300 rounded p-2">
+              {monthOptions.map((month) => {
+                const isFutureMonth = isFutureMonthForYear(month.value, multiMonthYear);
+
+                return (
+                <label key={month.value} className={`flex items-center gap-1 text-xs ${isFutureMonth ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <input
+                    type="checkbox"
+                    checked={selectedMonths.includes(month.value)}
+                    onChange={() => handleMultiMonthToggle(month.value)}
+                    disabled={isFutureMonth}
+                  />
+                  {month.label}
+                </label>
+                );
+              })}
+            </div>
+          </div>
+          <div className='px-3 py-2 rounded border border-blue-300 bg-blue-50 text-blue-900'>
+            Multi-month reports export to Excel only, use one location per submission, and require consecutive months.
+          </div>
+        </div>}
         </div>
         <div className="">
           <label htmlFor="displayFormat" className="font-bold block text-gray-700">Display:</label>
           <select
             id="displayFormat"
             value={displayFormat}
-            onChange={(e) => setDisplayFormat(e.target.value)}
+            onChange={(e) => setDisplayFormat(isMultiMonthReport ? 'excel' : e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-
+            disabled={isMultiMonthReport}
           >
-            {reportType != "historical" && <option value="html">Formatted</option>}
-            {<option value="csv">CSV</option>}
-            {VITE_FEATURE_PDF_REPORT == "true" && reportType != "sms" && reportType != "emails" && <option value="pdf">PDF</option>}
-            {VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails" &&  <option value="excel">Excel</option>}
+            {!isMultiMonthReport && reportType != "historical" && <option value="html">Formatted</option>}
+            {!isMultiMonthReport && <option value="csv">CSV</option>}
+            {!isMultiMonthReport && VITE_FEATURE_PDF_REPORT == "true" && reportType != "sms" && reportType != "emails" && <option value="pdf">PDF</option>}
+            {(isMultiMonthReport || (VITE_FEATURE_EXCEL_REPORT  === "true" && reportType != "sms" && reportType != "emails")) &&  <option value="excel">Excel</option>}
           </select>
+          {isMultiMonthReport && <p className='mt-1 text-xs text-gray-600'>Multi-month reports are available in Excel format only.</p>}
         </div>
 
         {isTypeFeatureActive && (
@@ -572,18 +811,24 @@ const Reports = () => {
 
         {/* Row 3 */}
         
-        {(reportType == "daily" || reportType=== "historical" ||reportType == "rapidrain" || reportType == "monthly" || reportType == "custom") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
-          <label htmlFor="locList" className="hidden md:flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations: ({selectedLocations.length})</span><div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div></label>
+        {(reportType == "daily" || reportType=== "historical" ||reportType == "rapidrain" || reportType == "monthly" || reportType == "custom" || reportType == "multi-month") && !user.is_superuser && <div className="w-full  min-w-[12rem]">
+          <label htmlFor="locList" className="hidden md:flex justify-between gap-2 w-full font-bold block text-gray-700"><span>Locations: ({selectedLocations.length})</span>{!isMultiMonthReport && <div><input id="all" type="checkbox" checked={selectAll} onChange={handleSelectAllChange} /><span> Select All</span></div>}</label>
           <select
         id="locList"
-        multiple
-        value={selectedLocations}
+        multiple={!isMultiMonthReport}
+        size={isMultiMonthReport ? 8 : undefined}
+        value={isMultiMonthReport ? (selectedLocations[0] || '') : selectedLocations}
         onChange={(e) => {
+          if (isMultiMonthReport) {
+            setSelectedLocations(e.target.value ? [parseInt(e.target.value, 10)] : []);
+            return;
+          }
+
           const options = Array.from(e.target.options);
           const selected = options
             .filter((option) => option.selected)
             .map((option) => parseInt(option.value, 10));
-          setSelectedLocations(selected);
+          setSelectedLocations(isMultiMonthReport ? selected.slice(0, 1) : selected);
         }}
         className="hidden md:block border border-gray-300 w-full rounded p-2"
       >
@@ -603,7 +848,21 @@ const Reports = () => {
       />
       <div className={`md:hidden flex w-full flex-col`}>
         <div>Locations</div>
-        <MultiSelectDropdown className={``} locations={filtered} onSelectedOption={(list)=> { console.log(`I see list ${JSON.stringify(list)}`); setSelectedLocations(list)} }/>
+        {isMultiMonthReport ? (
+          <select
+            value={selectedLocations[0] || ''}
+            onChange={(e) => setSelectedLocations(e.target.value ? [parseInt(e.target.value, 10)] : [])}
+            className="border border-gray-300 rounded p-2"
+          >
+            <option value="">Select one location</option>
+            {filtered.map((l) => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
+        ) : (
+          <MultiSelectDropdown className={``} locations={filtered} onSelectedOption={(list)=> { console.log(`I see list ${JSON.stringify(list)}`); setSelectedLocations(list)} }/>
+        )}
+        {isMultiMonthReport && <p className='text-xs text-gray-600 mt-1'>Choose one location for each multi-month report.</p>}
       </div>
         </div>}
 

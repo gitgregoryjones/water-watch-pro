@@ -184,6 +184,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     }
   };
 
+  const mapPickerCenter = pickedLocation || { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = pickedLocation ? 18 : 5;
+
   const handleDelete = async () => {
     setIsWorking(true)
     if (!isEditMode) {
@@ -283,8 +286,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
               <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
                 <Map
                   mapId={'mainMap'}
-                  defaultZoom={5}
-                  defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                  defaultZoom={mapPickerZoom}
+                  defaultCenter={mapPickerCenter}
                   onClick={handleMapClick}
                   gestureHandling={'greedy'}
                   disableDefaultUI={false}

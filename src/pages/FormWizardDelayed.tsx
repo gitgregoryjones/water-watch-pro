@@ -249,6 +249,9 @@ const FormWizardDelayed = () => {
     }));
   };
 
+  const mapPickerCenter = pickedLocation || { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = pickedLocation ? 18 : 5;
+
   const handleNext = () => {
     setErrors("");
     if (validateStep()) setCurrentStep(prev => prev + 1);
@@ -751,8 +754,8 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                   <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
                     <Map
                       mapId={'mainMap'}
-                      defaultZoom={5}
-                      defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                      defaultZoom={mapPickerZoom}
+                      defaultCenter={mapPickerCenter}
                       onClick={handleWizardMapClick}
                       gestureHandling={'greedy'}
                       disableDefaultUI={false}

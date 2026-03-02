@@ -47,6 +47,7 @@ const FormWizardDelayed = () => {
 
   const { isActive } = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
+  const isClick2MapPart2Enabled = isActive('click2mapPart2');
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -236,14 +237,31 @@ const FormWizardDelayed = () => {
     const roundedLat = lat.toFixed(6);
     const roundedLng = lng.toFixed(6);
 
+    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
+
+    if (!isClick2MapPart2Enabled) {
+      setFormData(prev => ({
+        ...prev,
+        latitude: roundedLat,
+        longitude: roundedLng,
+      }));
+      setShowMapPicker(false);
+    }
+  };
+
+  const applyWizardPickedCoordinates = () => {
+    if (!isClick2MapPart2Enabled || !pickedLocation) return;
+
     setFormData(prev => ({
       ...prev,
-      latitude: roundedLat,
-      longitude: roundedLng,
+      latitude: pickedLocation.lat.toFixed(6),
+      longitude: pickedLocation.lng.toFixed(6),
     }));
-    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
     setShowMapPicker(false);
   };
+
+  const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = isClick2MapPart2Enabled && pickedLocation ? 18 : 5;
 
   const handleNext = () => {
     setErrors("");
@@ -734,7 +752,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
             {showMapPicker && isClick2PointEnabled && (
               <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+                  <p className="text-sm text-gray-700">{isClick2MapPart2Enabled ? 'Click any point on the map to place a pin, then click Update coordinates.' : 'Click any point on the map to auto-fill latitude and longitude.'}</p>
                   <button
                     type="button"
                     className="text-xs text-gray-600 underline"
@@ -747,8 +765,8 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                   <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
                     <Map
                       mapId={'mainMap'}
-                      defaultZoom={5}
-                      defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                      defaultZoom={mapPickerZoom}
+                      defaultCenter={mapPickerCenter}
                       onClick={handleWizardMapClick}
                       gestureHandling={'greedy'}
                       disableDefaultUI={false}
@@ -757,6 +775,18 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                     </Map>
                   </APIProvider>
                 </div>
+                {isClick2MapPart2Enabled && (
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                      onClick={applyWizardPickedCoordinates}
+                      disabled={!pickedLocation}
+                    >
+                      Update coordinates
+                    </button>
+                  </div>
+                )}
               </div>
             )}
             <div className="mb-4">

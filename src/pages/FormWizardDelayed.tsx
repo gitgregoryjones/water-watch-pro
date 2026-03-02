@@ -257,6 +257,7 @@ const FormWizardDelayed = () => {
       latitude: pickedLocation.lat.toFixed(6),
       longitude: pickedLocation.lng.toFixed(6),
     }));
+    setShowMapPicker(false);
   };
 
   const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };

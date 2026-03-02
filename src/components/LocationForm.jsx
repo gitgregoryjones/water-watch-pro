@@ -84,6 +84,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
     setLatitude(pickedLocation.lat.toFixed(6));
     setLongitude(pickedLocation.lng.toFixed(6));
+    setShowMapPicker(false);
   };
 
   const handleSubmit = async (e) => {

@@ -25,6 +25,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [msg,setMsg] = useState("")
   const {isActive} = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
+  const isClick2MapPart2Enabled = isActive('click2mapPart2');
 
   const navigate = useNavigate();
 
@@ -69,9 +70,20 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     const roundedLat = lat.toFixed(6);
     const roundedLng = lng.toFixed(6);
 
-    setLatitude(roundedLat);
-    setLongitude(roundedLng);
     setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
+
+    if (!isClick2MapPart2Enabled) {
+      setLatitude(roundedLat);
+      setLongitude(roundedLng);
+      setShowMapPicker(false);
+    }
+  };
+
+  const applyPickedCoordinates = () => {
+    if (!isClick2MapPart2Enabled || !pickedLocation) return;
+
+    setLatitude(pickedLocation.lat.toFixed(6));
+    setLongitude(pickedLocation.lng.toFixed(6));
     setShowMapPicker(false);
   };
 
@@ -180,6 +192,9 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     }
   };
 
+  const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = isClick2MapPart2Enabled && pickedLocation ? 18 : 5;
+
   const handleDelete = async () => {
     setIsWorking(true)
     if (!isEditMode) {
@@ -266,7 +281,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         {showMapPicker && !isEditMode && isClick2PointEnabled && (
           <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+              <p className="text-sm text-gray-700">{isClick2MapPart2Enabled ? 'Click any point on the map to place a pin, then click Update coordinates.' : 'Click any point on the map to auto-fill latitude and longitude.'}</p>
               <button
                 type="button"
                 className="text-xs text-gray-600 underline"
@@ -279,8 +294,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
               <APIProvider apiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
                 <Map
                   mapId={'mainMap'}
-                  defaultZoom={5}
-                  defaultCenter={{ lat: 39.5, lng: -98.35 }}
+                  defaultZoom={mapPickerZoom}
+                  defaultCenter={mapPickerCenter}
                   onClick={handleMapClick}
                   gestureHandling={'greedy'}
                   disableDefaultUI={false}
@@ -289,6 +304,18 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                 </Map>
               </APIProvider>
             </div>
+            {isClick2MapPart2Enabled && (
+              <div className="mt-3 flex justify-end">
+                <button
+                  type="button"
+                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  onClick={applyPickedCoordinates}
+                  disabled={!pickedLocation}
+                >
+                  Update coordinates
+                </button>
+              </div>
+            )}
           </div>
         )}
 

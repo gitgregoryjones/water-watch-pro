@@ -21,7 +21,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@fontsource/roboto": "^5.1.0",
-    "@geejay/use-feature-flags": "^1.0.13",
+    "@geejay/use-feature-flags": "^1.0.34",
     "@mui/material": "^6.1.5",
     "@mui/x-charts": "^7.22.0",
     "@netlify/functions": "^4.2.2",

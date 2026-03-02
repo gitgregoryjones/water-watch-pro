@@ -69,10 +69,14 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     const roundedLat = lat.toFixed(6);
     const roundedLng = lng.toFixed(6);
 
-    setLatitude(roundedLat);
-    setLongitude(roundedLng);
     setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
-    setShowMapPicker(false);
+  };
+
+  const applyPickedCoordinates = () => {
+    if (!pickedLocation) return;
+
+    setLatitude(pickedLocation.lat.toFixed(6));
+    setLongitude(pickedLocation.lng.toFixed(6));
   };
 
   const handleSubmit = async (e) => {
@@ -266,7 +270,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         {showMapPicker && !isEditMode && isClick2PointEnabled && (
           <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+              <p className="text-sm text-gray-700">Click any point on the map to place a pin, then click Update coordinates.</p>
               <button
                 type="button"
                 className="text-xs text-gray-600 underline"
@@ -288,6 +292,16 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                   {pickedLocation && <AdvancedMarker position={pickedLocation} />}
                 </Map>
               </APIProvider>
+            </div>
+            <div className="mt-3 flex justify-end">
+              <button
+                type="button"
+                className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                onClick={applyPickedCoordinates}
+                disabled={!pickedLocation}
+              >
+                Update coordinates
+              </button>
             </div>
           </div>
         )}

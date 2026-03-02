@@ -236,13 +236,17 @@ const FormWizardDelayed = () => {
     const roundedLat = lat.toFixed(6);
     const roundedLng = lng.toFixed(6);
 
+    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
+  };
+
+  const applyWizardPickedCoordinates = () => {
+    if (!pickedLocation) return;
+
     setFormData(prev => ({
       ...prev,
-      latitude: roundedLat,
-      longitude: roundedLng,
+      latitude: pickedLocation.lat.toFixed(6),
+      longitude: pickedLocation.lng.toFixed(6),
     }));
-    setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
-    setShowMapPicker(false);
   };
 
   const handleNext = () => {
@@ -734,7 +738,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
             {showMapPicker && isClick2PointEnabled && (
               <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-700">Click any point on the map to auto-fill latitude and longitude.</p>
+                  <p className="text-sm text-gray-700">Click any point on the map to place a pin, then click Update coordinates.</p>
                   <button
                     type="button"
                     className="text-xs text-gray-600 underline"
@@ -756,6 +760,16 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                       {pickedLocation && <AdvancedMarker position={pickedLocation} />}
                     </Map>
                   </APIProvider>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <button
+                    type="button"
+                    className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    onClick={applyWizardPickedCoordinates}
+                    disabled={!pickedLocation}
+                  >
+                    Update coordinates
+                  </button>
                 </div>
               </div>
             )}

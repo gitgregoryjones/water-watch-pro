@@ -262,15 +262,49 @@ export default function RainIQ() {
 
   const selectedRangeMeta = timeRanges.find((range) => range.value === selectedRange);
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
-  const maxChartValue = Math.max(...selectedResponse.chart.map((item) => item.value), 1);
 
   const locationOptions = [
     ...(user.locations || []).slice(0, 5).map((loc) => ({ id: String(loc.id), name: loc.name })),
   ];
 
+  const fallbackLocations = [
+    { id: 'north-pump', name: 'North Pump Station' },
+    { id: 'west-yard', name: 'West Yard' },
+    { id: 'east-basin', name: 'East Basin' },
+  ];
+
+  const availableLocations = locationOptions.length ? locationOptions : fallbackLocations;
+
   const [selectedLocations, setSelectedLocations] = useState(
     locationOptions.length ? [locationOptions[0].id] : ['north-pump'],
   );
+
+  const selectedLocationResults = useMemo(() => {
+    const activeLocations = selectedLocations.length
+      ? selectedLocations
+      : availableLocations.slice(0, 1).map((location) => location.id);
+
+    return activeLocations.map((locationId, index) => {
+      const locationName = availableLocations.find((location) => location.id === locationId)?.name || 'Selected location';
+      const valueOffset = index * 0.09;
+
+      return {
+        id: locationId,
+        locationName,
+        headline: selectedResponse.headline.replace(/North Pump Station/g, locationName),
+        metrics: selectedResponse.metrics.map((metric) => ({
+          ...metric,
+          value: metric.value.replace(/North Pump Station/g, locationName),
+        })),
+        columns: selectedResponse.columns,
+        rows: selectedResponse.rows,
+        chart: selectedResponse.chart.map((item) => ({
+          ...item,
+          value: Number((item.value + valueOffset).toFixed(2)),
+        })),
+      };
+    });
+  }, [availableLocations, selectedLocations, selectedResponse]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -325,13 +359,7 @@ export default function RainIQ() {
           <div className="rounded-lg border p-4">
             <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Location(s)</label>
             <div className="space-y-2">
-              {(locationOptions.length
-                ? locationOptions
-                : [
-                    { id: 'north-pump', name: 'North Pump Station' },
-                    { id: 'west-yard', name: 'West Yard' },
-                    { id: 'east-basin', name: 'East Basin' },
-                  ]).map((location) => (
+              {availableLocations.map((location) => (
                 <label key={location.id} className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
@@ -392,65 +420,80 @@ export default function RainIQ() {
 
         <div className="mt-6 rounded-lg border border-[--main-2] bg-slate-50 p-4 dark:bg-slate-800">
           <h2 className="text-xl font-semibold">Headline Insight</h2>
-          <p className="mt-2 text-base">{selectedResponse.headline}</p>
+          <p className="mt-2 text-base">
+            Showing deterministic analytics for {selectedLocationResults.length} selected location{selectedLocationResults.length === 1 ? '' : 's'}.
+          </p>
           <p className="mt-3 text-xs text-slate-500">
             Based on monitoring data from {selectedRangeMeta?.scope}. RainIQ runs deterministic analytics and does not use third-party AI.
           </p>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {selectedResponse.metrics.map((metric) => (
-            <div key={metric.label} className="rounded-lg border p-4">
-              <div className="text-xs uppercase text-slate-500">{metric.label}</div>
-              <div className="mt-1 text-2xl font-bold text-[--main-2]">{metric.value}</div>
-            </div>
-          ))}
-        </div>
+        <div className="mt-6 space-y-8">
+          {selectedLocationResults.map((locationResult) => {
+            const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-lg border p-4">
-            <h3 className="mb-3 text-lg font-semibold">Supporting table</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-sm">
-                <thead>
-                  <tr className="border-b">
-                    {selectedResponse.columns.map((column) => (
-                      <th key={column} className="px-2 py-2 font-semibold">{column}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedResponse.rows.map((row, index) => (
-                    <tr key={`${row[0]}-${index}`} className="border-b last:border-0">
-                      {row.map((cell, cellIndex) => (
-                        <td key={`${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
-                      ))}
-                    </tr>
+            return (
+              <section key={locationResult.id} className="rounded-xl border p-4 md:p-5">
+                <h3 className="text-lg font-semibold text-[--main-2]">{locationResult.locationName}</h3>
+                <p className="mt-2 text-sm">{locationResult.headline}</p>
+
+                <div className="mt-4 grid gap-4 md:grid-cols-3">
+                  {locationResult.metrics.map((metric) => (
+                    <div key={`${locationResult.id}-${metric.label}`} className="rounded-lg border p-4">
+                      <div className="text-xs uppercase text-slate-500">{metric.label}</div>
+                      <div className="mt-1 text-2xl font-bold text-[--main-2]">{metric.value}</div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                </div>
 
-          <div className="rounded-lg border p-4">
-            <h3 className="mb-3 text-lg font-semibold">Supporting chart</h3>
-            <div className="space-y-3">
-              {selectedResponse.chart.map((item) => (
-                <div key={item.label}>
-                  <div className="mb-1 flex justify-between text-xs">
-                    <span>{item.label}</span>
-                    <span>{item.value}</span>
+                <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                  <div className="rounded-lg border p-4">
+                    <h4 className="mb-3 text-lg font-semibold">Supporting table</h4>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-left text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            {locationResult.columns.map((column) => (
+                              <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {locationResult.rows.map((row, index) => (
+                            <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
+                              {row.map((cell, cellIndex) => (
+                                <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                  <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                    <div
-                      className="h-3 rounded bg-[--main-2]"
-                      style={{ width: `${(item.value / maxChartValue) * 100}%` }}
-                    />
+
+                  <div className="rounded-lg border p-4">
+                    <h4 className="mb-3 text-lg font-semibold">Supporting chart</h4>
+                    <div className="space-y-3">
+                      {locationResult.chart.map((item) => (
+                        <div key={`${locationResult.id}-${item.label}`}>
+                          <div className="mb-1 flex justify-between text-xs">
+                            <span>{item.label}</span>
+                            <span>{item.value}</span>
+                          </div>
+                          <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
+                            <div
+                              className="h-3 rounded bg-[--main-2]"
+                              style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </section>
+            );
+          })}
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">

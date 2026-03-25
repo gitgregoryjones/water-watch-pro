@@ -1,0 +1,34 @@
+{
+  "name": "@geejay/use-feature-flags",
+  "version": "1.0.34",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepack": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=16.8"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.54.0",
+    "jotai": "^2.13.0"
+  },
+  "sideEffects": false,
+  "yalcSig": "9b77c48cd2cbd414e90b7eb74f05cade"
+}

@@ -113,12 +113,7 @@ export default function Header({ theme, onToggleTheme }) {
       >
         Reports
       </Link>
-  {isActive('rainIQ') && <Link
-        to="/rainiq"
-        className={getLinkClasses(theme,location.pathname === "/rainiq")}
-      >
-        RainIQ
-      </Link>}
+  {false}
   
   {((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) )  && (
       <Link
@@ -170,7 +165,7 @@ export default function Header({ theme, onToggleTheme }) {
 
 
   {VITE_FEATURE_MULTIPLE_CLIENTS == "true" && <ProfilePic  mini={true} />}
-  {onToggleTheme && isActive("dark-mode") && (
+  {onToggleTheme && (
     <button onClick={onToggleTheme} className='text-[--main-2]'>
       {theme === 'dark' ? <FaSun  className='outline-none ' color='yellow'/>  : <FaMoon  className='text-slate-800 outline-none'/>}
     </button>

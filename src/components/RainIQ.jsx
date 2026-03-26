@@ -257,7 +257,7 @@ export default function RainIQ() {
   const [requestMessage, setRequestMessage] = useState('');
 
   const canAccessRainIQ = useMemo(() => {
-    return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
+    return true;
   }, [user, isActive]);
 
   const selectedRangeMeta = timeRanges.find((range) => range.value === selectedRange);

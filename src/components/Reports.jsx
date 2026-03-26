@@ -41,7 +41,7 @@ const Reports = () => {
   const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
   const isTypeFeatureActive = isActive(typeFlag);
   const isMultiMonthFeatureActive = isActive('multi-month');
-  const isMultiMonthReport = isMultiMonthFeatureActive && reportType === 'multi-month';
+  const isMultiMonthReport = reportType === 'multi-month';
 
   const availableYears = Array.from(
     { length: Math.max(1, new Date().getFullYear() - 2022 + 1) },

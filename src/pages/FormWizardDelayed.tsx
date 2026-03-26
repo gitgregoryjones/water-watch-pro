@@ -46,8 +46,8 @@ const FormWizardDelayed = () => {
   const [success, setSuccess] = useState("");
 
   const { isActive } = useFeatureFlags();
-  const isClick2PointEnabled = isActive('click2point');
-  const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const isClick2PointEnabled = true;
+  const isClick2MapPart2Enabled = true;
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -209,7 +209,7 @@ const FormWizardDelayed = () => {
 
 
   useEffect(() => {
-    if (!isClick2PointEnabled) return;
+    
     if (!formData.latitude || !formData.longitude) return;
 
     const lat = Number(formData.latitude);
@@ -221,14 +221,11 @@ const FormWizardDelayed = () => {
   }, [formData.latitude, formData.longitude, isClick2PointEnabled]);
 
   useEffect(() => {
-    if (!isClick2PointEnabled) {
-      setShowMapPicker(false);
-      setPickedLocation(null);
-    }
+    
   }, [isClick2PointEnabled]);
 
   const handleWizardMapClick = (mapEvent) => {
-    if (!isClick2PointEnabled) return;
+    
     const lat = mapEvent?.detail?.latLng?.lat;
     const lng = mapEvent?.detail?.latLng?.lng;
 
@@ -239,14 +236,7 @@ const FormWizardDelayed = () => {
 
     setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
 
-    if (!isClick2MapPart2Enabled) {
-      setFormData(prev => ({
-        ...prev,
-        latitude: roundedLat,
-        longitude: roundedLng,
-      }));
-      setShowMapPicker(false);
-    }
+    
   };
 
   const applyWizardPickedCoordinates = () => {
@@ -260,8 +250,8 @@ const FormWizardDelayed = () => {
     setShowMapPicker(false);
   };
 
-  const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
-  const mapPickerZoom = isClick2MapPart2Enabled && pickedLocation ? 18 : 5;
+  const mapPickerCenter = pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = pickedLocation ? 18 : 5;
 
   const handleNext = () => {
     setErrors("");
@@ -736,23 +726,17 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
             <div className="mb-4">
               <div className="flex items-center justify-between gap-2">
                 <label className="block">Latitude <span className='text-[red]'>*</span></label>
-                {isClick2PointEnabled && (
-                  <button
-                    type="button"
-                    className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    onClick={() => setShowMapPicker(true)}
-                  >
+                {<button type="button" className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" onClick={() => setShowMapPicker(true)}>
                     Pick on map
-                  </button>
-                )}
+                  </button>}
               </div>
               <input type="number" name="latitude" value={formData.latitude} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" required />
             </div>
 
-            {showMapPicker && isClick2PointEnabled && (
+            {showMapPicker && (
               <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-sm text-gray-700">{isClick2MapPart2Enabled ? 'Click any point on the map to place a pin, then click Update coordinates.' : 'Click any point on the map to auto-fill latitude and longitude.'}</p>
+                  <p className="text-sm text-gray-700">{'Click any point on the map to place a pin, then click Update coordinates.'}</p>
                   <button
                     type="button"
                     className="text-xs text-gray-600 underline"
@@ -775,18 +759,11 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                     </Map>
                   </APIProvider>
                 </div>
-                {isClick2MapPart2Enabled && (
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      type="button"
-                      className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                      onClick={applyWizardPickedCoordinates}
-                      disabled={!pickedLocation}
-                    >
+                {<div className="mt-3 flex justify-end">
+                    <button type="button" className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed" onClick={applyWizardPickedCoordinates} disabled={!pickedLocation}>
                       Update coordinates
                     </button>
-                  </div>
-                )}
+                  </div>}
               </div>
             )}
             <div className="mb-4">

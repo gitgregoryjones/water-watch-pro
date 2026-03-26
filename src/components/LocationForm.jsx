@@ -24,8 +24,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const isEditMode = locationToEdit !== null;
   const [msg,setMsg] = useState("")
   const {isActive} = useFeatureFlags();
-  const isClick2PointEnabled = isActive('click2point');
-  const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const isClick2PointEnabled = false;
+  const isClick2MapPart2Enabled = false;
 
   const navigate = useNavigate();
 
@@ -44,7 +44,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   }, [locationToEdit, isEditMode]);
 
   useEffect(() => {
-    if (!isClick2PointEnabled) return;
+    return;
 
     if (latitude && longitude) {
       setPickedLocation({ lat: parseFloat(latitude), lng: parseFloat(longitude) });
@@ -52,14 +52,14 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   }, [latitude, longitude, isClick2PointEnabled]);
 
   useEffect(() => {
-    if (!isClick2PointEnabled) {
-      setShowMapPicker(false);
-      setPickedLocation(null);
-    }
+    {
+  setShowMapPicker(false);
+  setPickedLocation(null);
+}
   }, [isClick2PointEnabled]);
 
   const handleMapClick = (mapEvent) => {
-    if (!isClick2PointEnabled) return;
+    return;
     const lat = mapEvent?.detail?.latLng?.lat;
     const lng = mapEvent?.detail?.latLng?.lng;
 
@@ -72,11 +72,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
     setPickedLocation({ lat: Number(roundedLat), lng: Number(roundedLng) });
 
-    if (!isClick2MapPart2Enabled) {
-      setLatitude(roundedLat);
-      setLongitude(roundedLng);
-      setShowMapPicker(false);
-    }
+    {
+  setLatitude(roundedLat);
+  setLongitude(roundedLng);
+  setShowMapPicker(false);
+}
   };
 
   const applyPickedCoordinates = () => {
@@ -192,8 +192,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     }
   };
 
-  const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
-  const mapPickerZoom = isClick2MapPart2Enabled && pickedLocation ? 18 : 5;
+  const mapPickerCenter = false ? pickedLocation : { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = false ? 18 : 5;
 
   const handleDelete = async () => {
     setIsWorking(true)
@@ -256,7 +256,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             <label htmlFor="latitude" className="block font-bold">
               Latitude
             </label>
-            {!isEditMode && isClick2PointEnabled && (
+            {false && (
               <button
                 type="button"
                 className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
@@ -278,10 +278,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           />
         </div>
 
-        {showMapPicker && !isEditMode && isClick2PointEnabled && (
+        {false && (
           <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-gray-700">{isClick2MapPart2Enabled ? 'Click any point on the map to place a pin, then click Update coordinates.' : 'Click any point on the map to auto-fill latitude and longitude.'}</p>
+              <p className="text-sm text-gray-700">{'Click any point on the map to auto-fill latitude and longitude.'}</p>
               <button
                 type="button"
                 className="text-xs text-gray-600 underline"
@@ -304,18 +304,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                 </Map>
               </APIProvider>
             </div>
-            {isClick2MapPart2Enabled && (
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="button"
-                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  onClick={applyPickedCoordinates}
-                  disabled={!pickedLocation}
-                >
-                  Update coordinates
-                </button>
-              </div>
-            )}
+            {false}
           </div>
         )}
 
@@ -398,7 +387,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             {isEditMode ? 'Update Location' : 'Create Location'}
           </button>
           
-          {isActive("past-data") && isEditMode && <button
+          {isEditMode && <button
               type="button"
               onClick={()=> navigate(`/order-locations?location_id=${locationToEdit?.id}`)}
               className="bg-[#128DA6] text-white px-6 py-2 rounded hover:bg-[#128DA6]"

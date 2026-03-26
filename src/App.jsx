@@ -158,15 +158,9 @@ function App() {
     </div>
 
     
-    {isActive('dark-mode') && (
-      <button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
-        {theme === 'dark' ? (
-          <FaSun color="yellow" className="outline-none" />
-        ) : (
-          <FaMoon className="text-slate-800 outline-none" />
-        )}
-      </button>
-    )}
+    {<button onClick={handleThemeToggle} className="menu-item bm-item text-[--main-2]">
+        {theme === 'dark' ? <FaSun color="yellow" className="outline-none" /> : <FaMoon className="text-slate-800 outline-none" />}
+      </button>}
     <Link to={user.role != "admin" ? `/dashboard` : "/admin"} onClick={showSettings} className="menu-item bm-item">Data</Link>
     {user.role != "admin" &&<Link to="/dashboard#graphs" onClick={()=>setOpen(false)} className={`hover:text-[--main-2] ${location.hash === "#graphs" && location.pathname === "/dashboard" ? "text-slate-800" : "text-[--main-2]"}`}>
     Graphs
@@ -176,7 +170,7 @@ function App() {
   </Link>}
     <div   className="flex flex-col">
       <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
-      {isActive('rainIQ') && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
+      {<div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
    <Upgrade showMsg={false} tier={1}>
     
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}
@@ -248,7 +242,7 @@ function App() {
         <Route path="/upgrade" element={<Prices />} />
         <Route path="/admin" element={<AdminCards />} />
         <Route path="/cancel-signup" element={<CancelSignUp />} />
-        {isActive("past-data") && <Route  path="/order-locations" element={<AnonymousReportForm/>}/>}
+        {<Route path="/order-locations" element={<AnonymousReportForm />} />}
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />

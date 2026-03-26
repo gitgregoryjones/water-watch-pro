@@ -192,8 +192,8 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
     }
   };
 
-  const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
-  const mapPickerZoom = isClick2MapPart2Enabled && pickedLocation ? 18 : 5;
+  const mapPickerCenter = pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
+  const mapPickerZoom = pickedLocation ? 18 : 5;
 
   const handleDelete = async () => {
     setIsWorking(true)
@@ -256,7 +256,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             <label htmlFor="latitude" className="block font-bold">
               Latitude
             </label>
-            {!isEditMode && isClick2PointEnabled && (
+            {!isEditMode && (
               <button
                 type="button"
                 className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
@@ -278,10 +278,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           />
         </div>
 
-        {showMapPicker && !isEditMode && isClick2PointEnabled && (
+        {showMapPicker && !isEditMode && (
           <div className="mb-4 rounded border border-gray-300 p-3 bg-white">
             <div className="flex justify-between items-center mb-2">
-              <p className="text-sm text-gray-700">{isClick2MapPart2Enabled ? 'Click any point on the map to place a pin, then click Update coordinates.' : 'Click any point on the map to auto-fill latitude and longitude.'}</p>
+              <p className="text-sm text-gray-700">{'Click any point on the map to place a pin, then click Update coordinates.'}</p>
               <button
                 type="button"
                 className="text-xs text-gray-600 underline"
@@ -304,18 +304,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                 </Map>
               </APIProvider>
             </div>
-            {isClick2MapPart2Enabled && (
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="button"
-                  className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                  onClick={applyPickedCoordinates}
-                  disabled={!pickedLocation}
-                >
+            {<div className="mt-3 flex justify-end">
+                <button type="button" className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed" onClick={applyPickedCoordinates} disabled={!pickedLocation}>
                   Update coordinates
                 </button>
-              </div>
-            )}
+              </div>}
           </div>
         )}
 

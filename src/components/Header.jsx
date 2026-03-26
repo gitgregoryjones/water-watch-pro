@@ -113,10 +113,7 @@ export default function Header({ theme, onToggleTheme }) {
       >
         Reports
       </Link>
-  {isActive('rainIQ') && <Link
-        to="/rainiq"
-        className={getLinkClasses(theme,location.pathname === "/rainiq")}
-      >
+  {<Link to="/rainiq" className={getLinkClasses(theme, location.pathname === "/rainiq")}>
         RainIQ
       </Link>}
   

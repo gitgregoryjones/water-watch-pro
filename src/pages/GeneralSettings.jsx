@@ -16,7 +16,7 @@ const GeneralSettingsPage = () => {
   const DAILY_REPORT_HOURS = [6, 7, 8, 9];
   const { state } = useLocation();
   const { isActive } = useFeatureFlags();
-  const isCustomDailyReportTimeEnabled = isActive('customDailyReportTime');
+  const isCustomDailyReportTimeEnabled = true;
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
   const [settings, setSettings] = useState({});
@@ -93,9 +93,7 @@ const GeneralSettingsPage = () => {
     setWorking(true)
     setMsg("")
     try {
-      const payload = isCustomDailyReportTimeEnabled
-        ? settings
-        : { ...settings, notification_time: undefined };
+      const payload = settings;
       await api.patch(`/api/clients/${client.id}`, payload);
       //alert('Settings updated successfully!');
       setTimeout(() => {
@@ -144,26 +142,16 @@ const GeneralSettingsPage = () => {
               </div>
               <div className='ml-[56px] mb-4 flex flex-col gap-2'>
                 <span>
-                  All contacts will receive the daily report, sent at {isCustomDailyReportTimeEnabled ? (settings.notification_time || 6) : 6} am EDT
+                  All contacts will receive the daily report, sent at {settings.notification_time || 6} am EDT
                 </span>
-                {isCustomDailyReportTimeEnabled && (
-                  <label htmlFor="notification-time" className="flex items-center gap-2">
+                {<label htmlFor="notification-time" className="flex items-center gap-2">
                     <span>Send time:</span>
-                    <select
-                      id="notification-time"
-                      className="border rounded px-2 py-1"
-                      value={settings.notification_time || 6}
-                      onChange={(e) => handleSettingChange('notification_time', Number(e.target.value))}
-                      disabled={!settings.daily_report_on}
-                    >
-                      {DAILY_REPORT_HOURS.map((hour) => (
-                        <option key={hour} value={hour}>
+                    <select id="notification-time" className="border rounded px-2 py-1" value={settings.notification_time || 6} onChange={e => handleSettingChange('notification_time', Number(e.target.value))} disabled={!settings.daily_report_on}>
+                      {DAILY_REPORT_HOURS.map(hour => <option key={hour} value={hour}>
                           {hour} am
-                        </option>
-                      ))}
+                        </option>)}
                     </select>
-                  </label>
-                )}
+                  </label>}
               </div>
               <div className="hidden flex items-center mb-4 gap-2">
                 <Toggle

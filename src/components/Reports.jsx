@@ -464,7 +464,7 @@ const Reports = () => {
       const endMonth = sortedMonths[sortedMonths.length - 1];
       const lastDay = new Date(multiMonthYear, parseInt(endMonth, 10), 0).toISOString().slice(0, 10);
 
-      query = `${API_HOST}/api/reports/daily_excel_by_date_range/${firstDay}/${lastDay}`;
+      query =  `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
       
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;

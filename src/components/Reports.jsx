@@ -39,8 +39,8 @@ const Reports = () => {
   const [locations, setLocations] = useState([])
   const reportAreaRef = useRef(null);
   const typeFlag = 'https://blinkprojects.atlassian.net/browse/DP-197';
-  const isTypeFeatureActive = isActive(typeFlag);
-  const isMultiMonthFeatureActive = isActive('multi-month');
+  const isTypeFeatureActive = true;
+  const isMultiMonthFeatureActive = true;
   const isMultiMonthReport = reportType === 'multi-month';
 
   const availableYears = Array.from(
@@ -481,7 +481,9 @@ const Reports = () => {
       email_format: displayFormat,
       email_list: selectedContacts,
       locations: selectedLocations.map((id) => parseInt(id, 10)), // Ensure IDs are numbers
-      ...(isTypeFeatureActive && { daily: timeType === "daily"}),
+      ...({
+  daily: timeType === "daily"
+}),
     };
 
     setShowDialog(true);
@@ -496,7 +498,7 @@ const Reports = () => {
       }
 
       try {
-        const postQuery = isTypeFeatureActive ? `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}` : baseQuery
+        const postQuery = `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}`
         const response =  await api.post(postQuery, requestData);
 
         setShowDialog(false);
@@ -541,10 +543,10 @@ const Reports = () => {
         query = baseQuery;
       }
 
-      if (isTypeFeatureActive) {
-        const getDelimiter = query.includes('?') ? '&' : '?'
-        query = `${query}${getDelimiter}${typeParam}`
-      }
+      {
+  const getDelimiter = query.includes('?') ? '&' : '?';
+  query = `${query}${getDelimiter}${typeParam}`;
+}
 
       try {
 
@@ -553,7 +555,7 @@ const Reports = () => {
 
         if(requestData.email_list.length > 0){
           console.log(`Trying to email one location`)
-          const emailQuery = isTypeFeatureActive ? `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}` : baseQuery
+          const emailQuery = `${baseQuery}${baseQuery.includes('?') ? '&' : '?'}${typeParam}`
           await api.post(emailQuery, requestData);
         }
 
@@ -652,7 +654,7 @@ const Reports = () => {
               {/*!user.is_superuser && <option value="weekly">Weekly</option>*/}
             
             {!user.is_superuser && <option value="monthly">Monthly</option>}
-            {!user.is_superuser && isMultiMonthFeatureActive && <option value="multi-month">Multi-Month</option>}
+            {!user.is_superuser && <option value="multi-month">Multi-Month</option>}
             {!user.is_superuser && <option value="rapidrain">RapidRain</option>}
           </select>
         </div>
@@ -785,29 +787,19 @@ const Reports = () => {
           {isMultiMonthReport && <p className='mt-1 text-xs text-gray-600'>Multi-month reports are available in Excel format only.</p>}
         </div>
 
-        {isTypeFeatureActive && (
-          <div className="">
+        {<div className="">
             <label className="font-bold block text-gray-700">Type:</label>
             <div className="flex gap-4">
               <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={timeType === 'hourly'}
-                  onChange={() => setTimeType("hourly")}
-                />
+                <input type="checkbox" checked={timeType === 'hourly'} onChange={() => setTimeType("hourly")} />
                 Hourly
               </label>
               <label className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={timeType === 'daily'}
-                  onChange={() => setTimeType('daily')}
-                />
+                <input type="checkbox" checked={timeType === 'daily'} onChange={() => setTimeType('daily')} />
                 Daily
               </label>
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Row 3 */}
         

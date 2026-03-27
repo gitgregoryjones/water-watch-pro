@@ -16,7 +16,7 @@ const GeneralSettingsPage = () => {
   const DAILY_REPORT_HOURS = [6, 7, 8, 9];
   const { state } = useLocation();
   const { isActive } = useFeatureFlags();
-  const isCustomDailyReportTimeEnabled = isActive('customDailyReportTime');
+  const isCustomDailyReportTimeEnabled = true;
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
   const [settings, setSettings] = useState({});

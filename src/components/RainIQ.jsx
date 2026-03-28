@@ -26,6 +26,13 @@ const formatMonthForUi = (yearMonth) => {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 };
 
+const formatMonthShortForUi = (yearMonth) => {
+  const [year, month] = yearMonth.split('-');
+  const date = new Date(Number(year), Number(month) - 1, 1);
+
+  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+};
+
 const getRangeDates = (selectedRange) => {
   const endDate = new Date();
   endDate.setHours(0, 0, 0, 0);
@@ -350,9 +357,10 @@ export default function RainIQ() {
           .slice(0, 3);
 
         const nextClosest = rankedMonths.find(([month]) => month !== topMonth.month);
-        const dailyRows = (wettestLocationData.daily_totals || []).slice(-10).map((entry) => [
-          formatDateForUi(entry.date),
-          Number(entry.daily_total || 0).toFixed(2),
+        const summaryRows = rankedMonths.map(([month, total], rankIndex) => [
+          formatMonthShortForUi(month),
+          Number(total || 0).toFixed(2),
+          String(rankIndex + 1),
         ]);
 
         return {
@@ -369,10 +377,10 @@ export default function RainIQ() {
                 : 'N/A',
             },
           ],
-          columns: ['Date', 'Daily Rainfall (in)'],
-          rows: dailyRows.length ? dailyRows : [['N/A', '0.00']],
+          columns: ['Month', 'Total Rainfall (in)', 'Rank'],
+          rows: summaryRows.length ? summaryRows : [['N/A', '0.00', '1']],
           chart: rankedMonths.map(([month, total]) => ({
-            label: formatMonthForUi(month),
+            label: formatMonthShortForUi(month),
             value: Number(total || 0),
           })),
         };
@@ -402,6 +410,50 @@ export default function RainIQ() {
         ? prev.filter((id) => id !== locationId)
         : [...prev, locationId],
     );
+  };
+
+  const handleExportCsv = () => {
+    if (selectedQuery !== 'wettestMonth' || !wettestMonthResponse?.data?.length) {
+      return;
+    }
+
+    const rows = [['Location ID', 'Location Name', 'Date', 'Daily Total (in)', 'Wettest Month', 'Wettest Month Total (in)']];
+
+    wettestMonthResponse.data.forEach((locationData) => {
+      const wettestMonth = locationData.wettest_month_on_record?.month || '';
+      const wettestMonthTotal = locationData.wettest_month_on_record?.total_rainfall ?? '';
+
+      (locationData.daily_totals || []).forEach((dailyTotal) => {
+        rows.push([
+          String(locationData.location_id ?? ''),
+          locationData.location_name || '',
+          dailyTotal.date || '',
+          String(dailyTotal.daily_total ?? ''),
+          wettestMonth,
+          String(wettestMonthTotal),
+        ]);
+      });
+    });
+
+    const escapeCsvValue = (value) => {
+      const stringValue = String(value ?? '');
+      if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+        return `"${stringValue.replaceAll('"', '""')}"`;
+      }
+      return stringValue;
+    };
+
+    const csvContent = rows.map((row) => row.map(escapeCsvValue).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.setAttribute('download', `wettest-month-on-record-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -644,7 +696,13 @@ export default function RainIQ() {
         </div>
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white">Export CSV</button>
+          <button
+            className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleExportCsv}
+            disabled={selectedQuery === 'wettestMonth' && !wettestMonthResponse?.data?.length}
+          >
+            Export CSV
+          </button>
           <button className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2]">Export PDF</button>
         </div>
 

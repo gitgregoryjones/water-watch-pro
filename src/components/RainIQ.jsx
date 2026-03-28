@@ -315,6 +315,9 @@ export default function RainIQ() {
   const [qualifyingEventsResponse, setQualifyingEventsResponse] = useState(null);
   const [qualifyingEventsLoading, setQualifyingEventsLoading] = useState(false);
   const [qualifyingEventsError, setQualifyingEventsError] = useState('');
+  const [largest24hResponse, setLargest24hResponse] = useState(null);
+  const [largest24hLoading, setLargest24hLoading] = useState(false);
+  const [largest24hError, setLargest24hError] = useState('');
 
   const canAccessRainIQ = useMemo(() => {
     return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
@@ -343,6 +346,8 @@ export default function RainIQ() {
         ? avgDailyResponse
         : selectedQuery === 'qualifyingEvents'
           ? qualifyingEventsResponse
+          : selectedQuery === 'largest24h'
+            ? largest24hResponse
       : null;
 
   const locationOptions = [
@@ -569,6 +574,40 @@ export default function RainIQ() {
         };
       }
 
+      if (selectedQuery === 'largest24h' && reportLocationData) {
+        const dailyTotals = reportLocationData.daily_totals || [];
+        const sortedDailyTotals = [...dailyTotals].sort((a, b) => Number(b.daily_total || 0) - Number(a.daily_total || 0));
+        const peakEvent = sortedDailyTotals[0] || { date: '', daily_total: 0 };
+        const largest24hValue = Number(reportLocationData.largest_24h_rainfall_total || peakEvent.daily_total || 0);
+
+        const topRows = sortedDailyTotals.slice(0, 10).map((entry) => [
+          formatDateForUi(entry.date),
+          reportLocationData.location_name || locationName,
+          Number(entry.daily_total || 0).toFixed(2),
+        ]);
+
+        const chartRows = sortedDailyTotals.slice(0, 3).map((entry) => ({
+          label: formatDateForUi(entry.date),
+          value: Number(entry.daily_total || 0),
+        }));
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: peakEvent?.date
+            ? `The largest 24-hour rainfall total was ${largest24hValue.toFixed(2)} inches on ${formatDateForUi(peakEvent.date)}.`
+            : `The largest 24-hour rainfall total was ${largest24hValue.toFixed(2)} inches.`,
+          metrics: [
+            { label: 'Largest 24-hour total', value: `${largest24hValue.toFixed(2)} in` },
+            { label: 'Date', value: peakEvent?.date ? formatDateForUi(peakEvent.date) : 'N/A' },
+            { label: 'Location', value: reportLocationData.location_name || locationName },
+          ],
+          columns: ['Date', 'Location', '24-hour Total (in)'],
+          rows: topRows.length ? topRows : [['N/A', reportLocationData.location_name || locationName, '0.00']],
+          chart: chartRows.length ? chartRows : [{ label: 'N/A', value: 0 }],
+        };
+      }
+
       return {
         id: locationId,
         locationName,
@@ -596,7 +635,7 @@ export default function RainIQ() {
   };
 
   const handleExportCsv = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -611,14 +650,18 @@ export default function RainIQ() {
           ? 'Average Monthly Rainfall'
           : selectedQuery === 'avgDaily'
             ? 'Average Daily Rainfall'
-            : 'Qualifying Rain Events',
+            : selectedQuery === 'qualifyingEvents'
+              ? 'Qualifying Rain Events'
+              : 'Largest 24-hour Rainfall Total',
       selectedQuery === 'wettestMonth'
         ? 'Wettest Month Total (in)'
         : selectedQuery === 'avgMonthly'
           ? 'Average Monthly Rainfall (in)'
           : selectedQuery === 'avgDaily'
             ? 'Average Daily Rainfall (in)'
-            : 'Qualifying Rain Events Count',
+            : selectedQuery === 'qualifyingEvents'
+              ? 'Qualifying Rain Events Count'
+              : 'Largest 24-hour Rainfall Total (in)',
     ]];
 
     apiBackedResponse.data.forEach((locationData) => {
@@ -631,7 +674,9 @@ export default function RainIQ() {
           ? (locationData.average_monthly_rainfall ?? '')
           : selectedQuery === 'avgDaily'
             ? (locationData.average_daily_rainfall ?? '')
-            : (locationData.qualifying_rain_events_count ?? '');
+            : selectedQuery === 'qualifyingEvents'
+              ? (locationData.qualifying_rain_events_count ?? '')
+              : (locationData.largest_24h_rainfall_total ?? '');
 
       (locationData.daily_totals || []).forEach((dailyTotal) => {
         rows.push([
@@ -665,7 +710,9 @@ export default function RainIQ() {
         ? 'average-monthly-rainfall'
         : selectedQuery === 'avgDaily'
           ? 'average-daily-rainfall'
-          : 'qualifying-rain-events-count';
+          : selectedQuery === 'qualifyingEvents'
+            ? 'qualifying-rain-events-count'
+            : 'largest-24h-rainfall-total';
     link.setAttribute('download', `${filenamePrefix}-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
     document.body.appendChild(link);
     link.click();
@@ -674,7 +721,7 @@ export default function RainIQ() {
   };
 
   const handleExportPdf = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -860,6 +907,13 @@ export default function RainIQ() {
         setLoading: setQualifyingEventsLoading,
         setError: setQualifyingEventsError,
         invalidLocationMessage: 'Qualifying Rain Events requires mapped account locations.',
+      },
+      largest24h: {
+        endpoint: '/api/reports/historical/metrics/largest-24h-rainfall-total',
+        setResponse: setLargest24hResponse,
+        setLoading: setLargest24hLoading,
+        setError: setLargest24hError,
+        invalidLocationMessage: 'Largest 24-hour Rainfall Total requires mapped account locations.',
       },
     };
 
@@ -1125,6 +1179,12 @@ export default function RainIQ() {
         {selectedQuery === 'qualifyingEvents' && qualifyingEventsError && (
           <p className="mt-4 text-sm font-semibold text-red-600">{qualifyingEventsError}</p>
         )}
+        {selectedQuery === 'largest24h' && largest24hLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading largest 24-hour rainfall total report data...</p>
+        )}
+        {selectedQuery === 'largest24h' && largest24hError && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{largest24hError}</p>
+        )}
 
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
@@ -1198,14 +1258,14 @@ export default function RainIQ() {
           <button
             className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportCsv}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export CSV
           </button>
           <button
             className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportPdf}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export PDF
           </button>

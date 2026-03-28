@@ -308,6 +308,8 @@ export default function RainIQ() {
   const { isActive } = useFeatureFlags();
 
   const [selectedRange, setSelectedRange] = useState('30d');
+  const [customStartDate, setCustomStartDate] = useState(() => getRangeDates('custom').startDate);
+  const [customEndDate, setCustomEndDate] = useState(() => getRangeDates('custom').endDate);
   const [selectedQuery, setSelectedQuery] = useState('avgDaily');
   const [threshold, setThreshold] = useState('');
   const [includeZeroDays, setIncludeZeroDays] = useState(true);
@@ -337,7 +339,29 @@ export default function RainIQ() {
     return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
 
-  const selectedDateRange = useMemo(() => getRangeDates(selectedRange), [selectedRange]);
+  const customRangeError = useMemo(() => {
+    if (selectedRange !== 'custom') {
+      return '';
+    }
+    if (!customStartDate || !customEndDate) {
+      return 'Please provide both custom start and end dates.';
+    }
+    if (customStartDate > customEndDate) {
+      return 'Custom start date must be on or before end date.';
+    }
+    return '';
+  }, [selectedRange, customStartDate, customEndDate]);
+
+  const selectedDateRange = useMemo(() => {
+    if (selectedRange === 'custom') {
+      return {
+        startDate: customStartDate,
+        endDate: customEndDate,
+      };
+    }
+
+    return getRangeDates(selectedRange);
+  }, [selectedRange, customStartDate, customEndDate]);
   const parsedThreshold = useMemo(() => {
     const trimmedThreshold = threshold.trim();
     if (!trimmedThreshold) {
@@ -704,6 +728,11 @@ export default function RainIQ() {
     );
   };
 
+  const handleLocationMultiSelectChange = (event) => {
+    const selectedIds = Array.from(event.target.selectedOptions).map((option) => option.value);
+    setSelectedLocations(selectedIds);
+  };
+
   const handleExportCsv = () => {
     if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
@@ -1008,6 +1037,12 @@ export default function RainIQ() {
         return;
       }
 
+      if (customRangeError) {
+        activeQueryConfig.setError(customRangeError);
+        activeQueryConfig.setResponse(null);
+        return;
+      }
+
       const locationIds = selectedLocations
         .map((locationId) => Number(locationId))
         .filter((locationId) => Number.isInteger(locationId));
@@ -1040,7 +1075,7 @@ export default function RainIQ() {
     };
 
     fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold]);
+  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError]);
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
@@ -1159,18 +1194,34 @@ export default function RainIQ() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg border p-4">
             <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Location(s)</label>
-            <div className="space-y-2">
-              {availableLocations.map((location) => (
-                <label key={location.id} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={selectedLocations.includes(location.id)}
-                    onChange={() => handleLocationToggle(location.id)}
-                  />
-                  {location.name}
-                </label>
-              ))}
-            </div>
+            {availableLocations.length > 5 ? (
+              <select
+                multiple
+                value={selectedLocations}
+                onChange={handleLocationMultiSelectChange}
+                className="w-full rounded border p-2 text-sm text-slate-800"
+                size={Math.min(availableLocations.length, 8)}
+              >
+                {availableLocations.map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {location.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="space-y-2">
+                {availableLocations.map((location) => (
+                  <label key={location.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedLocations.includes(location.id)}
+                      onChange={() => handleLocationToggle(location.id)}
+                    />
+                    {location.name}
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="rounded-lg border p-4">
@@ -1189,6 +1240,27 @@ export default function RainIQ() {
             <p className="mt-2 text-xs text-slate-500">
               Data scope preview: {formatDateForUi(selectedDateRange.startDate)} to {formatDateForUi(selectedDateRange.endDate)}
             </p>
+            {selectedRange === 'custom' && (
+              <div className="mt-3 grid gap-2">
+                <label className="text-xs font-bold uppercase text-slate-500">Custom start date</label>
+                <input
+                  type="date"
+                  value={customStartDate}
+                  max={customEndDate || undefined}
+                  onChange={(event) => setCustomStartDate(event.target.value)}
+                  className="rounded border p-2 text-sm text-slate-800"
+                />
+                <label className="text-xs font-bold uppercase text-slate-500">Custom end date</label>
+                <input
+                  type="date"
+                  value={customEndDate}
+                  min={customStartDate || undefined}
+                  onChange={(event) => setCustomEndDate(event.target.value)}
+                  className="rounded border p-2 text-sm text-slate-800"
+                />
+                {customRangeError && <p className="text-xs font-semibold text-red-600">{customRangeError}</p>}
+              </div>
+            )}
           </div>
 
           <div className="rounded-lg border p-4 md:col-span-2">

@@ -298,7 +298,7 @@ export default function RainIQ() {
 
   const [selectedRange, setSelectedRange] = useState('30d');
   const [selectedQuery, setSelectedQuery] = useState('avgDaily');
-  const [threshold, setThreshold] = useState('0.50');
+  const [threshold, setThreshold] = useState('');
   const [includeZeroDays, setIncludeZeroDays] = useState(true);
   const [requestText, setRequestText] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
@@ -312,6 +312,19 @@ export default function RainIQ() {
   }, [user, isActive]);
 
   const selectedDateRange = useMemo(() => getRangeDates(selectedRange), [selectedRange]);
+  const parsedThreshold = useMemo(() => {
+    const trimmedThreshold = threshold.trim();
+    if (!trimmedThreshold) {
+      return null;
+    }
+
+    const thresholdValue = Number(trimmedThreshold);
+    if (!Number.isFinite(thresholdValue)) {
+      return null;
+    }
+
+    return thresholdValue;
+  }, [threshold]);
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
 
   const locationOptions = [
@@ -345,11 +358,12 @@ export default function RainIQ() {
       const wettestLocationData = wettestDataByLocation.get(locationId);
 
       if (selectedQuery === 'wettestMonth' && wettestLocationData?.wettest_month_on_record) {
-        const topMonth = wettestLocationData.wettest_month_on_record;
-        const monthLabel = formatMonthForUi(topMonth.month);
+        const filteredDailyTotals = (wettestLocationData.daily_totals || []).filter((entry) =>
+          parsedThreshold === null ? true : Number(entry.daily_total || 0) >= parsedThreshold,
+        );
         const sortedMonthTotals = {};
 
-        wettestLocationData.daily_totals?.forEach((entry) => {
+        filteredDailyTotals.forEach((entry) => {
           const month = entry.date.slice(0, 7);
           sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
         });
@@ -358,7 +372,10 @@ export default function RainIQ() {
           .sort(([, a], [, b]) => b - a)
           .slice(0, 3);
 
-        const nextClosest = rankedMonths.find(([month]) => month !== topMonth.month);
+        const topMonth = rankedMonths[0];
+        const monthLabel = topMonth ? formatMonthForUi(topMonth[0]) : 'N/A';
+        const topMonthTotal = Number(topMonth?.[1] || 0).toFixed(2);
+        const nextClosest = rankedMonths[1];
         const summaryRows = rankedMonths.map(([month, total], rankIndex) => [
           formatMonthShortForUi(month),
           Number(total || 0).toFixed(2),
@@ -368,13 +385,15 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: wettestLocationData.location_name || locationName,
-          headline: `The wettest month on record is ${monthLabel} with ${Number(topMonth.total_rainfall || 0).toFixed(2)} inches of rain.`,
+          headline: parsedThreshold === null
+            ? `The wettest month on record is ${monthLabel} with ${topMonthTotal} inches of rain.`
+            : `The wettest month on record is ${monthLabel} with ${topMonthTotal} inches of rain (daily totals filtered to ≥ ${parsedThreshold} in).`,
           metrics: [
             { label: 'Wettest month', value: monthLabel },
-            { label: 'Rainfall total', value: `${Number(topMonth.total_rainfall || 0).toFixed(2)} in` },
+            { label: 'Rainfall total', value: `${topMonthTotal} in` },
             {
               label: 'Next closest',
-              value: nextClosest
+              value: nextClosest?.[0]
                 ? `${formatMonthForUi(nextClosest[0])} (${Number(nextClosest[1] || 0).toFixed(2)} in)`
                 : 'N/A',
             },
@@ -404,7 +423,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, wettestMonthResponse]);
+  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, wettestMonthResponse, parsedThreshold]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>

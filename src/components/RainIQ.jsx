@@ -301,7 +301,7 @@ const groupedQueries = queries.reduce((acc, query) => {
   return acc;
 }, {});
 
-const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'];
+const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'];
 
 export default function RainIQ() {
   const user = useSelector((state) => state.userInfo.user);
@@ -329,6 +329,9 @@ export default function RainIQ() {
   const [largest24hResponse, setLargest24hResponse] = useState(null);
   const [largest24hLoading, setLargest24hLoading] = useState(false);
   const [largest24hError, setLargest24hError] = useState('');
+  const [totalRainResponse, setTotalRainResponse] = useState(null);
+  const [totalRainLoading, setTotalRainLoading] = useState(false);
+  const [totalRainError, setTotalRainError] = useState('');
 
   const canAccessRainIQ = useMemo(() => {
     return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
@@ -359,6 +362,8 @@ export default function RainIQ() {
           ? qualifyingEventsResponse
           : selectedQuery === 'largest24h'
             ? largest24hResponse
+            : selectedQuery === 'totalRain'
+              ? totalRainResponse
       : null;
 
   const locationOptions = [
@@ -622,6 +627,41 @@ export default function RainIQ() {
         };
       }
 
+      if (selectedQuery === 'totalRain' && reportLocationData) {
+        const dailyTotals = reportLocationData.daily_totals || [];
+        const totalRainfall = Number(reportLocationData.total_rainfall_selected_period || 0);
+        const rainDays = dailyTotals.filter((entry) => Number(entry.daily_total || 0) > 0).length;
+        const averagePerRainDay = rainDays ? totalRainfall / rainDays : 0;
+
+        const midpoint = Math.floor(dailyTotals.length / 2);
+        const firstHalfTotal = dailyTotals
+          .slice(0, midpoint)
+          .reduce((acc, entry) => acc + Number(entry.daily_total || 0), 0);
+        const secondHalfTotal = dailyTotals
+          .slice(midpoint)
+          .reduce((acc, entry) => acc + Number(entry.daily_total || 0), 0);
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: `Total rainfall in the selected period is ${formatRainValue(totalRainfall)} inches.`,
+          metrics: [
+            { label: 'Total rainfall', value: `${formatRainValue(totalRainfall)} in` },
+            { label: 'Average per rain day', value: `${formatRainValue(averagePerRainDay)} in` },
+            { label: 'Days with rain', value: String(rainDays) },
+          ],
+          columns: ['Period', 'Total Rainfall (in)'],
+          rows: [
+            ['First half of period', formatRainValue(firstHalfTotal)],
+            ['Second half of period', formatRainValue(secondHalfTotal)],
+          ],
+          chart: [
+            { label: 'First Half', value: Number(firstHalfTotal.toFixed(3)) },
+            { label: 'Second Half', value: Number(secondHalfTotal.toFixed(3)) },
+          ],
+        };
+      }
+
       if (apiBackedQueries.includes(selectedQuery)) {
         return {
           id: locationId,
@@ -665,7 +705,7 @@ export default function RainIQ() {
   };
 
   const handleExportCsv = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -682,7 +722,9 @@ export default function RainIQ() {
             ? 'Average Daily Rainfall'
             : selectedQuery === 'qualifyingEvents'
               ? 'Qualifying Rain Events'
-              : 'Largest 24-hour Rainfall Total',
+              : selectedQuery === 'largest24h'
+                ? 'Largest 24-hour Rainfall Total'
+                : 'Total Rainfall Selected Period',
       selectedQuery === 'wettestMonth'
         ? 'Wettest Month Total (in)'
         : selectedQuery === 'avgMonthly'
@@ -691,7 +733,9 @@ export default function RainIQ() {
             ? 'Average Daily Rainfall (in)'
             : selectedQuery === 'qualifyingEvents'
               ? 'Qualifying Rain Events Count'
-              : 'Largest 24-hour Rainfall Total (in)',
+              : selectedQuery === 'largest24h'
+                ? 'Largest 24-hour Rainfall Total (in)'
+                : 'Total Rainfall Selected Period (in)',
     ]];
 
     apiBackedResponse.data.forEach((locationData) => {
@@ -706,7 +750,9 @@ export default function RainIQ() {
             ? (locationData.average_daily_rainfall ?? '')
             : selectedQuery === 'qualifyingEvents'
               ? (locationData.qualifying_rain_events_count ?? '')
-              : (locationData.largest_24h_rainfall_total ?? '');
+              : selectedQuery === 'largest24h'
+                ? (locationData.largest_24h_rainfall_total ?? '')
+                : (locationData.total_rainfall_selected_period ?? '');
 
       (locationData.daily_totals || []).forEach((dailyTotal) => {
         rows.push([
@@ -742,7 +788,9 @@ export default function RainIQ() {
           ? 'average-daily-rainfall'
           : selectedQuery === 'qualifyingEvents'
             ? 'qualifying-rain-events-count'
-            : 'largest-24h-rainfall-total';
+            : selectedQuery === 'largest24h'
+              ? 'largest-24h-rainfall-total'
+              : 'total-rainfall-selected-period';
     link.setAttribute('download', `${filenamePrefix}-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
     document.body.appendChild(link);
     link.click();
@@ -751,7 +799,7 @@ export default function RainIQ() {
   };
 
   const handleExportPdf = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -944,6 +992,13 @@ export default function RainIQ() {
         setLoading: setLargest24hLoading,
         setError: setLargest24hError,
         invalidLocationMessage: 'Largest 24-hour Rainfall Total requires mapped account locations.',
+      },
+      totalRain: {
+        endpoint: '/api/reports/historical/metrics/total-rainfall-selected-period',
+        setResponse: setTotalRainResponse,
+        setLoading: setTotalRainLoading,
+        setError: setTotalRainError,
+        invalidLocationMessage: 'Total Rainfall for Selected Period requires mapped account locations.',
       },
     };
 
@@ -1215,6 +1270,12 @@ export default function RainIQ() {
         {selectedQuery === 'largest24h' && largest24hError && (
           <p className="mt-4 text-sm font-semibold text-red-600">{largest24hError}</p>
         )}
+        {selectedQuery === 'totalRain' && totalRainLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading total rainfall report data...</p>
+        )}
+        {selectedQuery === 'totalRain' && totalRainError && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{totalRainError}</p>
+        )}
 
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
@@ -1288,14 +1349,14 @@ export default function RainIQ() {
           <button
             className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportCsv}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export CSV
           </button>
           <button
             className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportPdf}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export PDF
           </button>

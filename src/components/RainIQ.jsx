@@ -301,6 +301,8 @@ const groupedQueries = queries.reduce((acc, query) => {
   return acc;
 }, {});
 
+const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h'];
+
 export default function RainIQ() {
   const user = useSelector((state) => state.userInfo.user);
   const { isActive } = useFeatureFlags();
@@ -620,6 +622,22 @@ export default function RainIQ() {
         };
       }
 
+      if (apiBackedQueries.includes(selectedQuery)) {
+        return {
+          id: locationId,
+          locationName,
+          headline: `No ${queries.find((query) => query.value === selectedQuery)?.label || 'report'} data returned for this location in the selected range.`,
+          metrics: [
+            { label: 'Status', value: 'No data' },
+            { label: 'Date range', value: `${formatDateForUi(selectedDateRange.startDate)} - ${formatDateForUi(selectedDateRange.endDate)}` },
+            { label: 'Threshold', value: threshold || 'N/A' },
+          ],
+          columns: ['Info', 'Value'],
+          rows: [['Location', locationName], ['Result', 'No report data returned']],
+          chart: [{ label: 'No Data', value: 0 }],
+        };
+      }
+
       return {
         id: locationId,
         locationName,
@@ -636,7 +654,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold]);
+  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>

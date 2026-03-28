@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
+import { VITE_SOCKETLABS_FROM_EMAIL } from '../utility/constants';
 
 const timeRanges = [
   { label: 'Last 30 days', value: '30d' },
@@ -301,6 +302,7 @@ export default function RainIQ() {
   const [includeZeroDays, setIncludeZeroDays] = useState(true);
   const [requestText, setRequestText] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
+  const [requestMessageType, setRequestMessageType] = useState('success');
   const [wettestMonthResponse, setWettestMonthResponse] = useState(null);
   const [wettestMonthLoading, setWettestMonthLoading] = useState(false);
   const [wettestMonthError, setWettestMonthError] = useState('');
@@ -653,15 +655,87 @@ export default function RainIQ() {
     fetchWettestMonth();
   }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays]);
 
-  const handleRequestSubmit = (event) => {
+  const handleRequestSubmit = async (event) => {
     event.preventDefault();
 
     if (!requestText.trim()) {
       return;
     }
 
-    setRequestMessage('Thanks — we’ve captured this request.');
-    setRequestText('');
+    try {
+      const meResponse = await api.get('/users/me');
+      const submitter = meResponse?.data || user || {};
+      const submitterName = submitter.name || submitter.account_name || 'Unknown';
+      const submitterEmail = submitter.email || submitter.invoice_email || 'Unknown';
+      const queryLabel = queries.find((query) => query.value === selectedQuery)?.label || selectedQuery;
+      const rangeLabel = timeRanges.find((range) => range.value === selectedRange)?.label || selectedRange;
+      const selectedLocationNames = selectedLocations
+        .map((locationId) => availableLocations.find((location) => String(location.id) === String(locationId))?.name)
+        .filter(Boolean);
+
+      const toEmail = VITE_SOCKETLABS_FROM_EMAIL;
+      if (!toEmail) {
+        throw new Error('SOCKETLABS_FROM_EMAIL is not configured.');
+      }
+
+      const emailSubject = `RainIQ new query request from ${submitterName}`;
+      const emailTextBody = [
+        'A new RainIQ query request was submitted.',
+        '',
+        `Submitted by: ${submitterName}`,
+        `Submitter email: ${submitterEmail}`,
+        '',
+        'Report context:',
+        `- Query type: ${queryLabel}`,
+        `- Time range preset: ${rangeLabel}`,
+        `- Date range: ${selectedDateRange.startDate} to ${selectedDateRange.endDate}`,
+        `- Locations: ${selectedLocationNames.join(', ') || 'None selected'}`,
+        `- Include zero-rain days: ${includeZeroDays ? 'Yes' : 'No'}`,
+        `- Threshold input: ${threshold || 'N/A'} inches`,
+        '',
+        'Requested new report details:',
+        requestText.trim(),
+      ].join('\n');
+
+      const emailHtmlBody = `
+        <h2>RainIQ New Query Request</h2>
+        <p><strong>Submitted by:</strong> ${submitterName}</p>
+        <p><strong>Submitter email:</strong> ${submitterEmail}</p>
+        <h3>Report context</h3>
+        <ul>
+          <li><strong>Query type:</strong> ${queryLabel}</li>
+          <li><strong>Time range preset:</strong> ${rangeLabel}</li>
+          <li><strong>Date range:</strong> ${selectedDateRange.startDate} to ${selectedDateRange.endDate}</li>
+          <li><strong>Locations:</strong> ${selectedLocationNames.join(', ') || 'None selected'}</li>
+          <li><strong>Include zero-rain days:</strong> ${includeZeroDays ? 'Yes' : 'No'}</li>
+          <li><strong>Threshold input:</strong> ${threshold || 'N/A'} inches</li>
+        </ul>
+        <h3>Requested new report details</h3>
+        <p>${requestText.trim().replaceAll('\n', '<br />')}</p>
+      `;
+
+      const response = await fetch('/.netlify/functions/sendEmail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toEmail,
+          subject: emailSubject,
+          textBody: emailTextBody,
+          htmlBody: emailHtmlBody,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Unable to send request email.');
+      }
+
+      setRequestMessageType('success');
+      setRequestMessage('Thanks — we’ve captured this request and emailed the RainIQ team.');
+      setRequestText('');
+    } catch (error) {
+      setRequestMessageType('error');
+      setRequestMessage(error.message || 'Unable to submit your request right now.');
+    }
   };
 
   if (!canAccessRainIQ) {
@@ -887,7 +961,11 @@ export default function RainIQ() {
               Submit request
             </button>
           </form>
-          {requestMessage && <p className="mt-3 text-sm font-semibold text-green-600">{requestMessage}</p>}
+          {requestMessage && (
+            <p className={`mt-3 text-sm font-semibold ${requestMessageType === 'error' ? 'text-red-600' : 'text-green-600'}`}>
+              {requestMessage}
+            </p>
+          )}
         </div>
       </div>
     </div>

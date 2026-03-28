@@ -1,14 +1,52 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
+import api from '../utility/api';
 
 const timeRanges = [
-  { label: 'Last 30 days', value: '30d', scope: '01/31/2026 to 03/01/2026' },
-  { label: 'Last 90 days', value: '90d', scope: '12/02/2025 to 03/01/2026' },
-  { label: 'Year to date', value: 'ytd', scope: '01/01/2026 to 03/01/2026' },
-  { label: 'Custom', value: 'custom', scope: '02/01/2026 to 02/29/2026' },
+  { label: 'Last 30 days', value: '30d' },
+  { label: 'Last 90 days', value: '90d' },
+  { label: 'Year to date', value: 'ytd' },
+  { label: 'Custom', value: 'custom' },
 ];
+
+const formatDateForApi = (date) => date.toISOString().split('T')[0];
+
+const formatDateForUi = (isoDate) => {
+  const date = new Date(`${isoDate}T00:00:00`);
+
+  return date.toLocaleDateString('en-US');
+};
+
+const formatMonthForUi = (yearMonth) => {
+  const [year, month] = yearMonth.split('-');
+  const date = new Date(Number(year), Number(month) - 1, 1);
+
+  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+};
+
+const getRangeDates = (selectedRange) => {
+  const endDate = new Date();
+  endDate.setHours(0, 0, 0, 0);
+
+  const startDate = new Date(endDate);
+
+  if (selectedRange === '90d') {
+    startDate.setDate(endDate.getDate() - 89);
+  } else if (selectedRange === 'ytd') {
+    startDate.setMonth(0, 1);
+  } else if (selectedRange === 'custom') {
+    startDate.setMonth(endDate.getMonth() - 1);
+  } else {
+    startDate.setDate(endDate.getDate() - 29);
+  }
+
+  return {
+    startDate: formatDateForApi(startDate),
+    endDate: formatDateForApi(endDate),
+  };
+};
 
 const queries = [
   { group: 'Baseline Metrics', label: 'Average daily rainfall', value: 'avgDaily' },
@@ -253,14 +291,18 @@ export default function RainIQ() {
   const [selectedRange, setSelectedRange] = useState('30d');
   const [selectedQuery, setSelectedQuery] = useState('avgDaily');
   const [threshold, setThreshold] = useState('0.50');
+  const [includeZeroDays, setIncludeZeroDays] = useState(true);
   const [requestText, setRequestText] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
+  const [wettestMonthResponse, setWettestMonthResponse] = useState(null);
+  const [wettestMonthLoading, setWettestMonthLoading] = useState(false);
+  const [wettestMonthError, setWettestMonthError] = useState('');
 
   const canAccessRainIQ = useMemo(() => {
     return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
 
-  const selectedRangeMeta = timeRanges.find((range) => range.value === selectedRange);
+  const selectedDateRange = useMemo(() => getRangeDates(selectedRange), [selectedRange]);
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
 
   const locationOptions = [
@@ -280,6 +322,10 @@ export default function RainIQ() {
   );
 
   const selectedLocationResults = useMemo(() => {
+    const wettestDataByLocation = new Map(
+      (wettestMonthResponse?.data || []).map((locationData) => [String(locationData.location_id), locationData]),
+    );
+
     const activeLocations = selectedLocations.length
       ? selectedLocations
       : availableLocations.slice(0, 1).map((location) => location.id);
@@ -287,6 +333,50 @@ export default function RainIQ() {
     return activeLocations.map((locationId, index) => {
       const locationName = availableLocations.find((location) => location.id === locationId)?.name || 'Selected location';
       const valueOffset = index * 0.09;
+      const wettestLocationData = wettestDataByLocation.get(locationId);
+
+      if (selectedQuery === 'wettestMonth' && wettestLocationData?.wettest_month_on_record) {
+        const topMonth = wettestLocationData.wettest_month_on_record;
+        const monthLabel = formatMonthForUi(topMonth.month);
+        const sortedMonthTotals = {};
+
+        wettestLocationData.daily_totals?.forEach((entry) => {
+          const month = entry.date.slice(0, 7);
+          sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
+        });
+
+        const rankedMonths = Object.entries(sortedMonthTotals)
+          .sort(([, a], [, b]) => b - a)
+          .slice(0, 3);
+
+        const nextClosest = rankedMonths.find(([month]) => month !== topMonth.month);
+        const dailyRows = (wettestLocationData.daily_totals || []).slice(-10).map((entry) => [
+          formatDateForUi(entry.date),
+          Number(entry.daily_total || 0).toFixed(2),
+        ]);
+
+        return {
+          id: locationId,
+          locationName: wettestLocationData.location_name || locationName,
+          headline: `The wettest month on record is ${monthLabel} with ${Number(topMonth.total_rainfall || 0).toFixed(2)} inches of rain.`,
+          metrics: [
+            { label: 'Wettest month', value: monthLabel },
+            { label: 'Rainfall total', value: `${Number(topMonth.total_rainfall || 0).toFixed(2)} in` },
+            {
+              label: 'Next closest',
+              value: nextClosest
+                ? `${formatMonthForUi(nextClosest[0])} (${Number(nextClosest[1] || 0).toFixed(2)} in)`
+                : 'N/A',
+            },
+          ],
+          columns: ['Date', 'Daily Rainfall (in)'],
+          rows: dailyRows.length ? dailyRows : [['N/A', '0.00']],
+          chart: rankedMonths.map(([month, total]) => ({
+            label: formatMonthForUi(month),
+            value: Number(total || 0),
+          })),
+        };
+      }
 
       return {
         id: locationId,
@@ -304,7 +394,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse]);
+  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, wettestMonthResponse]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -313,6 +403,45 @@ export default function RainIQ() {
         : [...prev, locationId],
     );
   };
+
+  useEffect(() => {
+    const fetchWettestMonth = async () => {
+      if (selectedQuery !== 'wettestMonth') {
+        return;
+      }
+
+      const locationIds = selectedLocations
+        .map((locationId) => Number(locationId))
+        .filter((locationId) => Number.isInteger(locationId));
+
+      if (!locationIds.length) {
+        setWettestMonthError('Wettest Month on Record requires mapped account locations.');
+        setWettestMonthResponse(null);
+        return;
+      }
+
+      setWettestMonthLoading(true);
+      setWettestMonthError('');
+
+      try {
+        const { data } = await api.post('/api/reports/historical/metrics/wettest-month-on-record', {
+          start_date: selectedDateRange.startDate,
+          end_date: selectedDateRange.endDate,
+          location_ids: locationIds,
+          include_zero_days: includeZeroDays,
+        });
+
+        setWettestMonthResponse(data);
+      } catch (error) {
+        setWettestMonthResponse(null);
+        setWettestMonthError(error.message || 'Unable to load Wettest Month on Record.');
+      } finally {
+        setWettestMonthLoading(false);
+      }
+    };
+
+    fetchWettestMonth();
+  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays]);
 
   const handleRequestSubmit = (event) => {
     event.preventDefault();
@@ -385,7 +514,9 @@ export default function RainIQ() {
                 </option>
               ))}
             </select>
-            <p className="mt-2 text-xs text-slate-500">Data scope preview: {selectedRangeMeta?.scope}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              Data scope preview: {formatDateForUi(selectedDateRange.startDate)} to {formatDateForUi(selectedDateRange.endDate)}
+            </p>
           </div>
 
           <div className="rounded-lg border p-4 md:col-span-2">
@@ -415,6 +546,15 @@ export default function RainIQ() {
               />
               <span className="text-xs text-slate-500">inches</span>
             </div>
+
+            <label className="mt-3 inline-flex items-center gap-2 text-xs font-bold uppercase text-slate-500">
+              <input
+                type="checkbox"
+                checked={includeZeroDays}
+                onChange={(event) => setIncludeZeroDays(event.target.checked)}
+              />
+              Include zero-rain days
+            </label>
           </div>
         </div>
 
@@ -424,9 +564,16 @@ export default function RainIQ() {
             Showing deterministic analytics for {selectedLocationResults.length} selected location{selectedLocationResults.length === 1 ? '' : 's'}.
           </p>
           <p className="mt-3 text-xs text-slate-500">
-            Based on monitoring data from {selectedRangeMeta?.scope}. RainIQ runs deterministic analytics and does not use third-party AI.
+            Based on monitoring data from {formatDateForUi(selectedDateRange.startDate)} to {formatDateForUi(selectedDateRange.endDate)}. RainIQ runs deterministic analytics and does not use third-party AI.
           </p>
         </div>
+
+        {selectedQuery === 'wettestMonth' && wettestMonthLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading wettest month report data...</p>
+        )}
+        {selectedQuery === 'wettestMonth' && wettestMonthError && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{wettestMonthError}</p>
+        )}
 
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {

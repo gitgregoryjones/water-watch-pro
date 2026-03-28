@@ -469,6 +469,12 @@ export default function RainIQ() {
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#039;');
 
+    const selectedQueryLabel = queries.find((query) => query.value === selectedQuery)?.label || selectedQuery;
+    const selectedLocationNames = selectedLocations
+      .map((locationId) => availableLocations.find((location) => String(location.id) === String(locationId))?.name)
+      .filter(Boolean);
+    const selectedRangeLabel = timeRanges.find((range) => range.value === selectedRange)?.label || selectedRange;
+
     const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
       const sourceData = wettestMonthResponse.data.find(
         (item) => String(item.location_id) === String(locationResult.id),
@@ -567,6 +573,10 @@ export default function RainIQ() {
             h3 { margin: 18px 0 8px; color: #1f4f7a; }
             p { margin: 0 0 12px; }
             .subhead { color: #475569; font-size: 12px; margin-bottom: 20px; }
+            .criteria-box { border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; margin-bottom: 20px; background: #f8fafc; }
+            .criteria-title { margin: 0 0 8px; font-size: 14px; color: #1f4f7a; font-weight: 700; }
+            .criteria-list { margin: 0; padding-left: 18px; }
+            .criteria-list li { margin: 4px 0; font-size: 12px; }
             .location-section { border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 24px; page-break-inside: avoid; }
             .headline { margin-bottom: 12px; }
             .metrics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
@@ -584,6 +594,17 @@ export default function RainIQ() {
             Range: ${escapeHtml(formatDateForUi(selectedDateRange.startDate))} to ${escapeHtml(formatDateForUi(selectedDateRange.endDate))}
             &nbsp;|&nbsp; Include zero-rain days: ${includeZeroDays ? 'Yes' : 'No'}
           </p>
+          <div class="criteria-box">
+            <p class="criteria-title">Search criteria</p>
+            <ul class="criteria-list">
+              <li><strong>Query:</strong> ${escapeHtml(selectedQueryLabel)}</li>
+              <li><strong>Locations:</strong> ${escapeHtml(selectedLocationNames.join(', ') || 'None selected')}</li>
+              <li><strong>Time range preset:</strong> ${escapeHtml(selectedRangeLabel)}</li>
+              <li><strong>Date range:</strong> ${escapeHtml(selectedDateRange.startDate)} to ${escapeHtml(selectedDateRange.endDate)}</li>
+              <li><strong>Include zero-rain days:</strong> ${includeZeroDays ? 'Yes' : 'No'}</li>
+              <li><strong>Threshold input:</strong> ${escapeHtml(threshold || 'N/A')} inches</li>
+            </ul>
+          </div>
           ${reportSectionsHtml}
         </body>
       </html>

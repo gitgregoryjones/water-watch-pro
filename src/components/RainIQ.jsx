@@ -371,12 +371,10 @@ export default function RainIQ() {
       const reportLocationData = reportDataByLocation.get(locationId);
 
       if (selectedQuery === 'wettestMonth' && reportLocationData?.wettest_month_on_record) {
-        const filteredDailyTotals = (reportLocationData.daily_totals || []).filter((entry) =>
-          parsedThreshold === null ? true : Number(entry.daily_total || 0) >= parsedThreshold,
-        );
+        const dailyTotals = reportLocationData.daily_totals || [];
         const sortedMonthTotals = {};
 
-        filteredDailyTotals.forEach((entry) => {
+        dailyTotals.forEach((entry) => {
           const month = entry.date.slice(0, 7);
           sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
         });
@@ -398,9 +396,7 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: parsedThreshold === null
-            ? `The wettest month on record is ${monthLabel} with ${topMonthTotal} inches of rain.`
-            : `The wettest month on record is ${monthLabel} with ${topMonthTotal} inches of rain (daily totals filtered to ≥ ${parsedThreshold} in).`,
+          headline: `The wettest month on record is ${monthLabel} with ${topMonthTotal} inches of rain.`,
           metrics: [
             { label: 'Wettest month', value: monthLabel },
             { label: 'Rainfall total', value: `${topMonthTotal} in` },
@@ -421,12 +417,10 @@ export default function RainIQ() {
       }
 
       if (selectedQuery === 'avgMonthly' && reportLocationData) {
-        const filteredDailyTotals = (reportLocationData.daily_totals || []).filter((entry) =>
-          parsedThreshold === null ? true : Number(entry.daily_total || 0) >= parsedThreshold,
-        );
+        const dailyTotals = reportLocationData.daily_totals || [];
         const sortedMonthTotals = {};
 
-        filteredDailyTotals.forEach((entry) => {
+        dailyTotals.forEach((entry) => {
           const month = entry.date.slice(0, 7);
           sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
         });
@@ -436,18 +430,13 @@ export default function RainIQ() {
           .slice(0, 3);
 
         const analyzedMonthCount = Object.keys(sortedMonthTotals).length;
-        const aggregateTotal = Object.values(sortedMonthTotals).reduce((acc, value) => acc + value, 0);
-        const monthlyAverage = analyzedMonthCount
-          ? Number((aggregateTotal / analyzedMonthCount).toFixed(2))
-          : Number(reportLocationData.average_monthly_rainfall || 0);
+        const monthlyAverage = Number(reportLocationData.average_monthly_rainfall || 0);
         const highestMonth = rankedMonths[0];
 
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: parsedThreshold === null
-            ? `Average monthly rainfall is ${monthlyAverage.toFixed(2)} inches.`
-            : `Average monthly rainfall is ${monthlyAverage.toFixed(2)} inches (daily totals filtered to ≥ ${parsedThreshold} in).`,
+          headline: `Average monthly rainfall is ${monthlyAverage.toFixed(2)} inches.`,
           metrics: [
             { label: 'Monthly average', value: `${monthlyAverage.toFixed(2)} in` },
             { label: 'Months analyzed', value: String(analyzedMonthCount || 0) },
@@ -472,22 +461,17 @@ export default function RainIQ() {
       }
 
       if (selectedQuery === 'avgDaily' && reportLocationData) {
-        const filteredDailyTotals = (reportLocationData.daily_totals || []).filter((entry) =>
-          parsedThreshold === null ? true : Number(entry.daily_total || 0) >= parsedThreshold,
-        );
+        const dailyTotals = reportLocationData.daily_totals || [];
 
-        const dayCount = filteredDailyTotals.length;
-        const rainfallTotal = filteredDailyTotals.reduce((acc, entry) => acc + Number(entry.daily_total || 0), 0);
-        const averageDaily = dayCount
-          ? Number((rainfallTotal / dayCount).toFixed(2))
-          : Number(reportLocationData.average_daily_rainfall || 0);
-        const rainDaysCount = filteredDailyTotals.filter((entry) => Number(entry.daily_total || 0) > 0).length;
-        const peakDay = filteredDailyTotals.reduce(
+        const dayCount = dailyTotals.length;
+        const averageDaily = Number(reportLocationData.average_daily_rainfall || 0);
+        const rainDaysCount = dailyTotals.filter((entry) => Number(entry.daily_total || 0) > 0).length;
+        const peakDay = dailyTotals.reduce(
           (maxEntry, entry) => (Number(entry.daily_total || 0) > Number(maxEntry.daily_total || 0) ? entry : maxEntry),
           { date: '', daily_total: 0 },
         );
 
-        const topDailyRows = [...filteredDailyTotals]
+        const topDailyRows = [...dailyTotals]
           .sort((a, b) => Number(b.daily_total || 0) - Number(a.daily_total || 0))
           .slice(0, 10)
           .map((entry, rankIndex) => [
@@ -497,7 +481,7 @@ export default function RainIQ() {
           ]);
 
         const monthBuckets = {};
-        filteredDailyTotals.forEach((entry) => {
+        dailyTotals.forEach((entry) => {
           const month = entry.date.slice(0, 7);
           monthBuckets[month] = Number(((monthBuckets[month] || 0) + Number(entry.daily_total || 0)).toFixed(2));
         });
@@ -512,9 +496,7 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: parsedThreshold === null
-            ? `Average daily rainfall for the selected period is ${averageDaily.toFixed(2)} inches.`
-            : `Average daily rainfall for the selected period is ${averageDaily.toFixed(2)} inches (daily totals filtered to ≥ ${parsedThreshold} in).`,
+          headline: `Average daily rainfall for the selected period is ${averageDaily.toFixed(2)} inches.`,
           metrics: [
             { label: 'Average daily total', value: `${averageDaily.toFixed(2)} in` },
             { label: 'Rain days', value: `${rainDaysCount} of ${dayCount || 0} days` },
@@ -547,7 +529,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold]);
+  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -835,6 +817,7 @@ export default function RainIQ() {
           end_date: selectedDateRange.endDate,
           location_ids: locationIds,
           include_zero_days: includeZeroDays,
+          ...(parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
         });
 
         activeQueryConfig.setResponse(data);
@@ -847,7 +830,7 @@ export default function RainIQ() {
     };
 
     fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays]);
+  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold]);
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();

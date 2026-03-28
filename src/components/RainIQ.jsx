@@ -456,6 +456,143 @@ export default function RainIQ() {
     URL.revokeObjectURL(url);
   };
 
+  const handleExportPdf = () => {
+    if (selectedQuery !== 'wettestMonth' || !wettestMonthResponse?.data?.length) {
+      return;
+    }
+
+    const escapeHtml = (value) =>
+      String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+
+    const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
+      const sourceData = wettestMonthResponse.data.find(
+        (item) => String(item.location_id) === String(locationResult.id),
+      );
+
+      const metricsHtml = locationResult.metrics
+        .map(
+          (metric) => `
+            <div class="metric-card">
+              <div class="metric-label">${escapeHtml(metric.label)}</div>
+              <div class="metric-value">${escapeHtml(metric.value)}</div>
+            </div>
+          `,
+        )
+        .join('');
+
+      const summaryRowsHtml = locationResult.rows
+        .map(
+          (row) => `
+            <tr>
+              ${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join('')}
+            </tr>
+          `,
+        )
+        .join('');
+
+      const chartRowsHtml = locationResult.chart
+        .map(
+          (item) => `
+            <tr>
+              <td>${escapeHtml(item.label)}</td>
+              <td>${escapeHtml(Number(item.value || 0).toFixed(2))}</td>
+            </tr>
+          `,
+        )
+        .join('');
+
+      const fullJsonRowsHtml = (sourceData?.daily_totals || [])
+        .map(
+          (entry) => `
+            <tr>
+              <td>${escapeHtml(entry.date)}</td>
+              <td>${escapeHtml(Number(entry.daily_total || 0).toFixed(2))}</td>
+            </tr>
+          `,
+        )
+        .join('');
+
+      return `
+        <section class="location-section">
+          <h2>${escapeHtml(locationResult.locationName)}</h2>
+          <p class="headline">${escapeHtml(locationResult.headline)}</p>
+
+          <div class="metrics-grid">${metricsHtml}</div>
+
+          <h3>Supporting table</h3>
+          <table>
+            <thead>
+              <tr>${locationResult.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join('')}</tr>
+            </thead>
+            <tbody>${summaryRowsHtml}</tbody>
+          </table>
+
+          <h3>Supporting chart values</h3>
+          <table>
+            <thead>
+              <tr><th>Label</th><th>Value</th></tr>
+            </thead>
+            <tbody>${chartRowsHtml}</tbody>
+          </table>
+
+          <h3>Full JSON values</h3>
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Daily Total (in)</th></tr>
+            </thead>
+            <tbody>${fullJsonRowsHtml || '<tr><td colspan="2">No daily totals returned.</td></tr>'}</tbody>
+          </table>
+        </section>
+      `;
+    }).join('');
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      return;
+    }
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>RainIQ Wettest Month Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #1e293b; margin: 24px; }
+            h1 { color: #1f4f7a; margin-bottom: 8px; }
+            h2 { color: #1f4f7a; margin: 0 0 8px; }
+            h3 { margin: 18px 0 8px; color: #1f4f7a; }
+            p { margin: 0 0 12px; }
+            .subhead { color: #475569; font-size: 12px; margin-bottom: 20px; }
+            .location-section { border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; margin-bottom: 24px; page-break-inside: avoid; }
+            .headline { margin-bottom: 12px; }
+            .metrics-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+            .metric-card { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px; }
+            .metric-label { font-size: 11px; text-transform: uppercase; color: #64748b; }
+            .metric-value { margin-top: 4px; font-weight: 700; color: #1f4f7a; font-size: 18px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+            th, td { border-bottom: 1px solid #d1d5db; text-align: left; padding: 8px; font-size: 12px; }
+            th { background: #f8fafc; font-weight: 700; }
+          </style>
+        </head>
+        <body>
+          <h1>RainIQ - Wettest Month on Record</h1>
+          <p class="subhead">
+            Range: ${escapeHtml(formatDateForUi(selectedDateRange.startDate))} to ${escapeHtml(formatDateForUi(selectedDateRange.endDate))}
+            &nbsp;|&nbsp; Include zero-rain days: ${includeZeroDays ? 'Yes' : 'No'}
+          </p>
+          ${reportSectionsHtml}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
   useEffect(() => {
     const fetchWettestMonth = async () => {
       if (selectedQuery !== 'wettestMonth') {
@@ -703,7 +840,13 @@ export default function RainIQ() {
           >
             Export CSV
           </button>
-          <button className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2]">Export PDF</button>
+          <button
+            className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2] disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleExportPdf}
+            disabled={selectedQuery === 'wettestMonth' && !wettestMonthResponse?.data?.length}
+          >
+            Export PDF
+          </button>
         </div>
 
         <div className="mt-8 rounded-lg border p-4">

@@ -34,6 +34,15 @@ const formatMonthShortForUi = (yearMonth) => {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
+const formatRainValue = (value, digits = 3) => {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return '0';
+  }
+
+  return numericValue.toFixed(digits).replace(/\.?0+$/, '');
+};
+
 const getRangeDates = (selectedRange) => {
   const endDate = new Date();
   endDate.setHours(0, 0, 0, 0);
@@ -578,7 +587,10 @@ export default function RainIQ() {
         const dailyTotals = reportLocationData.daily_totals || [];
         const sortedDailyTotals = [...dailyTotals].sort((a, b) => Number(b.daily_total || 0) - Number(a.daily_total || 0));
         const peakEvent = sortedDailyTotals[0] || { date: '', daily_total: 0 };
-        const largest24hValue = Number(reportLocationData.largest_24h_rainfall_total || peakEvent.daily_total || 0);
+        const largest24hFromService = Number(reportLocationData.largest_24h_rainfall_total);
+        const largest24hValue = Number.isFinite(largest24hFromService)
+          ? largest24hFromService
+          : Number(peakEvent.daily_total || 0);
 
         const topRows = sortedDailyTotals.slice(0, 10).map((entry) => [
           formatDateForUi(entry.date),
@@ -595,10 +607,10 @@ export default function RainIQ() {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
           headline: peakEvent?.date
-            ? `The largest 24-hour rainfall total was ${largest24hValue.toFixed(2)} inches on ${formatDateForUi(peakEvent.date)}.`
-            : `The largest 24-hour rainfall total was ${largest24hValue.toFixed(2)} inches.`,
+            ? `The largest 24-hour rainfall total was ${formatRainValue(largest24hValue)} inches on ${formatDateForUi(peakEvent.date)}.`
+            : `The largest 24-hour rainfall total was ${formatRainValue(largest24hValue)} inches.`,
           metrics: [
-            { label: 'Largest 24-hour total', value: `${largest24hValue.toFixed(2)} in` },
+            { label: 'Largest 24-hour total', value: `${formatRainValue(largest24hValue)} in` },
             { label: 'Date', value: peakEvent?.date ? formatDateForUi(peakEvent.date) : 'N/A' },
             { label: 'Location', value: reportLocationData.location_name || locationName },
           ],

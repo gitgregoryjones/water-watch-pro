@@ -311,7 +311,7 @@ export default function RainIQ() {
   const [customStartDate, setCustomStartDate] = useState(() => getRangeDates('custom').startDate);
   const [customEndDate, setCustomEndDate] = useState(() => getRangeDates('custom').endDate);
   const [selectedQuery, setSelectedQuery] = useState('avgDaily');
-  const [threshold, setThreshold] = useState('');
+  const [threshold, setThreshold] = useState('1.0');
   const [includeZeroDays, setIncludeZeroDays] = useState(true);
   const [requestText, setRequestText] = useState('');
   const [requestMessage, setRequestMessage] = useState('');

@@ -391,8 +391,10 @@ export default function RainIQ() {
       : null;
 
   const locationOptions = [
-    ...(user.locations || []).slice(0, 5).map((loc) => ({ id: String(loc.id), name: loc.name })),
+    ...(user.locations || []).map((loc) => ({ id: String(loc.id), name: loc.name })),
   ];
+
+
 
   const fallbackLocations = [
     { id: 'north-pump', name: 'North Pump Station' },

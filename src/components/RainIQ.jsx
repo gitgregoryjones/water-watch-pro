@@ -665,7 +665,8 @@ export default function RainIQ() {
     try {
       const meResponse = await api.get('/users/me');
       const submitter = meResponse?.data || user || {};
-      const submitterName = submitter.name || submitter.account_name || 'Unknown';
+      const submitterNameFromParts = `${submitter.first_name || ''} ${submitter.last_name || ''}`.trim();
+      const submitterName = submitterNameFromParts || submitter.name || submitter.account_name || 'Unknown';
       const submitterEmail = submitter.email || submitter.invoice_email || 'Unknown';
       const queryLabel = queries.find((query) => query.value === selectedQuery)?.label || selectedQuery;
       const rangeLabel = timeRanges.find((range) => range.value === selectedRange)?.label || selectedRange;

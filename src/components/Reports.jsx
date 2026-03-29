@@ -788,19 +788,6 @@ const Reports = () => {
           {isMultiMonthReport && <p className='mt-1 text-xs text-gray-600'>Multi-month reports are available in Excel format only.</p>}
         </div>
 
-        {<div className="">
-            <label className="font-bold block text-gray-700">Type:</label>
-            <div className="flex gap-4">
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={timeType === 'hourly'} onChange={() => setTimeType("hourly")} />
-                Hourly
-              </label>
-              <label className="flex items-center gap-1">
-                <input type="checkbox" checked={timeType === 'daily'} onChange={() => setTimeType('daily')} />
-                Daily
-              </label>
-            </div>
-          </div>}
 
         {/* Row 3 */}
         

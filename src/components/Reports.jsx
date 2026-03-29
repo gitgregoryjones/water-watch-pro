@@ -789,6 +789,20 @@ const Reports = () => {
         </div>
 
 
+        {user.role !== "admin" && <div className="">
+            <label className="font-bold block text-gray-700">Type:</label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-1">
+                <input type="checkbox" checked={timeType === 'hourly'} onChange={() => setTimeType("hourly")} />
+                Hourly
+              </label>
+              <label className="flex items-center gap-1">
+                <input type="checkbox" checked={timeType === 'daily'} onChange={() => setTimeType('daily')} />
+                Daily
+              </label>
+            </div>
+          </div>}
+
         {/* Row 3 */}
         
         {(reportType == "daily" || reportType=== "historical" ||reportType == "rapidrain" || reportType == "monthly" || reportType == "custom" || reportType == "multi-month") && !user.is_superuser && <div className="w-full  min-w-[12rem]">

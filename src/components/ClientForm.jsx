@@ -30,7 +30,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [msg,setMsg] = useState("")
   const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
   const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations || true)
-  const [send_monthly_report, setSendMonthlyReport] = useState(clientToEdit?.send_monthly_report ?? false)
+  const [monthly_report_on, setMonthlyReportOn] = useState(clientToEdit?.monthly_report_on ?? false)
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
   const { isActive } = useFeatureFlags();
@@ -96,7 +96,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
       is_trial_account: account_type == "trial",
       
       auto_add_locations,
-      send_monthly_report
+      monthly_report_on
       
     };
 
@@ -259,7 +259,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
         </div>
         {isActive('send_monthly_report') && (
           <div className=" flex items-center">
-            <Toggle checked={send_monthly_report === true} onChange={() => setSendMonthlyReport(!send_monthly_report)} />
+            <Toggle checked={monthly_report_on === true} onChange={() => setMonthlyReportOn(!monthly_report_on)} />
             <span className="ml-2">Send Monthly Report</span>
           </div>
         )}

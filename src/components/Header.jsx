@@ -46,6 +46,9 @@ export default function Header({ theme, onToggleTheme }) {
   
   const {isActive} = useFeatureFlags()
 
+  const rainIQAllowedEmails = ["gene.norman@waterwatchpro.com"];
+  const canViewRainIQMenu = isActive('rainIQ') && user.role !== "admin" && rainIQAllowedEmails.includes((user.email || "").toLowerCase());
+
   
 
   const daysLeft = (Math.max(Math.floor(differenceInMs / (1000 * 60 * 60 * 24)), 0));
@@ -113,7 +116,7 @@ export default function Header({ theme, onToggleTheme }) {
       >
         Reports
       </Link>
-  {isActive('rainIQ') && <Link
+  {canViewRainIQMenu && <Link
         to="/rainiq"
         className={getLinkClasses(theme,location.pathname === "/rainiq")}
       >

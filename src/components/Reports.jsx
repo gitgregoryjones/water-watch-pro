@@ -788,7 +788,8 @@ const Reports = () => {
           {isMultiMonthReport && <p className='mt-1 text-xs text-gray-600'>Multi-month reports are available in Excel format only.</p>}
         </div>
 
-        {<div className="">
+
+        {user.role !== "admin" && <div className="">
             <label className="font-bold block text-gray-700">Type:</label>
             <div className="flex gap-4">
               <label className="flex items-center gap-1">

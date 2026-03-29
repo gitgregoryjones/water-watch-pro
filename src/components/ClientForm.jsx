@@ -11,6 +11,7 @@ import { updateUser } from '../utility/UserSlice';
 import { useDispatch } from 'react-redux';
 import { convertTier } from '../utility/loginUser';
 import ChildAccountsWidget from './ChildAccountsWidget';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 const ClientForm = ({ clientToEdit,myself }) => {
 
@@ -29,8 +30,10 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [msg,setMsg] = useState("")
   const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
   const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations || true)
+  const [send_monthly_report, setSendMonthlyReport] = useState(clientToEdit?.send_monthly_report ?? false)
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
+  const { isActive } = useFeatureFlags();
 
   useEffect(()=>{
     setTimeout(()=>
@@ -92,7 +95,8 @@ const ClientForm = ({ clientToEdit,myself }) => {
       account_type,
       is_trial_account: account_type == "trial",
       
-      auto_add_locations
+      auto_add_locations,
+      send_monthly_report
       
     };
 
@@ -253,6 +257,12 @@ const ClientForm = ({ clientToEdit,myself }) => {
           <Toggle checked={JSON.stringify(auto_add_locations) == "true"} onChange={() => setAutoAddLocations(!auto_add_locations)} />
           <span className="ml-2">Auto Add Locations</span>
         </div>
+        {isActive('send_monthly_report') && (
+          <div className=" flex items-center">
+            <Toggle checked={send_monthly_report === true} onChange={() => setSendMonthlyReport(!send_monthly_report)} />
+            <span className="ml-2">Send Monthly Report</span>
+          </div>
+        )}
 
         {/* Account Actions */}
         <div className="border p-4 rounded shadow">

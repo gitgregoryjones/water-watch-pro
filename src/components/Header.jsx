@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import ProfilePic from './ProfilePic';
-import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
+import { RAINIQ_ALLOWED_EMAILS, VITE_FEATURE_MULTIPLE_CLIENTS } from '../utility/constants';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 import {getLinkClasses} from '../utility/getLinkClasses';
@@ -46,8 +46,7 @@ export default function Header({ theme, onToggleTheme }) {
   
   const {isActive} = useFeatureFlags()
 
-  const rainIQAllowedEmails = ["gene.norman@waterwatchpro.com"];
-  const canViewRainIQMenu = isActive('rainIQ') && user.role !== "admin" && rainIQAllowedEmails.includes((user.email || "").toLowerCase());
+  const canViewRainIQMenu = isActive('rainIQ') && user.role !== "admin" && RAINIQ_ALLOWED_EMAILS.includes((user.email || "").toLowerCase());
 
   
 

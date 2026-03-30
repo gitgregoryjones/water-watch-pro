@@ -25,8 +25,13 @@ export const VITE_FEATURE_TABLE_VIEW = import.meta.env.VITE_FEATURE_TABLE_VIEW;
 export const VITE_FEATURE_TABLE_COLORS = import.meta.env.VITE_FEATURE_TABLE_COLORS;
 export const VITE_FEATURE_HISTORY_REPORT = import.meta.env.VITE_FEATURE_HISTORY_REPORT
 
-
-
+export const RAINIQ_ALLOWED_EMAILS = [
+  "gene.norman@waterwatchpro.com",
+  "dtaylor@ersnell.com",
+  "fbrody@gmail.com",
+  "jt.midstate@gmail.com",
+  "keith@siltsaver.com",
+];
 
 if(!API_HOST){
     throw new Error(`ENV VARIABlES ARE NOT INITIALIZED CORRECTLY ${VITE_GOOGLE_API_KEY}  and ${API_HOST} ${VITE_FEATURE_HISTORY_REPORT}`)

@@ -50,7 +50,7 @@ import { useDispatch, useSelector } from "react-redux";
 import FormWizardDelayed from "./pages/FormWizardDelayed";
 import CancelSignUp from "./pages/CancelSignUp";
 import ProfileMenu from "./components/ProfileMenu";
-import {VITE_FEATURE_HISTORY_REPORT, VITE_FEATURE_MULTIPLE_CLIENTS} from "./utility/constants"
+import { RAINIQ_ALLOWED_EMAILS, VITE_FEATURE_HISTORY_REPORT, VITE_FEATURE_MULTIPLE_CLIENTS } from "./utility/constants"
 import api from './utility/api';
 import { updateUser } from "./utility/UserSlice";
 import WorkingDialog from "./components/WorkingDialog";
@@ -76,6 +76,7 @@ function App() {
 
   const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
   const {isActive,loading} = useFeatureFlags(featureFlagKey)
+  const canViewRainIQMenu = isActive('rainIQ') && RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
 
   const handleThemeToggle = () => {
     if (isActive('dark-mode')) {
@@ -176,7 +177,7 @@ function App() {
   </Link>}
     <div   className="flex flex-col">
       <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
-      {isActive('rainIQ') && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
+      {canViewRainIQMenu && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
    <Upgrade showMsg={false} tier={1}>
     
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}

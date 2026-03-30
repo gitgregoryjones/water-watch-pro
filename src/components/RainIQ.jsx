@@ -72,11 +72,11 @@ const queries = [
   { group: 'Compliance & Threshold Queries', label: 'Count of qualifying rain events (> X inches)', value: 'qualifyingEvents' },
   { group: 'Compliance & Threshold Queries', label: 'Largest 24-hour rainfall total', value: 'largest24h' },
   { group: 'Compliance & Threshold Queries', label: 'Total rainfall for selected period', value: 'totalRain' },
-  { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
+ /* { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
   { group: 'Streak Analysis', label: 'Longest consecutive rainfall period', value: 'longestWet' },
   { group: 'Temporal Distribution', label: 'Most common rainfall time of day', value: 'commonTimeOfDay' },
   { group: 'Temporal Distribution', label: 'Rainfall by day of week', value: 'rainByDay' },
-  { group: 'Limited Multi-Location', label: 'Location with highest rainfall in selected period', value: 'topLocation' },
+  { group: 'Limited Multi-Location', label: 'Location with highest rainfall in selected period', value: 'topLocation' },*/
 ];
 
 const mockResponses = {

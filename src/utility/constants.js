@@ -31,6 +31,10 @@ export const RAINIQ_ALLOWED_EMAILS = [
   "fbrody@gmail.com",
   "jt.midstate@gmail.com",
   "keith@siltsaver.com",
+  "johny.ye@synovas.com",
+  "sandy.peace@synovas.com",
+  "gregory.jones@synovas.com",
+  "gregory.jones05@gmail.com",
 ];
 
 if(!API_HOST){

@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import ProfilePic from './ProfilePic';
-import {VITE_FEATURE_MULTIPLE_CLIENTS} from '../utility/constants';
+import { RAINIQ_ALLOWED_EMAILS, VITE_FEATURE_MULTIPLE_CLIENTS } from '../utility/constants';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 
 import {getLinkClasses} from '../utility/getLinkClasses';
@@ -45,6 +45,8 @@ export default function Header({ theme, onToggleTheme }) {
   const differenceInMs = trialEndDate - today;
   
   const {isActive} = useFeatureFlags()
+
+  const canViewRainIQMenu = isActive('rainIQ') && user.role !== "admin" && RAINIQ_ALLOWED_EMAILS.includes((user.email || "").toLowerCase());
 
   
 
@@ -113,7 +115,7 @@ export default function Header({ theme, onToggleTheme }) {
       >
         Reports
       </Link>
-  {isActive('rainIQ') && <Link
+  {canViewRainIQMenu && <Link
         to="/rainiq"
         className={getLinkClasses(theme,location.pathname === "/rainiq")}
       >

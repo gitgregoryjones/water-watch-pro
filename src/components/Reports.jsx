@@ -464,7 +464,7 @@ const Reports = () => {
       const endMonth = sortedMonths[sortedMonths.length - 1];
       const lastDay = new Date(multiMonthYear, parseInt(endMonth, 10), 0).toISOString().slice(0, 10);
 
-      query = `${API_HOST}/api/reports/daily_excel_by_date_range/${firstDay}/${lastDay}`;
+      query =  `${API_HOST}/api/reports/data_by_date_range/${firstDay}/${lastDay}`;
       
     } else if (reportType === 'rapidrain'){
       query = `${API_HOST}/api/reports/rapidrain_by_date_range/${fromDate}/${toDate}`;
@@ -788,7 +788,8 @@ const Reports = () => {
           {isMultiMonthReport && <p className='mt-1 text-xs text-gray-600'>Multi-month reports are available in Excel format only.</p>}
         </div>
 
-        {<div className="">
+
+        {user.role !== "admin" && <div className="">
             <label className="font-bold block text-gray-700">Type:</label>
             <div className="flex gap-4">
               <label className="flex items-center gap-1">

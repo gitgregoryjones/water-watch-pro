@@ -29,6 +29,7 @@ export const RAINIQ_ALLOWED_EMAILS = [
   "gene.norman@waterwatchpro.com",
   "dtaylor@ersnell.com",
   "fbrody@gmail.com",
+  "fcbrody@gmail.com",
   "jt.midstate@gmail.com",
   "keith@siltsaver.com",
   "johny.ye@synovas.com",

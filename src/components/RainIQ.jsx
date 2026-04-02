@@ -4,6 +4,7 @@ import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
 import { VITE_SOCKETLABS_FROM_EMAIL } from '../utility/constants';
+import fetchByPage from '../utility/fetchByPage';
 
 const timeRanges = [
   { label: 'Last 30 days', value: '30d' },
@@ -334,6 +335,28 @@ export default function RainIQ() {
   const [totalRainResponse, setTotalRainResponse] = useState(null);
   const [totalRainLoading, setTotalRainLoading] = useState(false);
   const [totalRainError, setTotalRainError] = useState('');
+  const [locationOptions, setLocationOptions] = useState([]);
+  
+
+
+
+  useEffect(() => {
+    fetchLocations(1);
+  }, []);
+
+  const fetchLocations = async (page) => {
+    try {
+
+      
+      let rows = await fetchByPage(`/api/locations/?client_id=${user.clients[0].id}`)
+
+      setLocationOptions(rows); // Ensure `results` is always an array
+      //setTotalPages(Math.ceil(response.data.total / pageSize));
+    } catch (error) {
+      console.error('Error fetching locations:', error.message);
+      setLocationOptions([]); // Fallback to an empty array in case of an error
+    }
+  };
 
   const canAccessRainIQ = useMemo(() => {
     return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
@@ -390,19 +413,12 @@ export default function RainIQ() {
               ? totalRainResponse
       : null;
 
-  const locationOptions = [
-    ...(user.locations || []).map((loc) => ({ id: String(loc.id), name: loc.name })),
-  ];
+  
 
 
 
-  const fallbackLocations = [
-    { id: 'north-pump', name: 'North Pump Station' },
-    { id: 'west-yard', name: 'West Yard' },
-    { id: 'east-basin', name: 'East Basin' },
-  ];
 
-  const availableLocations = locationOptions.length ? locationOptions : fallbackLocations;
+  const availableLocations = locationOptions;
 
   const [selectedLocations, setSelectedLocations] = useState(
     locationOptions.length ? [locationOptions[0].id] : ['north-pump'],
@@ -1049,6 +1065,7 @@ export default function RainIQ() {
         .map((locationId) => Number(locationId))
         .filter((locationId) => Number.isInteger(locationId));
 
+        
       if (!locationIds.length) {
         activeQueryConfig.setError(activeQueryConfig.invalidLocationMessage);
         activeQueryConfig.setResponse(null);

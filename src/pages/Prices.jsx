@@ -1,5 +1,6 @@
 // src/pages/Prices.jsx
 import React, { useEffect, useRef } from 'react';
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { updateUser } from '../utility/UserSlice';
@@ -24,6 +25,8 @@ export default function Prices({ isSmall = false }) {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const upgradeTrackedRef = useRef(false);
+  const { isActive } = useFeatureFlags();
+  const showPlatinum = isActive('showPlatinum');
 
   // --- Upgrade → create Checkout Session via Netlify function ---
   const handleUpgrade = async (tier) => {
@@ -41,7 +44,7 @@ export default function Prices({ isSmall = false }) {
         },
         body: JSON.stringify({
           email: user.email,
-          plan: tier, // "gold" | "silver" | "bronze"
+          plan: tier, // "platinum" | "gold" | "silver" | "bronze"
         }),
       });
 
@@ -135,17 +138,18 @@ export default function Prices({ isSmall = false }) {
   }, [location.search, isSmall, dispatch, navigate, user]);
 
   const features = [
-    { name: '24/7 Monitoring', gold: true, silver: true, bronze: true },
-    { name: 'Threshold Notification', gold: true, silver: true, bronze: true },
-    { name: 'National Precipitation Forecast', gold: true, silver: true, bronze: true },
-    { name: 'Daily and Monthly Reports', gold: true, silver: true, bronze: false },
-    { name: 'Previous Month Report Only', gold: false, silver: false, bronze: true },
-    { name: 'Contact Notifications', gold: true, silver: true, bronze: true },
-    { name: 'Excessive Rainfall', gold: true, silver: true, bronze: false },
-    { name: 'RapidRain', gold: true, silver: true, bronze: false },
-    { name: 'Configurable RapidRain Thresholds', gold: true, silver: true, bronze: false },
-    { name: 'Site-Specific Forecasts', gold: true, silver: false, bronze: false },
-    { name: 'On-Demand Lookup', gold: true, silver: false, bronze: false },
+    { name: '24/7 Monitoring', platinum: true, gold: true, silver: true, bronze: true },
+    { name: 'Threshold Notification', platinum: true, gold: true, silver: true, bronze: true },
+    { name: 'National Precipitation Forecast', platinum: true, gold: true, silver: true, bronze: true },
+    { name: 'Daily and Monthly Reports', platinum: true, gold: true, silver: true, bronze: false },
+    { name: 'Previous Month Report Only', platinum: false, gold: false, silver: false, bronze: true },
+    { name: 'Contact Notifications', platinum: true, gold: true, silver: true, bronze: true },
+    { name: 'Excessive Rainfall', platinum: true, gold: true, silver: true, bronze: false },
+    { name: 'RapidRain', platinum: true, gold: true, silver: true, bronze: false },
+    { name: 'Configurable RapidRain Thresholds', platinum: true, gold: true, silver: true, bronze: false },
+    { name: 'Site-Specific Forecasts', platinum: true, gold: true, silver: false, bronze: false },
+    { name: 'On-Demand Lookup', platinum: true, gold: true, silver: false, bronze: false },
+    { name: 'RainIQ', platinum: true, gold: false, silver: false, bronze: false },
   ];
 
   const renderFeatures = (plan) =>
@@ -174,7 +178,24 @@ export default function Prices({ isSmall = false }) {
         </Link>
       )}
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className={`grid gap-6 ${showPlatinum ? 'md:grid-cols-4' : 'md:grid-cols-3'}`}>
+        {showPlatinum && (
+          <div className="plan platinum flex flex-col items-center justify-center border border-purple-400 rounded-lg p-6 bg-purple-50 shadow-md">
+            <h3 className="text-xl font-bold text-purple-700 mb-2">Platinum</h3>
+            <p className="text-4xl font-bold text-gray-800 mb-2">$30.00</p>
+            <p className="text-gray-600 text-sm text-center">per 5 locations</p>
+            <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('platinum')}</ul>
+            {!isSmall && (
+              <button
+                onClick={() => handleUpgrade('platinum')}
+                className="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+              >
+                Upgrade
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Gold */}
         <div className="plan gold flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">
           <h3 className="text-xl font-bold text-yellow-700 mb-2">Gold</h3>

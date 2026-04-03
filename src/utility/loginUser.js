@@ -197,6 +197,9 @@ const convertTier = (person) =>{
         case "gold":
             tier = 3;
             break;
+        case "platinum":
+            tier = 3;
+            break;
         case "silver":
             tier = 2;
             break;

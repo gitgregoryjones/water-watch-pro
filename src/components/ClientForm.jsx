@@ -34,6 +34,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
   const { isActive } = useFeatureFlags();
+  const showPlatinum = isActive('showPlatinum');
 
   useEffect(()=>{
     setTimeout(()=>
@@ -460,6 +461,20 @@ const ClientForm = ({ clientToEdit,myself }) => {
             />
             <label htmlFor="gold">Gold</label>
           </div>
+          {showPlatinum && (
+            <div className="flex items-center">
+              <input
+                type="radio"
+                id="platinum"
+                name="tier"
+                value="platinum"
+                checked={tier === 'platinum'}
+                onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('platinum')}
+                className="mr-2"
+              />
+              <label htmlFor="platinum">Platinum</label>
+            </div>
+          )}
         </div>
 
         {/* Form Actions */}

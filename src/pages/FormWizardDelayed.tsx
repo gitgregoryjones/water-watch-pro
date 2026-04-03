@@ -48,6 +48,7 @@ const FormWizardDelayed = () => {
   const { isActive } = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
   const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const showPlatinum = isActive('showPlatinum');
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -365,7 +366,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
     },
     body: JSON.stringify({
       email: formData.email,
-      plan: formData.tier, // "gold" | "silver" | "bronze"
+      plan: formData.tier, // "platinum" | "gold" | "silver" | "bronze"
       context: 'wizard' // or: 'upgrade'
     }),
   });
@@ -464,11 +465,11 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
         sort_by_rainfall: true,
       };
 
-      if (newClient.tier === "gold") {
+      if (newClient.tier === "gold" || newClient.tier === "platinum") {
         newClient.forecast_on = true;
         newClient.forecast_combine_locations = true;
       }
-      if (newClient.tier === "gold" || newClient.tier === "silver") {
+      if (newClient.tier === "gold" || newClient.tier === "silver" || newClient.tier === "platinum") {
         newClient.atlas14_on = true;
         newClient.atlas14_24h_on = true;
         newClient.atlas14_1h_on = true;
@@ -709,7 +710,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                 <div className="mb-4">
                   <label className="block">Tier</label>
                   <div className="flex gap-4">
-                    {['gold', 'silver', 'bronze'].map((tier) => (
+                    {(showPlatinum ? ['platinum', 'gold', 'silver', 'bronze'] : ['gold', 'silver', 'bronze']).map((tier) => (
                       <label key={tier}>
                         <input type="radio" name="tier"  value={tier} checked={formData.tier === tier} onChange={handleChange} className='mx-2' />
                         {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -807,7 +808,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
               </select>
             </div>
 
-            {(formData.tier === "gold" || formData.tier === "silver") && (
+            {(formData.tier === "gold" || formData.tier === "silver" || formData.tier === "platinum") && (
               <div className="mb-4">
                 <label htmlFor="rapidrain" className="block font-bold mb-2">RapidRain Threshold (inches)</label>
                 <div className='m-2 text-sm italic'>

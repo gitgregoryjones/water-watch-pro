@@ -25,7 +25,7 @@ export const VITE_FEATURE_TABLE_VIEW = import.meta.env.VITE_FEATURE_TABLE_VIEW;
 export const VITE_FEATURE_TABLE_COLORS = import.meta.env.VITE_FEATURE_TABLE_COLORS;
 export const VITE_FEATURE_HISTORY_REPORT = import.meta.env.VITE_FEATURE_HISTORY_REPORT
 
-export const RAINIQ_ALLOWED_EMAILS = [
+export const RAINIQ_ALLOWED_EMAILS = import.meta.env.VITE_RAINIQ_ALLOWED_EMAILS || [
   "gene.norman@waterwatchpro.com",
   "dtaylor@ersnell.com",
   "fbrody@gmail.com",

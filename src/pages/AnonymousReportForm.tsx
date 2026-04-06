@@ -9,6 +9,11 @@ import { useContext } from 'react';
 import { ThemeContext } from '../utility/ThemeContext';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { FaMoon, FaSun } from 'react-icons/fa';
+import {
+  isValidPhoneNumber,
+  PHONE_INPUT_PATTERN,
+  PHONE_VALIDATION_MESSAGE,
+} from '../utility/phoneValidation';
 
 const AnonymousReportForm = () => {
   const [formData, setFormData] = useState({
@@ -137,6 +142,11 @@ const AnonymousReportForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.phone && !isValidPhoneNumber(formData.phone)) {
+      alert(PHONE_VALIDATION_MESSAGE);
+      return;
+    }
 
     const bodyLines = [
       `Requester: ${formData.name}<br/>`,
@@ -285,6 +295,8 @@ This location will be automatically added to your account. If you do NOT wish to
         placeholder="Phone number"
         value={formData.phone}
         onChange={handleChange}
+        pattern={PHONE_INPUT_PATTERN}
+        title={PHONE_VALIDATION_MESSAGE}
         className="input placeholder:text-slate-500 border p-2 rounded-md"
       />
     </div>

@@ -359,7 +359,7 @@ export default function RainIQ() {
   };
 
   const canAccessRainIQ = useMemo(() => {
-    return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
+    return true;
   }, [user, isActive]);
 
   const customRangeError = useMemo(() => {

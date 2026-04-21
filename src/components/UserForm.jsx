@@ -9,6 +9,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../utility/UserSlice';
 import Toggle from './Toggle';
 import { convertTier } from '../utility/loginUser';
+import {
+  isValidPhoneNumber,
+  PHONE_INPUT_PATTERN,
+  PHONE_VALIDATION_MESSAGE,
+} from '../utility/phoneValidation';
 
 const UserForm = ({ clientToEdit, myself }) => {
 
@@ -79,6 +84,12 @@ const UserForm = ({ clientToEdit, myself }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowDialog(true);
+
+    if (!isValidPhoneNumber(phone)) {
+      setShowDialog(false);
+      setMsg(<span className="text-red-600">{PHONE_VALIDATION_MESSAGE}</span>);
+      return;
+    }
 
     const payload = { first_name: firstName, last_name: lastName, email, phone };
 
@@ -202,6 +213,8 @@ const UserForm = ({ clientToEdit, myself }) => {
                   <input
                     id="phone"
                     type="tel"
+                    pattern={PHONE_INPUT_PATTERN}
+                    title={PHONE_VALIDATION_MESSAGE}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="border border-gray-300  rounded p-2 w-full"

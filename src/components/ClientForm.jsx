@@ -12,6 +12,11 @@ import { useDispatch } from 'react-redux';
 import { convertTier } from '../utility/loginUser';
 import ChildAccountsWidget from './ChildAccountsWidget';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
+import {
+  isValidPhoneNumber,
+  PHONE_INPUT_PATTERN,
+  PHONE_VALIDATION_MESSAGE,
+} from '../utility/phoneValidation';
 
 const ClientForm = ({ clientToEdit,myself }) => {
 
@@ -83,6 +88,11 @@ const ClientForm = ({ clientToEdit,myself }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!isValidPhoneNumber(phone)) {
+      setMsg(<span className="text-[red]">{PHONE_VALIDATION_MESSAGE}</span>);
+      return;
+    }
 
     setShowDialog(true);
 
@@ -241,6 +251,8 @@ const ClientForm = ({ clientToEdit,myself }) => {
           <input
             id="phone"
             type="tel"
+            pattern={PHONE_INPUT_PATTERN}
+            title={PHONE_VALIDATION_MESSAGE}
             required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}

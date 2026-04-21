@@ -8,6 +8,11 @@ import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import {validateEmail} from '../utility/passwordFunc'
+import {
+  isValidPhoneNumber,
+  PHONE_INPUT_PATTERN,
+  PHONE_VALIDATION_MESSAGE,
+} from '../utility/phoneValidation';
 
 const ContactForm = ({  }) => {
   const { state } = useLocation();
@@ -181,13 +186,7 @@ const ContactForm = ({  }) => {
 
 
     if(phone){
-      const phoneRegex = /^(\+?\d{1,4}[\s-]?)?(\(?\d{3}\)?[\s-]?)?\d{3}[\s-]?\d{4}$/;
-
-      // Example usage
-      const validatePhoneNumber = (phoneNumber) => phoneRegex.test(phoneNumber);
-
-      
-      if(!validatePhoneNumber(phone)){
+      if(!isValidPhoneNumber(phone)){
         setMsg(<span className='text-[red]'>Please enter a valid phone number</span>)
         setShowDialog(false);
         return;
@@ -374,7 +373,8 @@ const ContactForm = ({  }) => {
           <input
             id="phone"
             type="tel"
-            
+            pattern={PHONE_INPUT_PATTERN}
+            title={PHONE_VALIDATION_MESSAGE}
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"

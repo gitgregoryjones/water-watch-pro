@@ -644,7 +644,7 @@ export default function RainIQ() {
           headline: `There were ${Number(reportLocationData.qualifying_rain_events_count || 0)} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
           metrics: [
             { label: 'Threshold', value: `${effectiveThreshold.toFixed(2)} in` },
-            { label: 'Qualifying events', value: String(reportLocationData.qualifying_rain_events_count || 0) },
+            { label: 'Qualifying events', value: String(qualifyingRows.length) },
             {
               label: 'Most intense event',
               value: mostIntenseEvent?.date

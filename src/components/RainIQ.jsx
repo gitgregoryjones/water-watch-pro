@@ -1452,51 +1452,53 @@ export default function RainIQ() {
                   ))}
                 </div>
 
-                <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                  <div className="rounded-lg border p-4">
-                    <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-left text-sm">
-                        <thead>
-                          <tr className="border-b">
-                            {locationResult.columns.map((column) => (
-                              <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {locationResult.rows.map((row, index) => (
-                            <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
-                              {row.map((cell, cellIndex) => (
-                                <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
+                {selectedQuery !== 'totalRain' && (
+                  <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div className="rounded-lg border p-4">
+                      <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-left text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              {locationResult.columns.map((column) => (
+                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {locationResult.rows.map((row, index) => (
+                              <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
+                                {row.map((cell, cellIndex) => (
+                                  <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="rounded-lg border p-4">
-                    <h4 className="mb-3 text-lg font-semibold">Monthly rainfall totals</h4>
-                    <div className="space-y-3">
-                      {locationResult.chart.map((item) => (
-                        <div key={`${locationResult.id}-${item.label}`}>
-                          <div className="mb-1 flex justify-between text-xs">
-                            <span>{item.label}</span>
-                            <span>{item.value}</span>
+                    <div className="rounded-lg border p-4">
+                      <h4 className="mb-3 text-lg font-semibold">Monthly rainfall totals</h4>
+                      <div className="space-y-3">
+                        {locationResult.chart.map((item) => (
+                          <div key={`${locationResult.id}-${item.label}`}>
+                            <div className="mb-1 flex justify-between text-xs">
+                              <span>{item.label}</span>
+                              <span>{item.value}</span>
+                            </div>
+                            <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
+                              <div
+                                className="h-3 rounded bg-[--main-2]"
+                                style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                            <div
-                              className="h-3 rounded bg-[--main-2]"
-                              style={{ width: `${(item.value / locationChartMax) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </section>
             );
           })}

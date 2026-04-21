@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
 import { VITE_SOCKETLABS_FROM_EMAIL } from '../utility/constants';
@@ -359,7 +358,8 @@ export default function RainIQ() {
   };
 
   const canAccessRainIQ = useMemo(() => {
-    return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
+    const userTier = user?.clients?.[0]?.tier?.toLowerCase();
+    return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
 
   const customRangeError = useMemo(() => {

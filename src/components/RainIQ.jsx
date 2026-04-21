@@ -408,6 +408,7 @@ export default function RainIQ() {
   }, [threshold]);
   const includeZeroDays = calculationMethod === 'allDays';
   const showCalculationMethod = calculationMethodSupportedQueries.includes(selectedQuery);
+  const showThresholdInput = selectedQuery === 'qualifyingEvents';
   const queryHasError = useMemo(
     () => ({
       wettestMonth: wettestMonthError,
@@ -744,7 +745,7 @@ export default function RainIQ() {
           metrics: [
             { label: 'Status', value: 'No data' },
             { label: 'Date range', value: `${formatDateForUi(selectedDateRange.startDate)} - ${formatDateForUi(selectedDateRange.endDate)}` },
-            { label: 'Threshold', value: threshold || 'N/A' },
+            ...(showThresholdInput ? [{ label: 'Threshold', value: threshold || 'N/A' }] : []),
           ],
           columns: ['Info', 'Value'],
           rows: [['Location', locationName], ['Result', 'No report data returned']],
@@ -768,7 +769,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold]);
+  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -1023,7 +1024,7 @@ export default function RainIQ() {
               <li><strong>Time range preset:</strong> ${escapeHtml(selectedRangeLabel)}</li>
               <li><strong>Date range:</strong> ${escapeHtml(selectedDateRange.startDate)} to ${escapeHtml(selectedDateRange.endDate)}</li>
               <li><strong>Calculation method:</strong> ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}</li>
-              <li><strong>Threshold input:</strong> ${escapeHtml(threshold || 'N/A')} inches</li>
+              ${showThresholdInput ? `<li><strong>Threshold input:</strong> ${escapeHtml(threshold || 'N/A')} inches</li>` : ''}
             </ul>
           </div>
           ${reportSectionsHtml}
@@ -1115,7 +1116,7 @@ export default function RainIQ() {
           end_date: selectedDateRange.endDate,
           location_ids: locationIds,
           include_zero_days: includeZeroDays,
-          ...(parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+          ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
         });
 
         activeQueryConfig.setResponse(data);
@@ -1130,7 +1131,7 @@ export default function RainIQ() {
     };
 
     fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError]);
+  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError, showThresholdInput]);
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
@@ -1169,7 +1170,7 @@ export default function RainIQ() {
         `- Date range: ${selectedDateRange.startDate} to ${selectedDateRange.endDate}`,
         `- Locations: ${selectedLocationNames.join(', ') || 'None selected'}`,
         `- Calculation method: ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}`,
-        `- Threshold input: ${threshold || 'N/A'} inches`,
+        ...(showThresholdInput ? [`- Threshold input: ${threshold || 'N/A'} inches`] : []),
         '',
         'Requested new report details:',
         requestText.trim(),
@@ -1186,7 +1187,7 @@ export default function RainIQ() {
           <li><strong>Date range:</strong> ${selectedDateRange.startDate} to ${selectedDateRange.endDate}</li>
           <li><strong>Locations:</strong> ${selectedLocationNames.join(', ') || 'None selected'}</li>
           <li><strong>Calculation method:</strong> ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}</li>
-          <li><strong>Threshold input:</strong> ${threshold || 'N/A'} inches</li>
+          ${showThresholdInput ? `<li><strong>Threshold input:</strong> ${threshold || 'N/A'} inches</li>` : ''}
         </ul>
         <h3>Requested new report details</h3>
         <p>${requestText.trim().replaceAll('\n', '<br />')}</p>
@@ -1346,15 +1347,17 @@ export default function RainIQ() {
               ))}
             </select>
 
-            <div className="mt-3 flex items-center gap-3">
-              <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
-              <input
-                value={threshold}
-                onChange={(event) => setThreshold(event.target.value)}
-                className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
-              />
-              <span className="text-xs text-slate-500">inches</span>
-            </div>
+            {showThresholdInput && (
+              <div className="mt-3 flex items-center gap-3">
+                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
+                <input
+                  value={threshold}
+                  onChange={(event) => setThreshold(event.target.value)}
+                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
+                />
+                <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
 
             {showCalculationMethod && (
               <div className="mt-3">

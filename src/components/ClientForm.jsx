@@ -462,7 +462,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
             <label htmlFor="gold">Gold</label>
           </div>
           {showPlatinum && (
-            <div className="flex items-center">
+            <div className="flex items-center mt-2">
               <input
                 type="radio"
                 id="platinum"

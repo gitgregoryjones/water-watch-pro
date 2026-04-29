@@ -413,7 +413,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     
     
     || <div className="flex flex-row w-full">
-      <div className="sticky left-0 z-20 h-[400px] w-[64px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+      <div className="sticky left-0 z-20 h-[400px] w-[84px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
         {chartData && (
           <Bar
             data={{ labels: [""], datasets: [{ data: [0], backgroundColor: "transparent", borderWidth: 0 }] }}
@@ -421,6 +421,9 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
               responsive: true,
               maintainAspectRatio: false,
               animation: false,
+              layout: {
+                padding: { left: 10, right: 4 },
+              },
               scales: {
                 x: { display: false, grid: { display: false } },
                 y: {
@@ -430,6 +433,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
                     stepSize: 0.25,
                     callback: (value) => Number(value).toFixed(2),
                     color: isDark && "white",
+                    padding: 4,
                   },
                   grid: { display: false },
                 },

@@ -436,17 +436,31 @@ const ClientForm = ({ clientToEdit,myself }) => {
         <div className="border p-4 rounded shadow">
            <h2 className="text-xl flex flex-col gap-2 font-bold mb-4"><span>Account Type</span>
          {myself && <Link to="/upgrade" className='text-sm'>I want to change my subscription</Link>}</h2>
+          {showPlatinum && (
+            <div className="flex items-center mb-2">
+              <input
+                type="radio"
+                id="platinum"
+                name="tier"
+                value="platinum"
+                checked={tier === 'platinum'}
+                onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('platinum')}
+                className="mr-2"
+              />
+              <label htmlFor="platinum">Platinum</label>
+            </div>
+          )}
           <div className="flex items-center mb-2">
             <input
               type="radio"
-              id="bronze"
+              id="gold"
               name="tier"
-              value="bronze"
-              checked={tier === 'bronze'}
-              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('bronze')}
+              value="gold"
+              checked={tier === 'gold'}
+              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('gold')}
               className="mr-2"
             />
-            <label htmlFor="bronze">Bronze</label>
+            <label htmlFor="gold">Gold</label>
           </div>
           <div className="flex items-center mb-2">
             <input
@@ -464,29 +478,15 @@ const ClientForm = ({ clientToEdit,myself }) => {
           <div className="flex items-center">
             <input
               type="radio"
-              id="gold"
+              id="bronze"
               name="tier"
-              value="gold"
-              checked={tier === 'gold'}
-              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('gold')}
+              value="bronze"
+              checked={tier === 'bronze'}
+              onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('bronze')}
               className="mr-2"
             />
-            <label htmlFor="gold">Gold</label>
+            <label htmlFor="bronze">Bronze</label>
           </div>
-          {showPlatinum && (
-            <div className="flex items-center mt-2">
-              <input
-                type="radio"
-                id="platinum"
-                name="tier"
-                value="platinum"
-                checked={tier === 'platinum'}
-                onChange={(e) =>  e.target.value != tier && myself ? navigate("/upgrade") : setTier('platinum')}
-                className="mr-2"
-              />
-              <label htmlFor="platinum">Platinum</label>
-            </div>
-          )}
         </div>
 
         {/* Form Actions */}

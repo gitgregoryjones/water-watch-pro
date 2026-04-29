@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { updateUser } from "../utility/UserSlice";
 import Upgrade from "../components/Upgrade";
 import { swapUser } from "../utility/loginUser";
+import { isActive } from "../utility/featureFlags";
 
 
 const ClientListPage = () => {
@@ -20,6 +21,7 @@ const ClientListPage = () => {
   const [pageSize, setPageSize] = useState(250);
   const [sortConfig, setSortConfig] = useState({ key: "account_name", direction: "asc" });
   const location = useLocation();
+  const showPlatinum = isActive("showPlatinum");
 
   
   const dispatch = useDispatch();
@@ -106,6 +108,7 @@ const ClientListPage = () => {
       // Create an array of selected tiers
       const selectedTiers = [];
       if (selectedFilters.gold) selectedTiers.push("gold");
+      if (selectedFilters.platinum) selectedTiers.push("platinum");
       if (selectedFilters.silver) selectedTiers.push("silver");
       if (selectedFilters.bronze) selectedTiers.push("bronze");
       
@@ -229,6 +232,17 @@ const ClientListPage = () => {
             </button>
           </div>
           <div className="flex gap-4 items-center justify-start">
+            {showPlatinum && (
+              <div className="font-bold">
+                Platinum{" "}
+                <input
+                  type="checkbox"
+                  name="platinum"
+                  checked={selectedFilters.platinum}
+                  onChange={() => handleFilterChange("platinum")}
+                />
+              </div>
+            )}
             <div className="font-bold">
               Gold{" "}
               <input

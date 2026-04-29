@@ -453,6 +453,7 @@ export default function RainIQ() {
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [analyzedLocations, setAnalyzedLocations] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showDetailedView, setShowDetailedView] = useState(false);
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
@@ -1413,6 +1414,20 @@ export default function RainIQ() {
             {calculationLine}
           </p>
         </div>
+        <div className="mt-4 flex items-center gap-3">
+          <label htmlFor="detailed-view-toggle" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Detailed view
+          </label>
+          <input
+            id="detailed-view-toggle"
+            type="checkbox"
+            checked={showDetailedView}
+            onChange={(event) => setShowDetailedView(event.target.checked)}
+          />
+          <span className="text-xs text-slate-500">
+            {showDetailedView ? 'On: show summary + chart details.' : 'Off: show summary cards only.'}
+          </span>
+        </div>
 
         {hasExecutedQuery && selectedQuery === 'wettestMonth' && wettestMonthLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading wettest month report data...</p>
@@ -1470,7 +1485,7 @@ export default function RainIQ() {
                   ))}
                 </div>
 
-                {selectedQuery !== 'totalRain' && (
+                {showDetailedView && selectedQuery !== 'totalRain' && (
                   <div className="mt-6 grid gap-6 lg:grid-cols-2">
                     <div className="rounded-lg border p-4">
                       <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>

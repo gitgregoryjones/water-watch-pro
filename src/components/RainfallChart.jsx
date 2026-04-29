@@ -332,7 +332,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     maintainAspectRatio: false,
     layout: {
       padding: {
-          left: 15, // Fixed width for the y-axis
+          left: 0
       },
   },
     scales: {
@@ -364,17 +364,14 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
         beginAtZero: true,
         max: yAxisMax,
         ticks: {
-          stepSize: 0.25,
-          callback: function (value) {
-            return value.toFixed(2); // Adjust formatting if needed
-        },
-        font: {
-            size: 12, // Control font size
-        },
-        color: isDark &&'white'
+          display: false,
         },
         grid: {
           display: true,
+          drawTicks: false,
+        },
+        border: {
+          display: false,
         },
         
       },

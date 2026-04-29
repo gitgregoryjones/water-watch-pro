@@ -15,9 +15,6 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   const [chartData, setChartData] = useState(null);
   const [error, setError] = useState(null);
   const chartContainerRef = useRef(null);
-  const snapshotDivRef = useRef(null);
-  const [hideYAxis, setHideYAxis] = useState(true); 
-
   const [rawData, setRawData] = useState([]);
 
   const today = new Date();
@@ -30,7 +27,6 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   const [originalKeys, setOriginalKeys] = useState([]);
 
-  const [scrollPosition, setScrollPosition] = useState(0);
 
   const { theme } = useContext(ThemeContext);
     const isDark = theme === 'dark';
@@ -80,31 +76,6 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
   //ChartJS.register(barValuePlugin);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (chartContainerRef.current) {
-        setScrollPosition(chartContainerRef.current.scrollLeft);
-        console.log(`Scrolled to position: ${chartContainerRef.current.scrollLeft}`);
-        if(chartContainerRef.current.scrollLeft > 10){
-          setHideYAxis(false)
-        } else {
-          setHideYAxis(true)
-        }
-      }
-    };
-
-    const container = chartContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-    }
-
-    // Cleanup
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, []);
 
   function getBeginEndRange() {
     const currentDate = new Date();
@@ -275,42 +246,10 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     }
   }, [chartData]);
 
-  const takeSnapshot = () => {
-    if (!chartContainerRef.current || !snapshotDivRef.current) return;
-
-    const canvas = chartContainerRef.current.querySelector("canvas");
-    if (!canvas) return;
-
-    const snapshotCanvas = document.createElement("canvas");
-    const theWidth = window.innerWidth < 600 ? 150 : 110;
-    snapshotCanvas.width = theWidth; // Snapshot width
-    snapshotCanvas.height = canvas.height; // Full chart height
-
-    const ctx = snapshotCanvas.getContext("2d");
-    try {
-      ctx.drawImage(canvas, 0, 0, 120, 120, 0, 0, theWidth, 120);
-    }catch(e){
-      console.log(e.message)
-      console.log(`Greg what is rainfall`)
-    }
-
-    const dataUrl = snapshotCanvas.toDataURL();
-    snapshotDivRef.current.style.backgroundImage = `url(${dataUrl})`;
-    snapshotDivRef.current.style.backgroundRepeat = "no-repeat";
-    snapshotDivRef.current.style.backgroundSize = "cover";
-    snapshotDivRef.current.style.backgroundPosition = "center";
-    //setHideYAxis(true);
-  };
-
   useEffect(() => {
     fetchChartData();
   }, [ location.id,period], tableOnly);
 
-  useEffect(() => {
-    if (chartData) {
-      setTimeout(takeSnapshot, 500); // Delay to ensure chart is rendered
-    }
-  }, [chartData,period]);
   
 
   const dayChangeBackgroundPlugin = {
@@ -385,6 +324,9 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
 
   
 
+  const maxYValue = chartData ? Math.max(...chartData.datasets[0].data, 0.5) : 0.5;
+  const yAxisMax = Math.ceil(maxYValue / 0.25) * 0.25;
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -420,6 +362,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
       },
       y: {
         beginAtZero: true,
+        max: yAxisMax,
         ticks: {
           stepSize: 0.25,
           callback: function (value) {
@@ -471,8 +414,33 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
     
     
     
-    || <div className="flex flex-row w-full ">
-      <div ref={snapshotDivRef} className={` ${hideYAxis ? 'hidden' : ''}  h-[400px] w-[50px] bg-white ]`}></div>
+    || <div className="flex flex-row w-full">
+      <div className="sticky left-0 z-20 h-[400px] w-[64px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700">
+        {chartData && (
+          <Bar
+            data={{ labels: [""], datasets: [{ data: [0], backgroundColor: "transparent", borderWidth: 0 }] }}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              animation: false,
+              scales: {
+                x: { display: false, grid: { display: false } },
+                y: {
+                  beginAtZero: true,
+                  max: yAxisMax,
+                  ticks: {
+                    stepSize: 0.25,
+                    callback: (value) => Number(value).toFixed(2),
+                    color: isDark && "white",
+                  },
+                  grid: { display: false },
+                },
+              },
+              plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            }}
+          />
+        )}
+      </div>
       <div ref={chartContainerRef} className="overflow-x-auto w-full h-[400px]">
         {error ? (
           <div>Error loading data. Please try again later. {error}</div>

@@ -451,16 +451,19 @@ export default function RainIQ() {
   const availableLocations = locationOptions;
 
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const [analyzedLocations, setAnalyzedLocations] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showDetailedView, setShowDetailedView] = useState(false);
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
       (apiBackedResponse?.data || []).map((locationData) => [String(locationData.location_id), locationData]),
     );
 
-    const activeLocations = selectedLocations;
+    const activeLocations = analyzedLocations;
 
     return activeLocations.map((locationId, index) => {
-      const locationName = availableLocations.find((location) => location.id === locationId)?.name || 'Selected location';
+      const locationName = availableLocations.find((location) => String(location.id) === String(locationId))?.name || 'Selected location';
       const valueOffset = index * 0.09;
       const reportLocationData = reportDataByLocation.get(locationId);
 
@@ -769,7 +772,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
+  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -1036,7 +1039,7 @@ export default function RainIQ() {
     printWindow.print();
   };
 
-  useEffect(() => {
+  const runAnalysis = async () => {
     const queryConfig = {
       wettestMonth: {
         endpoint: '/api/reports/historical/metrics/wettest-month-on-record',
@@ -1083,55 +1086,53 @@ export default function RainIQ() {
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
-    const fetchReportData = async () => {
-      if (!activeQueryConfig) {
-        return;
-      }
+    if (!activeQueryConfig) {
+      return;
+    }
 
-      if (customRangeError) {
-        activeQueryConfig.setError(customRangeError);
-        activeQueryConfig.setResponse(null);
-        setHasExecutedQuery(true);
-        return;
-      }
+    if (customRangeError) {
+      activeQueryConfig.setError(customRangeError);
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(true);
+      return;
+    }
 
-      const locationIds = selectedLocations
-        .map((locationId) => Number(locationId))
-        .filter((locationId) => Number.isInteger(locationId));
+    const locationIds = selectedLocations
+      .map((locationId) => Number(locationId))
+      .filter((locationId) => Number.isInteger(locationId));
 
-        
-      if (!locationIds.length) {
-        activeQueryConfig.setError('');
-        activeQueryConfig.setResponse(null);
-        setHasExecutedQuery(false);
-        return;
-      }
-
-      activeQueryConfig.setLoading(true);
+    if (!locationIds.length) {
       activeQueryConfig.setError('');
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(false);
+      return;
+    }
 
-      try {
-        const { data } = await api.post(activeQueryConfig.endpoint, {
-          start_date: selectedDateRange.startDate,
-          end_date: selectedDateRange.endDate,
-          location_ids: locationIds,
-          include_zero_days: includeZeroDays,
-          ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
-        });
+    setIsAnalyzing(true);
+    activeQueryConfig.setLoading(true);
+    activeQueryConfig.setError('');
 
-        activeQueryConfig.setResponse(data);
-        setHasExecutedQuery(true);
-      } catch (error) {
-        activeQueryConfig.setResponse(null);
-        activeQueryConfig.setError(error.message || 'Unable to load report data.');
-        setHasExecutedQuery(true);
-      } finally {
-        activeQueryConfig.setLoading(false);
-      }
-    };
+    try {
+      const { data } = await api.post(activeQueryConfig.endpoint, {
+        start_date: selectedDateRange.startDate,
+        end_date: selectedDateRange.endDate,
+        location_ids: locationIds,
+        include_zero_days: includeZeroDays,
+        ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+      });
 
-    fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError, showThresholdInput]);
+      activeQueryConfig.setResponse(data);
+      setAnalyzedLocations(locationIds.map(String));
+      setHasExecutedQuery(true);
+    } catch (error) {
+      activeQueryConfig.setResponse(null);
+      activeQueryConfig.setError(error.message || 'Unable to load report data.');
+      setHasExecutedQuery(true);
+    } finally {
+      activeQueryConfig.setLoading(false);
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
@@ -1223,8 +1224,8 @@ export default function RainIQ() {
       ? 'Calculated across all days in the selected period (including days with no rainfall).'
       : 'Calculated using only days with measurable rainfall (>= 0.01 inches; defined as a “rain day”), excluding dry days.')
     : 'Based on observed rainfall totals for the selected period.';
-  const primaryHeadline = !selectedLocations.length
-    ? 'Select a location and time range to analyze rainfall trends.'
+  const primaryHeadline = !hasExecutedQuery
+    ? 'Select criteria and click Analyze to view rainfall trends.'
     : (selectedLocationResults[0]?.headline || 'Run a query to view rainfall insights for this location.');
 
   if (!canAccessRainIQ) {
@@ -1258,6 +1259,61 @@ export default function RainIQ() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border p-4 md:col-span-2">
+            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">What do you want to analyze?</label>
+            <select
+              value={selectedQuery}
+              onChange={(event) => setSelectedQuery(event.target.value)}
+              className="w-full rounded border p-2 text-sm text-slate-800"
+            >
+              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
+                <optgroup key={group} label={group}>
+                  {groupQueries.map((query) => (
+                    <option key={query.value} value={query.value}>
+                      {query.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+
+            {showThresholdInput && (
+              <div className="mt-3 flex items-center gap-3">
+                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
+                <input
+                  value={threshold}
+                  onChange={(event) => setThreshold(event.target.value)}
+                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
+                />
+                <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
+
+            {showCalculationMethod && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase text-slate-500">Calculation method</p>
+                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'allDays'}
+                    onChange={() => setCalculationMethod('allDays')}
+                  />
+                  All days (including dry days)
+                </label>
+                <label className="mt-1 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'rainDaysOnly'}
+                    onChange={() => setCalculationMethod('rainDaysOnly')}
+                  />
+                  Rain days only (&gt;= 0.01 inches)
+                </label>
+              </div>
+            )}
+          </div>
+
           <div className="rounded-lg border p-4">
             <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Location(s)</label>
             {availableLocations.length > 5 ? (
@@ -1329,60 +1385,23 @@ export default function RainIQ() {
             )}
           </div>
 
-          <div className="rounded-lg border p-4 md:col-span-2">
-            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">What do you want to analyze?</label>
-            <select
-              value={selectedQuery}
-              onChange={(event) => setSelectedQuery(event.target.value)}
-              className="w-full rounded border p-2 text-sm text-slate-800"
-            >
-              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
-                <optgroup key={group} label={group}>
-                  {groupQueries.map((query) => (
-                    <option key={query.value} value={query.value}>
-                      {query.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-
-            {showThresholdInput && (
-              <div className="mt-3 flex items-center gap-3">
-                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
-                <input
-                  value={threshold}
-                  onChange={(event) => setThreshold(event.target.value)}
-                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
-                />
-                <span className="text-xs text-slate-500">inches</span>
-              </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={runAnalysis}
+            disabled={isAnalyzing}
+            className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          >
+            {isAnalyzing ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Analyzing...
+              </span>
+            ) : (
+              'Analyze'
             )}
-
-            {showCalculationMethod && (
-              <div className="mt-3">
-                <p className="text-xs font-bold uppercase text-slate-500">Calculation method</p>
-                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="radio"
-                    name="calculation-method"
-                    checked={calculationMethod === 'allDays'}
-                    onChange={() => setCalculationMethod('allDays')}
-                  />
-                  All days (including dry days)
-                </label>
-                <label className="mt-1 flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="radio"
-                    name="calculation-method"
-                    checked={calculationMethod === 'rainDaysOnly'}
-                    onChange={() => setCalculationMethod('rainDaysOnly')}
-                  />
-                  Rain days only (&gt;= 0.01 inches)
-                </label>
-              </div>
-            )}
-          </div>
+          </button>
         </div>
 
         <div className="mt-6 rounded-lg border border-[--main-2] bg-slate-50 p-4 dark:bg-slate-800">
@@ -1395,45 +1414,59 @@ export default function RainIQ() {
             {calculationLine}
           </p>
         </div>
+        <div className="mt-4 flex items-center gap-3">
+          <label htmlFor="detailed-view-toggle" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Detailed view
+          </label>
+          <input
+            id="detailed-view-toggle"
+            type="checkbox"
+            checked={showDetailedView}
+            onChange={(event) => setShowDetailedView(event.target.checked)}
+          />
+          <span className="text-xs text-slate-500">
+            {showDetailedView ? 'On: show summary + chart details.' : 'Off: show summary cards only.'}
+          </span>
+        </div>
 
-        {selectedLocations.length > 0 && selectedQuery === 'wettestMonth' && wettestMonthLoading && (
+        {hasExecutedQuery && selectedQuery === 'wettestMonth' && wettestMonthLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading wettest month report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'wettestMonth' && wettestMonthError && hasExecutedQuery && (
+        {selectedQuery === 'wettestMonth' && wettestMonthError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{wettestMonthError}</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'avgMonthly' && avgMonthlyLoading && (
+        {hasExecutedQuery && selectedQuery === 'avgMonthly' && avgMonthlyLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading average monthly rainfall report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'avgMonthly' && avgMonthlyError && hasExecutedQuery && (
+        {selectedQuery === 'avgMonthly' && avgMonthlyError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{avgMonthlyError}</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'avgDaily' && avgDailyLoading && (
+        {hasExecutedQuery && selectedQuery === 'avgDaily' && avgDailyLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading average daily rainfall report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'avgDaily' && avgDailyError && hasExecutedQuery && (
+        {selectedQuery === 'avgDaily' && avgDailyError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{avgDailyError}</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'qualifyingEvents' && qualifyingEventsLoading && (
+        {hasExecutedQuery && selectedQuery === 'qualifyingEvents' && qualifyingEventsLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading qualifying rain events report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'qualifyingEvents' && qualifyingEventsError && hasExecutedQuery && (
+        {selectedQuery === 'qualifyingEvents' && qualifyingEventsError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{qualifyingEventsError}</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'largest24h' && largest24hLoading && (
+        {hasExecutedQuery && selectedQuery === 'largest24h' && largest24hLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading largest 24-hour rainfall total report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'largest24h' && largest24hError && hasExecutedQuery && (
+        {selectedQuery === 'largest24h' && largest24hError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{largest24hError}</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'totalRain' && totalRainLoading && (
+        {hasExecutedQuery && selectedQuery === 'totalRain' && totalRainLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading total rainfall report data...</p>
         )}
-        {selectedLocations.length > 0 && selectedQuery === 'totalRain' && totalRainError && hasExecutedQuery && (
+        {selectedQuery === 'totalRain' && totalRainError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{totalRainError}</p>
         )}
 
-        {selectedLocations.length > 0 && hasExecutedQuery && !queryHasError && (
+        {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
             const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
@@ -1452,7 +1485,7 @@ export default function RainIQ() {
                   ))}
                 </div>
 
-                {selectedQuery !== 'totalRain' && (
+                {showDetailedView && selectedQuery !== 'totalRain' && (
                   <div className="mt-6 grid gap-6 lg:grid-cols-2">
                     <div className="rounded-lg border p-4">
                       <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>

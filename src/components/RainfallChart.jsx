@@ -337,6 +337,7 @@ const RainfallChart = ({ location, period, max = 72, tableOnly= false }) => {
   },
     scales: {
       x: {
+        offset: false,
         title: {
           display: false,
         },

@@ -10,7 +10,8 @@ import { useDispatch } from "react-redux";
 import { updateUser } from "../utility/UserSlice";
 import Upgrade from "../components/Upgrade";
 import { swapUser } from "../utility/loginUser";
-import { isActive } from "../utility/featureFlags";
+import { useFeatureFlags } from "@geejay/use-feature-flags";
+  
 
 
 const ClientListPage = () => {
@@ -21,6 +22,8 @@ const ClientListPage = () => {
   const [pageSize, setPageSize] = useState(250);
   const [sortConfig, setSortConfig] = useState({ key: "account_name", direction: "asc" });
   const location = useLocation();
+  
+  const { isActive } = useFeatureFlags();
   const showPlatinum = isActive("showPlatinum");
 
   

@@ -79,7 +79,7 @@ const FormWizardDelayed = () => {
   companyPhone: '',
   companyEmail: '',
   subscriptionLevel: 'paid', // or 'trial'
-  tier: 'gold',
+  tier: showPlatinum ? 'platinum' : 'gold',
   locationName: '',
   latitude: '', // Keep as string for input, convert when submitting
   longitude: '', // Keep as string for input, convert when submitting

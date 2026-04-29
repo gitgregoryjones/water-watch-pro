@@ -1036,7 +1036,7 @@ export default function RainIQ() {
     printWindow.print();
   };
 
-  useEffect(() => {
+  const runAnalysis = async () => {
     const queryConfig = {
       wettestMonth: {
         endpoint: '/api/reports/historical/metrics/wettest-month-on-record',
@@ -1083,55 +1083,50 @@ export default function RainIQ() {
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
-    const fetchReportData = async () => {
-      if (!activeQueryConfig) {
-        return;
-      }
+    if (!activeQueryConfig) {
+      return;
+    }
 
-      if (customRangeError) {
-        activeQueryConfig.setError(customRangeError);
-        activeQueryConfig.setResponse(null);
-        setHasExecutedQuery(true);
-        return;
-      }
+    if (customRangeError) {
+      activeQueryConfig.setError(customRangeError);
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(true);
+      return;
+    }
 
-      const locationIds = selectedLocations
-        .map((locationId) => Number(locationId))
-        .filter((locationId) => Number.isInteger(locationId));
+    const locationIds = selectedLocations
+      .map((locationId) => Number(locationId))
+      .filter((locationId) => Number.isInteger(locationId));
 
-        
-      if (!locationIds.length) {
-        activeQueryConfig.setError('');
-        activeQueryConfig.setResponse(null);
-        setHasExecutedQuery(false);
-        return;
-      }
-
-      activeQueryConfig.setLoading(true);
+    if (!locationIds.length) {
       activeQueryConfig.setError('');
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(false);
+      return;
+    }
 
-      try {
-        const { data } = await api.post(activeQueryConfig.endpoint, {
-          start_date: selectedDateRange.startDate,
-          end_date: selectedDateRange.endDate,
-          location_ids: locationIds,
-          include_zero_days: includeZeroDays,
-          ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
-        });
+    activeQueryConfig.setLoading(true);
+    activeQueryConfig.setError('');
 
-        activeQueryConfig.setResponse(data);
-        setHasExecutedQuery(true);
-      } catch (error) {
-        activeQueryConfig.setResponse(null);
-        activeQueryConfig.setError(error.message || 'Unable to load report data.');
-        setHasExecutedQuery(true);
-      } finally {
-        activeQueryConfig.setLoading(false);
-      }
-    };
+    try {
+      const { data } = await api.post(activeQueryConfig.endpoint, {
+        start_date: selectedDateRange.startDate,
+        end_date: selectedDateRange.endDate,
+        location_ids: locationIds,
+        include_zero_days: includeZeroDays,
+        ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+      });
 
-    fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError, showThresholdInput]);
+      activeQueryConfig.setResponse(data);
+      setHasExecutedQuery(true);
+    } catch (error) {
+      activeQueryConfig.setResponse(null);
+      activeQueryConfig.setError(error.message || 'Unable to load report data.');
+      setHasExecutedQuery(true);
+    } finally {
+      activeQueryConfig.setLoading(false);
+    }
+  };
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
@@ -1258,6 +1253,61 @@ export default function RainIQ() {
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border p-4 md:col-span-2">
+            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">What do you want to analyze?</label>
+            <select
+              value={selectedQuery}
+              onChange={(event) => setSelectedQuery(event.target.value)}
+              className="w-full rounded border p-2 text-sm text-slate-800"
+            >
+              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
+                <optgroup key={group} label={group}>
+                  {groupQueries.map((query) => (
+                    <option key={query.value} value={query.value}>
+                      {query.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+
+            {showThresholdInput && (
+              <div className="mt-3 flex items-center gap-3">
+                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
+                <input
+                  value={threshold}
+                  onChange={(event) => setThreshold(event.target.value)}
+                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
+                />
+                <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
+
+            {showCalculationMethod && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase text-slate-500">Calculation method</p>
+                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'allDays'}
+                    onChange={() => setCalculationMethod('allDays')}
+                  />
+                  All days (including dry days)
+                </label>
+                <label className="mt-1 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'rainDaysOnly'}
+                    onChange={() => setCalculationMethod('rainDaysOnly')}
+                  />
+                  Rain days only (&gt;= 0.01 inches)
+                </label>
+              </div>
+            )}
+          </div>
+
           <div className="rounded-lg border p-4">
             <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Location(s)</label>
             {availableLocations.length > 5 ? (
@@ -1329,60 +1379,15 @@ export default function RainIQ() {
             )}
           </div>
 
-          <div className="rounded-lg border p-4 md:col-span-2">
-            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">What do you want to analyze?</label>
-            <select
-              value={selectedQuery}
-              onChange={(event) => setSelectedQuery(event.target.value)}
-              className="w-full rounded border p-2 text-sm text-slate-800"
-            >
-              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
-                <optgroup key={group} label={group}>
-                  {groupQueries.map((query) => (
-                    <option key={query.value} value={query.value}>
-                      {query.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-
-            {showThresholdInput && (
-              <div className="mt-3 flex items-center gap-3">
-                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
-                <input
-                  value={threshold}
-                  onChange={(event) => setThreshold(event.target.value)}
-                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
-                />
-                <span className="text-xs text-slate-500">inches</span>
-              </div>
-            )}
-
-            {showCalculationMethod && (
-              <div className="mt-3">
-                <p className="text-xs font-bold uppercase text-slate-500">Calculation method</p>
-                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="radio"
-                    name="calculation-method"
-                    checked={calculationMethod === 'allDays'}
-                    onChange={() => setCalculationMethod('allDays')}
-                  />
-                  All days (including dry days)
-                </label>
-                <label className="mt-1 flex items-center gap-2 text-sm text-slate-700">
-                  <input
-                    type="radio"
-                    name="calculation-method"
-                    checked={calculationMethod === 'rainDaysOnly'}
-                    onChange={() => setCalculationMethod('rainDaysOnly')}
-                  />
-                  Rain days only (&gt;= 0.01 inches)
-                </label>
-              </div>
-            )}
-          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={runAnalysis}
+            className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          >
+            Analyze
+          </button>
         </div>
 
         <div className="mt-6 rounded-lg border border-[--main-2] bg-slate-50 p-4 dark:bg-slate-800">

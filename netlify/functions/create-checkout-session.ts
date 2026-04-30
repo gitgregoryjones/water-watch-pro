@@ -7,6 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06
 
 // server-side whitelist
 const PRICE_BY_PLAN: Record<string,string> = {
+  platinum: process.env.PRICE_ID_PLATINUM!,
   gold: process.env.PRICE_ID_GOLD!,
   silver: process.env.PRICE_ID_SILVER!,
   bronze: process.env.PRICE_ID_BRONZE!,

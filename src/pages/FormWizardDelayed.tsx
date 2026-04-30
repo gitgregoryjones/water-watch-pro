@@ -10,6 +10,11 @@ import { loginUser, patchClient } from '../utility/loginUser';
 import { trackAnalyticsEvent } from '../utility/analytics';
 
 import { validatePassword, validateEmail } from '../utility/passwordFunc';
+import {
+  isValidPhoneNumber,
+  PHONE_INPUT_PATTERN,
+  PHONE_VALIDATION_MESSAGE,
+} from '../utility/phoneValidation';
 import Prices from './Prices';
 import { abandon, newTrialSignUp } from '../utility/abandon';
 import { useFeatureFlags } from "@geejay/use-feature-flags";
@@ -48,6 +53,7 @@ const FormWizardDelayed = () => {
   const { isActive } = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
   const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const showPlatinum = isActive('showPlatinum');
 
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [showMapPicker, setShowMapPicker] = useState(false);
@@ -73,7 +79,7 @@ const FormWizardDelayed = () => {
   companyPhone: '',
   companyEmail: '',
   subscriptionLevel: 'paid', // or 'trial'
-  tier: 'gold',
+  tier: showPlatinum ? 'platinum' : 'gold',
   locationName: '',
   latitude: '', // Keep as string for input, convert when submitting
   longitude: '', // Keep as string for input, convert when submitting
@@ -282,8 +288,7 @@ const FormWizardDelayed = () => {
         if (!formData.email) return setErr('Email is required.');
         if (!validateEmail(formData.email)) return setErr('Please enter a valid email address.');
         if (!formData.phone) return setErr('Phone number is required.');
-        const phonePattern = /^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$/;
-        if (!phonePattern.test(formData.phone)) return setErr('Please enter a valid phone number.');
+        if (!isValidPhoneNumber(formData.phone)) return setErr(PHONE_VALIDATION_MESSAGE);
         if (!formData.password || !formData.confirmPassword) return setErr('Please fill in both password fields.');
         if (formData.password !== formData.confirmPassword) return setErr('Passwords do not match.');
         const msgs = validatePassword(formData.password, formData.confirmPassword);
@@ -365,7 +370,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
     },
     body: JSON.stringify({
       email: formData.email,
-      plan: formData.tier, // "gold" | "silver" | "bronze"
+      plan: formData.tier, // "platinum" | "gold" | "silver" | "bronze"
       context: 'wizard' // or: 'upgrade'
     }),
   });
@@ -464,11 +469,11 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
         sort_by_rainfall: true,
       };
 
-      if (newClient.tier === "gold") {
+      if (newClient.tier === "gold" || newClient.tier === "platinum") {
         newClient.forecast_on = true;
         newClient.forecast_combine_locations = true;
       }
-      if (newClient.tier === "gold" || newClient.tier === "silver") {
+      if (newClient.tier === "gold" || newClient.tier === "silver" || newClient.tier === "platinum") {
         newClient.atlas14_on = true;
         newClient.atlas14_24h_on = true;
         newClient.atlas14_1h_on = true;
@@ -661,7 +666,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
 
               <div className="mb-4">
                 <label className="block">Phone <span className='text-[red]'>*</span></label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" placeholder='(XXX) XXX-XXXX' required />
+                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full border border-gray-300 rounded p-2" placeholder='(XXX) XXX-XXXX' pattern={PHONE_INPUT_PATTERN} title={PHONE_VALIDATION_MESSAGE} required />
               </div>
             </div>
 
@@ -709,7 +714,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
                 <div className="mb-4">
                   <label className="block">Tier</label>
                   <div className="flex gap-4">
-                    {['gold', 'silver', 'bronze'].map((tier) => (
+                    {(showPlatinum ? ['platinum', 'gold', 'silver', 'bronze'] : ['gold', 'silver', 'bronze']).map((tier) => (
                       <label key={tier}>
                         <input type="radio" name="tier"  value={tier} checked={formData.tier === tier} onChange={handleChange} className='mx-2' />
                         {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -807,7 +812,7 @@ sessionStorage.setItem('signup.cache', JSON.stringify({
               </select>
             </div>
 
-            {(formData.tier === "gold" || formData.tier === "silver") && (
+            {(formData.tier === "gold" || formData.tier === "silver" || formData.tier === "platinum") && (
               <div className="mb-4">
                 <label htmlFor="rapidrain" className="block font-bold mb-2">RapidRain Threshold (inches)</label>
                 <div className='m-2 text-sm italic'>

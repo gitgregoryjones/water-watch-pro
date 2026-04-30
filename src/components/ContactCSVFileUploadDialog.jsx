@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Papa from "papaparse";
 import api from "../utility/api"; // Replace with your actual API utility
 import { useSelector } from "react-redux";
+import { isValidPhoneNumber } from "../utility/phoneValidation";
 
 const ContactCSVFileUploadDialog = ({className, onClose}) => {
   const [file, setFile] = useState(null);
@@ -31,8 +32,7 @@ const ContactCSVFileUploadDialog = ({className, onClose}) => {
     row.phone = row.phone.replace(/\./g,"-")
 
     if(row.phone != "none"){
-      // Validate phone number (simple check for digits and length)
-      if (row.phone && !/^\d{10}$|^\d{11}$/.test(row.phone.trim().replace(/[^0-9]/g, ""))) {
+      if (row.phone && !isValidPhoneNumber(row.phone)) {
         errorMessages.push(`Invalid phone number: ${row.phone}`);
       } 
     }

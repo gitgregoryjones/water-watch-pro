@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
 import { VITE_SOCKETLABS_FROM_EMAIL } from '../utility/constants';
@@ -67,11 +66,11 @@ const getRangeDates = (selectedRange) => {
 };
 
 const queries = [
-  { group: 'Baseline Metrics', label: 'Average daily rainfall', value: 'avgDaily' },
-  { group: 'Baseline Metrics', label: 'Average monthly rainfall', value: 'avgMonthly' },
-  { group: 'Baseline Metrics', label: 'Wettest month on record', value: 'wettestMonth' },
-  { group: 'Compliance & Threshold Queries', label: 'Count of qualifying rain events (> X inches)', value: 'qualifyingEvents' },
-  { group: 'Compliance & Threshold Queries', label: 'Largest 24-hour rainfall total', value: 'largest24h' },
+  { group: 'Baseline Metrics', label: 'Average rainfall per day', value: 'avgDaily' },
+  { group: 'Baseline Metrics', label: 'Average rainfall per month', value: 'avgMonthly' },
+  { group: 'Baseline Metrics', label: 'Wettest month in selected period', value: 'wettestMonth' },
+  { group: 'Compliance & Threshold Queries', label: 'Number of days with rainfall > X inches', value: 'qualifyingEvents' },
+  { group: 'Compliance & Threshold Queries', label: 'Maximum 24-hour rainfall', value: 'largest24h' },
   { group: 'Compliance & Threshold Queries', label: 'Total rainfall for selected period', value: 'totalRain' },
  /* { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
   { group: 'Streak Analysis', label: 'Longest consecutive rainfall period', value: 'longestWet' },
@@ -303,6 +302,7 @@ const groupedQueries = queries.reduce((acc, query) => {
 }, {});
 
 const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'];
+const calculationMethodSupportedQueries = ['avgDaily', 'avgMonthly'];
 
 export default function RainIQ() {
   const user = useSelector((state) => state.userInfo.user);
@@ -313,7 +313,7 @@ export default function RainIQ() {
   const [customEndDate, setCustomEndDate] = useState(() => getRangeDates('custom').endDate);
   const [selectedQuery, setSelectedQuery] = useState('avgDaily');
   const [threshold, setThreshold] = useState('1.0');
-  const [includeZeroDays, setIncludeZeroDays] = useState(true);
+  const [calculationMethod, setCalculationMethod] = useState('allDays');
   const [requestText, setRequestText] = useState('');
   const [requestMessage, setRequestMessage] = useState('');
   const [requestMessageType, setRequestMessageType] = useState('success');
@@ -336,6 +336,7 @@ export default function RainIQ() {
   const [totalRainLoading, setTotalRainLoading] = useState(false);
   const [totalRainError, setTotalRainError] = useState('');
   const [locationOptions, setLocationOptions] = useState([]);
+  const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   
 
 
@@ -343,6 +344,12 @@ export default function RainIQ() {
   useEffect(() => {
     fetchLocations(1);
   }, []);
+
+  useEffect(() => {
+    if (!calculationMethodSupportedQueries.includes(selectedQuery) && calculationMethod !== 'allDays') {
+      setCalculationMethod('allDays');
+    }
+  }, [selectedQuery, calculationMethod]);
 
   const fetchLocations = async (page) => {
     try {
@@ -359,7 +366,8 @@ export default function RainIQ() {
   };
 
   const canAccessRainIQ = useMemo(() => {
-    return convertTier(user) >= 3 || user.is_superuser || isActive('rainIQ');
+    const userTier = user?.clients?.[0]?.tier?.toLowerCase();
+    return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
 
   const customRangeError = useMemo(() => {
@@ -398,6 +406,28 @@ export default function RainIQ() {
 
     return thresholdValue;
   }, [threshold]);
+  const includeZeroDays = calculationMethod === 'allDays';
+  const showCalculationMethod = calculationMethodSupportedQueries.includes(selectedQuery);
+  const showThresholdInput = selectedQuery === 'qualifyingEvents';
+  const queryHasError = useMemo(
+    () => ({
+      wettestMonth: wettestMonthError,
+      avgMonthly: avgMonthlyError,
+      avgDaily: avgDailyError,
+      qualifyingEvents: qualifyingEventsError,
+      largest24h: largest24hError,
+      totalRain: totalRainError,
+    }[selectedQuery] || ''),
+    [
+      selectedQuery,
+      wettestMonthError,
+      avgMonthlyError,
+      avgDailyError,
+      qualifyingEventsError,
+      largest24hError,
+      totalRainError,
+    ],
+  );
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
   const apiBackedResponse = selectedQuery === 'wettestMonth'
     ? wettestMonthResponse
@@ -420,21 +450,20 @@ export default function RainIQ() {
 
   const availableLocations = locationOptions;
 
-  const [selectedLocations, setSelectedLocations] = useState(
-    locationOptions.length ? [locationOptions[0].id] : ['north-pump'],
-  );
+  const [selectedLocations, setSelectedLocations] = useState([]);
+  const [analyzedLocations, setAnalyzedLocations] = useState([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showDetailedView, setShowDetailedView] = useState(false);
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
       (apiBackedResponse?.data || []).map((locationData) => [String(locationData.location_id), locationData]),
     );
 
-    const activeLocations = selectedLocations.length
-      ? selectedLocations
-      : availableLocations.slice(0, 1).map((location) => location.id);
+    const activeLocations = analyzedLocations;
 
     return activeLocations.map((locationId, index) => {
-      const locationName = availableLocations.find((location) => location.id === locationId)?.name || 'Selected location';
+      const locationName = availableLocations.find((location) => String(location.id) === String(locationId))?.name || 'Selected location';
       const valueOffset = index * 0.09;
       const reportLocationData = reportDataByLocation.get(locationId);
 
@@ -504,9 +533,9 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: `Average monthly rainfall is ${monthlyAverage.toFixed(2)} inches.`,
+          headline: `Average rainfall per month is ${monthlyAverage.toFixed(2)} inches.`,
           metrics: [
-            { label: 'Monthly average', value: `${monthlyAverage.toFixed(2)} in` },
+            { label: 'Average rainfall per month', value: `${monthlyAverage.toFixed(2)} in` },
             { label: 'Months analyzed', value: String(analyzedMonthCount || 0) },
             {
               label: 'Highest month',
@@ -564,12 +593,12 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: `Average daily rainfall for the selected period is ${averageDaily.toFixed(2)} inches.`,
+          headline: `Average rainfall per day is ${averageDaily.toFixed(2)} inches for the selected period.`,
           metrics: [
-            { label: 'Average daily total', value: `${averageDaily.toFixed(2)} in` },
+            { label: 'Average per day', value: `${averageDaily.toFixed(2)} in` },
             { label: 'Rain days', value: `${rainDaysCount} of ${dayCount || 0} days` },
             {
-              label: 'Peak day',
+              label: 'Wettest day',
               value: peakDay?.date
                 ? `${Number(peakDay.daily_total || 0).toFixed(2)} in on ${formatDateForUi(peakDay.date)}`
                 : 'N/A',
@@ -615,10 +644,10 @@ export default function RainIQ() {
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: `There were ${Number(reportLocationData.qualifying_rain_events_count || 0)} qualifying rain events above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
+          headline: `There were ${Number(reportLocationData.qualifying_rain_events_count || 0)} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
           metrics: [
             { label: 'Threshold', value: `${effectiveThreshold.toFixed(2)} in` },
-            { label: 'Qualifying events', value: String(reportLocationData.qualifying_rain_events_count || 0) },
+            { label: 'Qualifying events', value: String(qualifyingRows.length) },
             {
               label: 'Most intense event',
               value: mostIntenseEvent?.date
@@ -705,14 +734,21 @@ export default function RainIQ() {
       }
 
       if (apiBackedQueries.includes(selectedQuery)) {
+        const isUnmappedLocation = Boolean(reportLocationData?.error?.toLowerCase?.().includes('mapped'));
+        const noRainfallInPeriod = !isUnmappedLocation && ['avgDaily', 'avgMonthly'].includes(selectedQuery);
+        const fallbackMessage = isUnmappedLocation
+          ? 'This location is not currently mapped to rainfall data. Try selecting a different location.'
+          : noRainfallInPeriod
+            ? 'No measurable rainfall recorded during this period.'
+            : 'No data returned for this query and selection.';
         return {
           id: locationId,
           locationName,
-          headline: `No ${queries.find((query) => query.value === selectedQuery)?.label || 'report'} data returned for this location in the selected range.`,
+          headline: fallbackMessage,
           metrics: [
             { label: 'Status', value: 'No data' },
             { label: 'Date range', value: `${formatDateForUi(selectedDateRange.startDate)} - ${formatDateForUi(selectedDateRange.endDate)}` },
-            { label: 'Threshold', value: threshold || 'N/A' },
+            ...(showThresholdInput ? [{ label: 'Threshold', value: threshold || 'N/A' }] : []),
           ],
           columns: ['Info', 'Value'],
           rows: [['Location', locationName], ['Result', 'No report data returned']],
@@ -736,7 +772,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, selectedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold]);
+  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -981,7 +1017,7 @@ export default function RainIQ() {
           <h1>RainIQ - ${escapeHtml(selectedQueryLabel)}</h1>
           <p class="subhead">
             Range: ${escapeHtml(formatDateForUi(selectedDateRange.startDate))} to ${escapeHtml(formatDateForUi(selectedDateRange.endDate))}
-            &nbsp;|&nbsp; Include zero-rain days: ${includeZeroDays ? 'Yes' : 'No'}
+            &nbsp;|&nbsp; Calculation method: ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}
           </p>
           <div class="criteria-box">
             <p class="criteria-title">Search criteria</p>
@@ -990,8 +1026,8 @@ export default function RainIQ() {
               <li><strong>Locations:</strong> ${escapeHtml(selectedLocationNames.join(', ') || 'None selected')}</li>
               <li><strong>Time range preset:</strong> ${escapeHtml(selectedRangeLabel)}</li>
               <li><strong>Date range:</strong> ${escapeHtml(selectedDateRange.startDate)} to ${escapeHtml(selectedDateRange.endDate)}</li>
-              <li><strong>Include zero-rain days:</strong> ${includeZeroDays ? 'Yes' : 'No'}</li>
-              <li><strong>Threshold input:</strong> ${escapeHtml(threshold || 'N/A')} inches</li>
+              <li><strong>Calculation method:</strong> ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}</li>
+              ${showThresholdInput ? `<li><strong>Threshold input:</strong> ${escapeHtml(threshold || 'N/A')} inches</li>` : ''}
             </ul>
           </div>
           ${reportSectionsHtml}
@@ -1003,98 +1039,100 @@ export default function RainIQ() {
     printWindow.print();
   };
 
-  useEffect(() => {
+  const runAnalysis = async () => {
     const queryConfig = {
       wettestMonth: {
         endpoint: '/api/reports/historical/metrics/wettest-month-on-record',
         setResponse: setWettestMonthResponse,
         setLoading: setWettestMonthLoading,
         setError: setWettestMonthError,
-        invalidLocationMessage: 'Wettest Month on Record requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
       avgMonthly: {
         endpoint: '/api/reports/historical/metrics/average-monthly-rainfall',
         setResponse: setAvgMonthlyResponse,
         setLoading: setAvgMonthlyLoading,
         setError: setAvgMonthlyError,
-        invalidLocationMessage: 'Average Monthly Rainfall requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
       avgDaily: {
         endpoint: '/api/reports/historical/metrics/average-daily-rainfall',
         setResponse: setAvgDailyResponse,
         setLoading: setAvgDailyLoading,
         setError: setAvgDailyError,
-        invalidLocationMessage: 'Average Daily Rainfall requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
       qualifyingEvents: {
         endpoint: '/api/reports/historical/metrics/qualifying-rain-events-count',
         setResponse: setQualifyingEventsResponse,
         setLoading: setQualifyingEventsLoading,
         setError: setQualifyingEventsError,
-        invalidLocationMessage: 'Qualifying Rain Events requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
       largest24h: {
         endpoint: '/api/reports/historical/metrics/largest-24h-rainfall-total',
         setResponse: setLargest24hResponse,
         setLoading: setLargest24hLoading,
         setError: setLargest24hError,
-        invalidLocationMessage: 'Largest 24-hour Rainfall Total requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
       totalRain: {
         endpoint: '/api/reports/historical/metrics/total-rainfall-selected-period',
         setResponse: setTotalRainResponse,
         setLoading: setTotalRainLoading,
         setError: setTotalRainError,
-        invalidLocationMessage: 'Total Rainfall for Selected Period requires mapped account locations.',
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
-    const fetchReportData = async () => {
-      if (!activeQueryConfig) {
-        return;
-      }
+    if (!activeQueryConfig) {
+      return;
+    }
 
-      if (customRangeError) {
-        activeQueryConfig.setError(customRangeError);
-        activeQueryConfig.setResponse(null);
-        return;
-      }
+    if (customRangeError) {
+      activeQueryConfig.setError(customRangeError);
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(true);
+      return;
+    }
 
-      const locationIds = selectedLocations
-        .map((locationId) => Number(locationId))
-        .filter((locationId) => Number.isInteger(locationId));
+    const locationIds = selectedLocations
+      .map((locationId) => Number(locationId))
+      .filter((locationId) => Number.isInteger(locationId));
 
-        
-      if (!locationIds.length) {
-        activeQueryConfig.setError(activeQueryConfig.invalidLocationMessage);
-        activeQueryConfig.setResponse(null);
-        return;
-      }
-
-      activeQueryConfig.setLoading(true);
+    if (!locationIds.length) {
       activeQueryConfig.setError('');
+      activeQueryConfig.setResponse(null);
+      setHasExecutedQuery(false);
+      return;
+    }
 
-      try {
-        const { data } = await api.post(activeQueryConfig.endpoint, {
-          start_date: selectedDateRange.startDate,
-          end_date: selectedDateRange.endDate,
-          location_ids: locationIds,
-          include_zero_days: includeZeroDays,
-          ...(parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
-        });
+    setIsAnalyzing(true);
+    activeQueryConfig.setLoading(true);
+    activeQueryConfig.setError('');
 
-        activeQueryConfig.setResponse(data);
-      } catch (error) {
-        activeQueryConfig.setResponse(null);
-        activeQueryConfig.setError(error.message || 'Unable to load report data.');
-      } finally {
-        activeQueryConfig.setLoading(false);
-      }
-    };
+    try {
+      const { data } = await api.post(activeQueryConfig.endpoint, {
+        start_date: selectedDateRange.startDate,
+        end_date: selectedDateRange.endDate,
+        location_ids: locationIds,
+        include_zero_days: includeZeroDays,
+        ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+      });
 
-    fetchReportData();
-  }, [selectedQuery, selectedLocations, selectedDateRange, includeZeroDays, parsedThreshold, customRangeError]);
+      activeQueryConfig.setResponse(data);
+      setAnalyzedLocations(locationIds.map(String));
+      setHasExecutedQuery(true);
+    } catch (error) {
+      activeQueryConfig.setResponse(null);
+      activeQueryConfig.setError(error.message || 'Unable to load report data.');
+      setHasExecutedQuery(true);
+    } finally {
+      activeQueryConfig.setLoading(false);
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleRequestSubmit = async (event) => {
     event.preventDefault();
@@ -1132,8 +1170,8 @@ export default function RainIQ() {
         `- Time range preset: ${rangeLabel}`,
         `- Date range: ${selectedDateRange.startDate} to ${selectedDateRange.endDate}`,
         `- Locations: ${selectedLocationNames.join(', ') || 'None selected'}`,
-        `- Include zero-rain days: ${includeZeroDays ? 'Yes' : 'No'}`,
-        `- Threshold input: ${threshold || 'N/A'} inches`,
+        `- Calculation method: ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}`,
+        ...(showThresholdInput ? [`- Threshold input: ${threshold || 'N/A'} inches`] : []),
         '',
         'Requested new report details:',
         requestText.trim(),
@@ -1149,8 +1187,8 @@ export default function RainIQ() {
           <li><strong>Time range preset:</strong> ${rangeLabel}</li>
           <li><strong>Date range:</strong> ${selectedDateRange.startDate} to ${selectedDateRange.endDate}</li>
           <li><strong>Locations:</strong> ${selectedLocationNames.join(', ') || 'None selected'}</li>
-          <li><strong>Include zero-rain days:</strong> ${includeZeroDays ? 'Yes' : 'No'}</li>
-          <li><strong>Threshold input:</strong> ${threshold || 'N/A'} inches</li>
+          <li><strong>Calculation method:</strong> ${includeZeroDays ? 'All days (including dry days)' : 'Rain days only (>= 0.01 inches)'}</li>
+          ${showThresholdInput ? `<li><strong>Threshold input:</strong> ${threshold || 'N/A'} inches</li>` : ''}
         </ul>
         <h3>Requested new report details</h3>
         <p>${requestText.trim().replaceAll('\n', '<br />')}</p>
@@ -1180,6 +1218,16 @@ export default function RainIQ() {
     }
   };
 
+  const periodLine = `Period: ${formatDateForUi(selectedDateRange.startDate)} to ${formatDateForUi(selectedDateRange.endDate)}`;
+  const calculationLine = showCalculationMethod
+    ? (includeZeroDays
+      ? 'Calculated across all days in the selected period (including days with no rainfall).'
+      : 'Calculated using only days with measurable rainfall (>= 0.01 inches; defined as a “rain day”), excluding dry days.')
+    : 'Based on observed rainfall totals for the selected period.';
+  const primaryHeadline = !hasExecutedQuery
+    ? 'Select criteria and click Analyze to view rainfall trends.'
+    : (selectedLocationResults[0]?.headline || 'Run a query to view rainfall insights for this location.');
+
   if (!canAccessRainIQ) {
     return (
       <div className="mt-40 px-6 pb-12">
@@ -1206,11 +1254,66 @@ export default function RainIQ() {
         <div className="mb-6 border-b pb-4">
           <h1 className="text-3xl font-bold text-[--main-2]">RainIQ</h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-            Deterministic rainfall analytics with structured intents and evidence-backed outputs.
+            Verified rainfall analysis based on National Weather Service data for indicated locations
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border p-4 md:col-span-2">
+            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">What do you want to analyze?</label>
+            <select
+              value={selectedQuery}
+              onChange={(event) => setSelectedQuery(event.target.value)}
+              className="w-full rounded border p-2 text-sm text-slate-800"
+            >
+              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
+                <optgroup key={group} label={group}>
+                  {groupQueries.map((query) => (
+                    <option key={query.value} value={query.value}>
+                      {query.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+
+            {showThresholdInput && (
+              <div className="mt-3 flex items-center gap-3">
+                <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
+                <input
+                  value={threshold}
+                  onChange={(event) => setThreshold(event.target.value)}
+                  className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
+                />
+                <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
+
+            {showCalculationMethod && (
+              <div className="mt-3">
+                <p className="text-xs font-bold uppercase text-slate-500">Calculation method</p>
+                <label className="mt-2 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'allDays'}
+                    onChange={() => setCalculationMethod('allDays')}
+                  />
+                  All days (including dry days)
+                </label>
+                <label className="mt-1 flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="radio"
+                    name="calculation-method"
+                    checked={calculationMethod === 'rainDaysOnly'}
+                    onChange={() => setCalculationMethod('rainDaysOnly')}
+                  />
+                  Rain days only (&gt;= 0.01 inches)
+                </label>
+              </div>
+            )}
+          </div>
+
           <div className="rounded-lg border p-4">
             <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Location(s)</label>
             {availableLocations.length > 5 ? (
@@ -1282,92 +1385,88 @@ export default function RainIQ() {
             )}
           </div>
 
-          <div className="rounded-lg border p-4 md:col-span-2">
-            <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Structured query catalog</label>
-            <select
-              value={selectedQuery}
-              onChange={(event) => setSelectedQuery(event.target.value)}
-              className="w-full rounded border p-2 text-sm text-slate-800"
-            >
-              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
-                <optgroup key={group} label={group}>
-                  {groupQueries.map((query) => (
-                    <option key={query.value} value={query.value}>
-                      {query.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
-
-            <div className="mt-3 flex items-center gap-3">
-              <label className="text-xs font-bold uppercase text-slate-500">Threshold (optional)</label>
-              <input
-                value={threshold}
-                onChange={(event) => setThreshold(event.target.value)}
-                className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
-              />
-              <span className="text-xs text-slate-500">inches</span>
-            </div>
-
-            <label className="mt-3 inline-flex items-center gap-2 text-xs font-bold uppercase text-slate-500">
-              <input
-                type="checkbox"
-                checked={includeZeroDays}
-                onChange={(event) => setIncludeZeroDays(event.target.checked)}
-              />
-              Include zero-rain days
-            </label>
-          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+          <button
+            type="button"
+            onClick={runAnalysis}
+            disabled={isAnalyzing}
+            className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+          >
+            {isAnalyzing ? (
+              <span className="inline-flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                Analyzing...
+              </span>
+            ) : (
+              'Analyze'
+            )}
+          </button>
         </div>
 
         <div className="mt-6 rounded-lg border border-[--main-2] bg-slate-50 p-4 dark:bg-slate-800">
           <h2 className="text-xl font-semibold">Headline Insight</h2>
-          <p className="mt-2 text-base">
-            Showing deterministic analytics for {selectedLocationResults.length} selected location{selectedLocationResults.length === 1 ? '' : 's'}.
+          <p className="mt-2 text-base font-semibold">{primaryHeadline}</p>
+          <p className="mt-2 text-sm">
+            {periodLine}
           </p>
-          <p className="mt-3 text-xs text-slate-500">
-            Based on monitoring data from {formatDateForUi(selectedDateRange.startDate)} to {formatDateForUi(selectedDateRange.endDate)}. RainIQ runs deterministic analytics and does not use third-party AI.
+          <p className="mt-2 text-sm text-slate-600">
+            {calculationLine}
           </p>
         </div>
+        <div className="mt-4 flex items-center gap-3">
+          <label htmlFor="detailed-view-toggle" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+            Detailed view
+          </label>
+          <input
+            id="detailed-view-toggle"
+            type="checkbox"
+            checked={showDetailedView}
+            onChange={(event) => setShowDetailedView(event.target.checked)}
+          />
+          <span className="text-xs text-slate-500">
+            {showDetailedView ? 'On: show summary + chart details.' : 'Off: show summary cards only.'}
+          </span>
+        </div>
 
-        {selectedQuery === 'wettestMonth' && wettestMonthLoading && (
+        {hasExecutedQuery && selectedQuery === 'wettestMonth' && wettestMonthLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading wettest month report data...</p>
         )}
-        {selectedQuery === 'wettestMonth' && wettestMonthError && (
+        {selectedQuery === 'wettestMonth' && wettestMonthError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{wettestMonthError}</p>
         )}
-        {selectedQuery === 'avgMonthly' && avgMonthlyLoading && (
+        {hasExecutedQuery && selectedQuery === 'avgMonthly' && avgMonthlyLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading average monthly rainfall report data...</p>
         )}
-        {selectedQuery === 'avgMonthly' && avgMonthlyError && (
+        {selectedQuery === 'avgMonthly' && avgMonthlyError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{avgMonthlyError}</p>
         )}
-        {selectedQuery === 'avgDaily' && avgDailyLoading && (
+        {hasExecutedQuery && selectedQuery === 'avgDaily' && avgDailyLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading average daily rainfall report data...</p>
         )}
-        {selectedQuery === 'avgDaily' && avgDailyError && (
+        {selectedQuery === 'avgDaily' && avgDailyError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{avgDailyError}</p>
         )}
-        {selectedQuery === 'qualifyingEvents' && qualifyingEventsLoading && (
+        {hasExecutedQuery && selectedQuery === 'qualifyingEvents' && qualifyingEventsLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading qualifying rain events report data...</p>
         )}
-        {selectedQuery === 'qualifyingEvents' && qualifyingEventsError && (
+        {selectedQuery === 'qualifyingEvents' && qualifyingEventsError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{qualifyingEventsError}</p>
         )}
-        {selectedQuery === 'largest24h' && largest24hLoading && (
+        {hasExecutedQuery && selectedQuery === 'largest24h' && largest24hLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading largest 24-hour rainfall total report data...</p>
         )}
-        {selectedQuery === 'largest24h' && largest24hError && (
+        {selectedQuery === 'largest24h' && largest24hError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{largest24hError}</p>
         )}
-        {selectedQuery === 'totalRain' && totalRainLoading && (
+        {hasExecutedQuery && selectedQuery === 'totalRain' && totalRainLoading && (
           <p className="mt-4 text-sm font-semibold text-slate-500">Loading total rainfall report data...</p>
         )}
-        {selectedQuery === 'totalRain' && totalRainError && (
+        {selectedQuery === 'totalRain' && totalRainError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{totalRainError}</p>
         )}
 
+        {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
             const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
@@ -1386,55 +1485,58 @@ export default function RainIQ() {
                   ))}
                 </div>
 
-                <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                  <div className="rounded-lg border p-4">
-                    <h4 className="mb-3 text-lg font-semibold">Supporting table</h4>
-                    <div className="overflow-x-auto">
-                      <table className="min-w-full text-left text-sm">
-                        <thead>
-                          <tr className="border-b">
-                            {locationResult.columns.map((column) => (
-                              <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {locationResult.rows.map((row, index) => (
-                            <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
-                              {row.map((cell, cellIndex) => (
-                                <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
+                {showDetailedView && selectedQuery !== 'totalRain' && (
+                  <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                    <div className="rounded-lg border p-4">
+                      <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-left text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              {locationResult.columns.map((column) => (
+                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
                               ))}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {locationResult.rows.map((row, index) => (
+                              <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
+                                {row.map((cell, cellIndex) => (
+                                  <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="rounded-lg border p-4">
-                    <h4 className="mb-3 text-lg font-semibold">Supporting chart</h4>
-                    <div className="space-y-3">
-                      {locationResult.chart.map((item) => (
-                        <div key={`${locationResult.id}-${item.label}`}>
-                          <div className="mb-1 flex justify-between text-xs">
-                            <span>{item.label}</span>
-                            <span>{item.value}</span>
+                    <div className="rounded-lg border p-4">
+                      <h4 className="mb-3 text-lg font-semibold">Monthly rainfall totals</h4>
+                      <div className="space-y-3">
+                        {locationResult.chart.map((item) => (
+                          <div key={`${locationResult.id}-${item.label}`}>
+                            <div className="mb-1 flex justify-between text-xs">
+                              <span>{item.label}</span>
+                              <span>{item.value}</span>
+                            </div>
+                            <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
+                              <div
+                                className="h-3 rounded bg-[--main-2]"
+                                style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                              />
+                            </div>
                           </div>
-                          <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                            <div
-                              className="h-3 rounded bg-[--main-2]"
-                              style={{ width: `${(item.value / locationChartMax) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </section>
             );
           })}
         </div>
+        )}
 
         <div className="mt-6 flex flex-wrap gap-3">
           <button

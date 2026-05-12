@@ -935,15 +935,21 @@ export default function RainIQ() {
         )
         .join('');
 
-      const chartRowsHtml = locationResult.chart
-        .map(
-          (item) => `
-            <tr>
-              <td>${escapeHtml(item.label)}</td>
-              <td>${escapeHtml(Number(item.value || 0).toFixed(2))}</td>
-            </tr>
-          `,
-        )
+      const chartMaxValue = Math.max(...locationResult.chart.map((item) => Number(item.value || 0)), 0);
+      const chartBarsHtml = locationResult.chart
+        .map((item) => {
+          const numericValue = Number(item.value || 0);
+          const widthPct = chartMaxValue > 0 ? (numericValue / chartMaxValue) * 100 : 0;
+          return `
+            <div class="bar-row">
+              <div class="bar-label">${escapeHtml(item.label)}</div>
+              <div class="bar-wrap">
+                <div class="bar-fill" style="width: ${Math.max(widthPct, 0).toFixed(2)}%;"></div>
+              </div>
+              <div class="bar-value">${escapeHtml(numericValue.toFixed(2))}</div>
+            </div>
+          `;
+        })
         .join('');
 
       const fullJsonRowsHtml = (sourceData?.daily_totals || [])
@@ -972,13 +978,10 @@ export default function RainIQ() {
             <tbody>${summaryRowsHtml}</tbody>
           </table>
 
-          <h3>Supporting chart values</h3>
-          <table>
-            <thead>
-              <tr><th>Label</th><th>Value</th></tr>
-            </thead>
-            <tbody>${chartRowsHtml}</tbody>
-          </table>
+          <h3>Supporting chart</h3>
+          <div class="bar-chart">
+            ${chartBarsHtml || '<p>No chart data available.</p>'}
+          </div>
 
           <h3>${escapeHtml(querySpecificDailyTotalsLabel)}</h3>
           <table>
@@ -1021,6 +1024,12 @@ export default function RainIQ() {
             table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
             th, td { border-bottom: 1px solid #d1d5db; text-align: left; padding: 8px; font-size: 12px; }
             th { background: #f8fafc; font-weight: 700; }
+            .bar-chart { margin: 6px 0 14px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+            .bar-row { display: grid; grid-template-columns: minmax(90px, 180px) 1fr 56px; gap: 8px; align-items: center; margin: 6px 0; }
+            .bar-label { font-size: 11px; color: #334155; }
+            .bar-wrap { background: #e2e8f0; height: 12px; border-radius: 999px; overflow: hidden; }
+            .bar-fill { background: #1f4f7a; height: 100%; border-radius: 999px; }
+            .bar-value { font-size: 11px; color: #1f4f7a; text-align: right; font-weight: 600; }
             .pdf-footer {
               position: fixed;
               bottom: 12px;

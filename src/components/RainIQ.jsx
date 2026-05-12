@@ -900,6 +900,15 @@ export default function RainIQ() {
       .filter(Boolean);
     const selectedRangeLabel = timeRanges.find((range) => range.value === selectedRange)?.label || selectedRange;
 
+    const querySpecificDailyTotalsLabel = {
+      wettestMonth: 'Daily totals',
+      avgMonthly: 'Daily totals',
+      avgDaily: 'Daily totals',
+      qualifyingEvents: 'Daily totals',
+      largest24h: 'Daily totals',
+      totalRain: 'Daily totals',
+    }[selectedQuery] || 'Daily totals';
+
     const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
       const sourceData = apiBackedResponse.data.find(
         (item) => String(item.location_id) === String(locationResult.id),
@@ -971,7 +980,7 @@ export default function RainIQ() {
             <tbody>${chartRowsHtml}</tbody>
           </table>
 
-          <h3>Full JSON values</h3>
+          <h3>${escapeHtml(querySpecificDailyTotalsLabel)}</h3>
           <table>
             <thead>
               <tr><th>Date</th><th>Daily Total (in)</th></tr>
@@ -992,6 +1001,7 @@ export default function RainIQ() {
         <head>
           <title>RainIQ ${escapeHtml(selectedQueryLabel)} Report</title>
           <style>
+            @page { margin: 24px 24px 56px; }
             body { font-family: Arial, sans-serif; color: #1e293b; margin: 24px; }
             h1 { color: #1f4f7a; margin-bottom: 8px; }
             h2 { color: #1f4f7a; margin: 0 0 8px; }
@@ -1011,6 +1021,18 @@ export default function RainIQ() {
             table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
             th, td { border-bottom: 1px solid #d1d5db; text-align: left; padding: 8px; font-size: 12px; }
             th { background: #f8fafc; font-weight: 700; }
+            .pdf-footer {
+              position: fixed;
+              bottom: 12px;
+              left: 24px;
+              right: 24px;
+              font-size: 10px;
+              color: #64748b;
+              text-align: center;
+              border-top: 1px solid #e2e8f0;
+              padding-top: 6px;
+              background: #ffffff;
+            }
           </style>
         </head>
         <body>
@@ -1031,6 +1053,7 @@ export default function RainIQ() {
             </ul>
           </div>
           ${reportSectionsHtml}
+          <div class="pdf-footer">Based on National Weather Service 1-km gridded rainfall data, updated hourly.</div>
         </body>
       </html>
     `);

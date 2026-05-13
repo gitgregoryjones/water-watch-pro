@@ -62,7 +62,8 @@ const GeneralSettingsPage = () => {
           exceed24h_combine_locations: response.data.exceed24h_combine_locations || false,
           rapidrain_on: response.data.rapidrain_on || false,
           rapidrain_combine_locations: response.data.rapidrain_combine_locations || false,
-          rapidrain_first_on: response.data.rapidrain_first_on || false
+          rapidrain_first_on: response.data.rapidrain_first_on || false,
+          monthly_report_on: response.data.monthly_report_on || false
         });
       } catch (error) {
         console.error('Error fetching client data:', error.message);
@@ -187,6 +188,20 @@ const GeneralSettingsPage = () => {
                 <span className="ml-4">Combine Locations</span>
               </div>
               
+            </div>
+
+            <div className="border p-6 rounded shadow-md">
+              <h2 className="text-xl font-bold mb-4">Monthly Report</h2>
+              <div className="flex items-center mb-4 gap-2">
+                <Toggle
+                  checked={settings.monthly_report_on}
+                  onChange={() => handleToggle('monthly_report_on')}
+                />
+                <span>Send Monthly Report</span>
+              </div>
+              <div className='ml-[56px] mb-2'>
+                All contacts will receive a monthly summary report.
+              </div>
             </div>
 
             {/* 24 Hour Threshold Section */}

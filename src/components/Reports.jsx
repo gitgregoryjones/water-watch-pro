@@ -489,7 +489,7 @@ const Reports = () => {
 
     setShowDialog(true);
     const baseQuery = query;
-    if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel') ) {
+    if ( (selectedLocations.length > 1 || displayFormat === 'csv' ||  displayFormat == 'excel' || displayFormat === 'pdf') ) {
       // POST Request for multiple locations
 
 
@@ -888,7 +888,7 @@ const Reports = () => {
             type="submit"
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
-            {selectedLocations.length > 1 || displayFormat == "csv"  || displayFormat == "excel" ? "Email Report" : "View Report"}
+            {selectedLocations.length > 1 || displayFormat == "csv"  || displayFormat == "excel" || displayFormat == "pdf" ? "Email Report" : "View Report"}
           </button>
         </div>
       </form>

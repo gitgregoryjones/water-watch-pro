@@ -32,6 +32,7 @@ const ContactForm = ({  }) => {
 
   const [formData, setFormData] = useState({
     monthly_report_on: contactToEdit ? contactToEdit?.monthly_report_on : true,
+    monthly_report_on_sms: contactToEdit ? contactToEdit?.monthly_report_on_sms : true,
     daily_report_on: contactToEdit ? contactToEdit?.daily_report_on : true,
     daily_report_on_sms: contactToEdit ? contactToEdit?.daily_report_on_sms  : true,
     exceed24h_on: contactToEdit ? contactToEdit?.exceed24h_on : true,
@@ -202,6 +203,7 @@ const ContactForm = ({  }) => {
       
       daily_report_on:formData.daily_report_on,
       monthly_report_on: formData.monthly_report_on,
+      monthly_report_on_sms: formData.monthly_report_on_sms,
       daily_report_on_sms: formData.daily_report_on_sms,
       forecast_on: formData.forecast_on,
       forecast_on_sms:formData.forecast_on_sms,
@@ -297,10 +299,15 @@ const ContactForm = ({  }) => {
   
     return Object.entries(groupedKeys).map(([header, { email, sms }]) => {
       const label = header.replace(/_/g, ' '); // Create a readable header
+      const formattedLabel = label
+        .trim()
+        .replace(/ on$/i, '')
+        .replace("atlas14 24h", "NOAA Atlas 14")
+        .replace("exceed24h", "24 Hour Threshold");
   
       return (
         ( <div className={`flex flex-col mb-4 ${label.toLocaleLowerCase().startsWith("forecast") && convertTier(user) < 3 ? 'hidden' : ''} ${label.toLocaleLowerCase().startsWith("atlas") && convertTier(user) < 2 ? 'hidden' : ''}`} key={header} >
-          <span className="font-bold capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
+          <span className="font-bold capitalize">{formattedLabel}</span>
           
           <div className="flex items-center mt-2">
             <span className="mr-2">Email</span>

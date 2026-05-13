@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import {validateEmail} from '../utility/passwordFunc'
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 import {
   isValidPhoneNumber,
   PHONE_INPUT_PATTERN,
@@ -57,6 +58,8 @@ const ContactForm = ({  }) => {
 
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(true);
   const user = useSelector((state) => state.userInfo.user);
+  const { isActive } = useFeatureFlags();
+  const isSendMonthlyReportEnabled = isActive('send_monthly_report');
 
   //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
   
@@ -286,7 +289,9 @@ const ContactForm = ({  }) => {
 
   const renderSettings = (settings) => {
     // Group the keys into pairs (email + SMS)
-    const groupedKeys = Object.keys(settings).reduce((acc, key) => {
+    const groupedKeys = Object.keys(settings)
+      .filter((key) => isSendMonthlyReportEnabled || !key.startsWith('monthly_report_on'))
+      .reduce((acc, key) => {
       const baseKey = key.replace('_sms', '');
       if (!acc[baseKey]) acc[baseKey] = {};
       if (key.endsWith('_sms')) {

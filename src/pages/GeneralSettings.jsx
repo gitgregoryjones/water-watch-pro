@@ -17,6 +17,7 @@ const GeneralSettingsPage = () => {
   const { state } = useLocation();
   const { isActive } = useFeatureFlags();
   const isCustomDailyReportTimeEnabled = isActive('customDailyReportTime');
+  const isSendMonthlyReportEnabled = isActive('send_monthly_report');
   const navigate = useNavigate();
   const user = useSelector((state) => state.userInfo.user);
   const [settings, setSettings] = useState({});
@@ -190,6 +191,7 @@ const GeneralSettingsPage = () => {
               
             </div>
 
+            {isSendMonthlyReportEnabled && (
             <div className="border p-6 rounded shadow-md">
               <h2 className="text-xl font-bold mb-4">Monthly Report</h2>
               <div className="flex items-center mb-4 gap-2">
@@ -203,6 +205,7 @@ const GeneralSettingsPage = () => {
                 All contacts will receive a monthly summary report.
               </div>
             </div>
+            )}
 
             {/* 24 Hour Threshold Section */}
             <div className="border p-6 rounded shadow-md flex flex-col gap-2">

@@ -322,7 +322,7 @@ const ContactForm = ({  }) => {
             />
           </div>
   
-          {sms && (
+          {sms && sms !== 'monthly_report_on_sms' && (
             <div className="flex items-center mt-2">
               <span className="mr-2">Text</span>
               <Toggle

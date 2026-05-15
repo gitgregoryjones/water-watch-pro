@@ -146,7 +146,7 @@ const mockResponses = {
     metrics: [
       { label: 'Threshold', value: '0.5 in' },
       { label: 'Qualifying events', value: '8' },
-      { label: 'Most intense event', value: '1.22 in on 01/23/2026' },
+      { label: 'Maximum event', value: '1.22 in on 01/23/2026' },
     ],
     columns: ['Date', '24-hour Rainfall (in)', 'Qualified'],
     rows: [
@@ -649,7 +649,7 @@ export default function RainIQ() {
             { label: 'Threshold', value: `${effectiveThreshold.toFixed(2)} in` },
             { label: 'Qualifying events', value: String(qualifyingRows.length) },
             {
-              label: 'Most intense event',
+              label: 'Maximum event',
               value: mostIntenseEvent?.date
                 ? `${Number(mostIntenseEvent.daily_total || 0).toFixed(2)} in on ${formatDateForUi(mostIntenseEvent.date)}`
                 : 'N/A',
@@ -902,7 +902,7 @@ export default function RainIQ() {
 
     const querySpecificDailyTotalsLabel = {
       wettestMonth: 'Daily totals',
-      avgMonthly: 'Daily totals',
+      avgMonthly: 'Daily detail',
       avgDaily: 'Daily totals',
       qualifyingEvents: 'Daily totals',
       largest24h: 'Daily totals',
@@ -977,11 +977,6 @@ export default function RainIQ() {
             </thead>
             <tbody>${summaryRowsHtml}</tbody>
           </table>
-
-          <h3>Supporting chart</h3>
-          <div class="bar-chart">
-            ${chartBarsHtml || '<p>No chart data available.</p>'}
-          </div>
 
           <h3>${escapeHtml(querySpecificDailyTotalsLabel)}</h3>
           <table>
@@ -1447,17 +1442,15 @@ export default function RainIQ() {
           </p>
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <label htmlFor="detailed-view-toggle" className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-            Detailed view
-          </label>
           <input
             id="detailed-view-toggle"
             type="checkbox"
             checked={showDetailedView}
             onChange={(event) => setShowDetailedView(event.target.checked)}
+            className="h-5 w-5"
           />
-          <span className="text-xs text-slate-500">
-            {showDetailedView ? 'On: show summary + chart details.' : 'Off: show summary cards only.'}
+          <span className="text-xl font-semibold text-slate-700 dark:text-slate-200">
+            Show specific dates and detail.
           </span>
         </div>
 
@@ -1544,7 +1537,7 @@ export default function RainIQ() {
                     </div>
 
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">Monthly rainfall totals</h4>
+                      <h4 className="mb-3 text-lg font-semibold">Rainfall totals</h4>
                       <div className="space-y-3">
                         {locationResult.chart.map((item) => (
                           <div key={`${locationResult.id}-${item.label}`}>

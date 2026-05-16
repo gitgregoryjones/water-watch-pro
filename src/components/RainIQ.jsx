@@ -970,7 +970,7 @@ export default function RainIQ() {
 
           <div class="metrics-grid">${metricsHtml}</div>
 
-          <h3>Supporting table</h3>
+          <h3>${escapeHtml(selectedQueryLabel)}</h3>
           <table>
             <thead>
               <tr>${locationResult.columns.map((column) => `<th>${escapeHtml(column)}</th>`).join('')}</tr>

@@ -34,6 +34,18 @@ const formatMonthShortForUi = (yearMonth) => {
   return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 };
 
+
+const buildMonthlyTotals = (dailyTotals = []) => {
+  const monthTotals = {};
+
+  dailyTotals.forEach((entry) => {
+    const month = entry.date.slice(0, 7);
+    monthTotals[month] = Number(((monthTotals[month] || 0) + Number(entry.daily_total || 0)).toFixed(2));
+  });
+
+  return Object.entries(monthTotals).sort(([monthA], [monthB]) => monthA.localeCompare(monthB));
+};
+
 const formatRainValue = (value, digits = 3) => {
   const numericValue = Number(value);
   if (!Number.isFinite(numericValue)) {
@@ -469,24 +481,18 @@ export default function RainIQ() {
 
       if (selectedQuery === 'wettestMonth' && reportLocationData?.wettest_month_on_record) {
         const dailyTotals = reportLocationData.daily_totals || [];
-        const sortedMonthTotals = {};
+        const monthTotals = buildMonthlyTotals(dailyTotals);
+        const rankedMonths = [...monthTotals].sort(([, a], [, b]) => b - a);
 
-        dailyTotals.forEach((entry) => {
-          const month = entry.date.slice(0, 7);
-          sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
-        });
-
-        const rankedMonths = Object.entries(sortedMonthTotals)
-          .sort(([, a], [, b]) => b - a);
-
+        const rankByMonth = new Map(rankedMonths.map(([month], rankIndex) => [month, rankIndex + 1]));
         const topMonth = rankedMonths[0];
         const monthLabel = topMonth ? formatMonthForUi(topMonth[0]) : 'N/A';
         const topMonthTotal = Number(topMonth?.[1] || 0).toFixed(2);
         const nextClosest = rankedMonths[1];
-        const summaryRows = rankedMonths.map(([month, total], rankIndex) => [
+        const summaryRows = monthTotals.map(([month, total]) => [
           formatMonthShortForUi(month),
           Number(total || 0).toFixed(2),
-          String(rankIndex + 1),
+          String(rankByMonth.get(month) || 0),
         ]);
 
         return {
@@ -505,7 +511,7 @@ export default function RainIQ() {
           ],
           columns: ['Month', 'Total Rainfall (in)', 'Rank'],
           rows: summaryRows.length ? summaryRows : [['N/A', '0.00', '1']],
-          chart: rankedMonths.map(([month, total]) => ({
+          chart: monthTotals.map(([month, total]) => ({
             label: formatMonthShortForUi(month),
             value: Number(total || 0),
           })),
@@ -514,17 +520,10 @@ export default function RainIQ() {
 
       if (selectedQuery === 'avgMonthly' && reportLocationData) {
         const dailyTotals = reportLocationData.daily_totals || [];
-        const sortedMonthTotals = {};
+        const monthTotals = buildMonthlyTotals(dailyTotals);
+        const rankedMonths = [...monthTotals].sort(([, a], [, b]) => b - a);
 
-        dailyTotals.forEach((entry) => {
-          const month = entry.date.slice(0, 7);
-          sortedMonthTotals[month] = Number(((sortedMonthTotals[month] || 0) + (entry.daily_total || 0)).toFixed(2));
-        });
-
-        const rankedMonths = Object.entries(sortedMonthTotals)
-          .sort(([, a], [, b]) => b - a);
-
-        const analyzedMonthCount = Object.keys(sortedMonthTotals).length;
+        const analyzedMonthCount = monthTotals.length;
         const monthlyAverage = Number(reportLocationData.average_monthly_rainfall || 0);
         const highestMonth = rankedMonths[0];
 
@@ -543,12 +542,12 @@ export default function RainIQ() {
             },
           ],
           columns: ['Month', 'Total Rainfall (in)', 'Rank'],
-          rows: rankedMonths.map(([month, total], rankIndex) => [
+          rows: monthTotals.map(([month, total]) => [
             formatMonthShortForUi(month),
             Number(total || 0).toFixed(2),
-            String(rankIndex + 1),
+            String((rankedMonths.findIndex(([rankedMonth]) => rankedMonth === month) || 0) + 1),
           ]),
-          chart: rankedMonths.map(([month, total]) => ({
+          chart: monthTotals.map(([month, total]) => ({
             label: formatMonthShortForUi(month),
             value: Number(total || 0),
           })),

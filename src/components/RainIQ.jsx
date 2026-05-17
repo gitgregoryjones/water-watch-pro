@@ -477,8 +477,7 @@ export default function RainIQ() {
         });
 
         const rankedMonths = Object.entries(sortedMonthTotals)
-          .sort(([, a], [, b]) => b - a)
-          .slice(0, 3);
+          .sort(([, a], [, b]) => b - a);
 
         const topMonth = rankedMonths[0];
         const monthLabel = topMonth ? formatMonthForUi(topMonth[0]) : 'N/A';

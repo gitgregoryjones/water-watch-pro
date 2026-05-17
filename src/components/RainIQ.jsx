@@ -523,8 +523,7 @@ export default function RainIQ() {
         });
 
         const rankedMonths = Object.entries(sortedMonthTotals)
-          .sort(([, a], [, b]) => b - a)
-          .slice(0, 3);
+          .sort(([, a], [, b]) => b - a);
 
         const analyzedMonthCount = Object.keys(sortedMonthTotals).length;
         const monthlyAverage = Number(reportLocationData.average_monthly_rainfall || 0);

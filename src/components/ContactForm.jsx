@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import WorkingDialog from './WorkingDialog';
 import { convertTier } from '../utility/loginUser';
 import {validateEmail} from '../utility/passwordFunc'
+import { useFeatureFlags } from '@geejay/use-feature-flags';
 import {
   isValidPhoneNumber,
   PHONE_INPUT_PATTERN,
@@ -31,6 +32,8 @@ const ContactForm = ({  }) => {
   const [msg,setMsg] = useState(null)
 
   const [formData, setFormData] = useState({
+    monthly_report_on: contactToEdit ? contactToEdit?.monthly_report_on : true,
+    monthly_report_on_sms: contactToEdit ? contactToEdit?.monthly_report_on_sms : true,
     daily_report_on: contactToEdit ? contactToEdit?.daily_report_on : true,
     daily_report_on_sms: contactToEdit ? contactToEdit?.daily_report_on_sms  : true,
     exceed24h_on: contactToEdit ? contactToEdit?.exceed24h_on : true,
@@ -55,6 +58,8 @@ const ContactForm = ({  }) => {
 
   const [isAlertSettingsExpanded, setIsAlertSettingsExpanded] = useState(true);
   const user = useSelector((state) => state.userInfo.user);
+  const { isActive } = useFeatureFlags();
+  const isSendMonthlyReportEnabled = isActive('send_monthly_report');
 
   //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
   
@@ -200,6 +205,8 @@ const ContactForm = ({  }) => {
       status: 'active',
       
       daily_report_on:formData.daily_report_on,
+      monthly_report_on: formData.monthly_report_on,
+      monthly_report_on_sms: formData.monthly_report_on_sms,
       daily_report_on_sms: formData.daily_report_on_sms,
       forecast_on: formData.forecast_on,
       forecast_on_sms:formData.forecast_on_sms,
@@ -282,7 +289,9 @@ const ContactForm = ({  }) => {
 
   const renderSettings = (settings) => {
     // Group the keys into pairs (email + SMS)
-    const groupedKeys = Object.keys(settings).reduce((acc, key) => {
+    const groupedKeys = Object.keys(settings)
+      .filter((key) => isSendMonthlyReportEnabled || !key.startsWith('monthly_report_on'))
+      .reduce((acc, key) => {
       const baseKey = key.replace('_sms', '');
       if (!acc[baseKey]) acc[baseKey] = {};
       if (key.endsWith('_sms')) {
@@ -295,10 +304,15 @@ const ContactForm = ({  }) => {
   
     return Object.entries(groupedKeys).map(([header, { email, sms }]) => {
       const label = header.replace(/_/g, ' '); // Create a readable header
+      const formattedLabel = label
+        .trim()
+        .replace(/ on$/i, '')
+        .replace("atlas14 24h", "NOAA Atlas 14")
+        .replace("exceed24h", "24 Hour Threshold");
   
       return (
         ( <div className={`flex flex-col mb-4 ${label.toLocaleLowerCase().startsWith("forecast") && convertTier(user) < 3 ? 'hidden' : ''} ${label.toLocaleLowerCase().startsWith("atlas") && convertTier(user) < 2 ? 'hidden' : ''}`} key={header} >
-          <span className="font-bold capitalize">{label.trim().replace("on","").replace("atlas14 24h","NOAA Atlas 14").replace("exceed24h","24 Hour Threshold")}</span>
+          <span className="font-bold capitalize">{formattedLabel}</span>
           
           <div className="flex items-center mt-2">
             <span className="mr-2">Email</span>
@@ -308,13 +322,15 @@ const ContactForm = ({  }) => {
             />
           </div>
   
-          <div className="flex items-center mt-2">
-            <span className="mr-2">Text</span>
-            <Toggle
-              checked={settings[sms]}
-              onChange={() => handleChange({ name: sms, value: !settings[sms] })}
-            />
-          </div>
+          {sms && sms !== 'monthly_report_on_sms' && (
+            <div className="flex items-center mt-2">
+              <span className="mr-2">Text</span>
+              <Toggle
+                checked={settings[sms]}
+                onChange={() => handleChange({ name: sms, value: !settings[sms] })}
+              />
+            </div>
+          )}
         </div>)
       );
     });

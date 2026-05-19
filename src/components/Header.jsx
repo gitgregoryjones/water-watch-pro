@@ -46,7 +46,8 @@ export default function Header({ theme, onToggleTheme }) {
   
   const {isActive} = useFeatureFlags()
 
-  const canViewRainIQMenu = isActive('rainIQ') && user.role !== "admin" && RAINIQ_ALLOWED_EMAILS.includes((user.email || "").toLowerCase());
+  const canViewRainIQByEmail = user.role !== "admin" && RAINIQ_ALLOWED_EMAILS.includes((user.email || "").toLowerCase());
+  const canViewRainIQMenu = isActive('rainIQ') && (isActive('free4All') || canViewRainIQByEmail);
 
   
 

@@ -270,12 +270,6 @@ const ClientForm = ({ clientToEdit,myself }) => {
           <Toggle checked={JSON.stringify(auto_add_locations) == "true"} onChange={() => setAutoAddLocations(!auto_add_locations)} />
           <span className="ml-2">Auto Add Locations</span>
         </div>
-        {isActive('send_monthly_report') && (
-          <div className=" flex items-center">
-            <Toggle checked={monthly_report_on === true} onChange={() => setMonthlyReportOn(!monthly_report_on)} />
-            <span className="ml-2">Send Monthly Report</span>
-          </div>
-        )}
 
         {/* Account Actions */}
         <div className="border p-4 rounded shadow">

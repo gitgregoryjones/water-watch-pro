@@ -761,7 +761,16 @@ export default function RainIQ() {
         const maxRainfall = Number(reportLocationData.max_rainfall_inches || 0);
         const maxWindow = formatDateTimeFromSql(reportLocationData.max_window_start);
         const topPeriods = (reportLocationData.top_periods || []).slice(0, 10);
-        const hourlySeries = reportLocationData.hourly_series || [];
+        const isRapidRain = (reportLocationData.data_source || apiBackedResponse?.data_source || '').toLowerCase() === 'rapidrain';
+        const intensitySeries = isRapidRain
+          ? (reportLocationData.fifteen_min_series || []).map((point) => ({
+            timestamp: point.bucket,
+            rainfall_inches: point.rainfall_inches,
+          }))
+          : (reportLocationData.hourly_series || []).map((point) => ({
+            timestamp: point.hour,
+            rainfall_inches: point.rainfall_inches,
+          }));
 
         return {
           id: locationId,
@@ -779,8 +788,8 @@ export default function RainIQ() {
               return [start.date, start.time, formatRainValue(period.rainfall_inches)];
             })
             : [['N/A', 'N/A', '0']],
-          chart: hourlySeries.map((point) => {
-            const ts = formatDateTimeFromSql(point.hour);
+          chart: intensitySeries.map((point) => {
+            const ts = formatDateTimeFromSql(point.timestamp);
             return {
               label: `${ts.date} ${ts.time}`,
               value: Number(point.rainfall_inches || 0),

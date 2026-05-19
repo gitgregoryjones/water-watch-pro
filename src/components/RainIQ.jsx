@@ -784,7 +784,7 @@ export default function RainIQ() {
           columns: ['Date', 'Time', 'Rainfall (in)'],
           rows: topPeriods.length
             ? topPeriods.map((period) => {
-              const start = formatDateTimeFromSql(period.hour_start);
+              const start = formatDateTimeFromSql(period.window_start || period.hour_start);
               return [start.date, start.time, formatRainValue(period.rainfall_inches)];
             })
             : [['N/A', 'N/A', '0']],
@@ -908,7 +908,7 @@ export default function RainIQ() {
 
       const rowSeries = selectedQuery === 'maxHourlyRainfall'
         ? (locationData.top_periods || []).map((period) => ({
-          date: period.hour_start || '',
+          date: period.window_start || period.hour_start || '',
           value: period.rainfall_inches ?? '',
         }))
         : (locationData.daily_totals || []).map((dailyTotal) => ({
@@ -1017,7 +1017,7 @@ export default function RainIQ() {
         )
         .join('');
 
-      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.hour_start, daily_total: entry.rainfall_inches })) : (sourceData?.daily_totals || []))
+      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.window_start || entry.hour_start, daily_total: entry.rainfall_inches })) : (sourceData?.daily_totals || []))
         .map(
           (entry) => `
             <tr>

@@ -55,6 +55,23 @@ const formatRainValue = (value, digits = 3) => {
   return numericValue.toFixed(digits).replace(/\.?0+$/, '');
 };
 
+
+const formatDateTimeFromSql = (sqlDateTime) => {
+  if (!sqlDateTime) {
+    return { date: 'N/A', time: 'N/A' };
+  }
+
+  const parsedDate = new Date(sqlDateTime.replace(' ', 'T'));
+  if (Number.isNaN(parsedDate.getTime())) {
+    return { date: 'N/A', time: 'N/A' };
+  }
+
+  return {
+    date: parsedDate.toLocaleDateString('en-US'),
+    time: parsedDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+  };
+};
+
 const getRangeDates = (selectedRange) => {
   const endDate = new Date();
   endDate.setHours(0, 0, 0, 0);
@@ -84,6 +101,7 @@ const queries = [
   { group: 'Compliance & Threshold Queries', label: 'Number of days with rainfall > X inches', value: 'qualifyingEvents' },
   { group: 'Compliance & Threshold Queries', label: 'Maximum 24-hour rainfall', value: 'largest24h' },
   { group: 'Compliance & Threshold Queries', label: 'Total rainfall for selected period', value: 'totalRain' },
+  { group: 'Compliance & Threshold Queries', label: 'Maximum hourly rainfall', value: 'maxHourlyRainfall' },
  /* { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
   { group: 'Streak Analysis', label: 'Longest consecutive rainfall period', value: 'longestWet' },
   { group: 'Temporal Distribution', label: 'Most common rainfall time of day', value: 'commonTimeOfDay' },
@@ -313,7 +331,7 @@ const groupedQueries = queries.reduce((acc, query) => {
   return acc;
 }, {});
 
-const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'];
+const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'];
 const calculationMethodSupportedQueries = ['avgDaily', 'avgMonthly'];
 
 export default function RainIQ() {
@@ -347,6 +365,10 @@ export default function RainIQ() {
   const [totalRainResponse, setTotalRainResponse] = useState(null);
   const [totalRainLoading, setTotalRainLoading] = useState(false);
   const [totalRainError, setTotalRainError] = useState('');
+  const [maxHourlyRainfallResponse, setMaxHourlyRainfallResponse] = useState(null);
+  const [maxHourlyRainfallLoading, setMaxHourlyRainfallLoading] = useState(false);
+  const [maxHourlyRainfallError, setMaxHourlyRainfallError] = useState('');
+  const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
   const [locationOptions, setLocationOptions] = useState([]);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   
@@ -363,7 +385,7 @@ export default function RainIQ() {
     }
   }, [selectedQuery, calculationMethod]);
 
-  const fetchLocations = async (page) => {
+  const fetchLocations = async () => {
     try {
 
       
@@ -429,6 +451,7 @@ export default function RainIQ() {
       qualifyingEvents: qualifyingEventsError,
       largest24h: largest24hError,
       totalRain: totalRainError,
+      maxHourlyRainfall: maxHourlyRainfallError,
     }[selectedQuery] || ''),
     [
       selectedQuery,
@@ -438,6 +461,7 @@ export default function RainIQ() {
       qualifyingEventsError,
       largest24hError,
       totalRainError,
+      maxHourlyRainfallError,
     ],
   );
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
@@ -453,6 +477,8 @@ export default function RainIQ() {
             ? largest24hResponse
             : selectedQuery === 'totalRain'
               ? totalRainResponse
+              : selectedQuery === 'maxHourlyRainfall'
+                ? maxHourlyRainfallResponse
       : null;
 
   
@@ -730,6 +756,39 @@ export default function RainIQ() {
         };
       }
 
+
+      if (selectedQuery === 'maxHourlyRainfall' && reportLocationData) {
+        const maxRainfall = Number(reportLocationData.max_rainfall_inches || 0);
+        const maxWindow = formatDateTimeFromSql(reportLocationData.max_window_start);
+        const topPeriods = (reportLocationData.top_periods || []).slice(0, 10);
+        const hourlySeries = reportLocationData.hourly_series || [];
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: `The highest hourly rainfall at ${reportLocationData.location_name || locationName} was ${formatRainValue(maxRainfall)} inches, occurring at ${maxWindow.time} on ${maxWindow.date}.`,
+          metrics: [
+            { label: 'Maximum hourly rainfall', value: `${formatRainValue(maxRainfall)} in` },
+            { label: 'Date', value: maxWindow.date },
+            { label: 'Time', value: maxWindow.time },
+          ],
+          columns: ['Date', 'Time', 'Rainfall (in)'],
+          rows: topPeriods.length
+            ? topPeriods.map((period) => {
+              const start = formatDateTimeFromSql(period.hour_start);
+              return [start.date, start.time, formatRainValue(period.rainfall_inches)];
+            })
+            : [['N/A', 'N/A', '0']],
+          chart: hourlySeries.map((point) => {
+            const ts = formatDateTimeFromSql(point.hour);
+            return {
+              label: `${ts.date} ${ts.time}`,
+              value: Number(point.rainfall_inches || 0),
+            };
+          }),
+        };
+      }
+
       if (apiBackedQueries.includes(selectedQuery)) {
         const isUnmappedLocation = Boolean(reportLocationData?.error?.toLowerCase?.().includes('mapped'));
         const noRainfallInPeriod = !isUnmappedLocation && ['avgDaily', 'avgMonthly'].includes(selectedQuery);
@@ -785,7 +844,7 @@ export default function RainIQ() {
   };
 
   const handleExportCsv = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -815,7 +874,9 @@ export default function RainIQ() {
               ? 'Qualifying Rain Events Count'
               : selectedQuery === 'largest24h'
                 ? 'Largest 24-hour Rainfall Total (in)'
-                : 'Total Rainfall Selected Period (in)',
+                : selectedQuery === 'maxHourlyRainfall'
+                  ? 'Maximum Hourly Rainfall (in)'
+                  : 'Total Rainfall Selected Period (in)',
     ]];
 
     apiBackedResponse.data.forEach((locationData) => {
@@ -832,14 +893,26 @@ export default function RainIQ() {
               ? (locationData.qualifying_rain_events_count ?? '')
               : selectedQuery === 'largest24h'
                 ? (locationData.largest_24h_rainfall_total ?? '')
-                : (locationData.total_rainfall_selected_period ?? '');
+                : selectedQuery === 'maxHourlyRainfall'
+                  ? (locationData.max_rainfall_inches ?? '')
+                  : (locationData.total_rainfall_selected_period ?? '');
 
-      (locationData.daily_totals || []).forEach((dailyTotal) => {
+      const rowSeries = selectedQuery === 'maxHourlyRainfall'
+        ? (locationData.top_periods || []).map((period) => ({
+          date: period.hour_start || '',
+          value: period.rainfall_inches ?? '',
+        }))
+        : (locationData.daily_totals || []).map((dailyTotal) => ({
+          date: dailyTotal.date || '',
+          value: dailyTotal.daily_total ?? '',
+        }));
+
+      rowSeries.forEach((entry) => {
         rows.push([
           String(locationData.location_id ?? ''),
           locationData.location_name || '',
-          dailyTotal.date || '',
-          String(dailyTotal.daily_total ?? ''),
+          entry.date || '',
+          String(entry.value ?? ''),
           String(reportMetricLabel),
           String(reportMetricValue),
         ]);
@@ -870,7 +943,9 @@ export default function RainIQ() {
             ? 'qualifying-rain-events-count'
             : selectedQuery === 'largest24h'
               ? 'largest-24h-rainfall-total'
-              : 'total-rainfall-selected-period';
+              : selectedQuery === 'maxHourlyRainfall'
+                ? 'maximum-hourly-rainfall'
+                : 'total-rainfall-selected-period';
     link.setAttribute('download', `${filenamePrefix}-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
     document.body.appendChild(link);
     link.click();
@@ -879,7 +954,7 @@ export default function RainIQ() {
   };
 
   const handleExportPdf = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -904,6 +979,7 @@ export default function RainIQ() {
       qualifyingEvents: 'Daily totals',
       largest24h: 'Daily totals',
       totalRain: 'Daily totals',
+      maxHourlyRainfall: 'Top hourly periods',
     }[selectedQuery] || 'Daily totals';
 
     const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
@@ -932,24 +1008,7 @@ export default function RainIQ() {
         )
         .join('');
 
-      const chartMaxValue = Math.max(...locationResult.chart.map((item) => Number(item.value || 0)), 0);
-      const chartBarsHtml = locationResult.chart
-        .map((item) => {
-          const numericValue = Number(item.value || 0);
-          const widthPct = chartMaxValue > 0 ? (numericValue / chartMaxValue) * 100 : 0;
-          return `
-            <div class="bar-row">
-              <div class="bar-label">${escapeHtml(item.label)}</div>
-              <div class="bar-wrap">
-                <div class="bar-fill" style="width: ${Math.max(widthPct, 0).toFixed(2)}%;"></div>
-              </div>
-              <div class="bar-value">${escapeHtml(numericValue.toFixed(2))}</div>
-            </div>
-          `;
-        })
-        .join('');
-
-      const fullJsonRowsHtml = (sourceData?.daily_totals || [])
+      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.hour_start, daily_total: entry.rainfall_inches })) : (sourceData?.daily_totals || []))
         .map(
           (entry) => `
             <tr>
@@ -1107,6 +1166,13 @@ export default function RainIQ() {
         setError: setTotalRainError,
         invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
+      maxHourlyRainfall: {
+        endpoint: '/api/reports/historical/metrics/max-hourly-rainfall',
+        setResponse: setMaxHourlyRainfallResponse,
+        setLoading: setMaxHourlyRainfallLoading,
+        setError: setMaxHourlyRainfallError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
@@ -1143,6 +1209,7 @@ export default function RainIQ() {
         location_ids: locationIds,
         include_zero_days: includeZeroDays,
         ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+        ...(selectedQuery === 'maxHourlyRainfall' ? { data_source: hourlyDataSource } : {}),
       });
 
       activeQueryConfig.setResponse(data);
@@ -1310,6 +1377,20 @@ export default function RainIQ() {
                   className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
                 />
                 <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
+
+            {selectedQuery === 'maxHourlyRainfall' && (
+              <div className="mt-3">
+                <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Rainfall source</label>
+                <select
+                  value={hourlyDataSource}
+                  onChange={(event) => setHourlyDataSource(event.target.value)}
+                  className="w-full rounded border p-2 text-sm text-slate-800"
+                >
+                  <option value="rapid">RapidRain (15-minute rolling hour)</option>
+                  <option value="hourly">Hourly</option>
+                </select>
               </div>
             )}
 
@@ -1487,6 +1568,12 @@ export default function RainIQ() {
         {selectedQuery === 'totalRain' && totalRainError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{totalRainError}</p>
         )}
+        {hasExecutedQuery && selectedQuery === 'maxHourlyRainfall' && maxHourlyRainfallLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading maximum hourly rainfall report data...</p>
+        )}
+        {selectedQuery === 'maxHourlyRainfall' && maxHourlyRainfallError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{maxHourlyRainfallError}</p>
+        )}
 
         {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
@@ -1510,7 +1597,7 @@ export default function RainIQ() {
                 {showDetailedView && selectedQuery !== 'totalRain' && (
                   <div className="mt-6 grid gap-6 lg:grid-cols-2">
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Top hourly rainfall periods' : 'Top rainfall days'}</h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full text-left text-sm">
                           <thead>
@@ -1534,7 +1621,7 @@ export default function RainIQ() {
                     </div>
 
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">Rainfall totals</h4>
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : 'Rainfall totals'}</h4>
                       <div className="space-y-3">
                         {locationResult.chart.map((item) => (
                           <div key={`${locationResult.id}-${item.label}`}>
@@ -1564,14 +1651,14 @@ export default function RainIQ() {
           <button
             className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportCsv}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export CSV
           </button>
           <button
             className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportPdf}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export PDF
           </button>

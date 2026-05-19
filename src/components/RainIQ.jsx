@@ -1388,7 +1388,7 @@ export default function RainIQ() {
                   onChange={(event) => setHourlyDataSource(event.target.value)}
                   className="w-full rounded border p-2 text-sm text-slate-800"
                 >
-                  <option value="rapid">RapidRain (15-minute rolling hour)</option>
+                  <option value="rapidrain">RapidRain (15-minute rolling hour)</option>
                   <option value="hourly">Hourly</option>
                 </select>
               </div>

@@ -1669,7 +1669,11 @@ export default function RainIQ() {
                                 ? (index / (locationResult.chart.length - 1)) * 560 + 20
                                 : 300;
                               const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
-                              return <circle key={`${locationResult.id}-pt-${item.label}-${index}`} cx={x} cy={y} r="3.5" fill="#1f4f7a" />;
+                              return (
+                                <circle key={`${locationResult.id}-pt-${item.label}-${index}`} cx={x} cy={y} r="5" fill="#1f4f7a">
+                                  <title>{`${item.label}: ${item.value}`}</title>
+                                </circle>
+                              );
                             })}
                           </svg>
                           <div className="mt-2 max-h-20 overflow-auto text-xs text-slate-500">

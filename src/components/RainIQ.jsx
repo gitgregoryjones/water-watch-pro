@@ -326,6 +326,8 @@ const mockResponses = {
   },
 };
 
+const last4ReportQueryValues = ['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'];
+
 const groupedQueries = queries.reduce((acc, query) => {
   if (!acc[query.group]) {
     acc[query.group] = [];
@@ -418,6 +420,31 @@ export default function RainIQ() {
     const userTier = user?.clients?.[0]?.tier?.toLowerCase();
     return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
+
+  const reportOptions = useMemo(() => {
+    const restrictToLast4 = isActive('last4Reports');
+    if (!restrictToLast4) {
+      return groupedQueries;
+    }
+
+    return Object.entries(groupedQueries).reduce((acc, [group, groupQueries]) => {
+      const filtered = groupQueries.filter((query) => last4ReportQueryValues.includes(query.value));
+      if (filtered.length) {
+        acc[group] = filtered;
+      }
+      return acc;
+    }, {});
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!isActive('last4Reports')) {
+      return;
+    }
+
+    if (!last4ReportQueryValues.includes(selectedQuery)) {
+      setSelectedQuery(last4ReportQueryValues[0]);
+    }
+  }, [isActive, selectedQuery]);
 
   const customRangeError = useMemo(() => {
     if (selectedRange !== 'custom') {
@@ -1545,7 +1572,7 @@ export default function RainIQ() {
               onChange={(event) => setSelectedQuery(event.target.value)}
               className="w-full rounded border p-2 text-sm text-slate-800"
             >
-              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
+              {Object.entries(reportOptions).map(([group, groupQueries]) => (
                 <optgroup key={group} label={group}>
                   {groupQueries.map((query) => (
                     <option key={query.value} value={query.value}>

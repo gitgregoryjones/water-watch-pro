@@ -422,13 +422,13 @@ export default function RainIQ() {
   }, [user, isActive]);
 
   const reportOptions = useMemo(() => {
-    const restrictToLast4 = isActive('last4Reports');
-    if (!restrictToLast4) {
+    const showAllOptions = isActive('last4Reports');
+    if (showAllOptions) {
       return groupedQueries;
     }
 
     return Object.entries(groupedQueries).reduce((acc, [group, groupQueries]) => {
-      const filtered = groupQueries.filter((query) => last4ReportQueryValues.includes(query.value));
+      const filtered = groupQueries.filter((query) => !last4ReportQueryValues.includes(query.value));
       if (filtered.length) {
         acc[group] = filtered;
       }
@@ -437,12 +437,12 @@ export default function RainIQ() {
   }, [isActive]);
 
   useEffect(() => {
-    if (!isActive('last4Reports')) {
+    if (isActive('last4Reports')) {
       return;
     }
 
-    if (!last4ReportQueryValues.includes(selectedQuery)) {
-      setSelectedQuery(last4ReportQueryValues[0]);
+    if (last4ReportQueryValues.includes(selectedQuery)) {
+      setSelectedQuery('avgDaily');
     }
   }, [isActive, selectedQuery]);
 

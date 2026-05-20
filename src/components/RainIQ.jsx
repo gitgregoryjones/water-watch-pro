@@ -492,6 +492,7 @@ export default function RainIQ() {
   const [analyzedLocations, setAnalyzedLocations] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
+  const [chartDisplayType, setChartDisplayType] = useState('bar');
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
@@ -1528,6 +1529,21 @@ export default function RainIQ() {
             {calculationLine}
           </p>
         </div>
+
+        {showDetailedView && (
+          <div className="mt-3 flex items-center gap-3">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Chart type</label>
+            <select
+              value={chartDisplayType}
+              onChange={(event) => setChartDisplayType(event.target.value)}
+              className="rounded border p-2 text-sm text-slate-800"
+            >
+              <option value="bar">Bar chart</option>
+              <option value="line">Line chart</option>
+            </select>
+          </div>
+        )}
+
         <div className="mt-4 flex items-center gap-3">
           <input
             id="detailed-view-toggle"
@@ -1631,22 +1647,53 @@ export default function RainIQ() {
 
                     <div className="rounded-lg border p-4">
                       <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : 'Rainfall totals'}</h4>
-                      <div className="space-y-3">
-                        {locationResult.chart.map((item) => (
-                          <div key={`${locationResult.id}-${item.label}`}>
-                            <div className="mb-1 flex justify-between text-xs">
-                              <span>{item.label}</span>
-                              <span>{item.value}</span>
-                            </div>
-                            <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                              <div
-                                className="h-3 rounded bg-[--main-2]"
-                                style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                      {chartDisplayType === 'line' ? (
+                        <div>
+                          <svg viewBox="0 0 600 220" className="h-56 w-full rounded border bg-white" preserveAspectRatio="none">
+                            {locationResult.chart.length > 1 && (
+                              <polyline
+                                fill="none"
+                                stroke="#1f4f7a"
+                                strokeWidth="3"
+                                points={locationResult.chart
+                                  .map((item, index) => {
+                                    const x = (index / (locationResult.chart.length - 1)) * 560 + 20;
+                                    const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
+                                    return `${x},${y}`;
+                                  })
+                                  .join(' ')}
                               />
-                            </div>
+                            )}
+                            {locationResult.chart.map((item, index) => {
+                              const x = locationResult.chart.length > 1
+                                ? (index / (locationResult.chart.length - 1)) * 560 + 20
+                                : 300;
+                              const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
+                              return <circle key={`${locationResult.id}-pt-${item.label}-${index}`} cx={x} cy={y} r="3.5" fill="#1f4f7a" />;
+                            })}
+                          </svg>
+                          <div className="mt-2 max-h-20 overflow-auto text-xs text-slate-500">
+                            {locationResult.chart.map((item) => `${item.label}: ${item.value}`).join(' • ')}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {locationResult.chart.map((item) => (
+                            <div key={`${locationResult.id}-${item.label}`}>
+                              <div className="mb-1 flex justify-between text-xs">
+                                <span>{item.label}</span>
+                                <span>{item.value}</span>
+                              </div>
+                              <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
+                                <div
+                                  className="h-3 rounded bg-[--main-2]"
+                                  style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

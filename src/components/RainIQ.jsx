@@ -762,7 +762,7 @@ export default function RainIQ() {
         const maxRainfall = Number(reportLocationData.max_rainfall_inches || 0);
         const maxWindow = formatDateTimeFromSql(reportLocationData.max_window_start);
         const topPeriods = (reportLocationData.top_periods || []).slice(0, 10);
-        const isRapidRain = (reportLocationData.data_source || apiBackedResponse?.data_source || '').toLowerCase() === 'rapidrain';
+        const isRapidRain = (apiBackedResponse?.data_source || '').toLowerCase() === 'rapidrain';
         const intensitySeries = isRapidRain
           ? (reportLocationData.fifteen_min_series || []).map((point) => ({
             timestamp: point.bucket,

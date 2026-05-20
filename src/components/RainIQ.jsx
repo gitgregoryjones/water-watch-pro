@@ -103,6 +103,7 @@ const queries = [
   { group: 'Compliance & Threshold Queries', label: 'Total rainfall for selected period', value: 'totalRain' },
   { group: 'Compliance & Threshold Queries', label: 'Maximum hourly rainfall', value: 'maxHourlyRainfall' },
   { group: 'Compliance & Threshold Queries', label: 'Maximum rolling 24-hour rainfall', value: 'maxRolling24hRainfall' },
+  { group: 'Compliance & Threshold Queries', label: 'Compare rainfall to design storm (NOAA Atlas 14)', value: 'designStormComparison' },
  /* { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
   { group: 'Streak Analysis', label: 'Longest consecutive rainfall period', value: 'longestWet' },
   { group: 'Temporal Distribution', label: 'Most common rainfall time of day', value: 'commonTimeOfDay' },
@@ -332,7 +333,7 @@ const groupedQueries = queries.reduce((acc, query) => {
   return acc;
 }, {});
 
-const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall'];
+const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison'];
 const calculationMethodSupportedQueries = ['avgDaily', 'avgMonthly'];
 
 export default function RainIQ() {
@@ -372,7 +373,12 @@ export default function RainIQ() {
   const [maxRolling24hRainfallResponse, setMaxRolling24hRainfallResponse] = useState(null);
   const [maxRolling24hRainfallLoading, setMaxRolling24hRainfallLoading] = useState(false);
   const [maxRolling24hRainfallError, setMaxRolling24hRainfallError] = useState('');
+  const [designStormComparisonResponse, setDesignStormComparisonResponse] = useState(null);
+  const [designStormComparisonLoading, setDesignStormComparisonLoading] = useState(false);
+  const [designStormComparisonError, setDesignStormComparisonError] = useState('');
   const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
+  const [designStormDuration, setDesignStormDuration] = useState('24h');
+  const [designStormReturnPeriod, setDesignStormReturnPeriod] = useState('2');
   const [locationOptions, setLocationOptions] = useState([]);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   
@@ -457,6 +463,8 @@ export default function RainIQ() {
       totalRain: totalRainError,
       maxHourlyRainfall: maxHourlyRainfallError,
       maxRolling24hRainfall: maxRolling24hRainfallError,
+      designStormComparisonError,
+      designStormComparison: designStormComparisonError,
     }[selectedQuery] || ''),
     [
       selectedQuery,
@@ -468,6 +476,7 @@ export default function RainIQ() {
       totalRainError,
       maxHourlyRainfallError,
       maxRolling24hRainfallError,
+      designStormComparisonError,
     ],
   );
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
@@ -487,6 +496,8 @@ export default function RainIQ() {
                 ? maxHourlyRainfallResponse
                 : selectedQuery === 'maxRolling24hRainfall'
                   ? maxRolling24hRainfallResponse
+                  : selectedQuery === 'designStormComparison'
+                    ? designStormComparisonResponse
       : null;
 
   
@@ -839,6 +850,33 @@ export default function RainIQ() {
         };
       }
 
+
+      if (selectedQuery === 'designStormComparison' && reportLocationData) {
+        const observed = Number(reportLocationData.observed_max_inches || reportLocationData.atlas14_comparison?.observed_inches || 0);
+        const observedTs = formatDateTimeFromSql(reportLocationData.observed_max_datetime);
+        const duration = reportLocationData.duration || designStormDuration;
+        const comparisons = reportLocationData.atlas14_comparison?.comparisons || [];
+        const highestExceeded = reportLocationData.atlas14_comparison?.highest_exceeded_return_period_years;
+        const selectedReturn = Number(designStormReturnPeriod);
+        const selectedExceeded = comparisons.find((c) => Number(c.return_period_years) === selectedReturn)?.exceeded;
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: selectedExceeded
+            ? `The observed rainfall at ${reportLocationData.location_name || locationName} exceeded the ${selectedReturn}-year ${duration} design storm on ${observedTs.date} at ${observedTs.time} with ${formatRainValue(observed)} inches.`
+            : `The observed rainfall at ${reportLocationData.location_name || locationName} did not exceed the ${selectedReturn}-year ${duration} design storm.`,
+          metrics: [
+            { label: 'Observed maximum', value: `${formatRainValue(observed)} in` },
+            { label: 'Observed date/time', value: `${observedTs.date} ${observedTs.time}` },
+            { label: 'Exceedance summary', value: reportLocationData.exceedance_summary || (highestExceeded ? `Exceeded ${highestExceeded}-year level` : 'This event remained below the 1-year level.') },
+          ],
+          columns: ['Return period (years)', 'Threshold (in)', 'Exceeded'],
+          rows: comparisons.map((c) => [String(c.return_period_years), formatRainValue(c.threshold_inches), c.exceeded ? 'Yes' : 'No']),
+          chart: comparisons.map((c) => ({ label: `${c.return_period_years}-yr`, value: Number(c.threshold_inches || 0) })),
+        };
+      }
+
       if (apiBackedQueries.includes(selectedQuery)) {
         const isUnmappedLocation = Boolean(reportLocationData?.error?.toLowerCase?.().includes('mapped'));
         const noRainfallInPeriod = !isUnmappedLocation && ['avgDaily', 'avgMonthly'].includes(selectedQuery);
@@ -878,7 +916,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
+  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput, designStormDuration, designStormReturnPeriod]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -894,7 +932,7 @@ export default function RainIQ() {
   };
 
   const handleExportCsv = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -915,6 +953,8 @@ export default function RainIQ() {
                 ? 'Largest 24-hour Rainfall Total'
                 : selectedQuery === 'maxRolling24hRainfall'
                   ? 'Maximum Rolling 24-hour Rainfall'
+                  : selectedQuery === 'designStormComparison'
+                    ? 'Design storm duration'
                   : 'Total Rainfall Selected Period',
       selectedQuery === 'wettestMonth'
         ? 'Wettest Month Total (in)'
@@ -928,6 +968,8 @@ export default function RainIQ() {
                 ? 'Largest 24-hour Rainfall Total (in)'
                 : selectedQuery === 'maxRolling24hRainfall'
                   ? 'Maximum Rolling 24-hour Rainfall (in)'
+                : selectedQuery === 'designStormComparison'
+                  ? 'Observed Maximum (in)'
                 : selectedQuery === 'maxHourlyRainfall'
                   ? 'Maximum Hourly Rainfall (in)'
                   : 'Total Rainfall Selected Period (in)',
@@ -949,6 +991,8 @@ export default function RainIQ() {
                 ? (locationData.largest_24h_rainfall_total ?? '')
                 : selectedQuery === 'maxRolling24hRainfall'
                   ? (locationData.total_rainfall ?? '')
+                : selectedQuery === 'designStormComparison'
+                  ? (locationData.observed_max_inches ?? '')
                 : selectedQuery === 'maxHourlyRainfall'
                   ? (locationData.max_rainfall_inches ?? '')
                   : (locationData.total_rainfall_selected_period ?? '');
@@ -963,6 +1007,11 @@ export default function RainIQ() {
             date: window.begin_local_datetime || '',
             value: window.rainfall_inches ?? '',
           }))
+        : selectedQuery === 'designStormComparison'
+          ? ((locationData.atlas14_comparison?.comparisons || []).map((cmp) => ({
+            date: `${cmp.return_period_years}-year`,
+            value: cmp.threshold_inches ?? '',
+          })))
         : (locationData.daily_totals || []).map((dailyTotal) => ({
           date: dailyTotal.date || '',
           value: dailyTotal.daily_total ?? '',
@@ -1008,6 +1057,8 @@ export default function RainIQ() {
                 ? 'maximum-hourly-rainfall'
                 : selectedQuery === 'maxRolling24hRainfall'
                   ? 'maximum-rolling-24h-rainfall'
+                : selectedQuery === 'designStormComparison'
+                  ? 'design-storm-comparison'
                 : 'total-rainfall-selected-period';
     link.setAttribute('download', `${filenamePrefix}-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
     document.body.appendChild(link);
@@ -1017,7 +1068,7 @@ export default function RainIQ() {
   };
 
   const handleExportPdf = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -1044,6 +1095,7 @@ export default function RainIQ() {
       totalRain: 'Daily totals',
       maxHourlyRainfall: 'Top hourly periods',
       maxRolling24hRainfall: 'Top rolling 24-hour windows',
+      designStormComparison: 'NOAA Atlas 14 comparison table',
     }[selectedQuery] || 'Daily totals';
 
     const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
@@ -1072,7 +1124,7 @@ export default function RainIQ() {
         )
         .join('');
 
-      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.window_start || entry.hour_start, daily_total: entry.rainfall_inches })) : selectedQuery === 'maxRolling24hRainfall' ? (sourceData?.top_windows || []).map((entry) => ({ date: entry.begin_local_datetime, daily_total: entry.rainfall_inches })) : (sourceData?.daily_totals || []))
+      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.window_start || entry.hour_start, daily_total: entry.rainfall_inches })) : selectedQuery === 'maxRolling24hRainfall' ? (sourceData?.top_windows || []).map((entry) => ({ date: entry.begin_local_datetime, daily_total: entry.rainfall_inches })) : selectedQuery === 'designStormComparison' ? (sourceData?.atlas14_comparison?.comparisons || []).map((entry) => ({ date: `${entry.return_period_years}-year`, daily_total: entry.threshold_inches })) : (sourceData?.daily_totals || []))
         .map(
           (entry) => `
             <tr>
@@ -1244,6 +1296,13 @@ export default function RainIQ() {
         setError: setMaxRolling24hRainfallError,
         invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
+      designStormComparison: {
+        endpoint: '/api/reports/historical/metrics/design-storm-comparison',
+        setResponse: setDesignStormComparisonResponse,
+        setLoading: setDesignStormComparisonLoading,
+        setError: setDesignStormComparisonError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
@@ -1280,7 +1339,7 @@ export default function RainIQ() {
         location_ids: locationIds,
         include_zero_days: includeZeroDays,
         ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
-        ...(['maxHourlyRainfall', 'maxRolling24hRainfall'].includes(selectedQuery) ? { data_source: 'hourly' } : {}),
+        ...(['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison'].includes(selectedQuery) ? { data_source: 'hourly' } : {}),
       });
 
       activeQueryConfig.setResponse(data);
@@ -1451,7 +1510,7 @@ export default function RainIQ() {
               </div>
             )}
 
-            {['maxHourlyRainfall', 'maxRolling24hRainfall'].includes(selectedQuery) && (
+            {['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison'].includes(selectedQuery) && (
               <div className="mt-3">
                 <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Rainfall source</label>
                 <select
@@ -1462,6 +1521,27 @@ export default function RainIQ() {
                   {selectedQuery === 'maxHourlyRainfall' && <option value="rapidrain">RapidRain (15-minute rolling hour)</option>}
                   <option value="hourly">Hourly</option>
                 </select>
+              </div>
+            )}
+
+
+            {selectedQuery === 'designStormComparison' && (
+              <div className="mt-3 grid gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase text-slate-500">Duration</p>
+                  <label className="mt-1 mr-4 inline-flex items-center gap-2 text-sm text-slate-700">
+                    <input type="radio" name="design-duration" checked={designStormDuration === '24h'} onChange={() => setDesignStormDuration('24h')} />24-hour
+                  </label>
+                  <label className="mt-1 inline-flex items-center gap-2 text-sm text-slate-700">
+                    <input type="radio" name="design-duration" checked={designStormDuration === '1h'} onChange={() => setDesignStormDuration('1h')} />1-hour
+                  </label>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase text-slate-500">Return period</label>
+                  <select value={designStormReturnPeriod} onChange={(event) => setDesignStormReturnPeriod(event.target.value)} className="w-full rounded border p-2 text-sm text-slate-800">
+                    {[1,2,5,10,25,100].map((year) => <option key={year} value={String(year)}>{year}-year</option>)}
+                  </select>
+                </div>
               </div>
             )}
 
@@ -1666,6 +1746,12 @@ export default function RainIQ() {
         {selectedQuery === 'maxRolling24hRainfall' && maxRolling24hRainfallError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{maxRolling24hRainfallError}</p>
         )}
+        {hasExecutedQuery && selectedQuery === 'designStormComparison' && designStormComparisonLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading design storm comparison report data...</p>
+        )}
+        {selectedQuery === 'designStormComparison' && designStormComparisonError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{designStormComparisonError}</p>
+        )}
 
         {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
@@ -1689,7 +1775,7 @@ export default function RainIQ() {
                 {showDetailedView && selectedQuery !== 'totalRain' && (
                   <div className="mt-6 grid gap-6 lg:grid-cols-2">
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Top hourly rainfall periods' : selectedQuery === 'maxRolling24hRainfall' ? 'Top rolling 24-hour windows' : 'Top rainfall days'}</h4>
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Top hourly rainfall periods' : selectedQuery === 'maxRolling24hRainfall' ? 'Top rolling 24-hour windows' : selectedQuery === 'designStormComparison' ? 'NOAA Atlas 14 comparisons' : 'Top rainfall days'}</h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full text-left text-sm">
                           <thead>
@@ -1713,7 +1799,7 @@ export default function RainIQ() {
                     </div>
 
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : selectedQuery === 'maxRolling24hRainfall' ? 'Rolling accumulation curve' : 'Rainfall totals'}</h4>
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : selectedQuery === 'maxRolling24hRainfall' ? 'Rolling accumulation curve' : selectedQuery === 'designStormComparison' ? 'Design storm thresholds curve' : 'Rainfall totals'}</h4>
                       {chartDisplayType === 'line' ? (
                         <div>
                           <svg viewBox="0 0 600 220" className="h-56 w-full rounded border bg-white" preserveAspectRatio="none">

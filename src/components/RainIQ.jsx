@@ -55,6 +55,23 @@ const formatRainValue = (value, digits = 3) => {
   return numericValue.toFixed(digits).replace(/\.?0+$/, '');
 };
 
+
+const formatDateTimeFromSql = (sqlDateTime) => {
+  if (!sqlDateTime) {
+    return { date: 'N/A', time: 'N/A' };
+  }
+
+  const parsedDate = new Date(sqlDateTime.replace(' ', 'T'));
+  if (Number.isNaN(parsedDate.getTime())) {
+    return { date: 'N/A', time: 'N/A' };
+  }
+
+  return {
+    date: parsedDate.toLocaleDateString('en-US'),
+    time: parsedDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+  };
+};
+
 const getRangeDates = (selectedRange) => {
   const endDate = new Date();
   endDate.setHours(0, 0, 0, 0);
@@ -84,6 +101,10 @@ const queries = [
   { group: 'Compliance & Threshold Queries', label: 'Number of days with rainfall > X inches', value: 'qualifyingEvents' },
   { group: 'Compliance & Threshold Queries', label: 'Maximum 24-hour rainfall', value: 'largest24h' },
   { group: 'Compliance & Threshold Queries', label: 'Total rainfall for selected period', value: 'totalRain' },
+  { group: 'Advanced Event Analytics', label: 'Maximum hourly rainfall', value: 'maxHourlyRainfall' },
+  { group: 'Advanced Event Analytics', label: 'Maximum rolling 24-hour rainfall', value: 'maxRolling24hRainfall' },
+  { group: 'Advanced Event Analytics', label: 'Compare rainfall to design storm (NOAA Atlas 14)', value: 'designStormComparison' },
+  { group: 'Advanced Event Analytics', label: 'Total rainfall by storm event', value: 'stormEvents' },
  /* { group: 'Streak Analysis', label: 'Longest dry period', value: 'longestDry' },
   { group: 'Streak Analysis', label: 'Longest consecutive rainfall period', value: 'longestWet' },
   { group: 'Temporal Distribution', label: 'Most common rainfall time of day', value: 'commonTimeOfDay' },
@@ -305,6 +326,8 @@ const mockResponses = {
   },
 };
 
+const last4ReportQueryValues = ['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'];
+
 const groupedQueries = queries.reduce((acc, query) => {
   if (!acc[query.group]) {
     acc[query.group] = [];
@@ -313,7 +336,7 @@ const groupedQueries = queries.reduce((acc, query) => {
   return acc;
 }, {});
 
-const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'];
+const apiBackedQueries = ['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'];
 const calculationMethodSupportedQueries = ['avgDaily', 'avgMonthly'];
 
 export default function RainIQ() {
@@ -347,6 +370,22 @@ export default function RainIQ() {
   const [totalRainResponse, setTotalRainResponse] = useState(null);
   const [totalRainLoading, setTotalRainLoading] = useState(false);
   const [totalRainError, setTotalRainError] = useState('');
+  const [maxHourlyRainfallResponse, setMaxHourlyRainfallResponse] = useState(null);
+  const [maxHourlyRainfallLoading, setMaxHourlyRainfallLoading] = useState(false);
+  const [maxHourlyRainfallError, setMaxHourlyRainfallError] = useState('');
+  const [maxRolling24hRainfallResponse, setMaxRolling24hRainfallResponse] = useState(null);
+  const [maxRolling24hRainfallLoading, setMaxRolling24hRainfallLoading] = useState(false);
+  const [maxRolling24hRainfallError, setMaxRolling24hRainfallError] = useState('');
+  const [designStormComparisonResponse, setDesignStormComparisonResponse] = useState(null);
+  const [designStormComparisonLoading, setDesignStormComparisonLoading] = useState(false);
+  const [designStormComparisonError, setDesignStormComparisonError] = useState('');
+  const [stormEventsResponse, setStormEventsResponse] = useState(null);
+  const [stormEventsLoading, setStormEventsLoading] = useState(false);
+  const [stormEventsError, setStormEventsError] = useState('');
+  const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
+  const [eventGapHours, setEventGapHours] = useState('6');
+  const [designStormDuration, setDesignStormDuration] = useState('24h');
+  const [designStormReturnPeriod, setDesignStormReturnPeriod] = useState('2');
   const [locationOptions, setLocationOptions] = useState([]);
   const [hasExecutedQuery, setHasExecutedQuery] = useState(false);
   
@@ -363,7 +402,7 @@ export default function RainIQ() {
     }
   }, [selectedQuery, calculationMethod]);
 
-  const fetchLocations = async (page) => {
+  const fetchLocations = async () => {
     try {
 
       
@@ -381,6 +420,31 @@ export default function RainIQ() {
     const userTier = user?.clients?.[0]?.tier?.toLowerCase();
     return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
+
+  const reportOptions = useMemo(() => {
+    const showAllOptions = isActive('last4Reports');
+    if (showAllOptions) {
+      return groupedQueries;
+    }
+
+    return Object.entries(groupedQueries).reduce((acc, [group, groupQueries]) => {
+      const filtered = groupQueries.filter((query) => !last4ReportQueryValues.includes(query.value));
+      if (filtered.length) {
+        acc[group] = filtered;
+      }
+      return acc;
+    }, {});
+  }, [isActive]);
+
+  useEffect(() => {
+    if (isActive('last4Reports')) {
+      return;
+    }
+
+    if (last4ReportQueryValues.includes(selectedQuery)) {
+      setSelectedQuery('avgDaily');
+    }
+  }, [isActive, selectedQuery]);
 
   const customRangeError = useMemo(() => {
     if (selectedRange !== 'custom') {
@@ -429,6 +493,10 @@ export default function RainIQ() {
       qualifyingEvents: qualifyingEventsError,
       largest24h: largest24hError,
       totalRain: totalRainError,
+      maxHourlyRainfall: maxHourlyRainfallError,
+      maxRolling24hRainfall: maxRolling24hRainfallError,
+      designStormComparison: designStormComparisonError,
+      stormEvents: stormEventsError,
     }[selectedQuery] || ''),
     [
       selectedQuery,
@@ -438,6 +506,10 @@ export default function RainIQ() {
       qualifyingEventsError,
       largest24hError,
       totalRainError,
+      maxHourlyRainfallError,
+      maxRolling24hRainfallError,
+      designStormComparisonError,
+      stormEventsError,
     ],
   );
   const selectedResponse = mockResponses[selectedQuery] ?? mockResponses.avgDaily;
@@ -453,6 +525,14 @@ export default function RainIQ() {
             ? largest24hResponse
             : selectedQuery === 'totalRain'
               ? totalRainResponse
+              : selectedQuery === 'maxHourlyRainfall'
+                ? maxHourlyRainfallResponse
+                : selectedQuery === 'maxRolling24hRainfall'
+                  ? maxRolling24hRainfallResponse
+                  : selectedQuery === 'designStormComparison'
+                    ? designStormComparisonResponse
+                    : selectedQuery === 'stormEvents'
+                      ? stormEventsResponse
       : null;
 
   
@@ -466,6 +546,7 @@ export default function RainIQ() {
   const [analyzedLocations, setAnalyzedLocations] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
+  const [chartDisplayType, setChartDisplayType] = useState('bar');
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
@@ -730,6 +811,136 @@ export default function RainIQ() {
         };
       }
 
+
+      if (selectedQuery === 'maxHourlyRainfall' && reportLocationData) {
+        const maxRainfall = Number(reportLocationData.max_rainfall_inches || 0);
+        const maxWindow = formatDateTimeFromSql(reportLocationData.max_window_start);
+        const topPeriods = (reportLocationData.top_periods || []).slice(0, 10);
+        const isRapidRain = (apiBackedResponse?.data_source || '').toLowerCase() === 'rapidrain';
+        const intensitySeries = isRapidRain
+          ? (reportLocationData.fifteen_min_series || []).map((point) => ({
+            timestamp: point.bucket,
+            rainfall_inches: point.rainfall_inches,
+          }))
+          : (reportLocationData.hourly_series || []).map((point) => ({
+            timestamp: point.hour,
+            rainfall_inches: point.rainfall_inches,
+          }));
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: `The highest hourly rainfall at ${reportLocationData.location_name || locationName} was ${formatRainValue(maxRainfall)} inches, occurring at ${maxWindow.time} on ${maxWindow.date}.`,
+          metrics: [
+            { label: 'Maximum hourly rainfall', value: `${formatRainValue(maxRainfall)} in` },
+            { label: 'Date', value: maxWindow.date },
+            { label: 'Time', value: maxWindow.time },
+          ],
+          columns: ['Date', 'Time', 'Rainfall (in)'],
+          rows: topPeriods.length
+            ? topPeriods.map((period) => {
+              const start = formatDateTimeFromSql(period.window_start || period.hour_start);
+              return [start.date, start.time, formatRainValue(period.rainfall_inches)];
+            })
+            : [['N/A', 'N/A', '0']],
+          chart: intensitySeries.map((point) => {
+            const ts = formatDateTimeFromSql(point.timestamp);
+            return {
+              label: `${ts.date} ${ts.time}`,
+              value: Number(point.rainfall_inches || 0),
+            };
+          }),
+        };
+      }
+
+
+      if (selectedQuery === 'maxRolling24hRainfall' && reportLocationData) {
+        const rollingTotal = Number(reportLocationData.total_rainfall || 0);
+        const begin = formatDateTimeFromSql(reportLocationData.begin_local_datetime);
+        const end = formatDateTimeFromSql(reportLocationData.end_local_datetime);
+        const topWindows = (reportLocationData.top_windows || []).slice(0, 10);
+        const hourlySeries = reportLocationData.hourly_series || [];
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: `The highest rolling 24-hour rainfall at ${reportLocationData.location_name || locationName} was ${formatRainValue(rollingTotal)} inches, occurring between ${begin.time} on ${begin.date} and ${end.time} on ${end.date}.`,
+          metrics: [
+            { label: 'Maximum rolling 24-hour rainfall', value: `${formatRainValue(rollingTotal)} in` },
+            { label: 'Window start', value: `${begin.time} on ${begin.date}` },
+            { label: 'Window end', value: `${end.time} on ${end.date}` },
+          ],
+          columns: ['Start', 'End', 'Rainfall (in)'],
+          rows: topWindows.length
+            ? topWindows.map((window) => {
+              const wStart = formatDateTimeFromSql(window.begin_local_datetime);
+              const wEnd = formatDateTimeFromSql(window.end_local_datetime);
+              return [`${wStart.date} ${wStart.time}`, `${wEnd.date} ${wEnd.time}`, formatRainValue(window.rainfall_inches)];
+            })
+            : [['N/A', 'N/A', '0']],
+          chart: hourlySeries.map((point) => {
+            const ts = formatDateTimeFromSql(point.hour);
+            return { label: `${ts.date} ${ts.time}`, value: Number(point.rainfall_inches || 0) };
+          }),
+        };
+      }
+
+
+      if (selectedQuery === 'designStormComparison' && reportLocationData) {
+        const observed = Number(reportLocationData.observed_max_inches || reportLocationData.atlas14_comparison?.observed_inches || 0);
+        const observedTs = formatDateTimeFromSql(reportLocationData.observed_max_datetime);
+        const duration = reportLocationData.duration || designStormDuration;
+        const comparisons = reportLocationData.atlas14_comparison?.comparisons || [];
+        const highestExceeded = reportLocationData.atlas14_comparison?.highest_exceeded_return_period_years;
+        const selectedReturn = Number(designStormReturnPeriod);
+        const selectedExceeded = comparisons.find((c) => Number(c.return_period_years) === selectedReturn)?.exceeded;
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: selectedExceeded
+            ? `The observed rainfall at ${reportLocationData.location_name || locationName} exceeded the ${selectedReturn}-year ${duration} design storm on ${observedTs.date} at ${observedTs.time} with ${formatRainValue(observed)} inches.`
+            : `The observed rainfall at ${reportLocationData.location_name || locationName} did not exceed the ${selectedReturn}-year ${duration} design storm.`,
+          metrics: [
+            { label: 'Observed maximum', value: `${formatRainValue(observed)} in` },
+            { label: 'Observed date/time', value: `${observedTs.date} ${observedTs.time}` },
+            { label: 'Exceedance summary', value: reportLocationData.exceedance_summary || (highestExceeded ? `Exceeded ${highestExceeded}-year level` : 'This event remained below the 1-year level.') },
+          ],
+          columns: ['Return period (years)', 'Threshold (in)', 'Exceeded'],
+          rows: comparisons.map((c) => [String(c.return_period_years), formatRainValue(c.threshold_inches), c.exceeded ? 'Yes' : 'No']),
+          chart: comparisons.map((c) => ({ label: `${c.return_period_years}-yr`, value: Number(c.threshold_inches || 0) })),
+        };
+      }
+
+
+      if (selectedQuery === 'stormEvents' && reportLocationData) {
+        const events = reportLocationData.events || [];
+        const largestEvent = [...events].sort((a, b) => Number(b.total_inches || 0) - Number(a.total_inches || 0))[0];
+        const largestTotal = Number(largestEvent?.total_inches || 0);
+        const largestDuration = Number(largestEvent?.duration_hours || 0);
+
+        return {
+          id: locationId,
+          locationName: reportLocationData.location_name || locationName,
+          headline: `The largest rainfall event at ${reportLocationData.location_name || locationName} produced ${formatRainValue(largestTotal)} inches over ${formatRainValue(largestDuration, 0)} hours.`,
+          metrics: [
+            { label: 'Event count', value: String(reportLocationData.event_count || events.length || 0) },
+            { label: 'Largest event total', value: `${formatRainValue(largestTotal)} in` },
+            { label: 'Gap boundary', value: `${reportLocationData.gap_hours || eventGapHours} hours` },
+          ],
+          columns: ['Start', 'End', 'Total (in)', 'Duration (hours)'],
+          rows: events.map((event) => {
+            const start = formatDateTimeFromSql(event.start_local_datetime);
+            const end = formatDateTimeFromSql(event.end_local_datetime);
+            return [`${start.date} ${start.time}`, `${end.date} ${end.time}`, formatRainValue(event.total_inches), formatRainValue(event.duration_hours, 0)];
+          }),
+          chart: events.map((event, idx) => ({
+            label: `Event ${idx + 1}`,
+            value: Number(event.total_inches || 0),
+          })),
+        };
+      }
+
       if (apiBackedQueries.includes(selectedQuery)) {
         const isUnmappedLocation = Boolean(reportLocationData?.error?.toLowerCase?.().includes('mapped'));
         const noRainfallInPeriod = !isUnmappedLocation && ['avgDaily', 'avgMonthly'].includes(selectedQuery);
@@ -769,7 +980,7 @@ export default function RainIQ() {
         })),
       };
     });
-  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput]);
+  }, [availableLocations, analyzedLocations, selectedResponse, selectedQuery, apiBackedResponse, parsedThreshold, selectedDateRange, threshold, showThresholdInput, designStormDuration, designStormReturnPeriod, eventGapHours]);
 
   const handleLocationToggle = (locationId) => {
     setSelectedLocations((prev) =>
@@ -785,7 +996,7 @@ export default function RainIQ() {
   };
 
   const handleExportCsv = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -804,7 +1015,13 @@ export default function RainIQ() {
               ? 'Qualifying Rain Events'
               : selectedQuery === 'largest24h'
                 ? 'Largest 24-hour Rainfall Total'
-                : 'Total Rainfall Selected Period',
+                : selectedQuery === 'maxRolling24hRainfall'
+                  ? 'Maximum Rolling 24-hour Rainfall'
+                  : selectedQuery === 'designStormComparison'
+                    ? 'Design storm duration'
+                  : selectedQuery === 'stormEvents'
+                    ? 'Storm event segmentation'
+                  : 'Total Rainfall Selected Period',
       selectedQuery === 'wettestMonth'
         ? 'Wettest Month Total (in)'
         : selectedQuery === 'avgMonthly'
@@ -815,7 +1032,15 @@ export default function RainIQ() {
               ? 'Qualifying Rain Events Count'
               : selectedQuery === 'largest24h'
                 ? 'Largest 24-hour Rainfall Total (in)'
-                : 'Total Rainfall Selected Period (in)',
+                : selectedQuery === 'maxRolling24hRainfall'
+                  ? 'Maximum Rolling 24-hour Rainfall (in)'
+                : selectedQuery === 'designStormComparison'
+                  ? 'Observed Maximum (in)'
+                : selectedQuery === 'stormEvents'
+                  ? 'Storm Event Total (in)'
+                : selectedQuery === 'maxHourlyRainfall'
+                  ? 'Maximum Hourly Rainfall (in)'
+                  : 'Total Rainfall Selected Period (in)',
     ]];
 
     apiBackedResponse.data.forEach((locationData) => {
@@ -832,14 +1057,47 @@ export default function RainIQ() {
               ? (locationData.qualifying_rain_events_count ?? '')
               : selectedQuery === 'largest24h'
                 ? (locationData.largest_24h_rainfall_total ?? '')
-                : (locationData.total_rainfall_selected_period ?? '');
+                : selectedQuery === 'maxRolling24hRainfall'
+                  ? (locationData.total_rainfall ?? '')
+                : selectedQuery === 'designStormComparison'
+                  ? (locationData.observed_max_inches ?? '')
+                : selectedQuery === 'stormEvents'
+                  ? ((locationData.events || [])[0]?.total_inches ?? '')
+                : selectedQuery === 'maxHourlyRainfall'
+                  ? (locationData.max_rainfall_inches ?? '')
+                  : (locationData.total_rainfall_selected_period ?? '');
 
-      (locationData.daily_totals || []).forEach((dailyTotal) => {
+      const rowSeries = selectedQuery === 'maxHourlyRainfall'
+        ? (locationData.top_periods || []).map((period) => ({
+          date: period.window_start || period.hour_start || '',
+          value: period.rainfall_inches ?? '',
+        }))
+        : selectedQuery === 'maxRolling24hRainfall'
+          ? (locationData.top_windows || []).map((window) => ({
+            date: window.begin_local_datetime || '',
+            value: window.rainfall_inches ?? '',
+          }))
+        : selectedQuery === 'designStormComparison'
+          ? ((locationData.atlas14_comparison?.comparisons || []).map((cmp) => ({
+            date: `${cmp.return_period_years}-year`,
+            value: cmp.threshold_inches ?? '',
+          })))
+        : selectedQuery === 'stormEvents'
+          ? ((locationData.events || []).map((event) => ({
+            date: event.start_local_datetime || '',
+            value: event.total_inches ?? '',
+          })))
+        : (locationData.daily_totals || []).map((dailyTotal) => ({
+          date: dailyTotal.date || '',
+          value: dailyTotal.daily_total ?? '',
+        }));
+
+      rowSeries.forEach((entry) => {
         rows.push([
           String(locationData.location_id ?? ''),
           locationData.location_name || '',
-          dailyTotal.date || '',
-          String(dailyTotal.daily_total ?? ''),
+          entry.date || '',
+          String(entry.value ?? ''),
           String(reportMetricLabel),
           String(reportMetricValue),
         ]);
@@ -870,7 +1128,15 @@ export default function RainIQ() {
             ? 'qualifying-rain-events-count'
             : selectedQuery === 'largest24h'
               ? 'largest-24h-rainfall-total'
-              : 'total-rainfall-selected-period';
+              : selectedQuery === 'maxHourlyRainfall'
+                ? 'maximum-hourly-rainfall'
+                : selectedQuery === 'maxRolling24hRainfall'
+                  ? 'maximum-rolling-24h-rainfall'
+                : selectedQuery === 'designStormComparison'
+                  ? 'design-storm-comparison'
+                : selectedQuery === 'stormEvents'
+                  ? 'storm-events'
+                : 'total-rainfall-selected-period';
     link.setAttribute('download', `${filenamePrefix}-${selectedDateRange.startDate}-to-${selectedDateRange.endDate}.csv`);
     document.body.appendChild(link);
     link.click();
@@ -879,7 +1145,7 @@ export default function RainIQ() {
   };
 
   const handleExportPdf = () => {
-    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
+    if (!['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) || !apiBackedResponse?.data?.length) {
       return;
     }
 
@@ -904,6 +1170,10 @@ export default function RainIQ() {
       qualifyingEvents: 'Daily totals',
       largest24h: 'Daily totals',
       totalRain: 'Daily totals',
+      maxHourlyRainfall: 'Top hourly periods',
+      maxRolling24hRainfall: 'Top rolling 24-hour windows',
+      designStormComparison: 'NOAA Atlas 14 comparison table',
+      stormEvents: 'Storm events table',
     }[selectedQuery] || 'Daily totals';
 
     const reportSectionsHtml = selectedLocationResults.map((locationResult) => {
@@ -932,24 +1202,7 @@ export default function RainIQ() {
         )
         .join('');
 
-      const chartMaxValue = Math.max(...locationResult.chart.map((item) => Number(item.value || 0)), 0);
-      const chartBarsHtml = locationResult.chart
-        .map((item) => {
-          const numericValue = Number(item.value || 0);
-          const widthPct = chartMaxValue > 0 ? (numericValue / chartMaxValue) * 100 : 0;
-          return `
-            <div class="bar-row">
-              <div class="bar-label">${escapeHtml(item.label)}</div>
-              <div class="bar-wrap">
-                <div class="bar-fill" style="width: ${Math.max(widthPct, 0).toFixed(2)}%;"></div>
-              </div>
-              <div class="bar-value">${escapeHtml(numericValue.toFixed(2))}</div>
-            </div>
-          `;
-        })
-        .join('');
-
-      const fullJsonRowsHtml = (sourceData?.daily_totals || [])
+      const fullJsonRowsHtml = (selectedQuery === 'maxHourlyRainfall' ? (sourceData?.top_periods || []).map((entry) => ({ date: entry.window_start || entry.hour_start, daily_total: entry.rainfall_inches })) : selectedQuery === 'maxRolling24hRainfall' ? (sourceData?.top_windows || []).map((entry) => ({ date: entry.begin_local_datetime, daily_total: entry.rainfall_inches })) : selectedQuery === 'designStormComparison' ? (sourceData?.atlas14_comparison?.comparisons || []).map((entry) => ({ date: `${entry.return_period_years}-year`, daily_total: entry.threshold_inches })) : selectedQuery === 'stormEvents' ? (sourceData?.events || []).map((entry) => ({ date: entry.start_local_datetime, daily_total: entry.total_inches })) : (sourceData?.daily_totals || []))
         .map(
           (entry) => `
             <tr>
@@ -1107,6 +1360,34 @@ export default function RainIQ() {
         setError: setTotalRainError,
         invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
       },
+      maxHourlyRainfall: {
+        endpoint: '/api/reports/historical/metrics/max-hourly-rainfall',
+        setResponse: setMaxHourlyRainfallResponse,
+        setLoading: setMaxHourlyRainfallLoading,
+        setError: setMaxHourlyRainfallError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
+      maxRolling24hRainfall: {
+        endpoint: '/api/reports/historical/metrics/max-rolling-24h-rainfall',
+        setResponse: setMaxRolling24hRainfallResponse,
+        setLoading: setMaxRolling24hRainfallLoading,
+        setError: setMaxRolling24hRainfallError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
+      designStormComparison: {
+        endpoint: '/api/reports/historical/metrics/design-storm-comparison',
+        setResponse: setDesignStormComparisonResponse,
+        setLoading: setDesignStormComparisonLoading,
+        setError: setDesignStormComparisonError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
+      stormEvents: {
+        endpoint: '/api/reports/historical/metrics/storm-events',
+        setResponse: setStormEventsResponse,
+        setLoading: setStormEventsLoading,
+        setError: setStormEventsError,
+        invalidLocationMessage: 'This location is not currently mapped to rainfall data. Try selecting a different location.',
+      },
     };
 
     const activeQueryConfig = queryConfig[selectedQuery];
@@ -1143,6 +1424,7 @@ export default function RainIQ() {
         location_ids: locationIds,
         include_zero_days: includeZeroDays,
         ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+        ...(['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) ? { data_source: 'hourly' } : {}),
       });
 
       activeQueryConfig.setResponse(data);
@@ -1290,7 +1572,7 @@ export default function RainIQ() {
               onChange={(event) => setSelectedQuery(event.target.value)}
               className="w-full rounded border p-2 text-sm text-slate-800"
             >
-              {Object.entries(groupedQueries).map(([group, groupQueries]) => (
+              {Object.entries(reportOptions).map(([group, groupQueries]) => (
                 <optgroup key={group} label={group}>
                   {groupQueries.map((query) => (
                     <option key={query.value} value={query.value}>
@@ -1310,6 +1592,54 @@ export default function RainIQ() {
                   className="w-24 rounded border px-2 py-1 text-sm text-slate-800"
                 />
                 <span className="text-xs text-slate-500">inches</span>
+              </div>
+            )}
+
+            {['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) && (
+              <div className="mt-3">
+                <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Rainfall source</label>
+                <select
+                  value={hourlyDataSource}
+                  onChange={(event) => setHourlyDataSource(event.target.value)}
+                  className="w-full rounded border p-2 text-sm text-slate-800"
+                >
+                  {selectedQuery === 'maxHourlyRainfall' && <option value="rapidrain">RapidRain (15-minute rolling hour)</option>}
+                  <option value="hourly">Hourly</option>
+                </select>
+              </div>
+            )}
+
+
+            {selectedQuery === 'designStormComparison' && (
+              <div className="mt-3 grid gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase text-slate-500">Duration</p>
+                  <label className="mt-1 mr-4 inline-flex items-center gap-2 text-sm text-slate-700">
+                    <input type="radio" name="design-duration" checked={designStormDuration === '24h'} onChange={() => setDesignStormDuration('24h')} />24-hour
+                  </label>
+                  <label className="mt-1 inline-flex items-center gap-2 text-sm text-slate-700">
+                    <input type="radio" name="design-duration" checked={designStormDuration === '1h'} onChange={() => setDesignStormDuration('1h')} />1-hour
+                  </label>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase text-slate-500">Return period</label>
+                  <select value={designStormReturnPeriod} onChange={(event) => setDesignStormReturnPeriod(event.target.value)} className="w-full rounded border p-2 text-sm text-slate-800">
+                    {[1,2,5,10,25,100].map((year) => <option key={year} value={String(year)}>{year}-year</option>)}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {selectedQuery === 'stormEvents' && (
+              <div className="mt-3">
+                <label className="mb-1 block text-xs font-bold uppercase text-slate-500">Event gap boundary (hours)</label>
+                <input
+                  type="number"
+                  min="1"
+                  value={eventGapHours}
+                  onChange={(event) => setEventGapHours(event.target.value)}
+                  className="w-24 rounded border p-2 text-sm text-slate-800"
+                />
               </div>
             )}
 
@@ -1438,6 +1768,21 @@ export default function RainIQ() {
             {calculationLine}
           </p>
         </div>
+
+        {showDetailedView && (
+          <div className="mt-3 flex items-center gap-3">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Chart type</label>
+            <select
+              value={chartDisplayType}
+              onChange={(event) => setChartDisplayType(event.target.value)}
+              className="rounded border p-2 text-sm text-slate-800"
+            >
+              <option value="bar">Bar chart</option>
+              <option value="line">Line chart</option>
+            </select>
+          </div>
+        )}
+
         <div className="mt-4 flex items-center gap-3">
           <input
             id="detailed-view-toggle"
@@ -1487,6 +1832,30 @@ export default function RainIQ() {
         {selectedQuery === 'totalRain' && totalRainError && hasExecutedQuery && (
           <p className="mt-4 text-sm font-semibold text-red-600">{totalRainError}</p>
         )}
+        {hasExecutedQuery && selectedQuery === 'maxHourlyRainfall' && maxHourlyRainfallLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading maximum hourly rainfall report data...</p>
+        )}
+        {selectedQuery === 'maxHourlyRainfall' && maxHourlyRainfallError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{maxHourlyRainfallError}</p>
+        )}
+        {hasExecutedQuery && selectedQuery === 'maxRolling24hRainfall' && maxRolling24hRainfallLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading maximum rolling 24-hour rainfall report data...</p>
+        )}
+        {selectedQuery === 'maxRolling24hRainfall' && maxRolling24hRainfallError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{maxRolling24hRainfallError}</p>
+        )}
+        {hasExecutedQuery && selectedQuery === 'designStormComparison' && designStormComparisonLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading design storm comparison report data...</p>
+        )}
+        {selectedQuery === 'designStormComparison' && designStormComparisonError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{designStormComparisonError}</p>
+        )}
+        {hasExecutedQuery && selectedQuery === 'stormEvents' && stormEventsLoading && (
+          <p className="mt-4 text-sm font-semibold text-slate-500">Loading storm events report data...</p>
+        )}
+        {selectedQuery === 'stormEvents' && stormEventsError && hasExecutedQuery && (
+          <p className="mt-4 text-sm font-semibold text-red-600">{stormEventsError}</p>
+        )}
 
         {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
@@ -1510,7 +1879,7 @@ export default function RainIQ() {
                 {showDetailedView && selectedQuery !== 'totalRain' && (
                   <div className="mt-6 grid gap-6 lg:grid-cols-2">
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">Top rainfall days</h4>
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Top hourly rainfall periods' : selectedQuery === 'maxRolling24hRainfall' ? 'Top rolling 24-hour windows' : selectedQuery === 'designStormComparison' ? 'NOAA Atlas 14 comparisons' : selectedQuery === 'stormEvents' ? 'Storm event timelines' : 'Top rainfall days'}</h4>
                       <div className="overflow-x-auto">
                         <table className="min-w-full text-left text-sm">
                           <thead>
@@ -1534,23 +1903,58 @@ export default function RainIQ() {
                     </div>
 
                     <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">Rainfall totals</h4>
-                      <div className="space-y-3">
-                        {locationResult.chart.map((item) => (
-                          <div key={`${locationResult.id}-${item.label}`}>
-                            <div className="mb-1 flex justify-between text-xs">
-                              <span>{item.label}</span>
-                              <span>{item.value}</span>
-                            </div>
-                            <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                              <div
-                                className="h-3 rounded bg-[--main-2]"
-                                style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : selectedQuery === 'maxRolling24hRainfall' ? 'Rolling accumulation curve' : selectedQuery === 'designStormComparison' ? 'Design storm thresholds curve' : selectedQuery === 'stormEvents' ? 'Storm event totals' : 'Rainfall totals'}</h4>
+                      {chartDisplayType === 'line' ? (
+                        <div>
+                          <svg viewBox="0 0 600 220" className="h-56 w-full rounded border bg-white" preserveAspectRatio="none">
+                            {locationResult.chart.length > 1 && (
+                              <polyline
+                                fill="none"
+                                stroke="#1f4f7a"
+                                strokeWidth="3"
+                                points={locationResult.chart
+                                  .map((item, index) => {
+                                    const x = (index / (locationResult.chart.length - 1)) * 560 + 20;
+                                    const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
+                                    return `${x},${y}`;
+                                  })
+                                  .join(' ')}
                               />
-                            </div>
+                            )}
+                            {locationResult.chart.map((item, index) => {
+                              const x = locationResult.chart.length > 1
+                                ? (index / (locationResult.chart.length - 1)) * 560 + 20
+                                : 300;
+                              const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
+                              return (
+                                <circle key={`${locationResult.id}-pt-${item.label}-${index}`} cx={x} cy={y} r="5" fill="#1f4f7a">
+                                  <title>{`${item.label}: ${item.value}`}</title>
+                                </circle>
+                              );
+                            })}
+                          </svg>
+                          <div className="mt-2 max-h-20 overflow-auto text-xs text-slate-500">
+                            {locationResult.chart.map((item) => `${item.label}: ${item.value}`).join(' • ')}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {locationResult.chart.map((item) => (
+                            <div key={`${locationResult.id}-${item.label}`}>
+                              <div className="mb-1 flex justify-between text-xs">
+                                <span>{item.label}</span>
+                                <span>{item.value}</span>
+                              </div>
+                              <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
+                                <div
+                                  className="h-3 rounded bg-[--main-2]"
+                                  style={{ width: `${(item.value / locationChartMax) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1564,14 +1968,14 @@ export default function RainIQ() {
           <button
             className="rounded-md bg-[--main-2] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportCsv}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export CSV
           </button>
           <button
             className="rounded-md border border-[--main-2] px-4 py-2 text-sm font-semibold text-[--main-2] disabled:cursor-not-allowed disabled:opacity-50"
             onClick={handleExportPdf}
-            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
+            disabled={['wettestMonth', 'avgMonthly', 'avgDaily', 'qualifyingEvents', 'largest24h', 'totalRain', 'maxHourlyRainfall'].includes(selectedQuery) && !apiBackedResponse?.data?.length}
           >
             Export PDF
           </button>

@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
-import { VITE_SOCKETLABS_FROM_EMAIL } from '../utility/constants';
+import { VITE_SOCKETLABS_FROM_EMAIL,RAINIQ_ALLOWED_EMAILS } from '../utility/constants';
+
 import fetchByPage from '../utility/fetchByPage';
 
 const timeRanges = [
@@ -420,9 +421,9 @@ export default function RainIQ() {
     const userTier = user?.clients?.[0]?.tier?.toLowerCase();
     return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
   }, [user, isActive]);
-
+const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
   const reportOptions = useMemo(() => {
-    const showAllOptions = isActive('last4Reports');
+    const showAllOptions = isActive('last4Reports') || canViewRainIQByEmail;
     if (showAllOptions) {
       return groupedQueries;
     }

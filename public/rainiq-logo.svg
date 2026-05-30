@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 623 282" role="img" aria-labelledby="rainiq-title rainiq-desc">
-  <title id="rainiq-title">RainIQ</title>
-  <desc id="rainiq-desc">RainIQ logo with blue Rain text and white IQ letters inside a green circle.</desc>
-  <rect width="623" height="282" fill="none"/>
-  <text x="20" y="196" fill="#108faa" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="168" font-weight="900" letter-spacing="-8">Rain</text>
-  <circle cx="493" cy="141" r="120" fill="#42b549"/>
-  <text x="403" y="196" fill="#ffffff" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="160" font-style="italic" font-weight="900" letter-spacing="-16">IQ</text>
-  <text x="571" y="189" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700">SM</text>
-</svg>

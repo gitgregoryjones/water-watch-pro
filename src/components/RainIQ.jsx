@@ -1540,7 +1540,7 @@ const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').t
       <div className="mt-40 px-6 pb-12">
         <div className="mx-auto max-w-4xl rounded-2xl border-2 border-[#ecbf1d] bg-white p-8 text-center shadow-lg dark:bg-slate-900">
           <h1>
-            <img src="/rainiq-logo.svg" alt="RainIQ" className="mx-auto h-16 w-auto" />
+            <img src="/rainiq-logo.png" alt="RainIQ" className="mx-auto h-16 w-auto" />
           </h1>
           <p className="mt-4 text-lg font-semibold">Unlock RainIQ insights</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
@@ -1562,7 +1562,7 @@ const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').t
       <div className="mx-auto max-w-7xl rounded-2xl bg-white p-4 shadow-lg md:p-8 dark:bg-slate-900 dark:text-white">
         <div className="mb-6 border-b pb-4">
           <h1>
-            <img src="/rainiq-logo.svg" alt="RainIQ" className="h-16 w-auto md:h-20" />
+            <img src="/rainiq-logo.png" alt="RainIQ" className="h-16 w-auto md:h-20" />
           </h1>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
             Verified rainfall analysis based on National Weather Service data for indicated locations

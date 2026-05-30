@@ -106,7 +106,8 @@ const ClientListPage = () => {
       const matchesSearch =
         client.account_name.toLowerCase().includes(searchLower) ||
         client.email?.toLowerCase().includes(searchLower) ||
-        client.phone?.toLowerCase().includes(searchLower);
+        client.phone?.toLowerCase().includes(searchLower) ||
+        client.stripe_customer_id?.toLowerCase().includes(searchLower);
     
       // Create an array of selected tiers
       const selectedTiers = [];
@@ -293,10 +294,10 @@ const ClientListPage = () => {
             </div>
           </div>
 
-          <table className="table-auto block md:w-full min-h-[300px] h-[300px] overflow-auto border border-gray-300">
+          <table className="table-fixed block md:w-full min-h-[300px] h-[300px] overflow-auto border border-gray-300">
             <thead>
               <tr className="bg-gray-100 sticky top-0">
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:min-w-[300px]">
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:w-[24%]">
                   <button
                     type="button"
                     onClick={() => handleSort("account_name")}
@@ -305,7 +306,7 @@ const ClientListPage = () => {
                     Account Name {sortIndicator("account_name")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-1/2">
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:table-cell md:w-[11%]">
                   <button
                     type="button"
                     onClick={() => handleSort("account_type")}
@@ -314,7 +315,7 @@ const ClientListPage = () => {
                     Status {sortIndicator("account_type")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full">
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:table-cell md:w-[10%]">
                   <button
                     type="button"
                     onClick={() => handleSort("locations_count")}
@@ -323,7 +324,7 @@ const ClientListPage = () => {
                     Locations {sortIndicator("locations_count")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:table-cell md:w-[14%]">
                   <button
                     type="button"
                     onClick={() => handleSort("tier")}
@@ -332,7 +333,16 @@ const ClientListPage = () => {
                     Account Type {sortIndicator("tier")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell">
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:table-cell md:w-[20%]">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("stripe_customer_id")}
+                    className={sortButtonClass("stripe_customer_id")}
+                  >
+                    Stripe Customer ID {sortIndicator("stripe_customer_id")}
+                  </button>
+                </th>
+                <th className="text-sm border border-gray-300 p-1 text-center sticky top-0 md:table-cell md:w-[21%]">
                   Actions
                 </th>
               </tr>
@@ -349,22 +359,25 @@ const ClientListPage = () => {
                       window.innerWidth < 800 && handleEdit(client)
                     }
                   >
-                    <td className="text-sm border border-gray-300 p-2 md:table-cell text-start">
+                    <td className="text-sm border border-gray-300 p-1 md:table-cell text-start">
                       {client.account_name}
                     </td>
-                    <td className="text-sm border border-gray-300 p-2 md:table-cell">
+                    <td className="text-sm border border-gray-300 p-1 md:table-cell">
                       {client.account_type || "N/A"}
                     </td>
-                    <td className="text-sm border border-gray-300 p-2 md:table-cell">
+                    <td className="text-sm border border-gray-300 p-1 md:table-cell">
                       {client.locations_count || "--"}
                     </td>
-                    <td className="text-sm border border-gray-300 p-2 md:table-cell">
+                    <td className="text-sm border border-gray-300 p-1 md:table-cell">
                       {client.tier || "N/A"}
                     </td>
-                    <td className="text-sm border border-gray-300 p-2 items-center gap-4 md:table-cell">
+                    <td className="text-xs font-mono border border-gray-300 p-1 md:table-cell break-all">
+                      {client.stripe_customer_id || "--"}
+                    </td>
+                    <td className="text-sm border border-gray-300 p-1 items-center gap-2 md:table-cell">
                     <Upgrade showMsg={false} tier={4}><button
                     onClick={() => masquerade(client)}
-                    className="text-blue-500 hover:text-blue-700 px-2"
+                    className="text-blue-500 hover:text-blue-700 px-1"
                     title={`Masquerade as ${client.name} `}
                   >
                     <FaUser />
@@ -372,7 +385,7 @@ const ClientListPage = () => {
                   </Upgrade>
                       <button
                         onClick={() => handleEdit(client)}
-                        className="text-blue-500 hover:text-blue-700 px-2"
+                        className="text-blue-500 hover:text-blue-700 px-1"
                         title="Edit Client"
                       >
                         <FaEdit />

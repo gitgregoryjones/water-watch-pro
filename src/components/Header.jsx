@@ -119,8 +119,9 @@ export default function Header({ theme, onToggleTheme }) {
   {canViewRainIQMenu && <Link
         to="/rainiq"
         className={getLinkClasses(theme,location.pathname === "/rainiq")}
+        aria-label="RainIQ"
       >
-        RainIQ
+        <img src="/rainiq-logo.png" alt="RainIQ" className="h-8 w-auto" />
       </Link>}
   
   {((user.role != "admin" && user.role != "contact" )|| (user.role == "contact" && user.co_owner == true) )  && (

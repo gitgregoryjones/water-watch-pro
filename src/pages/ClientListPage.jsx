@@ -324,7 +324,7 @@ const ClientListPage = () => {
                     Locations {sortIndicator("locations_count")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-1/2 md:min-w-[150px]">
                   <button
                     type="button"
                     onClick={() => handleSort("tier")}
@@ -333,7 +333,7 @@ const ClientListPage = () => {
                     Account Type {sortIndicator("tier")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell">
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:min-w-[300px]">
                   <button
                     type="button"
                     onClick={() => handleSort("stripe_customer_id")}

@@ -106,7 +106,8 @@ const ClientListPage = () => {
       const matchesSearch =
         client.account_name.toLowerCase().includes(searchLower) ||
         client.email?.toLowerCase().includes(searchLower) ||
-        client.phone?.toLowerCase().includes(searchLower);
+        client.phone?.toLowerCase().includes(searchLower) ||
+        client.stripe_customer_id?.toLowerCase().includes(searchLower);
     
       // Create an array of selected tiers
       const selectedTiers = [];
@@ -323,13 +324,22 @@ const ClientListPage = () => {
                     Locations {sortIndicator("locations_count")}
                   </button>
                 </th>
-                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-full md:min-w-[300px]">
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:w-1/2 md:min-w-[150px]">
                   <button
                     type="button"
                     onClick={() => handleSort("tier")}
                     className={sortButtonClass("tier")}
                   >
                     Account Type {sortIndicator("tier")}
+                  </button>
+                </th>
+                <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell md:min-w-[300px]">
+                  <button
+                    type="button"
+                    onClick={() => handleSort("stripe_customer_id")}
+                    className={sortButtonClass("stripe_customer_id")}
+                  >
+                    Stripe Customer ID {sortIndicator("stripe_customer_id")}
                   </button>
                 </th>
                 <th className="text-sm border border-gray-300 p-2 text-center sticky top-0 md:table-cell">
@@ -360,6 +370,9 @@ const ClientListPage = () => {
                     </td>
                     <td className="text-sm border border-gray-300 p-2 md:table-cell">
                       {client.tier || "N/A"}
+                    </td>
+                    <td className="text-xs font-mono border border-gray-300 p-2 md:table-cell break-all">
+                      {client.stripe_customer_id || "--"}
                     </td>
                     <td className="text-sm border border-gray-300 p-2 items-center gap-4 md:table-cell">
                     <Upgrade showMsg={false} tier={4}><button

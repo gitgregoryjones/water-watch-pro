@@ -178,7 +178,7 @@ function App() {
   </Link>}
     <div   className="flex flex-col">
       <div><Link to="/reports" onClick={showSettings} className="menu-item bm-item">Reports</Link></div>
-      {canViewRainIQMenu && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item">RainIQ</Link></div>}
+      {canViewRainIQMenu && <div><Link to="/rainiq" onClick={showSettings} className="menu-item bm-item" aria-label="RainIQ"><img src="/rainiq-logo.svg" alt="RainIQ" className="h-10 w-auto" /></Link></div>}
    <Upgrade showMsg={false} tier={1}>
     
     {window.innerWidth > 600 && <Link to="/assignments" onClick={showSettings} className="menu-item bm-item">Assignments</Link>}

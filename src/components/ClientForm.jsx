@@ -29,6 +29,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [account_type, setAccount_Type] = useState(clientToEdit?.account_type);
   const [invoiceDate, setInvoiceDate] = useState(clientToEdit?.invoice_day);
   const [paymentStatus, setPaymentStatus] = useState(clientToEdit?.last_payment_status);
+  const [stripeCustomerId, setStripeCustomerId] = useState(clientToEdit?.stripe_customer_id || '');
   const [manualInvoice, setManualInvoice] = useState(clientToEdit?.manual_invoice);
   const [tier, setTier] = useState(clientToEdit?.tier || 'Bronze'); // Radio button group for tier
   const [showDialog, setShowDialog] = useState(false);
@@ -104,6 +105,7 @@ const ClientForm = ({ clientToEdit,myself }) => {
       tier,
       manual_invoice:manualInvoice,
       account_type,
+      stripe_customer_id: stripeCustomerId,
       is_trial_account: account_type == "trial",
       
       auto_add_locations,
@@ -259,6 +261,22 @@ const ClientForm = ({ clientToEdit,myself }) => {
             className="border border-gray-300 rounded p-2 w-full"
           />
         </div>
+
+        {user.is_superuser && (
+          <div>
+            <label htmlFor="stripeCustomerId" className="block text-gray-700 font-bold">
+              Stripe Customer ID
+            </label>
+            <input
+              id="stripeCustomerId"
+              type="text"
+              value={stripeCustomerId}
+              onChange={(e) => setStripeCustomerId(e.target.value)}
+              className="border border-gray-300 rounded p-2 w-full font-mono"
+              placeholder="cus_TA83gExj2QmdBz"
+            />
+          </div>
+        )}
         </div>
         {/* Status Toggle */}
         <div className="hidden flex items-center">

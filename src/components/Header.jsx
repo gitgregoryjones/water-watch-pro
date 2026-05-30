@@ -116,7 +116,7 @@ export default function Header({ theme, onToggleTheme }) {
       >
         Reports
       </Link>
-  {canViewRainIQMenu && <Link
+  {canViewRainIQMenu && user.role != "admin" && <Link
         to="/rainiq"
         className={getLinkClasses(theme,location.pathname === "/rainiq")}
         aria-label="RainIQ"

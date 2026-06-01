@@ -77,7 +77,7 @@ function App() {
   const featureFlagKey = import.meta.env.VITE_GEEJAY_FEATURE_FLAGS || import.meta.env.GEEJAY_FEATURE_FLAGS || "aaba70cc-6ed2-4acf-a4c7-74c9e860fc75";
   const {isActive,loading} = useFeatureFlags(featureFlagKey)
   const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
-  const canViewRainIQMenu = isActive('rainIQ') && (isActive('free4All') || canViewRainIQByEmail);
+  const canViewRainIQMenu = user.role !== 'contact' && isActive('rainIQ') && (isActive('free4All') || canViewRainIQByEmail);
 
   const handleThemeToggle = () => {
     if (isActive('dark-mode')) {

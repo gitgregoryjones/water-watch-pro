@@ -417,35 +417,45 @@ export default function RainIQ() {
     }
   };
 
+  const userTier = user?.clients?.[0]?.tier?.toLowerCase();
+  const isBronzeTier = userTier === 'bronze';
+
   const canAccessRainIQ = useMemo(() => {
-    const userTier = user?.clients?.[0]?.tier?.toLowerCase();
     return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
-  }, [user, isActive]);
-const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
+  }, [user, userTier, isActive]);
+
+  const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
+  const last4ReportsActive = isActive('last4Reports');
+  const canViewAdvancedEventAnalytics = !isBronzeTier && (last4ReportsActive || canViewRainIQByEmail);
+
   const reportOptions = useMemo(() => {
-    const showAllOptions = isActive('last4Reports') || canViewRainIQByEmail;
-    if (showAllOptions) {
-      return groupedQueries;
-    }
+    const showAllOptions = canViewAdvancedEventAnalytics;
 
     return Object.entries(groupedQueries).reduce((acc, [group, groupQueries]) => {
-      const filtered = groupQueries.filter((query) => !last4ReportQueryValues.includes(query.value));
+      const filtered = groupQueries.filter((query) => {
+        const isAdvancedEventAnalyticsQuery = last4ReportQueryValues.includes(query.value);
+
+        if (isBronzeTier && isAdvancedEventAnalyticsQuery) {
+          return false;
+        }
+
+        return showAllOptions || !isAdvancedEventAnalyticsQuery;
+      });
+
       if (filtered.length) {
         acc[group] = filtered;
       }
       return acc;
     }, {});
-  }, [isActive]);
+  }, [canViewAdvancedEventAnalytics, isBronzeTier]);
 
   useEffect(() => {
-    if (isActive('last4Reports')) {
-      return;
-    }
+    const selectedQueryIsAdvancedEventAnalytics = last4ReportQueryValues.includes(selectedQuery);
 
-    if (last4ReportQueryValues.includes(selectedQuery)) {
+    if (selectedQueryIsAdvancedEventAnalytics && !canViewAdvancedEventAnalytics) {
       setSelectedQuery('avgDaily');
     }
-  }, [isActive, selectedQuery]);
+  }, [canViewAdvancedEventAnalytics, selectedQuery]);
 
   const customRangeError = useMemo(() => {
     if (selectedRange !== 'custom') {

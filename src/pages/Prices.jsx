@@ -138,7 +138,9 @@ export default function Prices({ isSmall = false }) {
   }, [location.search, isSmall, dispatch, navigate, user]);
 
   const features = [
-    { name: 'RainIQ', platinum: 'Full Access', gold: 'Limited Access', silver: 'Limited Access', bronze: false },
+    ...(showPlatinum
+      ? [{ name: 'RainIQ', platinum: 'Full Access', gold: 'Limited Access', silver: 'Limited Access', bronze: false }]
+      : []),
     { name: '24/7 Monitoring', platinum: true, gold: true, silver: true, bronze: true },
     { name: 'Threshold Notification', platinum: true, gold: true, silver: true, bronze: true },
     { name: 'National Precipitation Forecast', platinum: true, gold: true, silver: true, bronze: true },

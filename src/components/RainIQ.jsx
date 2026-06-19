@@ -499,6 +499,19 @@ export default function RainIQ() {
 
     return getRangeDates(selectedRange);
   }, [selectedRange, customStartDate, customEndDate]);
+
+  const rainfallSourceOptions = useMemo(() => {
+    const options = [];
+
+    if (selectedQuery === 'maxHourlyRainfall') {
+      options.push({ value: 'rapidrain', label: 'RapidRain (15-minute rolling hour)' });
+    }
+
+    options.push({ value: 'hourly', label: 'Hourly' });
+
+    return options;
+  }, [selectedQuery]);
+
   const parsedThreshold = useMemo(() => {
     const trimmedThreshold = threshold.trim();
     if (!trimmedThreshold) {
@@ -1632,14 +1645,21 @@ export default function RainIQ() {
             {['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) && (
               <div className="mt-3">
                 <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Rainfall source</label>
-                <select
-                  value={hourlyDataSource}
-                  onChange={(event) => setHourlyDataSource(event.target.value)}
-                  className="w-full rounded border p-2 text-sm text-slate-800"
-                >
-                  {selectedQuery === 'maxHourlyRainfall' && <option value="rapidrain">RapidRain (15-minute rolling hour)</option>}
-                  <option value="hourly">Hourly</option>
-                </select>
+                {rainfallSourceOptions.length > 1 ? (
+                  <select
+                    value={hourlyDataSource}
+                    onChange={(event) => setHourlyDataSource(event.target.value)}
+                    className="w-full rounded border p-2 text-sm text-slate-800"
+                  >
+                    {rainfallSourceOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="rounded border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                    {rainfallSourceOptions[0]?.label || 'Hourly'}
+                  </p>
+                )}
               </div>
             )}
 

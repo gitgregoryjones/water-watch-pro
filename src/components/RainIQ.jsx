@@ -728,14 +728,15 @@ export default function RainIQ() {
             label: formatMonthShortForUi(month),
             value: Number(count || 0),
           }));
+        const qualifyingEventCount = chartRows.reduce((total, row) => total + Number(row.value || 0), 0);
 
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: `There were ${Number(reportLocationData.qualifying_rain_events_count || 0)} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
+          headline: `There were ${qualifyingEventCount} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
           metrics: [
             { label: 'Threshold', value: `${effectiveThreshold.toFixed(2)} in` },
-            { label: 'Qualifying events', value: String(qualifyingRows.length) },
+            { label: 'Qualifying events', value: String(qualifyingEventCount) },
             {
               label: 'Maximum event',
               value: mostIntenseEvent?.date

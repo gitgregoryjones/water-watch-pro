@@ -167,7 +167,7 @@ const FormWizardDelayed = () => {
           // also include Stripe linkage from finalize payload:
           stripe_customer_id: sessionDetails.customerId,
           stripe_session_id: sessionDetails.sessionId,
-          tier: cached.tier || sessionDetails?.metadata?.plan_tier,
+          tier: cached.tier || sessionDetails?.plan,
           subscriptionLevel: cached.subscriptionLevel || sessionDetails?.metadata?.subscription_level,
           // Ensure numeric fields are numbers
           latitude: parseFloat(cached.latitude),

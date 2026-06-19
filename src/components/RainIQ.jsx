@@ -182,12 +182,12 @@ const mockResponses = {
       { label: 'Qualifying events', value: '8' },
       { label: 'Maximum event', value: '1.22 in on 01/23/2026' },
     ],
-    columns: ['Date', '24-hour Rainfall (in)', 'Qualified'],
+    columns: ['Date', '24-hour Rainfall (in)'],
     rows: [
-      ['01/04/2026', '0.67', 'Yes'],
-      ['01/14/2026', '0.58', 'Yes'],
-      ['01/23/2026', '1.22', 'Yes'],
-      ['02/14/2026', '0.97', 'Yes'],
+      ['01/04/2026', '0.67'],
+      ['01/14/2026', '0.58'],
+      ['01/23/2026', '1.22'],
+      ['02/14/2026', '0.97'],
     ],
     chart: [
       { label: 'Jan', value: 5 },
@@ -714,7 +714,6 @@ export default function RainIQ() {
           .map((entry) => [
             formatDateForUi(entry.date),
             Number(entry.daily_total || 0).toFixed(2),
-            'Yes',
           ]);
 
         const monthBucket = {};
@@ -744,8 +743,8 @@ export default function RainIQ() {
                 : 'N/A',
             },
           ],
-          columns: ['Date', '24-hour Rainfall (in)', 'Qualified'],
-          rows: qualifyingRows.length ? qualifyingRows : [['N/A', '0.00', 'No']],
+          columns: ['Date', '24-hour Rainfall (in)'],
+          rows: qualifyingRows.length ? qualifyingRows : [['N/A', '0.00']],
           chart: chartRows.length ? chartRows : [{ label: 'N/A', value: 0 }],
         };
       }

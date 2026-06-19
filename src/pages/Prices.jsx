@@ -89,12 +89,12 @@ export default function Prices({ isSmall = false }) {
           return;
         }
 
-        const tier = session?.metadata?.plan || session?.metadata?.plan_tier;
+        const tier = session?.plan ||session?.metadata?.plan || session?.metadata?.plan_tier;
         const customerId = session.customerId;
 
         // Update client via your API
         const patchResponse = await patchClient({
-          tier,
+          tier:tier,
           is_trial_account: false,
           account_type: 'paid',
           stripe_customer_id: customerId,

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import api from '../utility/api';
+import Upgrade from './Upgrade';
 import { VITE_SOCKETLABS_FROM_EMAIL,RAINIQ_ALLOWED_EMAILS } from '../utility/constants';
 
 import fetchByPage from '../utility/fetchByPage';
@@ -475,6 +476,7 @@ export default function RainIQ() {
 
   const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
   const last4ReportsActive = isActive('last4Reports');
+  const isRainIQBronzeUpgradeBlocked = isBronzeTier && isActive('blockUpgradeRainIQBronze');
   const canViewAdvancedEventAnalytics = !isBronzeTier && (last4ReportsActive || canViewRainIQByEmail);
 
   const reportOptions = useMemo(() => {
@@ -1613,6 +1615,10 @@ export default function RainIQ() {
   const primaryHeadline = !hasExecutedQuery
     ? 'Select criteria and click Analyze to view rainfall trends.'
     : (selectedLocationResults[0]?.headline || 'Run a query to view rainfall insights for this location.');
+
+  if (isRainIQBronzeUpgradeBlocked) {
+    return <Upgrade tier={2}><></></Upgrade>;
+  }
 
   if (!canAccessRainIQ) {
     return (

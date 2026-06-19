@@ -1976,16 +1976,27 @@ export default function RainIQ() {
                         <table className="min-w-full text-left text-sm">
                           <thead>
                             <tr className="border-b">
-                              {locationResult.columns.map((column, columnIndex) => (
-                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">
-                                  <button type="button" className="flex items-center gap-1 text-left font-semibold" onClick={() => handleTopRainfallDaysSort(columnIndex)}>
-                                    {column}
-                                    {topRainfallDaysSort.columnIndex === columnIndex && (
-                                      <span aria-hidden="true">{topRainfallDaysSort.direction === 'asc' ? '▲' : '▼'}</span>
-                                    )}
-                                  </button>
-                                </th>
-                              ))}
+                              {locationResult.columns.map((column, columnIndex) => {
+                                const isSortedColumn = topRainfallDaysSort.columnIndex === columnIndex;
+                                return (
+                                  <th
+                                    key={`${locationResult.id}-${column}`}
+                                    className="px-2 py-2 font-semibold"
+                                    aria-sort={isSortedColumn ? (topRainfallDaysSort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="flex w-full cursor-pointer items-center justify-between gap-1 rounded px-1 py-1 text-left font-semibold hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[--main-2] dark:hover:bg-slate-800"
+                                      onClick={() => handleTopRainfallDaysSort(columnIndex)}
+                                    >
+                                      <span>{column}</span>
+                                      <span aria-hidden="true" className="min-w-4 text-right">
+                                        {isSortedColumn ? (topRainfallDaysSort.direction === 'asc' ? '▲' : '▼') : '↕'}
+                                      </span>
+                                    </button>
+                                  </th>
+                                );
+                              })}
                             </tr>
                           </thead>
                           <tbody>

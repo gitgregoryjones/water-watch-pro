@@ -95,6 +95,54 @@ const getRangeDates = (selectedRange) => {
   };
 };
 
+const getRangeMonthCount = (selectedRange, selectedDateRange) => {
+  if (selectedRange === '30d') {
+    return 1;
+  }
+
+  if (selectedRange === '90d') {
+    return 3;
+  }
+
+  const startDate = new Date(`${selectedDateRange.startDate}T00:00:00`);
+  const endDate = new Date(`${selectedDateRange.endDate}T00:00:00`);
+
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || startDate > endDate) {
+    return 0;
+  }
+
+  return ((endDate.getFullYear() - startDate.getFullYear()) * 12) + endDate.getMonth() - startDate.getMonth() + 1;
+};
+
+const getSortableCellValue = (cell) => {
+  const numericValue = Number(cell);
+  if (Number.isFinite(numericValue) && String(cell).trim() !== '') {
+    return numericValue;
+  }
+
+  const dateValue = Date.parse(cell);
+  if (!Number.isNaN(dateValue)) {
+    return dateValue;
+  }
+
+  return String(cell || '').toLowerCase();
+};
+
+const sortTableRows = (rows, sortConfig) => {
+  const directionMultiplier = sortConfig.direction === 'asc' ? 1 : -1;
+
+  return [...rows].sort((a, b) => {
+    const aValue = getSortableCellValue(a[sortConfig.columnIndex]);
+    const bValue = getSortableCellValue(b[sortConfig.columnIndex]);
+
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return (aValue - bValue) * directionMultiplier;
+    }
+
+    return String(aValue).localeCompare(String(bValue), undefined, { numeric: true }) * directionMultiplier;
+  });
+};
+
 const queries = [
   { group: 'Baseline Metrics', label: 'Average rainfall per day', value: 'avgDaily' },
   { group: 'Baseline Metrics', label: 'Average rainfall per month', value: 'avgMonthly' },
@@ -182,12 +230,12 @@ const mockResponses = {
       { label: 'Qualifying events', value: '8' },
       { label: 'Maximum event', value: '1.22 in on 01/23/2026' },
     ],
-    columns: ['Date', '24-hour Rainfall (in)', 'Qualified'],
+    columns: ['Date', '24-hour Rainfall (in)'],
     rows: [
-      ['01/04/2026', '0.67', 'Yes'],
-      ['01/14/2026', '0.58', 'Yes'],
-      ['01/23/2026', '1.22', 'Yes'],
-      ['02/14/2026', '0.97', 'Yes'],
+      ['01/04/2026', '0.67'],
+      ['01/14/2026', '0.58'],
+      ['01/23/2026', '1.22'],
+      ['02/14/2026', '0.97'],
     ],
     chart: [
       { label: 'Jan', value: 5 },
@@ -384,6 +432,7 @@ export default function RainIQ() {
   const [stormEventsLoading, setStormEventsLoading] = useState(false);
   const [stormEventsError, setStormEventsError] = useState('');
   const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
+  const [topRainfallDaysSort, setTopRainfallDaysSort] = useState({ columnIndex: 0, direction: 'asc' });
   const [eventGapHours, setEventGapHours] = useState('6');
   const [designStormDuration, setDesignStormDuration] = useState('24h');
   const [designStormReturnPeriod, setDesignStormReturnPeriod] = useState('2');
@@ -480,6 +529,26 @@ export default function RainIQ() {
 
     return getRangeDates(selectedRange);
   }, [selectedRange, customStartDate, customEndDate]);
+
+  const rainfallSourceOptions = useMemo(() => {
+    const options = [];
+
+    if (selectedQuery === 'maxHourlyRainfall') {
+      options.push({ value: 'rapidrain', label: 'RapidRain (15-minute rolling hour)' });
+    }
+
+    options.push({ value: 'hourly', label: 'Hourly' });
+
+    return options;
+  }, [selectedQuery]);
+
+  const handleTopRainfallDaysSort = (columnIndex) => {
+    setTopRainfallDaysSort((currentSort) => ({
+      columnIndex,
+      direction: currentSort.columnIndex === columnIndex && currentSort.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
   const parsedThreshold = useMemo(() => {
     const trimmedThreshold = threshold.trim();
     if (!trimmedThreshold) {
@@ -615,7 +684,7 @@ export default function RainIQ() {
         const monthTotals = buildMonthlyTotals(dailyTotals);
         const rankedMonths = [...monthTotals].sort(([, a], [, b]) => b - a);
 
-        const analyzedMonthCount = monthTotals.length;
+        const analyzedMonthCount = Math.max(monthTotals.length, getRangeMonthCount(selectedRange, selectedDateRange));
         const monthlyAverage = Number(reportLocationData.average_monthly_rainfall || 0);
         const highestMonth = rankedMonths[0];
 
@@ -714,7 +783,6 @@ export default function RainIQ() {
           .map((entry) => [
             formatDateForUi(entry.date),
             Number(entry.daily_total || 0).toFixed(2),
-            'Yes',
           ]);
 
         const monthBucket = {};
@@ -729,14 +797,15 @@ export default function RainIQ() {
             label: formatMonthShortForUi(month),
             value: Number(count || 0),
           }));
+        const qualifyingEventCount = chartRows.reduce((total, row) => total + Number(row.value || 0), 0);
 
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
-          headline: `There were ${Number(reportLocationData.qualifying_rain_events_count || 0)} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
+          headline: `There were ${qualifyingEventCount} days with rainfall above ${effectiveThreshold.toFixed(2)} inches in the selected window.`,
           metrics: [
             { label: 'Threshold', value: `${effectiveThreshold.toFixed(2)} in` },
-            { label: 'Qualifying events', value: String(qualifyingRows.length) },
+            { label: 'Qualifying events', value: String(qualifyingEventCount) },
             {
               label: 'Maximum event',
               value: mostIntenseEvent?.date
@@ -744,8 +813,8 @@ export default function RainIQ() {
                 : 'N/A',
             },
           ],
-          columns: ['Date', '24-hour Rainfall (in)', 'Qualified'],
-          rows: qualifyingRows.length ? qualifyingRows : [['N/A', '0.00', 'No']],
+          columns: ['Date', '24-hour Rainfall (in)'],
+          rows: qualifyingRows.length ? qualifyingRows : [['N/A', '0.00']],
           chart: chartRows.length ? chartRows : [{ label: 'N/A', value: 0 }],
         };
       }
@@ -1613,14 +1682,21 @@ export default function RainIQ() {
             {['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) && (
               <div className="mt-3">
                 <label className="mb-2 block text-xs font-bold uppercase text-slate-500">Rainfall source</label>
-                <select
-                  value={hourlyDataSource}
-                  onChange={(event) => setHourlyDataSource(event.target.value)}
-                  className="w-full rounded border p-2 text-sm text-slate-800"
-                >
-                  {selectedQuery === 'maxHourlyRainfall' && <option value="rapidrain">RapidRain (15-minute rolling hour)</option>}
-                  <option value="hourly">Hourly</option>
-                </select>
+                {rainfallSourceOptions.length > 1 ? (
+                  <select
+                    value={hourlyDataSource}
+                    onChange={(event) => setHourlyDataSource(event.target.value)}
+                    className="w-full rounded border p-2 text-sm text-slate-800"
+                  >
+                    {rainfallSourceOptions.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <p className="rounded border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
+                    {rainfallSourceOptions[0]?.label || 'Hourly'}
+                  </p>
+                )}
               </div>
             )}
 
@@ -1876,6 +1952,7 @@ export default function RainIQ() {
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
             const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
+            const sortedTableRows = sortTableRows(locationResult.rows, topRainfallDaysSort);
 
             return (
               <section key={locationResult.id} className="rounded-xl border p-4 md:p-5">
@@ -1899,13 +1976,31 @@ export default function RainIQ() {
                         <table className="min-w-full text-left text-sm">
                           <thead>
                             <tr className="border-b">
-                              {locationResult.columns.map((column) => (
-                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
-                              ))}
+                              {locationResult.columns.map((column, columnIndex) => {
+                                const isSortedColumn = topRainfallDaysSort.columnIndex === columnIndex;
+                                return (
+                                  <th
+                                    key={`${locationResult.id}-${column}`}
+                                    className="px-2 py-2 font-semibold"
+                                    aria-sort={isSortedColumn ? (topRainfallDaysSort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
+                                  >
+                                    <button
+                                      type="button"
+                                      className="flex w-full cursor-pointer items-center justify-between gap-1 rounded px-1 py-1 text-left font-semibold hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[--main-2] dark:hover:bg-slate-800"
+                                      onClick={() => handleTopRainfallDaysSort(columnIndex)}
+                                    >
+                                      <span>{column}</span>
+                                      <span aria-hidden="true" className="min-w-4 text-right">
+                                        {isSortedColumn ? (topRainfallDaysSort.direction === 'asc' ? '▲' : '▼') : '↕'}
+                                      </span>
+                                    </button>
+                                  </th>
+                                );
+                              })}
                             </tr>
                           </thead>
                           <tbody>
-                            {locationResult.rows.map((row, index) => (
+                            {sortedTableRows.map((row, index) => (
                               <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
                                 {row.map((cell, cellIndex) => (
                                   <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>

@@ -95,6 +95,25 @@ const getRangeDates = (selectedRange) => {
   };
 };
 
+const getAnalyzedMonthCount = (selectedRange, selectedDateRange) => {
+  if (selectedRange === '30d') {
+    return 1;
+  }
+
+  if (selectedRange === '90d') {
+    return 3;
+  }
+
+  const startDate = new Date(`${selectedDateRange.startDate}T00:00:00`);
+  const endDate = new Date(`${selectedDateRange.endDate}T00:00:00`);
+
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || startDate > endDate) {
+    return 0;
+  }
+
+  return ((endDate.getFullYear() - startDate.getFullYear()) * 12) + endDate.getMonth() - startDate.getMonth() + 1;
+};
+
 const queries = [
   { group: 'Baseline Metrics', label: 'Average rainfall per day', value: 'avgDaily' },
   { group: 'Baseline Metrics', label: 'Average rainfall per month', value: 'avgMonthly' },
@@ -615,7 +634,7 @@ export default function RainIQ() {
         const monthTotals = buildMonthlyTotals(dailyTotals);
         const rankedMonths = [...monthTotals].sort(([, a], [, b]) => b - a);
 
-        const analyzedMonthCount = monthTotals.length;
+        const analyzedMonthCount = getAnalyzedMonthCount(selectedRange, selectedDateRange);
         const monthlyAverage = Number(reportLocationData.average_monthly_rainfall || 0);
         const highestMonth = rankedMonths[0];
 

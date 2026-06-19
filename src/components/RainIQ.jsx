@@ -114,19 +114,33 @@ const getRangeMonthCount = (selectedRange, selectedDateRange) => {
   return ((endDate.getFullYear() - startDate.getFullYear()) * 12) + endDate.getMonth() - startDate.getMonth() + 1;
 };
 
-const sortChartRows = (chartRows, sortConfig) => {
+const getSortableCellValue = (cell) => {
+  const numericValue = Number(cell);
+  if (Number.isFinite(numericValue) && String(cell).trim() !== '') {
+    return numericValue;
+  }
+
+  const dateValue = Date.parse(cell);
+  if (!Number.isNaN(dateValue)) {
+    return dateValue;
+  }
+
+  return String(cell || '').toLowerCase();
+};
+
+const sortTableRows = (rows, sortConfig) => {
   const directionMultiplier = sortConfig.direction === 'asc' ? 1 : -1;
 
-  return chartRows
-    .map((row, index) => ({ ...row, originalIndex: index }))
-    .sort((a, b) => {
-      if (sortConfig.column === 'value') {
-        return (Number(a.value || 0) - Number(b.value || 0)) * directionMultiplier;
-      }
+  return [...rows].sort((a, b) => {
+    const aValue = getSortableCellValue(a[sortConfig.columnIndex]);
+    const bValue = getSortableCellValue(b[sortConfig.columnIndex]);
 
-      return (a.originalIndex - b.originalIndex) * directionMultiplier;
-    })
-    .map(({ originalIndex, ...row }) => row);
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return (aValue - bValue) * directionMultiplier;
+    }
+
+    return String(aValue).localeCompare(String(bValue), undefined, { numeric: true }) * directionMultiplier;
+  });
 };
 
 const queries = [
@@ -418,7 +432,7 @@ export default function RainIQ() {
   const [stormEventsLoading, setStormEventsLoading] = useState(false);
   const [stormEventsError, setStormEventsError] = useState('');
   const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
-  const [rainfallTotalsSort, setRainfallTotalsSort] = useState({ column: 'label', direction: 'asc' });
+  const [topRainfallDaysSort, setTopRainfallDaysSort] = useState({ columnIndex: 0, direction: 'asc' });
   const [eventGapHours, setEventGapHours] = useState('6');
   const [designStormDuration, setDesignStormDuration] = useState('24h');
   const [designStormReturnPeriod, setDesignStormReturnPeriod] = useState('2');
@@ -528,10 +542,10 @@ export default function RainIQ() {
     return options;
   }, [selectedQuery]);
 
-  const handleRainfallTotalsSort = (column) => {
-    setRainfallTotalsSort((currentSort) => ({
-      column,
-      direction: currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc',
+  const handleTopRainfallDaysSort = (columnIndex) => {
+    setTopRainfallDaysSort((currentSort) => ({
+      columnIndex,
+      direction: currentSort.columnIndex === columnIndex && currentSort.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -1938,7 +1952,7 @@ export default function RainIQ() {
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
             const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
-            const sortedChartRows = sortChartRows(locationResult.chart, rainfallTotalsSort);
+            const sortedTableRows = sortTableRows(locationResult.rows, topRainfallDaysSort);
 
             return (
               <section key={locationResult.id} className="rounded-xl border p-4 md:p-5">
@@ -1962,13 +1976,20 @@ export default function RainIQ() {
                         <table className="min-w-full text-left text-sm">
                           <thead>
                             <tr className="border-b">
-                              {locationResult.columns.map((column) => (
-                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">{column}</th>
+                              {locationResult.columns.map((column, columnIndex) => (
+                                <th key={`${locationResult.id}-${column}`} className="px-2 py-2 font-semibold">
+                                  <button type="button" className="flex items-center gap-1 text-left font-semibold" onClick={() => handleTopRainfallDaysSort(columnIndex)}>
+                                    {column}
+                                    {topRainfallDaysSort.columnIndex === columnIndex && (
+                                      <span aria-hidden="true">{topRainfallDaysSort.direction === 'asc' ? '▲' : '▼'}</span>
+                                    )}
+                                  </button>
+                                </th>
                               ))}
                             </tr>
                           </thead>
                           <tbody>
-                            {locationResult.rows.map((row, index) => (
+                            {sortedTableRows.map((row, index) => (
                               <tr key={`${locationResult.id}-${row[0]}-${index}`} className="border-b last:border-0">
                                 {row.map((cell, cellIndex) => (
                                   <td key={`${locationResult.id}-${cell}-${cellIndex}`} className="px-2 py-2">{cell}</td>
@@ -2017,15 +2038,7 @@ export default function RainIQ() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          <div className="grid grid-cols-[1fr_auto] gap-3 border-b pb-2 text-xs font-semibold uppercase text-slate-500">
-                            <button type="button" className="text-left" onClick={() => handleRainfallTotalsSort('label')}>
-                              Label {rainfallTotalsSort.column === 'label' ? (rainfallTotalsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                            </button>
-                            <button type="button" className="text-right" onClick={() => handleRainfallTotalsSort('value')}>
-                              Total {rainfallTotalsSort.column === 'value' ? (rainfallTotalsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                            </button>
-                          </div>
-                          {sortedChartRows.map((item) => (
+                          {locationResult.chart.map((item) => (
                             <div key={`${locationResult.id}-${item.label}`}>
                               <div className="mb-1 flex justify-between text-xs">
                                 <span>{item.label}</span>

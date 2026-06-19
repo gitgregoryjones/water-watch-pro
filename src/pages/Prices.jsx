@@ -149,15 +149,28 @@ export default function Prices({ isSmall = false }) {
     { name: 'Configurable RapidRain Thresholds', platinum: true, gold: true, silver: true, bronze: false },
     { name: 'Site-Specific Forecasts', platinum: true, gold: true, silver: false, bronze: false },
     { name: 'On-Demand Lookup', platinum: true, gold: true, silver: false, bronze: false },
-    { name: 'RainIQ', platinum: true, gold: false, silver: false, bronze: false },
+    { name: 'RainIQ', platinum: 'Full Access', gold: 'Limited Access', silver: 'Limited Access', bronze: false },
   ];
+
+  const renderFeatureLabel = (feature, plan) => {
+    if (feature.name === 'RainIQ') {
+      return (
+        <span className="flex items-center gap-2">
+          <img src="/rainiq-logo.png" alt="RainIQ" className="h-6 w-auto" />
+          <span>{feature[plan]}</span>
+        </span>
+      );
+    }
+
+    return <span>{feature.name}</span>;
+  };
 
   const renderFeatures = (plan) =>
     features.map((feature, idx) =>
       feature[plan] ? (
         <li key={idx} className="flex items-center space-x-2">
           <span className="text-green-500 font-bold">✔</span>
-          <span>{feature.name}</span>
+          {renderFeatureLabel(feature, plan)}
         </li>
       ) : null
     );

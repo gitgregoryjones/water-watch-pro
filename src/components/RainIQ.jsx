@@ -114,6 +114,21 @@ const getRangeMonthCount = (selectedRange, selectedDateRange) => {
   return ((endDate.getFullYear() - startDate.getFullYear()) * 12) + endDate.getMonth() - startDate.getMonth() + 1;
 };
 
+const sortChartRows = (chartRows, sortConfig) => {
+  const directionMultiplier = sortConfig.direction === 'asc' ? 1 : -1;
+
+  return chartRows
+    .map((row, index) => ({ ...row, originalIndex: index }))
+    .sort((a, b) => {
+      if (sortConfig.column === 'value') {
+        return (Number(a.value || 0) - Number(b.value || 0)) * directionMultiplier;
+      }
+
+      return (a.originalIndex - b.originalIndex) * directionMultiplier;
+    })
+    .map(({ originalIndex, ...row }) => row);
+};
+
 const queries = [
   { group: 'Baseline Metrics', label: 'Average rainfall per day', value: 'avgDaily' },
   { group: 'Baseline Metrics', label: 'Average rainfall per month', value: 'avgMonthly' },
@@ -403,6 +418,7 @@ export default function RainIQ() {
   const [stormEventsLoading, setStormEventsLoading] = useState(false);
   const [stormEventsError, setStormEventsError] = useState('');
   const [hourlyDataSource, setHourlyDataSource] = useState('hourly');
+  const [rainfallTotalsSort, setRainfallTotalsSort] = useState({ column: 'label', direction: 'asc' });
   const [eventGapHours, setEventGapHours] = useState('6');
   const [designStormDuration, setDesignStormDuration] = useState('24h');
   const [designStormReturnPeriod, setDesignStormReturnPeriod] = useState('2');
@@ -511,6 +527,13 @@ export default function RainIQ() {
 
     return options;
   }, [selectedQuery]);
+
+  const handleRainfallTotalsSort = (column) => {
+    setRainfallTotalsSort((currentSort) => ({
+      column,
+      direction: currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
 
   const parsedThreshold = useMemo(() => {
     const trimmedThreshold = threshold.trim();
@@ -1915,6 +1938,7 @@ export default function RainIQ() {
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
             const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
+            const sortedChartRows = sortChartRows(locationResult.chart, rainfallTotalsSort);
 
             return (
               <section key={locationResult.id} className="rounded-xl border p-4 md:p-5">
@@ -1993,7 +2017,15 @@ export default function RainIQ() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {locationResult.chart.map((item) => (
+                          <div className="grid grid-cols-[1fr_auto] gap-3 border-b pb-2 text-xs font-semibold uppercase text-slate-500">
+                            <button type="button" className="text-left" onClick={() => handleRainfallTotalsSort('label')}>
+                              Label {rainfallTotalsSort.column === 'label' ? (rainfallTotalsSort.direction === 'asc' ? '▲' : '▼') : ''}
+                            </button>
+                            <button type="button" className="text-right" onClick={() => handleRainfallTotalsSort('value')}>
+                              Total {rainfallTotalsSort.column === 'value' ? (rainfallTotalsSort.direction === 'asc' ? '▲' : '▼') : ''}
+                            </button>
+                          </div>
+                          {sortedChartRows.map((item) => (
                             <div key={`${locationResult.id}-${item.label}`}>
                               <div className="mb-1 flex justify-between text-xs">
                                 <span>{item.label}</span>

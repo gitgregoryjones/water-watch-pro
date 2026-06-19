@@ -89,12 +89,12 @@ export default function Prices({ isSmall = false }) {
           return;
         }
 
-        const tier = session?.metadata?.plan || session?.metadata?.plan_tier;
+        const tier = session?.plan ||session?.metadata?.plan || session?.metadata?.plan_tier;
         const customerId = session.customerId;
 
         // Update client via your API
         const patchResponse = await patchClient({
-          tier,
+          tier:tier,
           is_trial_account: false,
           account_type: 'paid',
           stripe_customer_id: customerId,
@@ -138,6 +138,9 @@ export default function Prices({ isSmall = false }) {
   }, [location.search, isSmall, dispatch, navigate, user]);
 
   const features = [
+    ...(showPlatinum
+      ? [{ name: 'RainIQ', platinum: 'Full Access', gold: 'Limited Access', silver: 'Limited Access', bronze: false }]
+      : []),
     { name: '24/7 Monitoring', platinum: true, gold: true, silver: true, bronze: true },
     { name: 'Threshold Notification', platinum: true, gold: true, silver: true, bronze: true },
     { name: 'National Precipitation Forecast', platinum: true, gold: true, silver: true, bronze: true },
@@ -149,15 +152,27 @@ export default function Prices({ isSmall = false }) {
     { name: 'Configurable RapidRain Thresholds', platinum: true, gold: true, silver: true, bronze: false },
     { name: 'Site-Specific Forecasts', platinum: true, gold: true, silver: false, bronze: false },
     { name: 'On-Demand Lookup', platinum: true, gold: true, silver: false, bronze: false },
-    { name: 'RainIQ', platinum: true, gold: false, silver: false, bronze: false },
   ];
+
+  const renderFeatureLabel = (feature, plan) => {
+    if (feature.name === 'RainIQ') {
+      return (
+        <span className="flex items-end gap-1">
+          <img src="/rainiq-logo.png" alt="RainIQ" className="h-6 w-auto" />
+          <span>{feature[plan]}</span>
+        </span>
+      );
+    }
+
+    return <span>{feature.name}</span>;
+  };
 
   const renderFeatures = (plan) =>
     features.map((feature, idx) =>
       feature[plan] ? (
         <li key={idx} className="flex items-center space-x-2">
           <span className="text-green-500 font-bold">✔</span>
-          <span>{feature.name}</span>
+          {renderFeatureLabel(feature, plan)}
         </li>
       ) : null
     );
@@ -184,7 +199,7 @@ export default function Prices({ isSmall = false }) {
             <h3 className="text-xl font-bold text-purple-700 mb-2">Platinum</h3>
             <p className="text-4xl font-bold text-gray-800 mb-2">$30.00</p>
             <p className="text-gray-600 text-sm text-center">per 5 locations</p>
-            <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('platinum')}</ul>
+            <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('platinum')}</ul>
             {!isSmall && (
               <button
                 onClick={() => handleUpgrade('platinum')}
@@ -201,7 +216,7 @@ export default function Prices({ isSmall = false }) {
           <h3 className="text-xl font-bold text-yellow-700 mb-2">Gold</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$24.00</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('gold')}</ul>
+          <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('gold')}</ul>
           {!isSmall && (
             <button
               onClick={() => handleUpgrade('gold')}
@@ -217,7 +232,7 @@ export default function Prices({ isSmall = false }) {
           <h3 className="text-xl font-bold text-gray-700 mb-2">Silver</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$18.00</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('silver')}</ul>
+          <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('silver')}</ul>
           {!isSmall && (
             <button
               onClick={() => handleUpgrade('silver')}
@@ -233,7 +248,7 @@ export default function Prices({ isSmall = false }) {
           <h3 className="text-xl font-bold text-orange-700 mb-2">Bronze</h3>
           <p className="text-4xl font-bold text-gray-800 mb-2">$12.00</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
-          <ul className="mt-4 space-y-2 text-gray-700">{renderFeatures('bronze')}</ul>
+          <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('bronze')}</ul>
           {!isSmall && (
             <button
               onClick={() => handleUpgrade('bronze')}

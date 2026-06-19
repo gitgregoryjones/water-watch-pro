@@ -51,6 +51,13 @@ export const handler: Handler = async (event) => {
         customer_creation: "always",            // or: customer_creation: 'always'
         payment_intent_data: {
             setup_future_usage: 'off_session', // ← save for future backend charges
+                metadata: {
+          email,
+          plan,
+          nonce,
+          exp: String(exp),
+          sig,
+        },
         },
         line_items: [{ price, quantity: 1 }],
         success_url: `${successBase}?session_id={CHECKOUT_SESSION_ID}`,

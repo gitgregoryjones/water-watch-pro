@@ -19,6 +19,23 @@ export const handler: Handler = async (event) => {
       typeof session.customer === 'string'
         ? session.customer
         : session.customer?.id ?? null;
+    
+    const paymentIntentId =
+  typeof session.payment_intent === 'string'
+    ? session.payment_intent
+    : session.payment_intent?.id;
+
+    if (!paymentIntentId) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'No payment intent found for session' }),
+      };
+    }
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    console.log(paymentIntent.metadata);
 
     return {
       statusCode: 200,
@@ -27,7 +44,7 @@ export const handler: Handler = async (event) => {
         sessionId: session.id,
         status: session.payment_status,
         email: session.customer_details?.email,
-        plan: session.metadata?.plan,
+        plan:  paymentIntent.metadata.plan,
         customerId: stripeCustomerId,
       }),
     };

@@ -7,10 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06
 
 // server-side whitelist
 const PRICE_BY_PLAN: Record<string,string> = {
-  gold: process.env.PRICE_ID_GOLD!,
-  silver: process.env.PRICE_ID_SILVER!,
-  bronze: process.env.PRICE_ID_BRONZE!,
-  trial: process.env.PRICE_ID_TRIAL!, // if you use it
+  gold: process.env.UPGRADE_PRICE_ID_GOLD  |  PRICE_ID_GOLD!,
+  silver: process.env.UPGRADE_PRICE_ID_SILVER  |  PRICE_ID_SILVER!,
+  bronze: process.env.UPGRADE_PRICE_ID_BRONZE  |  PRICE_ID_BRONZE!,
+  trial: process.env.UPGRADE_PRICE_ID_TRIAL  |  PRICE_ID_TRIAL!, // if you use it
 };
 
 function sign(input: string) {

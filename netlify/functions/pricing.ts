@@ -28,6 +28,8 @@ const priceId = useUpgradePricing
   ? process.env[`UPGRADE_PRICE_ID_${tier}`]
   : process.env[`PRICE_ID_${tier}`];
 
+  console.log(`Price ID for tier ${tier} is ${priceId}`);
+
         if (!priceId) {
           throw new Error(`Missing env var UPGRADE_PRICE_ID_${tier}`);
         }

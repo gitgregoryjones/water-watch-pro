@@ -1,5 +1,5 @@
 // src/pages/Prices.jsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -217,7 +217,7 @@ useEffect(() => {
         {showPlatinum && (
           <div className="plan platinum flex flex-col items-center justify-center border border-purple-400 rounded-lg p-6 bg-purple-50 shadow-md">
             <h3 className="text-xl font-bold text-purple-700 mb-2">Platinum</h3>
-            <p className="text-4xl font-bold text-gray-800 mb-2">${displayPrice('platinum', '$30.00')}</p>
+            <p className="text-4xl font-bold text-gray-800 mb-2">{displayPrice('platinum', '$30.00')}</p>
             <p className="text-gray-600 text-sm text-center">per 5 locations</p>
             <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('platinum')}</ul>
             {!isSmall && (
@@ -234,7 +234,7 @@ useEffect(() => {
         {/* Gold */}
         <div className="plan gold flex flex-col items-center justify-center border border-yellow-400 rounded-lg p-6 bg-yellow-50 shadow-md">
           <h3 className="text-xl font-bold text-yellow-700 mb-2">Gold</h3>
-          <p className="text-4xl font-bold text-gray-800 mb-2">${displayPrice('gold', '$24.00')}</p>
+          <p className="text-4xl font-bold text-gray-800 mb-2">{displayPrice('gold', '$24.00')}</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
           <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('gold')}</ul>
           {!isSmall && (
@@ -250,7 +250,7 @@ useEffect(() => {
         {/* Silver */}
         <div className="plan silver flex flex-col items-center justify-start border border-gray-400 rounded-lg p-6 shadow-md">
           <h3 className="text-xl font-bold text-gray-700 mb-2">Silver</h3>
-          <p className="text-4xl font-bold text-gray-800 mb-2">$1{displayPrice('silver', '$20.00')}</p>
+          <p className="text-4xl font-bold text-gray-800 mb-2">{displayPrice('silver', '$20.00')}</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
           <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('silver')}</ul>
           {!isSmall && (
@@ -266,7 +266,7 @@ useEffect(() => {
         {/* Bronze */}
         <div className="plan bronze flex flex-col items-center justify-start border border-orange-400 rounded-lg p-6 bg-orange-50 shadow-md">
           <h3 className="text-xl font-bold text-orange-700 mb-2">Bronze</h3>
-          <p className="text-4xl font-bold text-gray-800 mb-2">$1{displayPrice('bronze', '$15.00')}</p>
+          <p className="text-4xl font-bold text-gray-800 mb-2">{displayPrice('bronze', '$15.00')}</p>
           <p className="text-gray-600 text-sm text-center">per 5 locations</p>
           <ul className="mt-4 space-y-4 text-gray-700">{renderFeatures('bronze')}</ul>
           {!isSmall && (

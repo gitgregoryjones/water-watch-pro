@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import Stripe from 'stripe';
 
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 const TIERS = ['BRONZE', 'SILVER', 'GOLD', 'PLATINUM'] as const;
@@ -18,7 +19,7 @@ export const handler: Handler = async () => {
   try {
     const prices = await Promise.all(
       TIERS.map(async (tier) => {
-        const priceId = process.env[`PRICE_ID_${tier}`] || process.env[`UPGRADE_PRICE_ID_${tier}`];
+        const priceId = process.env[`UPGRADE_2027`] && process.env[`UPGRADE_PRICE_ID_${tier}`] || process.env[`PRICE_ID_${tier}`];
 
         if (!priceId) {
           throw new Error(`Missing env var UPGRADE_PRICE_ID_${tier}`);

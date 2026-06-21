@@ -32,7 +32,7 @@ export default function Prices({ isSmall = false }) {
   const displayPrice = (tier, fallback) =>
   stripePrices?.[tier]?.displayPrice || fallback;
 
-  console.log(`Stripe prices: ${JSON.stringify(stripePrices)}`)
+  
   // --- Upgrade → create Checkout Session via Netlify function ---
   const handleUpgrade = async (tier) => {
     try {
@@ -78,6 +78,7 @@ useEffect(() => {
       }
       setStripePrices(byTier);
     })
+    console.log(`Stripe prices: ${JSON.stringify(stripePrices)}`)
     .catch((err) => {
       console.error('Failed to load Stripe prices:', err);
     });

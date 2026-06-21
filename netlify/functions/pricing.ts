@@ -22,7 +22,7 @@ export const handler: Handler = async () => {
         const useUpgradePricing =
   process.env.UPGRADE_2027 === 'Y';
 
-  console.log(`Using ${useUpgradePricing ? 'upgrade' : 'standard'} pricing for tier ${tier}`);  
+  console.log(`Using ${useUpgradePricing ? 'upgrade' : 'standard'} pricing for tier ${tier} not found in ${process.env}`);  
 
 const priceId = useUpgradePricing
   ? process.env[`UPGRADE_PRICE_ID_${tier}`]

@@ -74,6 +74,7 @@ useEffect(() => {
     .then((data) => {
       const byTier = {};
       for (const item of data.prices || []) {
+        console.log(`Processing price item: ${JSON.stringify(item)}`);
         byTier[item.tier] = item;
       }
       console.log('Loaded Stripe prices:', JSON.stringify(byTier));

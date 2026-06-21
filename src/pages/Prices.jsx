@@ -76,9 +76,10 @@ useEffect(() => {
       for (const item of data.prices || []) {
         byTier[item.tier] = item;
       }
+      console.log('Loaded Stripe prices:', JSON.stringify(byTier));
       setStripePrices(byTier);
     })
-    console.log(`Stripe prices: ${JSON.stringify(stripePrices)}`)
+    
     .catch((err) => {
       console.error('Failed to load Stripe prices:', err);
     });

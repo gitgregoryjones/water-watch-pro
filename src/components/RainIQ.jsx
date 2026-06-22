@@ -377,6 +377,7 @@ const mockResponses = {
 };
 
 const last4ReportQueryValues = ['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'];
+const goLive2027QueryGroups = ['Baseline Metrics', 'Compliance & Threshold Queries'];
 
 const groupedQueries = queries.reduce((acc, query) => {
   if (!acc[query.group]) {
@@ -469,20 +470,27 @@ export default function RainIQ() {
 
   const userTier = user?.clients?.[0]?.tier?.toLowerCase();
   const isBronzeTier = userTier === 'bronze';
+  const isSilverOrGoldTier = userTier === 'silver' || userTier === 'gold';
+  const goLive2027Active = isActive('GO_LIVE_2027');
+  const hasGoLive2027LimitedAccess = goLive2027Active && isSilverOrGoldTier;
 
   const canAccessRainIQ = useMemo(() => {
-    return userTier === 'platinum' || user.is_superuser || isActive('rainIQ');
-  }, [user, userTier, isActive]);
+    return userTier === 'platinum' || user.is_superuser || isActive('rainIQ') || hasGoLive2027LimitedAccess;
+  }, [user, userTier, isActive, hasGoLive2027LimitedAccess]);
 
   const canViewRainIQByEmail = RAINIQ_ALLOWED_EMAILS.includes((user.email || '').toLowerCase());
   const last4ReportsActive = isActive('last4Reports');
   const isRainIQBronzeUpgradeBlocked = isBronzeTier && isActive('blockUpgradeRainIQBronze');
-  const canViewAdvancedEventAnalytics = !isBronzeTier && (last4ReportsActive || canViewRainIQByEmail);
+  const canViewAdvancedEventAnalytics = !hasGoLive2027LimitedAccess && !isBronzeTier && (last4ReportsActive || canViewRainIQByEmail);
 
   const reportOptions = useMemo(() => {
     const showAllOptions = canViewAdvancedEventAnalytics;
 
     return Object.entries(groupedQueries).reduce((acc, [group, groupQueries]) => {
+      if (hasGoLive2027LimitedAccess && !goLive2027QueryGroups.includes(group)) {
+        return acc;
+      }
+
       const filtered = groupQueries.filter((query) => {
         const isAdvancedEventAnalyticsQuery = last4ReportQueryValues.includes(query.value);
 
@@ -498,7 +506,7 @@ export default function RainIQ() {
       }
       return acc;
     }, {});
-  }, [canViewAdvancedEventAnalytics, isBronzeTier]);
+  }, [canViewAdvancedEventAnalytics, hasGoLive2027LimitedAccess, isBronzeTier]);
 
   useEffect(() => {
     const selectedQueryIsAdvancedEventAnalytics = last4ReportQueryValues.includes(selectedQuery);

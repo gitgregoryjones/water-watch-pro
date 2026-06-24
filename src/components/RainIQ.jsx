@@ -1913,14 +1913,7 @@ export default function RainIQ() {
         {showDetailedView && (
           <div className="mt-3 flex items-center gap-3">
             <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Chart type</label>
-            <select
-              value={chartDisplayType}
-              onChange={(event) => setChartDisplayType(event.target.value)}
-              className="rounded border p-2 text-sm text-slate-800"
-            >
-              <option value="bar">Bar chart</option>
-              <option value="line">Line chart</option>
-            </select>
+            <input type="text" value={chartDisplayType} readOnly className="hidden" />       
           </div>
         )}
 

@@ -1919,7 +1919,6 @@ export default function RainIQ() {
               className="rounded border p-2 text-sm text-slate-800"
             >
               <option value="bar">Bar chart</option>
-              <option value="line">Line chart</option>
             </select>
           </div>
         )}

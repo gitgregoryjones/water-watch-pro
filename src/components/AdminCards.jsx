@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Card from './Card'
 import PrettyHeader from './PrettyHeader'
 import Stats from './Stats'
@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux'
 import WorkingDialog from './WorkingDialog'
 import Processing from './Processing'
 import ProfilePic from './ProfilePic'
+import { useFeatureFlags } from '@geejay/use-feature-flags'
 
 
 export default function AdminCards() {
@@ -16,16 +17,14 @@ export default function AdminCards() {
   
 
   const user = useSelector((state)=> state.userInfo.user)
+  const { isActive } = useFeatureFlags()
+  const showPlatinum = isActive('showPlatinum')
 
-  const [clients,setClients] = useState([])
-  const [gold,setGold] = useState([])
-  const [silver,setSilver] = useState([])
-  const [bronze,setBronze] = useState([])
-  const [trial,setTrial] = useState([])
-  const [currentPage,setCurrentPage] = useState(1)
+  const [currentPage] = useState(1)
   const [working,setWorking] = useState(false)
   const [summary,setSummary] = useState({
   
+      platinum: { count: 0, paid: 0, unpaid: 0 },
       gold: { count: 0, paid: 0, unpaid: 0 },
       silver: { count: 0, paid: 0, unpaid: 0 },
       bronze: { count: 0, paid: 0, unpaid: 0 },
@@ -45,6 +44,7 @@ export default function AdminCards() {
 
   function generateSummary(accounts) {
     const table = {
+      platinum: { count: 0, paid: 0, unpaid: 0 },
       gold: { count: 0, paid: 0, unpaid: 0 },
       silver: { count: 0, paid: 0, unpaid: 0 },
       bronze: { count: 0, paid: 0, unpaid: 0 },
@@ -136,8 +136,6 @@ async function countFailureTds() {
 
       //setTimeout(()=> setWorking(false),500)
 
-      setClients(response.data);
-
       setWorking(false);
      
       //Get Gold
@@ -188,19 +186,27 @@ async function countFailureTds() {
       <Card className={'flex gap-4 justify-center items-center md:border-[transparent] '} header={<PrettyHeader icon={<i className='fa  fa-solid fa-people-group text-[white]'></i>}>Client Status</PrettyHeader>} footer={<div className='flex justify-around items-center gap-2 text-sm'></div>} >
       <div className='grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-8' >
     
-        <Stats onClick={(e)=> navigate("/settings-admin",{state:{gold:true,trial:false}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[gold] fa fa-solid fa-circle-user'></i>Gold Tier </div>}>
+        {showPlatinum && (
+        <Stats onClick={()=> navigate("/settings-admin",{state:{platinum:true,trial:false}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-purple-400 fa fa-solid fa-circle-user'></i>Platinum Tier </div>}>
+        <div className='flex flex-col'>
+          <div className='flex items-center justify-center text-3xl'>{summary.platinum.count}</div>
+          <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.platinum.unpaid)}{summary.platinum.unpaid} unpaid</div>
+          </div>
+        </Stats>
+        )}
+        <Stats onClick={()=> navigate("/settings-admin",{state:{gold:true,trial:false}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[gold] fa fa-solid fa-circle-user'></i>Gold Tier </div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.gold.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.gold.unpaid)}{summary.gold.unpaid} unpaid</div>
           </div>
         </Stats>
-        <Stats onClick={(e)=> navigate("/settings-admin",{state:{silver:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Silver Tier </div>}>
+        <Stats onClick={()=> navigate("/settings-admin",{state:{silver:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Silver Tier </div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.silver.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.silver.unpaid)}{summary.silver.unpaid} unpaid</div>
           </div>  
         </Stats>
-        <Stats onClick={(e)=> navigate("/settings-admin",{state:{bronze:true}})}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[tan] fa-solid fa-circle-user'></i>Bronze Tier</div>}>
+        <Stats onClick={()=> navigate("/settings-admin",{state:{bronze:true}})}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[tan] fa-solid fa-circle-user'></i>Bronze Tier</div>}>
         <div className='flex flex-col'>
           <div className='flex items-center justify-center text-3xl'>{summary.bronze.count}</div>
           <div className='flex gap-2 justify-center items-center'>{checkOrNah(summary.bronze.unpaid)}{summary.bronze.unpaid} unpaid</div>
@@ -212,10 +218,10 @@ async function countFailureTds() {
         
           </div>
         </Stats>*/}
-        <Stats onClick={(e)=> navigate("/settings-admin")}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Accounts</div>}>
+        <Stats onClick={()=> navigate("/settings-admin")}  header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl fa-solid fa-circle-user'></i>Total Accounts</div>}>
           <div className='flex items-center justify-center text-3xl'>{summary.totalAccounts}</div>
         </Stats>
-        <Stats onClick={(e)=> navigate("/settings-admin",{state:{trial:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
+        <Stats onClick={()=> navigate("/settings-admin",{state:{trial:true}})} header={<div className='flex gap-2 justify-center items-center text-white h-full border-b-[white] text-xl md:text-2xl'><i className='text-3xl text-[limegreen] fa-solid fa-circle-user'></i>Trials</div>}>
           <div className='flex items-center justify-center  text-3xl'>{summary.totalUnpaid}</div>
         </Stats>
       

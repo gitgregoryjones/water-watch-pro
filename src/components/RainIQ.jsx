@@ -661,7 +661,6 @@ export default function RainIQ() {
   const [analyzedLocations, setAnalyzedLocations] = useState([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showDetailedView, setShowDetailedView] = useState(false);
-  const [chartDisplayType, setChartDisplayType] = useState('bar');
 
   const selectedLocationResults = useMemo(() => {
     const reportDataByLocation = new Map(
@@ -1389,12 +1388,6 @@ export default function RainIQ() {
             table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
             th, td { border-bottom: 1px solid #d1d5db; text-align: left; padding: 8px; font-size: 12px; }
             th { background: #f8fafc; font-weight: 700; }
-            .bar-chart { margin: 6px 0 14px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
-            .bar-row { display: grid; grid-template-columns: minmax(90px, 180px) 1fr 56px; gap: 8px; align-items: center; margin: 6px 0; }
-            .bar-label { font-size: 11px; color: #334155; }
-            .bar-wrap { background: #e2e8f0; height: 12px; border-radius: 999px; overflow: hidden; }
-            .bar-fill { background: #1f4f7a; height: 100%; border-radius: 999px; }
-            .bar-value { font-size: 11px; color: #1f4f7a; text-align: right; font-weight: 600; }
             .pdf-footer {
               position: fixed;
               bottom: 12px;
@@ -1910,20 +1903,6 @@ export default function RainIQ() {
           </p>
         </div>
 
-        {showDetailedView && (
-          <div className="mt-3 flex items-center gap-3">
-            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200">Chart type</label>
-            <select
-              value={chartDisplayType}
-              onChange={(event) => setChartDisplayType(event.target.value)}
-              className="rounded border p-2 text-sm text-slate-800"
-            >
-              <option value="bar">Bar chart</option>
-              <option value="line">Line chart</option>
-            </select>
-          </div>
-        )}
-
         <div className="mt-4 flex items-center gap-3">
           <input
             id="detailed-view-toggle"
@@ -2001,7 +1980,6 @@ export default function RainIQ() {
         {hasExecutedQuery && !queryHasError && (
         <div className="mt-6 space-y-8">
           {selectedLocationResults.map((locationResult) => {
-            const locationChartMax = Math.max(...locationResult.chart.map((item) => item.value), 1);
             const sortedTableRows = sortTableRows(locationResult.rows, topRainfallDaysSort);
 
             return (
@@ -2019,7 +1997,7 @@ export default function RainIQ() {
                 </div>
 
                 {showDetailedView && selectedQuery !== 'totalRain' && (
-                  <div className="mt-6 grid gap-6 lg:grid-cols-2">
+                  <div className="mt-6">
                     <div className="rounded-lg border p-4">
                       <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Top hourly rainfall periods' : selectedQuery === 'maxRolling24hRainfall' ? 'Top rolling 24-hour windows' : selectedQuery === 'designStormComparison' ? 'NOAA Atlas 14 comparisons' : selectedQuery === 'stormEvents' ? 'Storm event timelines' : 'Top rainfall days'}</h4>
                       <div className="overflow-x-auto">
@@ -2060,61 +2038,6 @@ export default function RainIQ() {
                           </tbody>
                         </table>
                       </div>
-                    </div>
-
-                    <div className="rounded-lg border p-4">
-                      <h4 className="mb-3 text-lg font-semibold">{selectedQuery === 'maxHourlyRainfall' ? 'Hourly rainfall intensity over time' : selectedQuery === 'maxRolling24hRainfall' ? 'Rolling accumulation curve' : selectedQuery === 'designStormComparison' ? 'Design storm thresholds curve' : selectedQuery === 'stormEvents' ? 'Storm event totals' : 'Rainfall totals'}</h4>
-                      {chartDisplayType === 'line' ? (
-                        <div>
-                          <svg viewBox="0 0 600 220" className="h-56 w-full rounded border bg-white" preserveAspectRatio="none">
-                            {locationResult.chart.length > 1 && (
-                              <polyline
-                                fill="none"
-                                stroke="#1f4f7a"
-                                strokeWidth="3"
-                                points={locationResult.chart
-                                  .map((item, index) => {
-                                    const x = (index / (locationResult.chart.length - 1)) * 560 + 20;
-                                    const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
-                                    return `${x},${y}`;
-                                  })
-                                  .join(' ')}
-                              />
-                            )}
-                            {locationResult.chart.map((item, index) => {
-                              const x = locationResult.chart.length > 1
-                                ? (index / (locationResult.chart.length - 1)) * 560 + 20
-                                : 300;
-                              const y = 200 - ((Number(item.value || 0) / locationChartMax) * 160 + 20);
-                              return (
-                                <circle key={`${locationResult.id}-pt-${item.label}-${index}`} cx={x} cy={y} r="5" fill="#1f4f7a">
-                                  <title>{`${item.label}: ${item.value}`}</title>
-                                </circle>
-                              );
-                            })}
-                          </svg>
-                          <div className="mt-2 max-h-20 overflow-auto text-xs text-slate-500">
-                            {locationResult.chart.map((item) => `${item.label}: ${item.value}`).join(' • ')}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {locationResult.chart.map((item) => (
-                            <div key={`${locationResult.id}-${item.label}`}>
-                              <div className="mb-1 flex justify-between text-xs">
-                                <span>{item.label}</span>
-                                <span>{item.value}</span>
-                              </div>
-                              <div className="h-3 rounded bg-slate-200 dark:bg-slate-700">
-                                <div
-                                  className="h-3 rounded bg-[--main-2]"
-                                  style={{ width: `${(item.value / locationChartMax) * 100}%` }}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}

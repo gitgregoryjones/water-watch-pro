@@ -1544,6 +1544,7 @@ export default function RainIQ() {
         location_ids: locationIds,
         include_zero_days: includeZeroDays,
         ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
+        ...(selectedQuery === 'stormEvents' ? { gap_hours: Number(eventGapHours) } : {}),
         ...(['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) ? { data_source: hourlyDataSource } : {}),
         ...(selectedQuery === 'designStormComparison' ? {
           duration: designStormDuration,

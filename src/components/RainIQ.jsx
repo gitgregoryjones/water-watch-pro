@@ -376,6 +376,31 @@ const mockResponses = {
   },
 };
 
+
+const getDesignStormComparisonData = (locationData, selectedDuration) => {
+  const atlasComparison = locationData?.atlas14_comparison || {};
+  const durationKey = selectedDuration || locationData?.duration || '24h';
+  const durationComparison = atlasComparison?.[durationKey] || atlasComparison?.durations?.[durationKey] || atlasComparison;
+
+  return {
+    duration: durationKey,
+    observed: Number(
+      locationData?.observed_max_by_duration?.[durationKey]
+      ?? durationComparison?.observed_inches
+      ?? locationData?.observed_max_inches
+      ?? atlasComparison?.observed_inches
+      ?? 0,
+    ),
+    observedDatetime:
+      locationData?.observed_max_datetime_by_duration?.[durationKey]
+      ?? durationComparison?.observed_max_datetime
+      ?? locationData?.observed_max_datetime,
+    comparisons: durationComparison?.comparisons || [],
+    highestExceeded: durationComparison?.highest_exceeded_return_period_years,
+    exceedanceSummary: durationComparison?.exceedance_summary || locationData?.exceedance_summary,
+  };
+};
+
 const last4ReportQueryValues = ['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'];
 const goLive2027QueryGroups = ['Baseline Metrics', 'Compliance & Threshold Queries'];
 
@@ -977,26 +1002,31 @@ export default function RainIQ() {
 
 
       if (selectedQuery === 'designStormComparison' && reportLocationData) {
-        const observed = Number(reportLocationData.observed_max_inches || reportLocationData.atlas14_comparison?.observed_inches || 0);
-        const observedTs = formatDateTimeFromSql(reportLocationData.observed_max_datetime);
-        const duration = reportLocationData.duration || designStormDuration;
-        const comparisons = reportLocationData.atlas14_comparison?.comparisons || [];
-        const highestExceeded = reportLocationData.atlas14_comparison?.highest_exceeded_return_period_years;
+        const {
+          duration,
+          observed,
+          observedDatetime,
+          comparisons,
+          highestExceeded,
+          exceedanceSummary,
+        } = getDesignStormComparisonData(reportLocationData, designStormDuration);
+        const observedTs = formatDateTimeFromSql(observedDatetime);
         const selectedReturn = Number(designStormReturnPeriod);
         const selectedExceeded = comparisons.find((c) => Number(c.return_period_years) === selectedReturn)?.exceeded;
+        const durationLabel = duration === '1h' ? '1-hour' : '24-hour';
 
         return {
           id: locationId,
           locationName: reportLocationData.location_name || locationName,
           headline: selectedExceeded
-            ? `The observed rainfall at ${reportLocationData.location_name || locationName} exceeded the ${selectedReturn}-year ${duration} design storm on ${observedTs.date} at ${observedTs.time} with ${formatRainValue(observed)} inches.`
-            : `The observed rainfall at ${reportLocationData.location_name || locationName} did not exceed the ${selectedReturn}-year ${duration} design storm.`,
+            ? `The observed rainfall at ${reportLocationData.location_name || locationName} exceeded the ${selectedReturn}-year ${durationLabel} design storm on ${observedTs.date} at ${observedTs.time} with ${formatRainValue(observed)} inches.`
+            : `The observed rainfall at ${reportLocationData.location_name || locationName} did not exceed the ${selectedReturn}-year ${durationLabel} design storm.`,
           metrics: [
+            { label: 'Duration', value: durationLabel },
             { label: 'Observed maximum', value: `${formatRainValue(observed)} in` },
-            { label: 'Observed date/time', value: `${observedTs.date} ${observedTs.time}` },
-            { label: 'Exceedance summary', value: reportLocationData.exceedance_summary || (highestExceeded ? `Exceeded ${highestExceeded}-year level` : 'This event remained below the 1-year level.') },
+            { label: 'Exceedance summary', value: exceedanceSummary || (highestExceeded ? `Exceeded ${highestExceeded}-year level` : 'This event remained below the 1-year level.') },
           ],
-          columns: ['Return period (years)', 'Threshold (in)', 'Exceeded'],
+          columns: ['Return period (years)', `${durationLabel} threshold (in)`, 'Exceeded'],
           rows: comparisons.map((c) => [String(c.return_period_years), formatRainValue(c.threshold_inches), c.exceeded ? 'Yes' : 'No']),
           chart: comparisons.map((c) => ({ label: `${c.return_period_years}-yr`, value: Number(c.threshold_inches || 0) })),
         };
@@ -1515,7 +1545,12 @@ export default function RainIQ() {
         include_zero_days: includeZeroDays,
         ...(showThresholdInput && parsedThreshold !== null ? { threshold_inches: parsedThreshold } : {}),
         ...(selectedQuery === 'stormEvents' ? { gap_hours: Number(eventGapHours) } : {}),
-        ...(['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) ? { data_source: 'hourly' } : {}),
+        ...(['maxHourlyRainfall', 'maxRolling24hRainfall', 'designStormComparison', 'stormEvents'].includes(selectedQuery) ? { data_source: hourlyDataSource } : {}),
+        ...(selectedQuery === 'designStormComparison' ? {
+          duration: designStormDuration,
+          design_storm_duration: designStormDuration,
+          return_period_years: Number(designStormReturnPeriod),
+        } : {}),
       });
 
       activeQueryConfig.setResponse(data);

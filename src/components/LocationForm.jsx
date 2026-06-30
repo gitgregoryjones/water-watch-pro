@@ -20,12 +20,14 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [pickedLocation, setPickedLocation] = useState(null);
   const [responseData, setResponseData] = useState(null); // Store response data
+  const [localDataDateRange, setLocalDataDateRange] = useState(null);
   const [isWorking, setIsWorking] = useState(false)
   const isEditMode = locationToEdit !== null;
   const [msg,setMsg] = useState("")
   const {isActive} = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
   const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const clientId = user?.clients?.[0]?.id;
 
   const navigate = useNavigate();
 
@@ -42,6 +44,27 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
 
     }
   }, [locationToEdit, isEditMode]);
+
+  useEffect(() => {
+    const fetchLocalDataDateRange = async () => {
+      if (!isEditMode || !locationToEdit?.id || !clientId) {
+        setLocalDataDateRange(null);
+        return;
+      }
+
+      try {
+        const response = await api.get(
+          `/api/locations/${locationToEdit.id}/local_data_date_range?client_id=${clientId}`
+        );
+        setLocalDataDateRange(response.data);
+      } catch (error) {
+        console.error('Error fetching local data date range:', error.message);
+        setLocalDataDateRange(null);
+      }
+    };
+
+    fetchLocalDataDateRange();
+  }, [locationToEdit?.id, isEditMode, clientId]);
 
   useEffect(() => {
     if (!isClick2PointEnabled) return;
@@ -190,6 +213,12 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setMsg(<span className="text-[red]">{error.message}</span>)
       setIsWorking(false)
     }
+  };
+
+  const formatLocalDate = (date) => {
+    if (!date) return '';
+
+    return new Date(`${date}T00:00:00`).toLocaleDateString('EN-US');
   };
 
   const mapPickerCenter = isClick2MapPart2Enabled && pickedLocation ? pickedLocation : { lat: 39.5, lng: -98.35 };
@@ -387,6 +416,11 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
           <label className='text-sm'>Date data began</label>
           <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
+        </div>}
+
+        {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
+          <label className='text-sm'>Date Location Added</label>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={formatLocalDate(localDataDateRange?.min_local_date)}/>
         </div>}
 
         {/* Action Buttons */}

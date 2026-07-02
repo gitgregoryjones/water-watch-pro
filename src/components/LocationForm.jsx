@@ -412,16 +412,17 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
                           <div className='flex text-sm gap-2'>Upgrade to set distinct RapidRain thresholds <Link to={"/upgrade"}>Upgrade Now</Link></div>
             </div>)}
         </div>
-
-        {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
-          <label className='text-sm'>Date data began</label>
-          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
+         {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
+          <label className='text-sm'>Date Data began</label>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={formatLocalDate(localDataDateRange?.min_local_date)}/>
         </div>}
 
         {locationToEdit?.id && <div className='flex flex-col gap-2 my-4'>
           <label className='text-sm'>Date Location Added</label>
-          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={formatLocalDate(localDataDateRange?.min_local_date)}/>
+          <input className="text p-2 border rounded  border-slate-200" readOnly disabled value={new Date(locationToEdit?.created_at).toLocaleDateString("EN-US")}/>
         </div>}
+
+       
 
         {/* Action Buttons */}
         <div className="flex justify-between">

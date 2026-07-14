@@ -51,9 +51,18 @@ export const handler: Handler = async (event) => {
         customer: stripeCustomerId,
         usage: 'off_session',
         payment_method_types: ['card'],
+        metadata: {
+          flow: 'update_payment_method',
+        },
       },
       { idempotencyKey: event.headers['x-idempotency-key'] as string | undefined }
     );
+
+    const setupIntentCustomerId = typeof setupIntent.customer === 'string' ? setupIntent.customer : setupIntent.customer?.id;
+    if (setupIntentCustomerId !== stripeCustomerId) {
+      console.error('SetupIntent created without the authenticated Stripe customer', { setupIntentId: setupIntent.id });
+      return json(500, { error: 'Unable to start payment method update.' });
+    }
 
     if (!setupIntent.client_secret) {
       console.error('SetupIntent created without a client secret', { setupIntentId: setupIntent.id });

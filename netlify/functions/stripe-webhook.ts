@@ -13,6 +13,23 @@ function sign(s: string) {
   return crypto.createHmac('sha256', PRECHECKOUT_SECRET).update(s).digest('hex');
 }
 
+
+async function updateActiveSubscriptionDefaults(customerId: string, paymentMethodId: string) {
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+    status: 'active',
+    limit: 100,
+  });
+
+  await Promise.all(
+    subscriptions.data.map((subscription) =>
+      stripe.subscriptions.update(subscription.id, {
+        default_payment_method: paymentMethodId,
+      })
+    )
+  );
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return { statusCode: 405, body: 'Method Not Allowed' };
 
@@ -43,11 +60,17 @@ export const handler: Handler = async (event) => {
         return { statusCode: 400, body: 'Customer mismatch' };
       }
 
+      if (!paymentMethodCustomerId) {
+        await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+      }
+
       await stripe.customers.update(customerId, {
         invoice_settings: {
           default_payment_method: paymentMethodId,
         },
       });
+
+      await updateActiveSubscriptionDefaults(customerId, paymentMethodId);
 
       processedSetupIntentEvents.add(evt.id);
     }

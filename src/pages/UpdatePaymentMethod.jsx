@@ -144,7 +144,7 @@ export default function UpdatePaymentMethod() {
               <div className="space-y-4 rounded border border-green-200 bg-green-50 p-5 text-green-800">
                 <h3 className="text-xl font-bold">Payment method saved</h3>
                 <p>Your new card was saved securely. It may take a moment for the billing summary to reflect the update.</p>
-                <button onClick={() => navigate('/client-form', { state: { client: activeClient, myself: true } })} className="rounded bg-green-700 px-4 py-2 font-bold text-white">Back to account</button>
+                <button onClick={() => navigate('/client-form', { state: { client: activeClient, myself: true, paymentMethodSaved: true } })} className="rounded bg-green-700 px-4 py-2 font-bold text-white">Back to account</button>
               </div>
             )}
             {!loading && !error && !success && options && (

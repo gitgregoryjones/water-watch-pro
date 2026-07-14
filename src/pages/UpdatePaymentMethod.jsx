@@ -30,10 +30,11 @@ function PaymentMethodForm({ onSucceeded }) { // eslint-disable-line react/prop-
   const elements = useElements();
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!stripe || !elements || isSubmitting) return;
+    if (!stripe || !elements || !isPaymentElementReady || isSubmitting) return;
 
     setIsSubmitting(true);
     setMessage('');
@@ -62,17 +63,28 @@ function PaymentMethodForm({ onSucceeded }) { // eslint-disable-line react/prop-
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      {message && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{message}</div>}
-      <button
-        type="submit"
-        disabled={!stripe || !elements || isSubmitting}
-        className="w-full rounded-lg bg-[#128CA6] px-5 py-3 font-bold text-white shadow hover:bg-green-800 disabled:cursor-not-allowed disabled:bg-gray-400 md:w-auto"
+    <div className="relative min-h-[320px]" aria-busy={!isPaymentElementReady}>
+      {!isPaymentElementReady && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg border bg-gray-50 p-6 text-center text-gray-700">
+          <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <p className="text-lg font-semibold text-gray-800">Loading secure payment form…</p>
+        </div>
+      )}
+      <form
+        onSubmit={handleSubmit}
+        className={`space-y-6 transition-opacity duration-200 ${isPaymentElementReady ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       >
-        {isSubmitting ? 'Saving…' : 'Save payment method'}
-      </button>
-    </form>
+        <PaymentElement onReady={() => setIsPaymentElementReady(true)} />
+        {message && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{message}</div>}
+        <button
+          type="submit"
+          disabled={!stripe || !elements || !isPaymentElementReady || isSubmitting}
+          className="w-full rounded-lg bg-[#128CA6] px-5 py-3 font-bold text-white shadow hover:bg-green-800 disabled:cursor-not-allowed disabled:bg-gray-400 md:w-auto"
+        >
+          {isSubmitting ? 'Saving…' : 'Save payment method'}
+        </button>
+      </form>
+    </div>
   );
 }
 

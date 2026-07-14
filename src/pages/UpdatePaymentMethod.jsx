@@ -81,11 +81,18 @@ export default function UpdatePaymentMethod() {
   const user = useSelector((state) => state.userInfo.user);
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(new URLSearchParams(window.location.search).has('setup_intent'));
+  const [acknowledged, setAcknowledged] = useState(success);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
     if (success) {
+      setLoading(false);
+      return;
+    }
+
+    if (!acknowledged) {
       setLoading(false);
       return;
     }
@@ -116,7 +123,7 @@ export default function UpdatePaymentMethod() {
     }
     createSetupIntent();
     return () => controller.abort();
-  }, [success]);
+  }, [acknowledged, success]);
 
   const options = useMemo(() => clientSecret ? { clientSecret, appearance } : null, [clientSecret]);
   const activeClient = user?.clients?.[0];
@@ -127,14 +134,46 @@ export default function UpdatePaymentMethod() {
       <Card header={<SettingsMenu activeTab="mysubscription" />} className="border-[whitesmoke] md:rounded-[unset]">
         <div className="mx-auto w-full max-w-3xl p-6">
           <div className="rounded-2xl border bg-white p-6 shadow-md md:p-8">
-            <p className="mb-2 text-sm font-bold uppercase tracking-wide text-[#128CA6]">Secure billing</p>
-            <h2 className="mb-3 text-3xl font-bold text-gray-900">Update payment method</h2>
-            <p className="mb-6 text-gray-600">
-              Add a new card for {activeClient?.account_name || 'your account'}. Stripe securely collects the card details, and the new payment method will be used for future payments after it is saved.
-            </p>
+            {!acknowledged && !success && (
+              <div className="space-y-6">
+                <p className="mb-2 text-sm font-bold uppercase tracking-wide text-[#128CA6]">Billing authorization</p>
+                <h2 className="mb-3 text-3xl font-bold text-gray-900">Confirm Billing Authorization</h2>
+                <div className="space-y-3 text-gray-700">
+                  <p className="font-semibold">You acknowledge that:</p>
+                  <ul className="list-disc space-y-2 pl-6">
+                    <li>You are authorized by your organization to make billing changes.</li>
+                    <li>You understand future subscription charges will use this payment method.</li>
+                    <li>WaterWatch PRO does not store your complete credit card information.</li>
+                  </ul>
+                </div>
+                <label className="flex items-start gap-3 rounded-lg border bg-gray-50 p-4 text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={isAuthorized}
+                    onChange={(event) => {
+                      setIsAuthorized(event.target.checked);
+                      if (event.target.checked) setAcknowledged(true);
+                    }}
+                    className="mt-1 h-5 w-5 rounded border-gray-300 text-[#128CA6] focus:ring-[#128CA6]"
+                  />
+                  <span className="font-semibold">I confirm I am authorized to update this payment method.</span>
+                </label>
+                <p className="text-sm text-gray-600">Checking the box will continue to the secure payment form.</p>
+              </div>
+            )}
 
-            {loading && <div className="rounded-lg border bg-gray-50 p-4 text-gray-700">Loading secure payment form…</div>}
-            {error && (
+            {acknowledged && !success && (
+              <>
+                <p className="mb-2 text-sm font-bold uppercase tracking-wide text-[#128CA6]">Secure billing</p>
+                <h2 className="mb-3 text-3xl font-bold text-gray-900">Update payment method</h2>
+                <p className="mb-6 text-gray-600">
+                  Add a new card for {activeClient?.account_name || 'your account'}. Stripe securely collects the card details, and the new payment method will be used for future payments after it is saved.
+                </p>
+              </>
+            )}
+
+            {acknowledged && loading && <div className="rounded-lg border bg-gray-50 p-4 text-gray-700">Loading secure payment form…</div>}
+            {acknowledged && error && (
               <div className="space-y-4">
                 <div className="rounded border border-red-200 bg-red-50 p-4 text-red-700">{error}</div>
                 <button onClick={() => window.location.reload()} className="rounded bg-[#128CA6] px-4 py-2 font-bold text-white">Try again</button>
@@ -147,7 +186,7 @@ export default function UpdatePaymentMethod() {
                 <button onClick={() => navigate('/client-form', { state: { client: activeClient, myself: true, paymentMethodSaved: true } })} className="rounded bg-green-700 px-4 py-2 font-bold text-white">Back to account</button>
               </div>
             )}
-            {!loading && !error && !success && options && (
+            {acknowledged && !loading && !error && !success && options && (
               <Elements stripe={stripePromise} options={options}>
                 <PaymentMethodForm onSucceeded={() => setSuccess(true)} />
               </Elements>

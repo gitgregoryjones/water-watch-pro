@@ -66,6 +66,16 @@ async function getActiveSubscriptionDefaultPaymentMethod(stripeCustomerId: strin
   return defaultPaymentMethod || null;
 }
 
+async function getAttachedCardPaymentMethod(stripeCustomerId: string) {
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: stripeCustomerId,
+    type: 'card',
+    limit: 1,
+  });
+
+  return paymentMethods.data[0] || null;
+}
+
 export const handler: Handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: cors(), body: '' };
   if (event.httpMethod !== 'GET') return json(405, { error: 'Method Not Allowed' });
@@ -89,7 +99,11 @@ export const handler: Handler = async (event) => {
 
     if (customer.deleted) return json(200, { hasPaymentMethod: false, paymentMethod: null });
 
-    return json(200, summarizePaymentMethod(customer.invoice_settings?.default_payment_method));
+    const customerSummary = summarizePaymentMethod(customer.invoice_settings?.default_payment_method);
+    if (customerSummary.hasPaymentMethod) return json(200, customerSummary);
+
+    const attachedPaymentMethod = await getAttachedCardPaymentMethod(stripeCustomerId);
+    return json(200, summarizePaymentMethod(attachedPaymentMethod));
   } catch (error) {
     console.error('Failed to retrieve payment method summary', { message: error instanceof Error ? error.message : 'Unknown error' });
     return json(500, { error: 'Unable to retrieve payment method.' });

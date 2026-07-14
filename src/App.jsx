@@ -59,6 +59,7 @@ import ContactForm from "./components/ContactForm";
 import AnonymousReportForm from "./pages/AnonymousReportForm";
 import { useFeatureFlags } from "@geejay/use-feature-flags";
 import RainIQPage from "./pages/RainIQPage";
+import UpdatePaymentMethod from "./pages/UpdatePaymentMethod";
 
 
 
@@ -255,6 +256,8 @@ function App() {
        
 <Route path="/contact-form" element={<ContactForm />} />
 <Route path="/client-form" element={<ClientPage />} />
+<Route path="/update-payment-method" element={<UpdatePaymentMethod />} />
+<Route path="/payment-method-updated" element={<UpdatePaymentMethod />} />
 <Route path="/profile" element={<UserForm />} />
 
       </Routes>

@@ -317,6 +317,19 @@ const ClientForm = ({ clientToEdit,myself }) => {
           </div>}
          
           {!user.is_superuser && <div  className='my-4'>Contact support@waterwatchpro.com if you would like to suspend or cancel your account</div>}
+
+          {myself && !manualInvoice && stripeCustomerId && (
+            <div className="my-4 rounded-lg border border-[#128CA6]/30 bg-[#128CA6]/5 p-4">
+              <h3 className="text-lg font-bold text-gray-800">Payment method</h3>
+              <p className="mt-1 text-sm text-gray-600">Securely replace the card used for future subscription payments. Card details are collected by Stripe and are never stored by Water Watch Pro.</p>
+              <Link
+                to="/update-payment-method"
+                className="mt-4 inline-flex rounded-lg bg-[#128CA6] px-4 py-2 font-bold text-white shadow hover:bg-green-800"
+              >
+                Update payment method
+              </Link>
+            </div>
+          )}
           
           <div className='border p-4 rounded my-4'>
 

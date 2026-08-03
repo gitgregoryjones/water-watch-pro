@@ -6,10 +6,28 @@ import crypto from 'node:crypto';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-06-20' });
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 const PRECHECKOUT_SECRET = process.env.PRECHECKOUT_SECRET!;
+const processedSetupIntentEvents = new Set<string>();
 
 // same sign func as above
 function sign(s: string) {
   return crypto.createHmac('sha256', PRECHECKOUT_SECRET).update(s).digest('hex');
+}
+
+
+async function updateActiveSubscriptionDefaults(customerId: string, paymentMethodId: string) {
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+    status: 'active',
+    limit: 100,
+  });
+
+  await Promise.all(
+    subscriptions.data.map((subscription) =>
+      stripe.subscriptions.update(subscription.id, {
+        default_payment_method: paymentMethodId,
+      })
+    )
+  );
 }
 
 export const handler: Handler = async (event) => {
@@ -19,6 +37,43 @@ export const handler: Handler = async (event) => {
     const sig = event.headers['stripe-signature'] as string;
     const raw = event.isBase64Encoded ? Buffer.from(event.body || '', 'base64').toString('utf8') : event.body || '';
     const evt = stripe.webhooks.constructEvent(raw, sig, endpointSecret);
+
+    if (evt.type === 'setup_intent.succeeded') {
+      if (processedSetupIntentEvents.has(evt.id)) {
+        return { statusCode: 200, body: 'ok' };
+      }
+
+      const setupIntent = evt.data.object as Stripe.SetupIntent;
+      const customerId = typeof setupIntent.customer === 'string' ? setupIntent.customer : setupIntent.customer?.id;
+      const paymentMethodId = typeof setupIntent.payment_method === 'string' ? setupIntent.payment_method : setupIntent.payment_method?.id;
+
+      if (!customerId || !paymentMethodId) {
+        console.warn('setup_intent.succeeded missing customer or payment method', { setupIntentId: setupIntent.id });
+        return { statusCode: 200, body: 'ok' };
+      }
+
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+      const paymentMethodCustomerId = typeof paymentMethod.customer === 'string' ? paymentMethod.customer : paymentMethod.customer?.id;
+
+      if (paymentMethodCustomerId && paymentMethodCustomerId !== customerId) {
+        console.warn('SetupIntent payment method customer mismatch', { setupIntentId: setupIntent.id });
+        return { statusCode: 400, body: 'Customer mismatch' };
+      }
+
+      if (!paymentMethodCustomerId) {
+        await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+      }
+
+      await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      });
+
+      await updateActiveSubscriptionDefaults(customerId, paymentMethodId);
+
+      processedSetupIntentEvents.add(evt.id);
+    }
 
     if (evt.type === 'checkout.session.completed') {
       const session = evt.data.object as Stripe.Checkout.Session;

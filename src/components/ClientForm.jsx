@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaTimes } from 'react-icons/fa';
 import api from '../utility/api';
@@ -17,6 +17,26 @@ import {
   PHONE_INPUT_PATTERN,
   PHONE_VALIDATION_MESSAGE,
 } from '../utility/phoneValidation';
+
+const NETLIFY_FUNC_BASE = '/.netlify/functions';
+const CARD_BRANDS = {
+  visa: 'Visa',
+  mastercard: 'Mastercard',
+  amex: 'American Express',
+  discover: 'Discover',
+  diners: 'Diners Club',
+  jcb: 'JCB',
+  unionpay: 'UnionPay',
+  unknown: 'Card',
+};
+
+function formatCardBrand(brand) {
+  return CARD_BRANDS[String(brand || '').toLowerCase()] || 'Card';
+}
+
+function formatExpirationMonth(month) {
+  return String(month || '').padStart(2, '0');
+}
 
 const ClientForm = ({ clientToEdit,myself }) => {
 
@@ -37,10 +57,72 @@ const ClientForm = ({ clientToEdit,myself }) => {
   const [is_trial_account,setIsTrialAccount] = useState(clientToEdit?.is_trial_account)
   const [auto_add_locations, setAutoAddLocations] = useState(clientToEdit?.auto_add_locations || true)
   const [monthly_report_on, setMonthlyReportOn] = useState(clientToEdit?.monthly_report_on ?? false)
+  const [paymentMethodSummary, setPaymentMethodSummary] = useState(null);
+  const [paymentMethodLoading, setPaymentMethodLoading] = useState(false);
+  const [paymentMethodError, setPaymentMethodError] = useState('');
+  const [paymentMethodUpdating, setPaymentMethodUpdating] = useState(false);
   const user = useSelector((state) => state.userInfo.user);
   const dispatch = useDispatch();
   const { isActive } = useFeatureFlags();
   const showPlatinum = isActive('showPlatinum');
+  const location = useLocation();
+
+  const fetchPaymentMethodSummary = useCallback(async ({ showLoading = true } = {}) => {
+    if (!myself || manualInvoice || !stripeCustomerId) return null;
+
+    if (showLoading) setPaymentMethodLoading(true);
+    setPaymentMethodError('');
+
+    try {
+      const response = await fetch(`${NETLIFY_FUNC_BASE}/get-payment-method`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken') || ''}`,
+          Accept: 'application/json',
+        },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Unable to load payment method.');
+      setPaymentMethodSummary(data);
+      return data;
+    } catch (error) {
+      setPaymentMethodError(error.message || 'Unable to load payment method.');
+      return null;
+    } finally {
+      if (showLoading) setPaymentMethodLoading(false);
+    }
+  }, [manualInvoice, myself, stripeCustomerId]);
+
+  useEffect(() => {
+    fetchPaymentMethodSummary();
+  }, [fetchPaymentMethodSummary]);
+
+  useEffect(() => {
+    if (!location.state?.paymentMethodSaved || !myself || manualInvoice || !stripeCustomerId) return undefined;
+
+    let attempts = 0;
+    let cancelled = false;
+    setPaymentMethodUpdating(true);
+
+    const retrySummary = async () => {
+      attempts += 1;
+      const summary = await fetchPaymentMethodSummary({ showLoading: false });
+      if (cancelled) return;
+
+      if (summary?.hasPaymentMethod || attempts >= 5) {
+        setPaymentMethodUpdating(false);
+        return;
+      }
+
+      window.setTimeout(retrySummary, 1500);
+    };
+
+    retrySummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchPaymentMethodSummary, location.state, manualInvoice, myself, stripeCustomerId]);
 
   useEffect(()=>{
     setTimeout(()=>
@@ -317,6 +399,47 @@ const ClientForm = ({ clientToEdit,myself }) => {
           </div>}
          
           {!user.is_superuser && <div  className='my-4'>Contact support@waterwatchpro.com if you would like to suspend or cancel your account</div>}
+
+          {myself && !manualInvoice && stripeCustomerId && (
+            <div className="my-4 rounded-lg border border-[#128CA6]/30 bg-[#128CA6]/5 p-4">
+              <h3 className="text-lg font-bold text-gray-800">Payment method</h3>
+              <p className="mt-1 text-sm text-gray-600">Confirm or securely replace the card used for future subscription payments. Card details are collected by Stripe and are never stored by Water Watch Pro.</p>
+
+              {paymentMethodLoading && (
+                <div className="mt-4 animate-pulse rounded border bg-white p-4 text-sm text-gray-600">Loading payment method…</div>
+              )}
+
+              {paymentMethodError && !paymentMethodLoading && (
+                <div className="mt-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{paymentMethodError}</div>
+              )}
+
+              {paymentMethodUpdating && (
+                <div className="mt-4 rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">Your payment method was saved and is being updated.</div>
+              )}
+
+              {!paymentMethodLoading && !paymentMethodError && paymentMethodSummary?.hasPaymentMethod && paymentMethodSummary.paymentMethod && (
+                <div className="mt-4 rounded border bg-white p-4">
+                  <strong>
+                    {formatCardBrand(paymentMethodSummary.paymentMethod.brand)} ending in {paymentMethodSummary.paymentMethod.last4}
+                  </strong>
+                  <div className="mt-1 text-sm text-gray-700">
+                    Expires {formatExpirationMonth(paymentMethodSummary.paymentMethod.expMonth)}/{paymentMethodSummary.paymentMethod.expYear}
+                  </div>
+                </div>
+              )}
+
+              {!paymentMethodLoading && !paymentMethodError && paymentMethodSummary && !paymentMethodSummary.hasPaymentMethod && (
+                <p className="mt-4 rounded border bg-white p-4 text-gray-700">No payment method on file.</p>
+              )}
+
+              <Link
+                to="/update-payment-method"
+                className="mt-4 inline-flex rounded-lg bg-[#128CA6] px-4 py-2 font-bold text-white shadow hover:bg-green-800"
+              >
+                {paymentMethodSummary?.hasPaymentMethod ? 'Update payment method' : 'Add payment method'}
+              </Link>
+            </div>
+          )}
           
           <div className='border p-4 rounded my-4'>
 

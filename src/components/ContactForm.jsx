@@ -45,6 +45,8 @@ const ContactForm = ({  }) => {
 
       rapidrain_on: contactToEdit? contactToEdit?.rapidrain_on  : true,
       rapidrain_on_sms: contactToEdit? contactToEdit?.rapidrain_on_sms  : true,
+      storm_tracker_on: contactToEdit ? contactToEdit.storm_tracker_on : true,
+      storm_tracker_on_sms: contactToEdit ? contactToEdit.storm_tracker_on_sms : true,
       //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
@@ -220,6 +222,8 @@ const ContactForm = ({  }) => {
       exceed24h_on_sms: formData.exceed24h_on_sms,
       rapidrain_on : formData.rapidrain_on,
       rapidrain_on_sms: formData.rapidrain_on_sms,
+      storm_tracker_on: formData.storm_tracker_on,
+      storm_tracker_on_sms: formData.storm_tracker_on_sms,
     };
 
     try {

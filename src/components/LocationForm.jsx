@@ -164,10 +164,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
              setRapidRainThreshold(h24Threshold)
             
         } else 
-        if(![0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4].includes(parseFloat(rapidRainThreshold))){
+        if(!(parseFloat(rapidRainThreshold) > 0)){
             
         if(user?.clients?.[0]?.tier != "bronze") {
-            setMsg(<span className="text-[red]">Rapidrain Threshold must be one of 0.01, 0.1, 0.25, 0.5, 0.75, 1.0, 1.5, 2, 3, 4</span>)
+            setMsg(<span className="text-[red]">RapidRain Threshold must be greater than zero</span>)
             setIsWorking(false); 
         }
         success = false;

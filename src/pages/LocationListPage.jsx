@@ -102,6 +102,7 @@ const LocationListPage = () => {
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  hidden md:table-cell">Longitude</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky  md:table-cell top-0">24 Hour Threshold</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">Inspection Threshold</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">Dry Period</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap   hidden md:flex justify-center items-center sticky flex-col top-0">RapidRain Threshold {convertTier(user) == 1 ? <div><Link to="/upgrade">Upgrade Now</Link></div> : ''}</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>
@@ -116,6 +117,7 @@ const LocationListPage = () => {
                 <td className="text-sm border border-gray-300 p-2 hidden md:table-cell">{location.longitude}</td>
                 <td className="text-sm border border-gray-300 p-2 ">{location.h24_threshold}</td>
                 <td className="text-sm border border-gray-300 p-2">{location.inspection_threshold}</td>
+                <td className="text-sm border border-gray-300 p-2">{location.dry_period}</td>
                 <td className={`text-sm border border-gray-300 p-2 hidden md:table-cell ${convertTier(user) == 1 ? 'bg-slate-200' : ''} `}>{location.rapidrain_threshold}</td>
                 <td className="text-smm border border-gray-300 p-2 flex items-center gap-4">
                   <button

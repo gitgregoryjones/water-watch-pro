@@ -21,6 +21,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const [h24Threshold, setH24Threshold] = useState('');
   const [rapidRainThreshold, setRapidRainThreshold] = useState();
   const [inspectionThreshold, setInspectionThreshold] = useState('');
+  const [dryPeriod, setDryPeriod] = useState('');
   const [showMapPicker, setShowMapPicker] = useState(false);
   const [pickedLocation, setPickedLocation] = useState(null);
   const [responseData, setResponseData] = useState(null); // Store response data
@@ -44,6 +45,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setH24Threshold(locationToEdit.h24_threshold || .5);
       setRapidRainThreshold(locationToEdit.rapidrain_threshold || locationToEdit.h24_threshold);
       setInspectionThreshold(locationToEdit.inspection_threshold ?? '');
+      setDryPeriod(locationToEdit.dry_period ?? '');
 
 
 
@@ -187,6 +189,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       h24_threshold: parseFloat(h24Threshold),
       rapidrain_threshold: parseFloat(rapidRainThreshold ? rapidRainThreshold : h24Threshold),
       inspection_threshold: inspectionThreshold === '' ? null : parseFloat(inspectionThreshold),
+      dry_period: dryPeriod === '' ? null : parseFloat(dryPeriod),
     };
 
     const submitController = new AbortController();
@@ -415,6 +418,21 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
               <option value={o} key={i}>{o}</option>
             ))}
           </select>
+        </div>
+
+        {/* Dry Period */}
+        <div className="mb-4">
+          <label htmlFor="dryPeriod" className="block font-bold mb-2">
+            Dry Period
+          </label>
+          <input
+            type="number"
+            step="any"
+            id="dryPeriod"
+            value={dryPeriod}
+            onChange={(e) => setDryPeriod(e.target.value)}
+            className="border border-gray-300 rounded p-2 w-full"
+          />
         </div>
 
         {/* RapidRain Threshold */}

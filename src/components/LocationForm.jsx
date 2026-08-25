@@ -11,6 +11,7 @@ import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { trackAnalyticsEvent } from '../utility/analytics';
 
 const RAIN_THRESHOLD_OPTIONS = [.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4];
+const LOCATION_SUBMIT_TIMEOUT_MS = 15000;
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
@@ -188,18 +189,23 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       inspection_threshold: inspectionThreshold === '' ? null : parseFloat(inspectionThreshold),
     };
 
+    const submitController = new AbortController();
+    const submitTimeout = setTimeout(() => submitController.abort(), LOCATION_SUBMIT_TIMEOUT_MS);
+
     try {
       let response;
+      const requestConfig = { signal: submitController.signal };
       if (isEditMode) {
         // Update existing location using PATCH
         response = await api.patch(
           `/api/locations/${locationToEdit.id}?client_id=${user.clients[0].id}`,
-          locationData
+          locationData,
+          requestConfig
         );
         
       } else {
         // Create new location using POST
-        response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData);
+        response = await api.post(`/api/locations/?client_id=${user.clients[0].id}`, locationData, requestConfig);
         trackAnalyticsEvent('site_added', {
           site_id: response?.data?.id ? String(response.data.id) : name,
         });
@@ -208,14 +214,15 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
       setResponseData(response.data); // Store response data for display
       console.log('Response Data:', response.data); // Log the response data
       setMsg(<span className="text-[green]">Successfully Updated</span>)
-      setTimeout(()=>{
-        setIsWorking(false); 
-       
-        navigate("/location-list")
-        },2000)
+      navigate("/location-list")
     } catch (error) {
       console.error('Error submitting location:', error.message);
-      setMsg(<span className="text-[red]">{error.message}</span>)
+      const errorMessage = error.name === 'CanceledError'
+        ? 'The location update timed out. Please try again.'
+        : error.message;
+      setMsg(<span className="text-[red]">{errorMessage}</span>)
+    } finally {
+      clearTimeout(submitTimeout);
       setIsWorking(false)
     }
   };

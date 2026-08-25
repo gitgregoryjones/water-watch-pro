@@ -50,7 +50,7 @@ api.interceptors.response.use(
     }
 
     // Specific handling for 400 errors with "details"
-    if (error.response.data?.detail) {
+    if (error.response?.data?.detail) {
       if(error.response.data.detail instanceof Object){
           error.message = error.response.data.detail[0].msg;
       } else {

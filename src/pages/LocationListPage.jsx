@@ -102,7 +102,7 @@ const LocationListPage = () => {
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0  hidden md:table-cell">Longitude</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky  md:table-cell top-0">24 Hour Threshold</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">Inspection Threshold</th>
-              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">Dry Period</th>
+              <th className="text-sm border border-gray-300 p-2 text-left text-nowrap sticky top-0">Dry Period Hours</th>
               <th className="text-sm border border-gray-300 p-2 text-left text-nowrap   hidden md:flex justify-center items-center sticky flex-col top-0">RapidRain Threshold {convertTier(user) == 1 ? <div><Link to="/upgrade">Upgrade Now</Link></div> : ''}</th>
               <th className="text-sm border border-gray-300 p-2 text-left sticky top-0 w-full">Actions</th>
             </tr>

@@ -11,6 +11,7 @@ import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { trackAnalyticsEvent } from '../utility/analytics';
 
 const RAIN_THRESHOLD_OPTIONS = [.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4];
+const DRY_PERIOD_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 const LOCATION_SUBMIT_TIMEOUT_MS = 15000;
 
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
@@ -420,19 +421,22 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           </select>
         </div>
 
-        {/* Dry Period */}
+        {/* Dry Period Hours */}
         <div className="mb-4">
           <label htmlFor="dryPeriod" className="block font-bold mb-2">
-            Dry Period
+            Dry Period Hours
           </label>
-          <input
-            type="number"
-            step="any"
+          <select
             id="dryPeriod"
             value={dryPeriod}
             onChange={(e) => setDryPeriod(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-          />
+          >
+            <option value="">-- Select Dry Period Hours --</option>
+            {DRY_PERIOD_OPTIONS.map((hours) => (
+              <option value={hours} key={hours}>{hours}</option>
+            ))}
+          </select>
         </div>
 
         {/* RapidRain Threshold */}

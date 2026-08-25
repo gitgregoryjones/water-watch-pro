@@ -10,6 +10,8 @@ import { convertTier } from '../utility/loginUser';
 import { useFeatureFlags } from '@geejay/use-feature-flags';
 import { trackAnalyticsEvent } from '../utility/analytics';
 
+const RAIN_THRESHOLD_OPTIONS = [.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4];
+
 const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const user = useSelector((state) => state.userInfo.user);
   const [name, setName] = useState('');
@@ -383,7 +385,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             
           >
                  <option value="">-- Select Threshhold --</option>
-           {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
+           {RAIN_THRESHOLD_OPTIONS.map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
             })
             }
@@ -395,14 +397,17 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
           <label htmlFor="inspectionThreshold" className="block font-bold mb-2">
             Inspection Threshold (inches)
           </label>
-          <input
-            type="number"
-            step="any"
+          <select
             id="inspectionThreshold"
             value={inspectionThreshold}
             onChange={(e) => setInspectionThreshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
-          />
+          >
+            <option value="">-- Select Threshhold --</option>
+            {RAIN_THRESHOLD_OPTIONS.map((o, i) => (
+              <option value={o} key={i}>{o}</option>
+            ))}
+          </select>
         </div>
 
         {/* RapidRain Threshold */}
@@ -422,7 +427,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             >
               <option value="">-- Select Threshhold --</option>
           
-            {[.01, .1, .25, .5, .75, 1.0, 1.5, 2, 3, 4].map((o,i)=>{
+            {RAIN_THRESHOLD_OPTIONS.map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
             })
             }

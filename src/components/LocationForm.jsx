@@ -33,6 +33,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
   const {isActive} = useFeatureFlags();
   const isClick2PointEnabled = isActive('click2point');
   const isClick2MapPart2Enabled = isActive('click2mapPart2');
+  const isSept2026Enabled = isActive('SEPT_2026');
   const clientId = user?.clients?.[0]?.id;
 
   const navigate = useNavigate();
@@ -404,7 +405,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
         </div>
 
         {/* Inspection Threshold */}
-        <div className="mb-4">
+        {isSept2026Enabled && <div className="mb-4">
           <label htmlFor="inspectionThreshold" className="block font-bold mb-2">
             Inspection Threshold (inches)
           </label>
@@ -419,10 +420,10 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
               <option value={o} key={i}>{o}</option>
             ))}
           </select>
-        </div>
+        </div>}
 
         {/* Dry Period Hours */}
-        <div className="mb-4">
+        {isSept2026Enabled && <div className="mb-4">
           <label htmlFor="dryPeriod" className="block font-bold mb-2">
             Dry Period Hours
           </label>
@@ -437,7 +438,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
               <option value={hours} key={hours}>{hours}</option>
             ))}
           </select>
-        </div>
+        </div>}
 
         {/* RapidRain Threshold */}
         <div className="mb-4">

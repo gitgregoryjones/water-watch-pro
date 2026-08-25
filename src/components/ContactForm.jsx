@@ -62,6 +62,7 @@ const ContactForm = ({  }) => {
   const user = useSelector((state) => state.userInfo.user);
   const { isActive } = useFeatureFlags();
   const isSendMonthlyReportEnabled = isActive('send_monthly_report');
+  const isSept2026Enabled = isActive('SEPT_2026');
 
   //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
   
@@ -307,6 +308,8 @@ const ContactForm = ({  }) => {
     }, {});
   
     return Object.entries(groupedKeys).map(([header, { email, sms }]) => {
+      if (header === 'storm_tracker_on' && !isSept2026Enabled) return null;
+
       const label = header.replace(/_/g, ' '); // Create a readable header
       const formattedLabel = label
         .trim()

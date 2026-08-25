@@ -345,8 +345,8 @@ This location will be automatically added to your account. If you do NOT wish to
             <input type="text" disabled={searchParams.get("location_id")} required placeholder="Location Name"  value={loc.name} onChange={(e) => handleChange(e, i, 'name')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             </div>
             <div className='flex flex-col-reverse gap-1'>
-              <label className='text-[#128DA6] text-xs'>Latitude must be between 24 and 48 degrees</label>
-              <input type="number" disabled={searchParams.get("location_id")} step="any" required placeholder={"Latitude"} min="24" max="48" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
+              <label className='text-[#128DA6] text-xs'>Latitude must be between 24 and 49 degrees</label>
+              <input type="number" disabled={searchParams.get("location_id")} step="any" required placeholder={"Latitude"} min="24" max="49" value={loc.latitude} onChange={(e) => handleChange(e, i, 'latitude')} className="input placeholder:text-slate-500 border p-2 rounded-md" />
             </div>
             <div className='flex flex-col-reverse gap-1'>
             <label className='text-[#128DA6] text-xs'>Longitude must be between -122 and -66 degrees *</label>

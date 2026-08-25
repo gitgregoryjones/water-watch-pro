@@ -304,7 +304,7 @@ const FormWizardDelayed = () => {
         if (!formData.latitude && formData.latitude !== 0) return setErr('Latitude is required');
         const lon = Number(formData.longitude);
         const lat = Number(formData.latitude);
-        if (lat < 24 || lat > 48) return setErr('Latitude must be between 24 and 48 degrees');
+        if (lat < 24 || lat > 49) return setErr('Latitude must be between 24 and 49 degrees');
         
         // Normalize longitude immediately and use the normalized value for validation
         const fixedLon = lon > 0 ? -lon : lon;

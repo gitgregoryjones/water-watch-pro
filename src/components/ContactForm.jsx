@@ -45,6 +45,8 @@ const ContactForm = ({  }) => {
 
       rapidrain_on: contactToEdit? contactToEdit?.rapidrain_on  : true,
       rapidrain_on_sms: contactToEdit? contactToEdit?.rapidrain_on_sms  : true,
+      storm_tracker_on: contactToEdit ? contactToEdit.storm_tracker_on : true,
+      storm_tracker_on_sms: contactToEdit ? contactToEdit.storm_tracker_on_sms : true,
       //atlas14_1h_on: contactToEdit?.atlas14_1h_on,
       //atlas14_1h_on_sms: contactToEdit?.atlas14_1h_on_sms,
       //atlas14_first_on: contactToEdit?.atlas14_first_on,
@@ -60,6 +62,7 @@ const ContactForm = ({  }) => {
   const user = useSelector((state) => state.userInfo.user);
   const { isActive } = useFeatureFlags();
   const isSendMonthlyReportEnabled = isActive('send_monthly_report');
+  const isSept2026Enabled = isActive('SEPT_2026');
 
   //alert(`Contact Form Received ${contactToEdit?.user_id} ${contactToEdit.name}`)
   
@@ -220,6 +223,8 @@ const ContactForm = ({  }) => {
       exceed24h_on_sms: formData.exceed24h_on_sms,
       rapidrain_on : formData.rapidrain_on,
       rapidrain_on_sms: formData.rapidrain_on_sms,
+      storm_tracker_on: formData.storm_tracker_on,
+      storm_tracker_on_sms: formData.storm_tracker_on_sms,
     };
 
     try {
@@ -303,6 +308,8 @@ const ContactForm = ({  }) => {
     }, {});
   
     return Object.entries(groupedKeys).map(([header, { email, sms }]) => {
+      if (header === 'storm_tracker_on' && !isSept2026Enabled) return null;
+
       const label = header.replace(/_/g, ' '); // Create a readable header
       const formattedLabel = label
         .trim()

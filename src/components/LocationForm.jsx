@@ -396,7 +396,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             className="border border-gray-300 rounded p-2 w-full"
             
           >
-                 <option value="">-- Select Threshhold --</option>
+                 <option value="">-- Select Threshold --</option>
            {RAIN_THRESHOLD_OPTIONS.map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
             })
@@ -415,7 +415,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             onChange={(e) => setInspectionThreshold(e.target.value)}
             className="border border-gray-300 rounded p-2 w-full"
           >
-            <option value="">-- Select Threshhold --</option>
+            <option value="">-- Select Threshold --</option>
             {RAIN_THRESHOLD_OPTIONS.map((o, i) => (
               <option value={o} key={i}>{o}</option>
             ))}
@@ -455,7 +455,7 @@ const LocationForm = ({ locationToEdit = null, onSubmitSuccess }) => {
             
             
             >
-              <option value="">-- Select Threshhold --</option>
+              <option value="">-- Select Threshold --</option>
           
             {RAIN_THRESHOLD_OPTIONS.map((o,i)=>{
                 return <option value={o} key={i}>{o}</option>
